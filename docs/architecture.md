@@ -21,6 +21,29 @@
 | Recharts | React 친화적, 커스터마이즈 쉬움 |
 | Vercel | GitHub 연동 자동 배포, 무료 tier로 시작 가능 |
 
+## 타이머 정확도 전략
+
+브라우저는 비활성 탭의 `setInterval`/`setTimeout`을 최소 1초, 최대 1분 간격으로 throttle한다.
+포모도로 타이머가 백그라운드에서 멈추거나 드리프트가 발생하는 핵심 원인이다.
+
+**채택 전략: 절대 시간 기반 계산 + Page Visibility API**
+
+- 타이머 시작 시 `startedAt = Date.now()` 저장
+- 매 tick마다 `remainingSeconds = targetSeconds - Math.floor((Date.now() - startedAt) / 1000)` 재계산 → drift 누적 방지
+- `document.addEventListener('visibilitychange', ...)` 로 탭 복귀 시 즉시 재계산
+
+```ts
+// 나쁨 — setInterval 카운트다운은 백그라운드에서 throttle됨
+setInterval(() => setState(s => s.remainingSeconds - 1), 1000)
+
+// 좋음 — 경과 시간을 절대 시각 기준으로 재계산
+const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+const remaining = targetSeconds - elapsed
+```
+
+> Web Worker 방식(워커 스레드 타이머)이 정확도는 더 높지만 구현 복잡도가 높다.
+> MVP에서는 절대 시간 기반으로 충분하며, 드리프트 문제 재발 시 Web Worker로 전환한다.
+
 ## 배포 전략
 
 1. Vercel 무료 tier로 시작 (`pomodash.vercel.app`)
