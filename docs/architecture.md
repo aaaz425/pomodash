@@ -12,7 +12,7 @@
 
 | 기술 | 선택 이유 |
 |------|-----------|
-| Next.js 15 | Vercel 최적화, App Router로 SSR/CSR 혼용 용이 |
+| Next.js 16 | Vercel 최적화, App Router로 SSR/CSR 혼용 용이, Turbopack stable |
 | Tailwind CSS + shadcn/ui | 빠른 UI 구성, 디자인 시스템 일관성 |
 | Zustand | 타이머 전역 상태 관리, Redux 대비 보일러플레이트 적음 |
 | localStorage (MVP) | 로그인 없이 즉시 사용 가능, 진입 장벽 최소화 |
