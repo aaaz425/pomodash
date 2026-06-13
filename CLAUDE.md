@@ -5,7 +5,7 @@
 포트폴리오 프로젝트 (혼자 개발). 자세한 내용: `docs/vision.md`, `docs/architecture.md`
 
 ## 기술 스택
-Next.js 15 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Recharts · Vercel
+Next.js 15 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Posthog · Vercel
 
 ## 개발 명령어
 ```bash

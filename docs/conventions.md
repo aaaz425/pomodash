@@ -47,6 +47,7 @@ hooks/
 lib/
   storage.ts                # localStorage 추상화 + Zod 파싱 (docs/data-models.md 참조)
   notifications.ts          # Web Notifications API
+  analytics.ts              # Posthog 이벤트 래핑 — 컴포넌트에서 posthog 직접 import 금지
 workers/
   timer.worker.ts           # (선택) Web Worker — MVP 이후 드리프트 재발 시 도입
 types/
@@ -155,6 +156,26 @@ const store = useTimerStore((s) => s)
 // 좋음 — 필요한 값만 선택
 const isRunning = useTimerStore((s) => s.startedAt !== null)
 ```
+
+## Analytics 패턴
+
+Posthog를 `lib/analytics.ts`에 래핑한다. 컴포넌트가 `posthog`를 직접 import하지 않는다.
+
+```typescript
+// lib/analytics.ts
+export function trackEvent(event: string, properties?: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== 'production') return  // 개발 환경 비활성화
+  posthog.capture(event, properties)
+}
+
+// 사용 예시
+trackEvent('timer_completed', { phase: 'focus', minutes: 25 })
+trackEvent('focus_mode_entered')
+```
+
+추적 이벤트 목록: `timer_started`, `timer_completed`, `focus_mode_entered`, `task_created`, `session_note_written`, `dashboard_viewed`
+
+---
 
 ## 기타
 
