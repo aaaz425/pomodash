@@ -1,0 +1,10 @@
+# type: 설명 (50자 이내, 한국어, 동사로 시작, 마침표 없음)
+# type: feat | fix | refactor | style | chore | docs | perf | ci
+
+
+# 본문 — WHY를 설명한다. WHAT은 코드가 말한다. (선택사항)
+# 72자 이내로 줄 바꿈
+
+
+# Breaking Change가 있으면:
+# BREAKING CHANGE: 설명
