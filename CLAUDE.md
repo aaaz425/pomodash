@@ -86,4 +86,4 @@ git fetch origin && git rebase origin/main
 ## 주요 결정사항
 - AI API 없이도 완전히 작동 (Claude API는 MVP 이후 선택적 추가)
 - localStorage만 사용 (로그인 없음, 진입 장벽 최소화)
-- 다크 모드 우선 디자인
+- 다크 모드 우선 + 라이트 모드 지원 (시스템 설정 연동, 수동 전환 가능)
