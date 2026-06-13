@@ -19,6 +19,11 @@
 | Supabase (이후) | localStorage에서 클라우드 동기화로 마이그레이션 |
 | Clerk (이후) | 인증 도입 시점에 빠른 연동 |
 | Recharts | React 친화적, 커스터마이즈 쉬움 |
+| date-fns | 대시보드 날짜 조작 (일/주/월 그루핑, 스트릭 계산). native Date 대비 코드량 절감 |
+| react-hook-form + @hookform/resolvers | shadcn/ui `<Form>` 컴포넌트 의존성, Zod 스키마와 폼 검증 일원화 |
+| framer-motion | 집중 모드 전환 애니메이션 |
+| Vercel Analytics | 페이지뷰, Web Vitals 모니터링. 쿠키 없음, GDPR 준수 |
+| Posthog | 제품 지표 (타이머 완료율, 기능별 사용 비율 등). 무료 1M 이벤트/월 |
 | Vercel | GitHub 연동 자동 배포, 무료 tier로 시작 가능 |
 
 ## 타이머 정확도 전략
