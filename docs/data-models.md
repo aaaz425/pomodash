@@ -52,6 +52,54 @@ const STORAGE_KEYS = {
 } as const
 ```
 
+## localStorage 접근 패턴
+
+localStorage 데이터는 외부 입력이므로 반드시 런타임 검증을 거친다.
+Zod 스키마로 파싱 + 타입 추론을 일원화하고, SSR 환경을 방어한다.
+
+```typescript
+import { z } from 'zod'
+
+// 스키마 정의 (types/index.ts의 interface와 1:1 대응)
+const TaskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  categoryId: z.string(),
+  targetMinutes: z.number(),
+  completed: z.boolean(),
+  createdAt: z.string(),
+})
+const TasksSchema = z.array(TaskSchema)
+
+// lib/storage.ts — 제네릭 유틸
+function loadFromStorage<T>(key: string, schema: z.ZodType<T>, fallback: T): T {
+  if (typeof window === 'undefined') return fallback  // SSR guard
+  try {
+    const raw = localStorage.getItem(key)
+    if (!raw) return fallback
+    return schema.parse(JSON.parse(raw))
+  } catch {
+    return fallback  // 파싱 실패 시 기본값 fallback (구버전 데이터 방어)
+  }
+}
+```
+
+## 스키마 버저닝
+
+데이터 구조 변경 시 기존 localStorage 데이터와 충돌을 방지하기 위해 버전을 관리한다.
+
+```typescript
+const STORAGE_VERSION = 1
+
+// 버전 불일치 감지 시 초기화 또는 마이그레이션
+const storedVersion = localStorage.getItem('pomodash:version')
+if (Number(storedVersion) !== STORAGE_VERSION) {
+  // 마이그레이션 로직 또는 초기화
+  localStorage.clear()
+  localStorage.setItem('pomodash:version', String(STORAGE_VERSION))
+}
+```
+
 ## Default Values
 
 ```typescript

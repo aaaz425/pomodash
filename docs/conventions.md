@@ -3,32 +3,73 @@
 ## 폴더 구조
 
 ```
-app/                        # Next.js App Router 페이지
-  (main)/                   # 레이아웃 그룹
+app/                        # 라우팅 세그먼트만 — 비즈니스 로직 금지
+  (main)/
+    layout.tsx              # 공통 레이아웃 + StoreProvider
     page.tsx                # 메인 (타이머 + 작업 목록)
-    dashboard/page.tsx      # 대시보드
-    journal/page.tsx        # 기록 히스토리
+    loading.tsx             # Suspense 스켈레톤
+    error.tsx               # 에러 바운더리
+    dashboard/
+      page.tsx
+      loading.tsx
+    journal/
+      page.tsx
+      loading.tsx
   api/
     ai/route.ts             # Claude API (선택적)
 components/
   ui/                       # shadcn/ui 설치 경로 — 직접 수정 금지
-  timer/                    # 타이머 관련 컴포넌트
-  tasks/                    # 작업 관련 컴포넌트
-  dashboard/                # 대시보드 관련 컴포넌트
-  journal/                  # 기록 관련 컴포넌트
+  timer/                    # 타이머 feature
+    TimerDisplay.tsx
+    TimerControls.tsx
+    FocusMode.tsx           # 집중 모드 전환 래퍼
+  tasks/                    # 작업 feature
+    TaskList.tsx
+    TaskItem.tsx
+    TaskForm.tsx
+  dashboard/                # 대시보드 feature
+    StudyChart.tsx
+    StreakCard.tsx
+  journal/                  # 기록 feature
+    SessionNote.tsx
+    SessionHistory.tsx
+  shared/                   # 여러 feature에서 공유하는 컴포넌트
+    CategoryBadge.tsx
+    MotivationalMessage.tsx
 store/
   timerStore.ts
   taskStore.ts
   sessionStore.ts
+  StoreProvider.tsx         # SSR 안전 초기화용 Provider — app/layout.tsx에 마운트
 hooks/
-  useTimer.ts
+  useTimer.ts               # 타이머 tick 로직 + visibilitychange 처리
   useTasks.ts
 lib/
-  storage.ts                # localStorage 추상화
-  notifications.ts          # Web Notifications
+  storage.ts                # localStorage 추상화 + Zod 파싱 (docs/data-models.md 참조)
+  notifications.ts          # Web Notifications API
+workers/
+  timer.worker.ts           # (선택) Web Worker — MVP 이후 드리프트 재발 시 도입
 types/
   index.ts                  # 모든 타입 (docs/data-models.md 참조)
 ```
+
+### 무엇이 어디에 들어가는가
+
+| 코드 종류 | 위치 |
+|-----------|------|
+| 페이지 라우트, 레이아웃 | `app/` |
+| UI 컴포넌트 (feature별) | `components/<feature>/` |
+| 여러 feature에서 쓰는 컴포넌트 | `components/shared/` |
+| shadcn/ui 원본 | `components/ui/` (수정 금지) |
+| 전역 상태 | `store/` |
+| 브라우저 API 추상화 훅 | `hooks/` |
+| 순수 유틸 (브라우저/서버 무관) | `lib/` |
+| 공유 TypeScript 타입 | `types/index.ts` |
+
+### 의존성 방향 규칙
+
+`app/ → components/ → lib/` 단방향만 허용.
+`lib/`에서 `components/`나 `app/`을 import하는 것은 금지한다.
 
 ## 네이밍
 
@@ -49,11 +90,18 @@ types/
 
 ## Zustand 스토어 패턴
 
+Next.js 15 SSR 환경에서 전역 싱글톤 스토어는 요청 간 상태 공유 버그를 유발한다.
+**팩토리 함수 + StoreProvider 패턴**을 반드시 사용한다.
+
 ```typescript
+// store/timerStore.ts — 팩토리 함수로 정의
+import { createStore } from 'zustand'
+
 interface TimerStore {
   // state
   phase: TimerPhase
   remainingSeconds: number
+  startedAt: number | null    // 절대 시간 기반 계산용
 
   // actions
   start: () => void
@@ -61,12 +109,51 @@ interface TimerStore {
   reset: () => void
 }
 
-export const useTimerStore = create<TimerStore>()(
-  devtools((set) => ({
-    // state 초기값
-    // actions
+export const createTimerStore = () =>
+  createStore<TimerStore>()((set) => ({
+    phase: 'focus',
+    remainingSeconds: 25 * 60,
+    startedAt: null,
+    start: () => set({ startedAt: Date.now() }),
+    pause: () => set({ startedAt: null }),
+    reset: () => set({ remainingSeconds: 25 * 60, startedAt: null }),
   }))
-)
+
+export type TimerStoreApi = ReturnType<typeof createTimerStore>
+```
+
+```typescript
+// store/StoreProvider.tsx — 앱 최상단에서 한 번만 초기화
+'use client'
+import { createContext, useContext, useRef } from 'react'
+import { useStore } from 'zustand'
+import { createTimerStore, TimerStoreApi } from './timerStore'
+
+const TimerStoreContext = createContext<TimerStoreApi | null>(null)
+
+export function StoreProvider({ children }: { children: React.ReactNode }) {
+  const storeRef = useRef<TimerStoreApi | null>(null)
+  if (!storeRef.current) storeRef.current = createTimerStore()
+  return (
+    <TimerStoreContext.Provider value={storeRef.current}>
+      {children}
+    </TimerStoreContext.Provider>
+  )
+}
+
+export function useTimerStore<T>(selector: (state: TimerStore) => T) {
+  const store = useContext(TimerStoreContext)
+  if (!store) throw new Error('StoreProvider missing')
+  return useStore(store, selector)
+}
+```
+
+**컴포넌트에서 스토어 구독 시 slice 선택자 필수:**
+```ts
+// 나쁨 — 스토어 전체 구독으로 불필요한 리렌더링 발생
+const store = useTimerStore((s) => s)
+// 좋음 — 필요한 값만 선택
+const isRunning = useTimerStore((s) => s.startedAt !== null)
 ```
 
 ## 기타
