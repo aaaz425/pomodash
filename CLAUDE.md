@@ -56,15 +56,23 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 ---
 
 ## Git 워크플로우
-- **브랜치 내 중간 커밋**: 자동으로 진행
-- **squash commit 메시지 / PR 생성**: 초안 제시 → 승인 후 실행
-- **커밋 후 항상 push까지 실행**, 커밋한 브랜치명을 응답에 명시
 
-### Squash merge 후 필수 — 빠뜨리면 이미 머지된 커밋이 다음 PR에 다시 나타남
+### 전체 흐름 (Claude가 전담)
+1. 브랜치 내 중간 커밋 → **자동으로 진행** (커밋한 브랜치명 응답에 명시, 즉시 push)
+2. 작업 완료 → PR 제목/본문 초안 제시 → **승인 후** `gh pr create`
+3. **승인 후** `gh pr merge --squash`
+4. merge 직후 **반드시** `git fetch origin && git rebase origin/main` 실행
+5. 다음 브랜치 생성
+
+### 핵심 규칙
+- 커밋 후 항상 **즉시 push**, 브랜치명 응답에 명시
+- Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
+- Squash merge 후 rebase 누락 시 이미 머지된 커밋이 다음 PR에 중복 등장함
+
 ```bash
+# merge 후 항상 실행
 git fetch origin && git rebase origin/main
 ```
-새 브랜치 시작 전, 또는 PR이 merge된 브랜치에서 계속 작업하기 전 **반드시** 실행.
 
 - 자세한 내용: `docs/commit-convention.md`
 
