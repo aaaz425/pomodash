@@ -12,7 +12,7 @@
 
 ## Tech Stack
 
-Next.js 15 · Tailwind CSS · shadcn/ui · Zustand · Recharts · Vercel
+Next.js 16 · Tailwind CSS · shadcn/ui · Zustand · Recharts · Vercel
 
 ## Getting Started
 
