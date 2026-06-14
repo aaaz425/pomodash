@@ -19,7 +19,7 @@ export interface Task {
   createdAt: string // ISO 8601
 }
 
-export interface Session {
+export interface TimerRecord {
   id: string
   taskId: string
   phase: TimerPhase
@@ -54,7 +54,7 @@ export const TaskSchema = z.object({
   createdAt: z.string(),
 })
 
-export const SessionSchema = z.object({
+export const TimerRecordSchema = z.object({
   id: z.string(),
   taskId: z.string(),
   phase: z.enum(['focus', 'short-break', 'long-break']),
@@ -66,14 +66,14 @@ export const SessionSchema = z.object({
 
 export const CategoriesSchema = z.array(CategorySchema)
 export const TasksSchema = z.array(TaskSchema)
-export const SessionsSchema = z.array(SessionSchema)
+export const TimerRecordsSchema = z.array(TimerRecordSchema)
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
 export const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
-  sessions: 'pomodash:sessions',
+  timerRecords: 'pomodash:timer-records',
   version: 'pomodash:version',
 } as const
 
