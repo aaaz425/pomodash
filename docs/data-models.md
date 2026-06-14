@@ -11,13 +11,16 @@
 완료 후 긴 휴식으로 세션이 마무리된다. 사용자는 세션을 시작/종료하며
 작업을 관리한다.
 
+**세션 메모(note):** 세션 완료 후 사용자가 1회 작성하는 회고 메모.
+현재 `TimerRecord`와 별개 개념으로, 향후 별도 모델로 구현 예정.
+
 ### 사이클 (Cycle)
 세션 내의 반복 단위. focus → short-break 한 쌍.
 `cyclesBeforeLongBreak`(기본 4)회 완료 시 long-break로 세션 종료.
 
 ### 타이머 기록 (TimerRecord)
 개별 타이머 phase(focus / short-break / long-break) 1회의 실행 기록.
-`TimerRecord` 인터페이스가 이를 나타낸다.
+`focusMinutes`는 설정값이 아닌 **실제 집중한 분 수** (일시정지·중단 시 더 짧을 수 있음).
 
 ---
 
@@ -36,7 +39,7 @@ export interface Task {
   id: string
   title: string
   categoryId: string
-  targetMinutes: number
+  targetMinutes: number // 총 누적 집중 목표 분 (진행도 표시용, 완료는 사용자 수동 설정)
   completed: boolean
   createdAt: string // ISO 8601
 }
@@ -45,18 +48,16 @@ export interface TimerRecord {
   id: string
   taskId: string
   phase: TimerPhase
-  startedAt: string  // ISO 8601
-  endedAt: string    // ISO 8601
-  focusMinutes: number
-  note: string
+  startedAt: string // ISO 8601
+  endedAt: string   // ISO 8601
+  focusMinutes: number // 실제 집중한 분 수 (일시정지·중단 시 설정값보다 작을 수 있음)
 }
 
-export interface TimerState {
-  phase: TimerPhase
-  remainingSeconds: number
-  isRunning: boolean
-  currentTaskId: string | null
-  cycleCount: number // 완료된 focus 세션 수 (4마다 long-break)
+export interface TimerSettings {
+  focusMinutes: number
+  shortBreakMinutes: number
+  longBreakMinutes: number
+  cyclesBeforeLongBreak: number
 }
 ```
 
@@ -67,6 +68,8 @@ const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
   timerRecords: 'pomodash:timer-records',
+  timerSettings: 'pomodash:timer-settings',
+  version: 'pomodash:version',
 } as const
 ```
 
@@ -128,10 +131,20 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: '4', name: '독서', color: 'bg-purple-500' },
 ]
 
-const DEFAULT_TIMER_SETTINGS = {
+const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   focusMinutes: 25,
   shortBreakMinutes: 5,
   longBreakMinutes: 15,
   cyclesBeforeLongBreak: 4,
 }
+```
+
+## Zod 유효성 범위
+
+```typescript
+// TimerSettingsSchema 허용 범위
+focusMinutes: 1–60분
+shortBreakMinutes: 1–30분
+longBreakMinutes: 1–60분
+cyclesBeforeLongBreak: 1–10회
 ```
