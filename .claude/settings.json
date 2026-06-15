@@ -1,0 +1,9 @@
+{
+    "hooks": {
+      "Stop": [
+        {
+          "command": "git status --short 2>/dev/null | head -10"
+        }
+      ]
+    }
+  }
