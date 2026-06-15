@@ -14,7 +14,9 @@ export interface Task {
   id: string
   title: string
   categoryId: string
-  targetMinutes: number // 총 누적 집중 목표 분 (진행도 표시용, 완료는 사용자 수동 설정)
+  targetFocusMinutes: number // 사이클당 집중 시간 (분)
+  targetCycles: number       // 목표 사이클 수 (회)
+  targetBreakMinutes: number // 사이클 간 휴식 시간 (분)
   completed: boolean
   createdAt: string // ISO 8601
 }
@@ -47,7 +49,9 @@ export const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
   categoryId: z.string(),
-  targetMinutes: z.number(),
+  targetFocusMinutes: z.number().default(25),
+  targetCycles: z.number().default(4),
+  targetBreakMinutes: z.number().default(5),
   completed: z.boolean(),
   createdAt: z.string(),
 })
@@ -89,6 +93,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: '2', name: '업무', color: 'bg-green-500' },
   { id: '3', name: '운동', color: 'bg-orange-500' },
   { id: '4', name: '독서', color: 'bg-purple-500' },
+  { id: '5', name: '기타', color: 'bg-gray-500' },
 ]
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
