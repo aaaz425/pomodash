@@ -7264,6 +7264,36 @@
       "fill": "$canvas",
       "children": [
         {
+          "type": "ellipse",
+          "id": "YJ9Np",
+          "layoutPosition": "absolute",
+          "x": 590,
+          "y": 200,
+          "name": "Ambient Glow",
+          "fill": {
+            "type": "gradient",
+            "gradientType": "radial",
+            "enabled": true,
+            "rotation": 0,
+            "size": {
+              "width": 1,
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#10d9a030",
+                "position": 0
+              },
+              {
+                "color": "#10d9a000",
+                "position": 1
+              }
+            ]
+          },
+          "width": 500,
+          "height": 500
+        },
+        {
           "id": "kxZ8q",
           "type": "ref",
           "ref": "WyxYx",
