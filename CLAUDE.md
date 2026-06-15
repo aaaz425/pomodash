@@ -2,7 +2,7 @@
 
 ## 프로젝트 개요
 포모도로 타이머 기반 학습 집중 도구. 작업 계획 → 집중 타이머 → 세션 기록 → 대시보드.
-포트폴리오 프로젝트 (혼자 개발). 자세한 내용: `docs/vision.md`, `docs/architecture.md`
+자세한 내용: `docs/vision.md`, `docs/architecture.md`
 
 ## 기술 스택
 Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Posthog · Vercel
@@ -82,9 +82,14 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
 - Squash merge 후 rebase 누락 시 이미 머지된 커밋이 다음 PR에 중복 등장함
 
+### 로드맵 상태 관리 (docs/roadmap.md)
+- 브랜치 생성 시 → 해당 항목 `[ ]` → `[>]` 로 변경
+- Squash merge 완료 직후 → 해당 항목 `[>]` → `[x]` 로 변경
+- 두 시점 모두 **예외 없이** roadmap.md 업데이트 후 커밋/머지 진행
+
 ```bash
 # merge 후 항상 실행
-git fetch origin && git rebase origin/main
+git switch main && git fetch origin && git rebase origin/main && git branch -D <merged-branch>
 ```
 
 - 자세한 내용: `docs/commit-convention.md`
