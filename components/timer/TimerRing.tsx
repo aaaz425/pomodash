@@ -22,6 +22,12 @@ const PHASE_LABELS: Record<TimerPhase, string> = {
   'long-break': '긴 휴식',
 }
 
+const PHASE_GLOW: Record<TimerPhase, string> = {
+  focus:         'bg-[radial-gradient(circle,_#10d9a030_0%,_transparent_70%)]',
+  'short-break': 'bg-[radial-gradient(circle,_#60a5fa30_0%,_transparent_70%)]',
+  'long-break':  'bg-[radial-gradient(circle,_#a78bfa30_0%,_transparent_70%)]',
+}
+
 const BASE = 240
 const SW = 18
 const R = BASE / 2 - SW / 2
@@ -45,8 +51,11 @@ export function TimerRing() {
   const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0')
   const ss = String(displaySeconds % 60).padStart(2, '0')
 
+  const glow = PHASE_GLOW[phase]
+
   return (
     <div className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]">
+      <div className={`absolute pointer-events-none rounded-full w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] lg:w-[440px] lg:h-[440px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${glow}`} />
       <svg
         viewBox={`0 0 ${BASE} ${BASE}`}
         className="w-full h-full -rotate-90"
