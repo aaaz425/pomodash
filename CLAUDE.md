@@ -70,17 +70,20 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 ## Git 워크플로우
 
+> 1인 개발을 전제로 설계된 워크플로우. 개발 인원 충원 시 역할 분담, 브랜치 보호 규칙 등을 재검토해야 한다.
+
 ### 전체 흐름 (Claude가 전담)
 1. 브랜치 내 중간 커밋 → **자동으로 진행** (커밋한 브랜치명 응답에 명시, 즉시 push)
-2. 작업 완료 → PR 제목/본문 초안 제시 → **승인 후** `gh pr create`
-3. **승인 후** `gh pr merge --squash`
-4. merge 직후 **반드시** `git fetch origin && git rebase origin/main` 실행
-5. 다음 브랜치 생성
+2. PR 생성 전 → **반드시** feature 브랜치에서 `git fetch origin && git rebase origin/main` 실행 후 push
+3. 작업 완료 → PR 제목/본문 초안 제시 → **승인 후** `gh pr create`
+4. **승인 후** `gh pr merge --squash`
+5. merge 직후 **반드시** main으로 전환 후 정리
+6. 다음 브랜치 생성
 
 ### 핵심 규칙
 - 커밋 후 항상 **즉시 push**, 브랜치명 응답에 명시
 - Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
-- Squash merge 후 rebase 누락 시 이미 머지된 커밋이 다음 PR에 중복 등장함
+- PR 전 rebase 누락 시 GitHub에서 충돌 발생 → **PR 생성 전 반드시 실행**
 - 커밋 메시지: `docs/commit-convention.md` 형식만 사용
 - PR 본문: `.github/pull_request_template.md` 형식만 사용
 
@@ -90,8 +93,11 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 두 시점 모두 **예외 없이** roadmap.md 업데이트 후 커밋/머지 진행
 
 ```bash
+# PR 생성 전 (feature 브랜치에서)
+git fetch origin && git rebase origin/main
+
 # merge 후 항상 실행
-git switch main && git fetch origin && git rebase origin/main && git branch -D <merged-branch>
+git switch main && git pull && git branch -D <merged-branch>
 ```
 
 - 자세한 내용: `docs/commit-convention.md`
