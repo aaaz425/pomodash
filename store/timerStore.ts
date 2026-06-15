@@ -14,6 +14,7 @@ interface TimerStore {
 
   start: () => void
   pause: () => void
+  complete: () => void     // 타이머 0 도달 시 훅이 호출 — pause와 달리 remainingSeconds를 0으로 고정
   reset: () => void
   setPhase: (phase: TimerPhase) => void
   setCurrentTask: (taskId: string | null) => void
@@ -58,6 +59,11 @@ export const createTimerStore = () =>
         if (!startedAt) return
         const elapsed = Math.floor((Date.now() - startedAt) / 1000)
         set({ startedAt: null, remainingSeconds: Math.max(0, remainingSeconds - elapsed) })
+      },
+      complete: () => {
+        const { startedAt } = get()
+        if (!startedAt) return
+        set({ startedAt: null, remainingSeconds: 0 })
       },
       reset: () => {
         const seconds = phaseSeconds(get().settings)
