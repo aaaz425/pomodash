@@ -85,16 +85,21 @@ PR description의 "왜 이렇게 구현했나" 항목이 가장 중요한 부분
 
 ### Squash merge 절차 (Claude 전담)
 
-1. PR 제목/본문 초안 제시 → 승인 후 `gh pr create`
-2. 승인 후 `gh pr merge --squash`
-3. **merge 직후 반드시 실행:**
+1. PR 생성 전 feature 브랜치에서 반드시 실행:
 
 ```bash
-git switch main && git fetch origin && git rebase origin/main && git branch -D <merged-branch>
+git fetch origin && git rebase origin/main
 ```
 
-Squash merge는 브랜치 커밋을 새 해시로 교체해 main에 올린다.
-rebase를 빠뜨리면 이미 머지된 커밋이 다음 PR에 다시 나타난다.
+2. PR 제목/본문 초안 제시 → 승인 후 `gh pr create`
+3. 승인 후 `gh pr merge --squash`
+4. **merge 직후 반드시 실행:**
+
+```bash
+git switch main && git pull && git branch -D <merged-branch>
+```
+
+PR 전 rebase를 빠뜨리면 main에 쌓인 커밋과 충돌이 발생한다.
 
 ---
 
