@@ -24,7 +24,6 @@ export function CycleIndicator() {
       {Array.from({ length: cyclesBeforeLongBreak }).map((_, i) => {
         const isCompleted = isLongBreak || i < pos
         const isCurrent = !isCompleted && i === pos && phase === 'focus'
-        const isEmpty = !isCompleted && !isCurrent
 
         return (
           <div
@@ -33,7 +32,7 @@ export function CycleIndicator() {
               'w-2 h-2 rounded-full transition-all duration-300',
               isCompleted ? dotClass : '',
               isCurrent ? `${dotClass} animate-pulse` : '',
-              isEmpty ? 'border-[1.5px] border-border' : '',
+              !isCompleted && !isCurrent ? 'border-[1.5px] border-border' : '',
             ].filter(Boolean).join(' ')}
           />
         )
