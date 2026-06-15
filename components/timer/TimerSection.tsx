@@ -50,9 +50,8 @@ export function TimerSection() {
       <div className="flex items-center rounded-lg border border-border bg-card divide-x divide-border">
         {[
           { value: `${settings.focusMinutes}분`, label: '집중' },
-          { value: `${settings.shortBreakMinutes}분`, label: '짧은 휴식' },
-          { value: `${settings.longBreakMinutes}분`, label: '긴 휴식' },
-          { value: `${settings.cyclesBeforeLongBreak}회`, label: '사이클' },
+          { value: `${settings.shortBreakMinutes}분`, label: '휴식' },
+          { value: `${settings.totalCycles}회`, label: '사이클' },
         ].map(({ value, label }) => (
           <div key={label} className="flex flex-col items-center gap-0.5 px-4 py-2.5">
             <span className="text-sm font-semibold text-foreground">{value}</span>

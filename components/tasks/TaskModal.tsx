@@ -51,7 +51,7 @@ export function TaskModal() {
         updateSettings({
           focusMinutes: task.targetFocusMinutes,
           shortBreakMinutes: task.targetBreakMinutes,
-          cyclesBeforeLongBreak: task.targetCycles,
+          totalCycles: task.targetCycles,
         })
       }
     }

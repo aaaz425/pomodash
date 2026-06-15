@@ -5,8 +5,7 @@ import type { TimerPhase } from '@/types'
 
 const PHASE_LABELS: Record<TimerPhase, string> = {
   focus: '집중 중',
-  'short-break': '짧은 휴식',
-  'long-break': '긴 휴식',
+  'short-break': '휴식 중',
 }
 
 const PHASE_STYLES: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
@@ -19,11 +18,6 @@ const PHASE_STYLES: Record<TimerPhase, { bg: string; dot: string; text: string }
     bg: 'bg-[#60a5fa1a]',
     dot: 'bg-[#60a5fa]',
     text: 'text-[#60a5fa]',
-  },
-  'long-break': {
-    bg: 'bg-[#a78bfa1a]',
-    dot: 'bg-[#a78bfa]',
-    text: 'text-[#a78bfa]',
   },
 }
 

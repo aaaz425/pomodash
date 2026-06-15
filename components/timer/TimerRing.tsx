@@ -7,25 +7,21 @@ import type { TimerPhase } from '@/types'
 const PHASE_COLORS: Record<TimerPhase, string> = {
   focus: '#10d9a0',
   'short-break': '#60a5fa',
-  'long-break': '#a78bfa',
 }
 
 const PHASE_BADGE: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
   focus:         { bg: 'bg-[#10d9a01a]', dot: 'bg-[#10d9a0]', text: 'text-[#10d9a0]' },
   'short-break': { bg: 'bg-[#60a5fa1a]', dot: 'bg-[#60a5fa]', text: 'text-[#60a5fa]' },
-  'long-break':  { bg: 'bg-[#a78bfa1a]', dot: 'bg-[#a78bfa]', text: 'text-[#a78bfa]' },
 }
 
 const PHASE_LABELS: Record<TimerPhase, string> = {
   focus: '집중 중',
-  'short-break': '짧은 휴식',
-  'long-break': '긴 휴식',
+  'short-break': '휴식 중',
 }
 
 const PHASE_GLOW: Record<TimerPhase, string> = {
   focus:         'bg-[radial-gradient(circle,_#10d9a030_0%,_transparent_70%)]',
   'short-break': 'bg-[radial-gradient(circle,_#60a5fa30_0%,_transparent_70%)]',
-  'long-break':  'bg-[radial-gradient(circle,_#a78bfa30_0%,_transparent_70%)]',
 }
 
 const BASE = 240
@@ -39,7 +35,6 @@ export function TimerRing() {
     ({
       focus: s.settings.focusMinutes * 60,
       'short-break': s.settings.shortBreakMinutes * 60,
-      'long-break': s.settings.longBreakMinutes * 60,
     })[s.phase]
   )
 
