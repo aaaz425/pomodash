@@ -54,6 +54,13 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 절대 경로 import 사용 (`@/components/...`), 상대 경로 금지
 - shadcn/ui `components/ui/` 파일 직접 수정 금지 — 래퍼 컴포넌트 사용
 
+### 보안
+- `NEXT_PUBLIC_` 접두사는 브라우저에 완전히 노출됨 → **API 키에 절대 사용 금지**
+- Claude API 키 등 모든 시크릿은 `.env.local`에만, `app/api/` 서버 사이드에서만 사용
+- `.env.local` **절대 커밋 금지** — `.gitignore`에 있어도 `git add -f` 사용 금지
+- API 라우트 응답은 필요한 필드만 추출해서 반환 — 외부 API 응답 원본을 클라이언트에 그대로 전달 금지
+- `dangerouslySetInnerHTML` 사용 금지 — 사용자 입력을 HTML로 렌더링하는 경로 차단
+
 ### Verification (커밋 전 필수)
 - `npm run build` 통과 확인 (pre-commit hook이 tsc + lint를 강제하지만 미리 확인)
 - UI 변경 시 다크/라이트 모드 양쪽 확인
