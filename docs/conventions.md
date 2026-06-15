@@ -88,6 +88,7 @@ types/
 - 서버 컴포넌트 기본, 클라이언트 상태/이벤트 필요 시 `'use client'` 명시
 - props 타입은 파일 상단에 `interface Props` 로 정의
 - shadcn/ui 컴포넌트 우선 사용, 없을 때만 직접 작성
+- `button`, `[role="button"]`, `select`, `label[for]` 요소는 호버 시 `cursor: pointer` — `globals.css`에 레이어 밖(unlayered) 전역 규칙으로 적용되어 있으므로 개별 클래스 추가 불필요. `disabled` 상태에는 `cursor-not-allowed`를 명시적으로 추가한다.
 
 ## Zustand 스토어 패턴
 

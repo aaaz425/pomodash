@@ -39,7 +39,9 @@ export interface Task {
   id: string
   title: string
   categoryId: string
-  targetMinutes: number // 총 누적 집중 목표 분 (진행도 표시용, 완료는 사용자 수동 설정)
+  targetFocusMinutes: number // 사이클당 집중 시간 (분)
+  targetCycles: number       // 목표 사이클 수 (회)
+  targetBreakMinutes: number // 사이클 간 휴식 시간 (분)
   completed: boolean
   createdAt: string // ISO 8601
 }
