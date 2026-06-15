@@ -11,23 +11,24 @@ interface TimerStore {
   cycleCount: number       // 현재 세션 내 완료된 focus 수
   currentTaskId: string | null
   settings: TimerSettings
+  sessionEnded: boolean    // true일 때 세션 기록 모달 표시
 
   start: () => void
   pause: () => void
-  complete: () => void     // 타이머 0 도달 시 훅이 호출 — pause와 달리 remainingSeconds를 0으로 고정
+  complete: () => void     // 타이머 0 도달 시 훅이 호출
   reset: () => void
   setPhase: (phase: TimerPhase) => void
   setCurrentTask: (taskId: string | null) => void
   completeCycle: () => void
   updateSettings: (patch: Partial<TimerSettings>) => void
   endSession: () => void
+  dismissSessionRecord: () => void
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
   return {
     focus: settings.focusMinutes * 60,
     'short-break': settings.shortBreakMinutes * 60,
-    'long-break': settings.longBreakMinutes * 60,
   }
 }
 
@@ -53,6 +54,7 @@ export const createTimerStore = () =>
       cycleCount: 0,
       currentTaskId: null,
       settings,
+      sessionEnded: false,
 
       start: () => set({ startedAt: Date.now() }),
       pause: () => {
@@ -78,14 +80,13 @@ export const createTimerStore = () =>
       completeCycle: () => {
         const { cycleCount, settings } = get()
         const next = cycleCount + 1
-        const nextPhase: TimerPhase =
-          next % settings.cyclesBeforeLongBreak === 0 ? 'long-break' : 'short-break'
-        const seconds = phaseSeconds(settings)
-        set({ cycleCount: next, phase: nextPhase, remainingSeconds: seconds[nextPhase], startedAt: null })
-      },
-      endSession: () => {
-        const seconds = phaseSeconds(get().settings)
-        set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null })
+        if (next >= settings.totalCycles) {
+          // 마지막 사이클 완료 → 세션 종료
+          set({ cycleCount: next, startedAt: null, sessionEnded: true })
+        } else {
+          const seconds = phaseSeconds(settings)
+          set({ cycleCount: next, phase: 'short-break', remainingSeconds: seconds['short-break'], startedAt: null })
+        }
       },
       updateSettings: (patch) => {
         const next = { ...get().settings, ...patch }
@@ -94,6 +95,13 @@ export const createTimerStore = () =>
         }
         const seconds = phaseSeconds(next)
         set({ settings: next, remainingSeconds: seconds[get().phase] })
+      },
+      endSession: () => {
+        set({ startedAt: null, sessionEnded: true })
+      },
+      dismissSessionRecord: () => {
+        const seconds = phaseSeconds(get().settings)
+        set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null, sessionEnded: false })
       },
     }
   })

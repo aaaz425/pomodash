@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 // ─── Core Types ───────────────────────────────────────────────────────────────
 
-export type TimerPhase = 'focus' | 'short-break' | 'long-break'
+export type TimerPhase = 'focus' | 'short-break'
 
 export interface Category {
   id: string
@@ -33,8 +33,7 @@ export interface TimerRecord {
 export interface TimerSettings {
   focusMinutes: number
   shortBreakMinutes: number
-  longBreakMinutes: number
-  cyclesBeforeLongBreak: number
+  totalCycles: number // 세션당 총 사이클 수 (이전 cyclesBeforeLongBreak)
 }
 
 // ─── Zod Schemas ──────────────────────────────────────────────────────────────
@@ -59,17 +58,16 @@ export const TaskSchema = z.object({
 export const TimerRecordSchema = z.object({
   id: z.string(),
   taskId: z.string(),
-  phase: z.enum(['focus', 'short-break', 'long-break']),
+  phase: z.enum(['focus', 'short-break']),
   startedAt: z.string(),
   endedAt: z.string(),
   focusMinutes: z.number(),
 })
 
 export const TimerSettingsSchema = z.object({
-  focusMinutes: z.number().min(1).max(60),
-  shortBreakMinutes: z.number().min(1).max(30),
-  longBreakMinutes: z.number().min(1).max(60),
-  cyclesBeforeLongBreak: z.number().min(1).max(10),
+  focusMinutes: z.number().min(5).max(120),
+  shortBreakMinutes: z.number().min(0).max(60),
+  totalCycles: z.number().min(1).max(20),
 })
 
 export const CategoriesSchema = z.array(CategorySchema)
@@ -99,6 +97,5 @@ export const DEFAULT_CATEGORIES: Category[] = [
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   focusMinutes: 25,
   shortBreakMinutes: 5,
-  longBreakMinutes: 15,
-  cyclesBeforeLongBreak: 4,
+  totalCycles: 4,
 }

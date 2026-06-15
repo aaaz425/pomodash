@@ -46,12 +46,12 @@ describe('timerStore', () => {
     expect(store.getState().startedAt).toBe(null)
   })
 
-  it('completeCycle() — cyclesBeforeLongBreak(4)회 후 long-break로 전환', () => {
+  it('completeCycle() — totalCycles(4)회 완료 후 sessionEnded가 true로 설정', () => {
     const store = createTimerStore()
     for (let i = 0; i < 4; i++) store.getState().completeCycle()
 
     expect(store.getState().cycleCount).toBe(4)
-    expect(store.getState().phase).toBe('long-break')
+    expect(store.getState().sessionEnded).toBe(true)
   })
 
   it('complete() — startedAt null, remainingSeconds 0으로 고정', () => {
