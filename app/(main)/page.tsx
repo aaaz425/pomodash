@@ -4,6 +4,7 @@ import { TopBar } from '@/components/shared/TopBar'
 import { BottomNav } from '@/components/shared/BottomNav'
 import { TimerSection } from '@/components/timer/TimerSection'
 import { TaskModal } from '@/components/tasks/TaskModal'
+import { SessionRecordModal } from '@/components/timer/SessionRecordModal'
 
 export default function HomePage() {
   return (
@@ -26,6 +27,7 @@ export default function HomePage() {
       <BottomNav />
 
       <TaskModal />
+      <SessionRecordModal />
     </div>
   )
 }
