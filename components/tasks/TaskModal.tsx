@@ -10,8 +10,10 @@ import { TaskAddModal } from './TaskAddModal'
 export function TaskModal() {
   const isOpen = useTaskStore((s) => s.isModalOpen)
   const closeModal = useTaskStore((s) => s.closeModal)
+  const tasks = useTaskStore((s) => s.tasks)
   const currentTaskId = useTimerStore((s) => s.currentTaskId)
   const setCurrentTask = useTimerStore((s) => s.setCurrentTask)
+  const updateSettings = useTimerStore((s) => s.updateSettings)
 
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -43,6 +45,16 @@ export function TaskModal() {
 
   function handleConfirm() {
     setCurrentTask(pendingTaskId)
+    if (pendingTaskId) {
+      const task = tasks.find((t) => t.id === pendingTaskId)
+      if (task) {
+        updateSettings({
+          focusMinutes: task.targetFocusMinutes,
+          shortBreakMinutes: task.targetBreakMinutes,
+          cyclesBeforeLongBreak: task.targetCycles,
+        })
+      }
+    }
     closeModal()
   }
 
