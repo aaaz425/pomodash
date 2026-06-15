@@ -6,17 +6,17 @@
 ## 개념 계층 (Concept Hierarchy)
 
 ### 세션 (Session)
-특정 작업에 할당된 집중 작업 단위. 한 세션 동안 여러 번의 포모도로
-사이클(집중 → 짧은 휴식)이 반복되며, `cyclesBeforeLongBreak` 사이클
-완료 후 긴 휴식으로 세션이 마무리된다. 사용자는 세션을 시작/종료하며
-작업을 관리한다.
+특정 작업에 할당된 집중 작업 단위. 한 세션은 `totalCycles`회의 사이클로 구성되며,
+마지막 사이클이 끝나면 세션 기록 모달이 표시되고 세션이 마무리된다.
+사용자는 세션을 시작/종료하며 작업을 관리한다.
 
-**세션 메모(note):** 세션 완료 후 사용자가 1회 작성하는 회고 메모.
+**세션 메모(note):** 세션이 완전히 끝난 후 사용자가 1회 작성하는 회고 메모. 최대 500자.
+사이클마다 작성하는 것이 아니라, 마지막 사이클 완료 시점에 한 번만 표시된다.
 현재 `TimerRecord`와 별개 개념으로, 향후 별도 모델로 구현 예정.
 
 ### 사이클 (Cycle)
 세션 내의 반복 단위. focus → short-break 한 쌍.
-`cyclesBeforeLongBreak`(기본 4)회 완료 시 long-break로 세션 종료.
+`totalCycles`(기본 4)회 완료 시 세션 종료.
 
 ### 타이머 기록 (TimerRecord)
 개별 타이머 phase(focus / short-break / long-break) 1회의 실행 기록.
@@ -27,7 +27,7 @@
 ## Core Types
 
 ```typescript
-export type TimerPhase = 'focus' | 'short-break' | 'long-break'
+export type TimerPhase = 'focus' | 'short-break'
 
 export interface Category {
   id: string
@@ -58,8 +58,7 @@ export interface TimerRecord {
 export interface TimerSettings {
   focusMinutes: number
   shortBreakMinutes: number
-  longBreakMinutes: number
-  cyclesBeforeLongBreak: number
+  totalCycles: number        // 세션당 총 사이클 수
 }
 ```
 
@@ -136,8 +135,7 @@ const DEFAULT_CATEGORIES: Category[] = [
 const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   focusMinutes: 25,
   shortBreakMinutes: 5,
-  longBreakMinutes: 15,
-  cyclesBeforeLongBreak: 4,
+  totalCycles: 4,
 }
 ```
 
@@ -145,8 +143,7 @@ const DEFAULT_TIMER_SETTINGS: TimerSettings = {
 
 ```typescript
 // TimerSettingsSchema 허용 범위
-focusMinutes: 1–60분
-shortBreakMinutes: 1–30분
-longBreakMinutes: 1–60분
-cyclesBeforeLongBreak: 1–10회
+focusMinutes: 5–120분
+shortBreakMinutes: 0–60분
+totalCycles: 1–20회
 ```
