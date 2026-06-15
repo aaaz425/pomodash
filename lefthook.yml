@@ -1,0 +1,13 @@
+pre-commit:
+  commands:
+    typecheck:
+      run: npx tsc --noEmit
+    lint:
+      run: npm run lint
+    # unit-test: vitest 도입 후 활성화
+    #   run: npm run test -- --run
+
+pre-push:
+  commands:
+    # e2e: Playwright 도입 후 활성화
+    #   run: npx playwright test

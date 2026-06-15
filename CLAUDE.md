@@ -12,6 +12,7 @@ Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Rechar
 npm run dev      # 로컬 개발 서버
 npm run build    # 프로덕션 빌드 — 커밋 전 반드시 통과 확인
 npm run lint     # 린트
+npm run test     # 단위 테스트 (vitest 도입 후)
 ```
 
 ---
@@ -53,6 +54,11 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 절대 경로 import 사용 (`@/components/...`), 상대 경로 금지
 - shadcn/ui `components/ui/` 파일 직접 수정 금지 — 래퍼 컴포넌트 사용
 
+### Verification (커밋 전 필수)
+- `npm run build` 통과 확인 (pre-commit hook이 tsc + lint를 강제하지만 미리 확인)
+- UI 변경 시 다크/라이트 모드 양쪽 확인
+- `lib/`, `store/` 변경 시 관련 단위 테스트 통과 확인
+
 ---
 
 ## Git 워크플로우
@@ -82,6 +88,7 @@ git fetch origin && git rebase origin/main
 @docs/data-models.md
 @docs/conventions.md
 @docs/commit-convention.md
+@docs/testing.md
 
 ## 주요 결정사항
 - AI API 없이도 완전히 작동 (Claude API는 MVP 이후 선택적 추가)
