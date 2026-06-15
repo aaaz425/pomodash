@@ -33,7 +33,7 @@ export function CycleIndicator() {
               'w-2 h-2 rounded-full transition-all duration-300',
               isCompleted ? dotClass : '',
               isCurrent ? `${dotClass} animate-pulse` : '',
-              isEmpty ? 'border-[1.5px] border-[#1e2d3d]' : '',
+              isEmpty ? 'border-[1.5px] border-border' : '',
             ].filter(Boolean).join(' ')}
           />
         )

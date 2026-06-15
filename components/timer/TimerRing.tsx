@@ -22,11 +22,13 @@ const PHASE_LABELS: Record<TimerPhase, string> = {
   'long-break': '긴 휴식',
 }
 
-interface Props {
-  size?: number
-}
+// SVG 좌표계 기준 크기 — CSS로 실제 표시 크기 제어
+const BASE = 240
+const SW = 18 // innerRadius 0.85 → 240 * 0.075
+const R = BASE / 2 - SW / 2
+const CIRC = 2 * Math.PI * R
 
-export function TimerRing({ size = 240 }: Props) {
+export function TimerRing() {
   const { displaySeconds, phase } = useTimer()
   const totalSeconds = useTimerStore((s) =>
     ({
@@ -36,42 +38,44 @@ export function TimerRing({ size = 240 }: Props) {
     })[s.phase]
   )
 
-  // innerRadius 0.85 → ring thickness = size * 0.075
-  const sw = Math.round(size * 0.075)
-  const r = size / 2 - sw / 2
-  const circ = 2 * Math.PI * r
-  const progress = totalSeconds > 0 ? displaySeconds / totalSeconds : 1
-  const dashOffset = circ * (1 - progress)
+  // 경과 시간 비율 → 시계방향으로 차오르는 애니메이션
+  const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0
+  const dashOffset = CIRC * (1 - elapsedFraction)
   const color = PHASE_COLORS[phase]
 
   const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0')
   const ss = String(displaySeconds % 60).padStart(2, '0')
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
+    // 반응형 크기: 모바일 180px / 태블릿 220px / 데스크탑 240px
+    <div className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]">
+      <svg
+        viewBox={`0 0 ${BASE} ${BASE}`}
+        className="w-full h-full -rotate-90"
+        aria-hidden="true"
+      >
         {/* Track */}
         <circle
-          cx={size / 2} cy={size / 2} r={r}
-          fill="none" stroke={color} strokeOpacity={0.1} strokeWidth={sw}
+          cx={BASE / 2} cy={BASE / 2} r={R}
+          fill="none" stroke={color} strokeOpacity={0.1} strokeWidth={SW}
         />
         {/* Progress */}
         <circle
-          cx={size / 2} cy={size / 2} r={r}
-          fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round"
-          strokeDasharray={circ} strokeDashoffset={dashOffset}
+          cx={BASE / 2} cy={BASE / 2} r={R}
+          fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round"
+          strokeDasharray={CIRC} strokeDashoffset={dashOffset}
           className="timer-progress-circle"
         />
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
         <time
-          className="font-mono font-bold tabular-nums text-foreground leading-none text-[3rem] tracking-[-2px]"
+          className="font-mono font-bold tabular-nums text-foreground leading-none tracking-[-2px] text-[1.75rem] sm:text-[2.5rem] lg:text-[3rem]"
           dateTime={`PT${Math.floor(displaySeconds / 60)}M${displaySeconds % 60}S`}
         >
           {mm}:{ss}
         </time>
-        <span className={`text-xs font-semibold tracking-[0.6px] ${PHASE_TEXT_CLASSES[phase]}`}>
+        <span className={`text-[10px] sm:text-xs font-semibold tracking-[0.6px] ${PHASE_TEXT_CLASSES[phase]}`}>
           {PHASE_LABELS[phase]}
         </span>
       </div>

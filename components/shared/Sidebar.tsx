@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Timer, TrendingUp, NotebookPen, Settings } from 'lucide-react'
+import { ThemeToggle } from './ThemeToggle'
 
 const NAV_ITEMS = [
   { href: '/', icon: Timer, label: '타이머' },
@@ -17,12 +18,10 @@ export function Sidebar() {
     <aside className="w-60 shrink-0 h-full flex flex-col justify-between bg-card border-r border-border">
       {/* Top: Logo + Nav */}
       <div className="flex flex-col">
-        {/* Logo */}
         <div className="h-16 flex items-center px-5 border-b border-border">
           <span className="text-primary text-base font-bold">Pomodash</span>
         </div>
 
-        {/* Nav */}
         <nav className="flex flex-col gap-0.5 px-2.5 py-3">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
             const isActive = pathname === href
@@ -33,7 +32,7 @@ export function Sidebar() {
                 className={[
                   'flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-[#10d9a01a] text-foreground'
+                    ? 'bg-primary/10 text-foreground'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 ].join(' ')}
               >
@@ -50,8 +49,9 @@ export function Sidebar() {
         </nav>
       </div>
 
-      {/* Bottom: Settings */}
+      {/* Bottom: Theme + Settings */}
       <div className="flex flex-col gap-0.5 px-2.5 py-3 border-t border-border">
+        <ThemeToggle showLabel className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
         <Link
           href="/settings"
           className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
