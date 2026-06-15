@@ -135,6 +135,13 @@
   }
 }
 
+button:not(:disabled),
+[role="button"],
+label[for],
+select:not(:disabled) {
+  cursor: pointer;
+}
+
 .timer-progress-circle {
   transition: stroke-dashoffset 1s linear;
 }
