@@ -1868,76 +1868,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "SUzm3",
-                              "name": "session-long",
-                              "width": 150,
-                              "cornerRadius": "$rounded-lg",
-                              "stroke": "$hairline",
-                              "strokeWidth": 1,
-                              "layout": "vertical",
-                              "children": [
-                                {
-                                  "type": "rectangle",
-                                  "cornerRadius": [
-                                    "$rounded-lg",
-                                    "$rounded-lg",
-                                    0,
-                                    0
-                                  ],
-                                  "id": "r5FBWw",
-                                  "name": "Color",
-                                  "fill": "$session-long",
-                                  "width": "fill_container",
-                                  "height": 64
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "K0dSF",
-                                  "name": "Meta",
-                                  "fill": "$surface-1",
-                                  "layout": "vertical",
-                                  "gap": 2,
-                                  "padding": [
-                                    10,
-                                    12
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "text",
-                                      "id": "voCt3",
-                                      "name": "Name",
-                                      "fill": "$ink",
-                                      "content": "session-long",
-                                      "fontFamily": "$font-ui",
-                                      "fontSize": 12,
-                                      "fontWeight": "500"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "L2afu",
-                                      "name": "Hex",
-                                      "fill": "$ink-subtle",
-                                      "content": "#a78bfa",
-                                      "fontFamily": "$font-mono",
-                                      "fontSize": 10,
-                                      "fontWeight": "normal"
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "f3gbub",
-                                      "name": "Note",
-                                      "fill": "$ink-tertiary",
-                                      "content": "긴 휴식 — 바이올렛",
-                                      "fontFamily": "$font-ui",
-                                      "fontSize": 10,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                }
-                              ]
                             }
                           ]
                         }
@@ -4073,11 +4003,11 @@
                                   "fill": "#a78bfa20",
                                   "descendants": {
                                     "s01jx": {
-                                      "fill": "$session-long"
+                                      "fill": "#a78bfa"
                                     },
                                     "E8HiJ": {
                                       "content": "긴 휴식",
-                                      "fill": "$session-long"
+                                      "fill": "#a78bfa"
                                     }
                                   }
                                 }
@@ -4395,48 +4325,6 @@
                                       "name": "State Label",
                                       "fill": "$ink-subtle",
                                       "content": "짧은 휴식",
-                                      "fontFamily": "$font-ui",
-                                      "fontSize": 12,
-                                      "fontWeight": "normal"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "frame",
-                                  "id": "osfFt",
-                                  "name": "긴 휴식 Col",
-                                  "layout": "vertical",
-                                  "gap": 10,
-                                  "alignItems": "center",
-                                  "children": [
-                                    {
-                                      "id": "d04Ci",
-                                      "type": "ref",
-                                      "ref": "S4xaQO",
-                                      "name": "긴 휴식 Timer",
-                                      "descendants": {
-                                        "z6njLO": {
-                                          "fill": "#a78bfa20"
-                                        },
-                                        "RiTPw": {
-                                          "fill": "$session-long",
-                                          "sweepAngle": -180
-                                        },
-                                        "JvfTX": {
-                                          "content": "15:00"
-                                        },
-                                        "d9Ejg": {
-                                          "content": "긴 휴식",
-                                          "fill": "$session-long"
-                                        }
-                                      }
-                                    },
-                                    {
-                                      "type": "text",
-                                      "id": "Pg6Zm",
-                                      "name": "State Label",
-                                      "fill": "$ink-subtle",
-                                      "content": "긴 휴식",
                                       "fontFamily": "$font-ui",
                                       "fontSize": 12,
                                       "fontWeight": "normal"
@@ -7536,39 +7424,7 @@
                           "type": "text",
                           "id": "USQsS",
                           "fill": "$ink-subtle",
-                          "content": "짧은 휴식",
-                          "fontFamily": "Inter",
-                          "fontSize": 10,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "r6VqR",
-                      "name": "Cell_긴 휴식",
-                      "layout": "vertical",
-                      "gap": 2,
-                      "padding": [
-                        10,
-                        16
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "l1c0w",
-                          "fill": "$ink",
-                          "content": "15분",
-                          "fontFamily": "Inter",
-                          "fontSize": 14,
-                          "fontWeight": "600"
-                        },
-                        {
-                          "type": "text",
-                          "id": "mLkOu",
-                          "fill": "$ink-subtle",
-                          "content": "긴 휴식",
+                          "content": "휴식",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -8727,38 +8583,6 @@
                         },
                         {
                           "type": "frame",
-                          "id": "lDzMV",
-                          "name": "Cell_긴 휴식",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "padding": [
-                            10,
-                            16
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "Q2oBEd",
-                              "fill": "$ink",
-                              "content": "15분",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "ZPLpb",
-                              "fill": "$ink-subtle",
-                              "content": "긴 휴식",
-                              "fontFamily": "Inter",
-                              "fontSize": 10,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
                           "id": "Ieq6Q",
                           "name": "Cell_사이클",
                           "layout": "vertical",
@@ -9107,7 +8931,7 @@
                       "id": "vSDmQ",
                       "name": "Cycle Label",
                       "fill": "$ink-subtle",
-                      "content": "오늘 사이클 2 / 4",
+                      "content": "완료된 사이클 2 / 4",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -9174,7 +8998,7 @@
                       "id": "sYvU2",
                       "name": "Char Count",
                       "fill": "$ink-tertiary",
-                      "content": "0 / 200",
+                      "content": "0 / 500",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -9185,64 +9009,40 @@
             },
             {
               "type": "frame",
-              "id": "C26QeX",
+              "id": "zFEOM",
               "name": "Actions",
               "width": "fill_container",
-              "justifyContent": "space_between",
+              "gap": 8,
+              "justifyContent": "end",
               "alignItems": "center",
               "children": [
                 {
-                  "id": "S0kUhK",
+                  "id": "Yh4nR",
                   "type": "ref",
-                  "ref": "Cmjw3",
-                  "name": "Next Phase",
-                  "fill": "#60a5fa1a",
+                  "ref": "ZIwra",
+                  "name": "Skip Btn",
                   "descendants": {
-                    "s01jx": {
-                      "fill": "#60a5fa"
+                    "R3YC3": {
+                      "enabled": false
                     },
-                    "E8HiJ": {
-                      "content": "짧은 휴식 예정",
-                      "fill": "#60a5fa"
+                    "EK7iN": {
+                      "content": "건너뛰기"
                     }
                   }
                 },
                 {
-                  "type": "frame",
-                  "id": "mmb3b",
-                  "name": "Btn Row",
-                  "gap": 8,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "id": "OGr3O",
-                      "type": "ref",
-                      "ref": "ZIwra",
-                      "name": "Skip Btn",
-                      "descendants": {
-                        "R3YC3": {
-                          "enabled": false
-                        },
-                        "EK7iN": {
-                          "content": "건너뛰기"
-                        }
-                      }
+                  "id": "Z302IV",
+                  "type": "ref",
+                  "ref": "DYjIX",
+                  "name": "Submit Btn",
+                  "descendants": {
+                    "Rx5jG": {
+                      "icon": "check"
                     },
-                    {
-                      "id": "cNPb0",
-                      "type": "ref",
-                      "ref": "DYjIX",
-                      "name": "Rest Btn",
-                      "descendants": {
-                        "Rx5jG": {
-                          "icon": "coffee"
-                        },
-                        "Tg2fx": {
-                          "content": "짧은 휴식 시작"
-                        }
-                      }
+                    "Tg2fx": {
+                      "content": "기록 완료"
                     }
-                  ]
+                  }
                 }
               ]
             }
@@ -13451,7 +13251,7 @@
       "id": "Q38rPk",
       "x": 2966,
       "y": 4960,
-      "name": "설정 Modal Page",
+      "name": " ",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -13730,38 +13530,6 @@
                               "id": "U0IX09",
                               "fill": "$ink-subtle",
                               "content": "짧은 휴식",
-                              "fontFamily": "Inter",
-                              "fontSize": 10,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "P1INVZ",
-                          "name": "Cell_긴 휴식",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "padding": [
-                            10,
-                            16
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "POAMt",
-                              "fill": "$ink",
-                              "content": "15분",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "iOfZA",
-                              "fill": "$ink-subtle",
-                              "content": "긴 휴식",
                               "fontFamily": "Inter",
                               "fontSize": 10,
                               "fontWeight": "normal"
@@ -14232,91 +14000,6 @@
                                 {
                                   "type": "icon",
                                   "id": "xSE5W",
-                                  "name": "Plus Icon",
-                                  "width": 14,
-                                  "height": 14,
-                                  "icon": "plus",
-                                  "library": "lucide",
-                                  "fill": "$ink-subtle"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "J6ySXj",
-                      "name": "Row_긴 휴식",
-                      "width": "fill_container",
-                      "justifyContent": "space_between",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "l3paW",
-                          "name": "Row Label",
-                          "fill": "$ink",
-                          "content": "긴 휴식",
-                          "fontFamily": "Inter",
-                          "fontSize": 13,
-                          "fontWeight": "500"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "U2h9Ot",
-                          "name": "Stepper",
-                          "gap": 12,
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "frame",
-                              "id": "PLx5B",
-                              "name": "Minus",
-                              "width": 28,
-                              "height": 28,
-                              "fill": "$surface-2",
-                              "cornerRadius": "$rounded-sm",
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "RFEPx",
-                                  "name": "Minus Icon",
-                                  "width": 14,
-                                  "height": 14,
-                                  "icon": "minus",
-                                  "library": "lucide",
-                                  "fill": "$ink-subtle"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "text",
-                              "id": "b5qlF",
-                              "name": "Value",
-                              "fill": "$ink",
-                              "content": "15분",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "frame",
-                              "id": "s6yiqP",
-                              "name": "Plus",
-                              "width": 28,
-                              "height": 28,
-                              "fill": "$surface-2",
-                              "cornerRadius": "$rounded-sm",
-                              "justifyContent": "center",
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "icon",
-                                  "id": "PbguV",
                                   "name": "Plus Icon",
                                   "width": 14,
                                   "height": 14,
@@ -14946,38 +14629,6 @@
                               "id": "oeS2c",
                               "fill": "$ink-subtle",
                               "content": "짧은 휴식",
-                              "fontFamily": "Inter",
-                              "fontSize": 10,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "SWfm6",
-                          "name": "Cell_긴 휴식",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "padding": [
-                            10,
-                            16
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "mMIHU",
-                              "fill": "$ink",
-                              "content": "15분",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "ebZsY",
-                              "fill": "$ink-subtle",
-                              "content": "긴 휴식",
                               "fontFamily": "Inter",
                               "fontSize": 10,
                               "fontWeight": "normal"
@@ -15844,38 +15495,6 @@
                                   "id": "XSy4N",
                                   "fill": "$ink-subtle",
                                   "content": "짧은 휴식",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "mTO2R",
-                              "name": "Cell_긴 휴식",
-                              "layout": "vertical",
-                              "gap": 2,
-                              "padding": [
-                                10,
-                                16
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "zyk2h",
-                                  "fill": "$ink",
-                                  "content": "15분",
-                                  "fontFamily": "Inter",
-                                  "fontSize": 14,
-                                  "fontWeight": "600"
-                                },
-                                {
-                                  "type": "text",
-                                  "id": "njC4g",
-                                  "fill": "$ink-subtle",
-                                  "content": "긴 휴식",
                                   "fontFamily": "Inter",
                                   "fontSize": 10,
                                   "fontWeight": "normal"
@@ -17151,10 +16770,6 @@
     "session-focus": {
       "type": "color",
       "value": "#10d9a0"
-    },
-    "session-long": {
-      "type": "color",
-      "value": "#a78bfa"
     },
     "session-short": {
       "type": "color",
