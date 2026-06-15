@@ -81,6 +81,8 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 커밋 후 항상 **즉시 push**, 브랜치명 응답에 명시
 - Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
 - Squash merge 후 rebase 누락 시 이미 머지된 커밋이 다음 PR에 중복 등장함
+- 커밋 메시지: `docs/commit-convention.md` 형식만 사용
+- PR 본문: `.github/pull_request_template.md` 형식만 사용
 
 ### 로드맵 상태 관리 (docs/roadmap.md)
 - 브랜치 생성 시 → 해당 항목 `[ ]` → `[>]` 로 변경
