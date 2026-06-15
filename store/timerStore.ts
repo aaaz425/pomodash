@@ -20,6 +20,7 @@ interface TimerStore {
   setCurrentTask: (taskId: string | null) => void
   completeCycle: () => void
   updateSettings: (patch: Partial<TimerSettings>) => void
+  endSession: () => void
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
@@ -81,6 +82,10 @@ export const createTimerStore = () =>
           next % settings.cyclesBeforeLongBreak === 0 ? 'long-break' : 'short-break'
         const seconds = phaseSeconds(settings)
         set({ cycleCount: next, phase: nextPhase, remainingSeconds: seconds[nextPhase], startedAt: null })
+      },
+      endSession: () => {
+        const seconds = phaseSeconds(get().settings)
+        set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null })
       },
       updateSettings: (patch) => {
         const next = { ...get().settings, ...patch }
