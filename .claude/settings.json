@@ -1,9 +1,17 @@
 {
-    "hooks": {
-      "Stop": [
-        {
-          "command": "git status --short 2>/dev/null | head -10"
-        }
-      ]
-    }
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "command": "ROADMAP=/Users/park/project/ai/pomodash/docs/roadmap.md; IN_PROGRESS=$(grep '^- \\[>\\]' \"$ROADMAP\" 2>/dev/null); [ -n \"$IN_PROGRESS\" ] && printf '── 진행 중 ──\\n%s\\n' \"$IN_PROGRESS\""
+      }
+    ],
+    "Stop": [
+      {
+        "command": "git status --short 2>/dev/null | head -10"
+      },
+      {
+        "command": "ROADMAP=/Users/park/project/ai/pomodash/docs/roadmap.md; NEXT=$(grep '^- \\[ \\]' \"$ROADMAP\" 2>/dev/null | head -3); [ -n \"$NEXT\" ] && printf '── 다음 작업 ──\\n%s\\n' \"$NEXT\""
+      }
+    ]
   }
+}
