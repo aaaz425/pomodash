@@ -2,6 +2,7 @@
 
 import { ListChecks } from 'lucide-react'
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
+import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { TimerRing } from '@/components/timer/TimerRing'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
@@ -9,13 +10,8 @@ import { TimerControls } from '@/components/timer/TimerControls'
 
 export function TimerSection() {
   const openModal = useTaskStore((s) => s.openModal)
-  const currentTaskId = useTimerStore((s) => s.currentTaskId)
   const settings = useTimerStore((s) => s.settings)
-  const tasks = useTaskStore((s) => s.tasks)
-  const categories = useTaskStore((s) => s.categories)
-
-  const task = tasks.find((t) => t.id === currentTaskId) ?? null
-  const category = task ? (categories.find((c) => c.id === task.categoryId) ?? null) : null
+  const { task, category } = useCurrentTask()
 
   return (
     <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">

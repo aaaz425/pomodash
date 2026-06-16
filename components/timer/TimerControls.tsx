@@ -8,13 +8,15 @@ export function TimerControls() {
   const start = useTimerStore((s) => s.start)
   const pause = useTimerStore((s) => s.pause)
   const endSession = useTimerStore((s) => s.endSession)
+  const enterFocusMode = useTimerStore((s) => s.enterFocusMode)
 
   return (
     <div className="flex items-center gap-2">
       <button
-        disabled
+        disabled={!isRunning}
+        onClick={enterFocusMode}
         aria-label="집중 모드"
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground opacity-60 cursor-not-allowed"
+        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
       >
         <Maximize2 className="w-3.5 h-3.5" />
         집중

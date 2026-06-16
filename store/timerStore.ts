@@ -12,6 +12,7 @@ interface TimerStore {
   currentTaskId: string | null
   settings: TimerSettings
   sessionEnded: boolean    // true일 때 세션 기록 모달 표시
+  isFocusMode: boolean     // true일 때 집중 모드 오버레이 표시
 
   start: () => void
   pause: () => void
@@ -23,6 +24,8 @@ interface TimerStore {
   updateSettings: (patch: Partial<TimerSettings>) => void
   endSession: () => void
   dismissSessionRecord: () => void
+  enterFocusMode: () => void
+  exitFocusMode: () => void
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
@@ -55,6 +58,7 @@ export const createTimerStore = () =>
       currentTaskId: null,
       settings,
       sessionEnded: false,
+      isFocusMode: false,
 
       start: () => set({ startedAt: Date.now() }),
       pause: () => {
@@ -64,9 +68,14 @@ export const createTimerStore = () =>
         set({ startedAt: null, remainingSeconds: Math.max(0, remainingSeconds - elapsed) })
       },
       complete: () => {
-        const { startedAt } = get()
+        const { startedAt, phase } = get()
         if (!startedAt) return
-        set({ startedAt: null, remainingSeconds: 0 })
+        // focus 종료 → 사이클 진행(휴식 전환 또는 세션 종료) / 휴식 종료 → 다음 focus로 전환
+        if (phase === 'focus') {
+          get().completeCycle()
+        } else {
+          get().setPhase('focus')
+        }
       },
       reset: () => {
         const seconds = phaseSeconds(get().settings)
@@ -82,7 +91,7 @@ export const createTimerStore = () =>
         const next = cycleCount + 1
         if (next >= settings.totalCycles) {
           // 마지막 사이클 완료 → 세션 종료
-          set({ cycleCount: next, startedAt: null, sessionEnded: true })
+          set({ cycleCount: next, startedAt: null, sessionEnded: true, isFocusMode: false })
         } else {
           const seconds = phaseSeconds(settings)
           set({ cycleCount: next, phase: 'short-break', remainingSeconds: seconds['short-break'], startedAt: null })
@@ -97,12 +106,14 @@ export const createTimerStore = () =>
         set({ settings: next, remainingSeconds: seconds[get().phase] })
       },
       endSession: () => {
-        set({ startedAt: null, sessionEnded: true })
+        set({ startedAt: null, sessionEnded: true, isFocusMode: false })
       },
       dismissSessionRecord: () => {
         const seconds = phaseSeconds(get().settings)
         set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null, sessionEnded: false })
       },
+      enterFocusMode: () => set({ isFocusMode: true }),
+      exitFocusMode: () => set({ isFocusMode: false }),
     }
   })
 

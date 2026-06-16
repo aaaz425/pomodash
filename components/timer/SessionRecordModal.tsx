@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Check } from 'lucide-react'
-import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
+import { useTimerStore } from '@/store/StoreProvider'
+import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
 
@@ -11,16 +12,11 @@ export function SessionRecordModal() {
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord)
   const cycleCount = useTimerStore((s) => s.cycleCount)
   const totalCycles = useTimerStore((s) => s.settings.totalCycles)
-  const currentTaskId = useTimerStore((s) => s.currentTaskId)
-  const tasks = useTaskStore((s) => s.tasks)
-  const categories = useTaskStore((s) => s.categories)
+  const { task, category } = useCurrentTask()
 
   const [note, setNote] = useState('')
 
   if (!sessionEnded) return null
-
-  const task = tasks.find((t) => t.id === currentTaskId) ?? null
-  const category = task ? (categories.find((c) => c.id === task.categoryId) ?? null) : null
 
   function handleSubmit() {
     dismissSessionRecord()
