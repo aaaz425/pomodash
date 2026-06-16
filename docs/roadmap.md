@@ -10,7 +10,7 @@
 ## Phase 1 — 타이머
 
 - [x] `chore/project-setup` — Next.js 15 + 패키지 + 폴더 구조 + 스캐폴드
-- [ ] `feat/timer-core` — timerStore 완성 (절대시간 기반) + useTimer 훅
+- [>] `feat/timer-core` — timerStore 완성 (절대시간 기반) + useTimer 훅
 - [ ] `feat/timer-ui` — TimerDisplay(링) + TimerControls + CycleIndicator + SessionBadge
 - [ ] `feat/focus-mode` — 집중 모드 오버레이 + framer-motion 전환 + 동기부여 메시지
 - [ ] `feat/session-settings` — 세션 시작 전 타이머 설정 UI (전역 설정값 기본)

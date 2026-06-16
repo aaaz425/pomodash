@@ -1,0 +1,211 @@
+'use client'
+
+import { useState } from 'react'
+import { Minus, Plus, X } from 'lucide-react'
+import { useTaskStore } from '@/store/StoreProvider'
+
+// ─── Stepper Input ────────────────────────────────────────────────────────────
+
+interface StepperProps {
+  value: number
+  onChange: (v: number) => void
+  min: number
+  max: number
+  step?: number
+  unit: string
+}
+
+function StepperInput({ value, onChange, min, max, step = 1, unit }: StepperProps) {
+  const [raw, setRaw] = useState('')
+  const [editing, setEditing] = useState(false)
+
+  function commit(s: string) {
+    const n = parseInt(s, 10)
+    if (!isNaN(n)) onChange(Math.max(min, Math.min(max, n)))
+    setEditing(false)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center rounded-lg border border-border bg-muted overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, value - step))}
+          aria-label="감소"
+          className="flex items-center justify-center w-8 h-9 text-muted-foreground hover:bg-border/50 hover:text-foreground transition-colors border-r border-border shrink-0"
+        >
+          <Minus className="w-3 h-3" />
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={editing ? raw : String(value)}
+          onFocus={() => { setRaw(String(value)); setEditing(true) }}
+          onChange={(e) => setRaw(e.target.value.replace(/\D/g, ''))}
+          onBlur={() => commit(raw)}
+          onKeyDown={(e) => e.key === 'Enter' && commit(raw)}
+          className="w-10 text-center text-sm font-semibold text-foreground bg-transparent focus:outline-none py-2"
+        />
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(max, value + step))}
+          aria-label="증가"
+          className="flex items-center justify-center w-8 h-9 text-muted-foreground hover:bg-border/50 hover:text-foreground transition-colors border-l border-border shrink-0"
+        >
+          <Plus className="w-3 h-3" />
+        </button>
+      </div>
+      <span className="text-sm text-muted-foreground w-4">{unit}</span>
+    </div>
+  )
+}
+
+// ─── Category Pills ────────────────────────────────────────────────────────────
+
+const PILL_COLORS: Record<string, { selected: string; dot: string; unselected: string }> = {
+  'bg-blue-500':   { selected: 'bg-blue-500/20 border border-blue-500 text-blue-500',     dot: 'bg-blue-500',   unselected: 'bg-muted border border-transparent text-muted-foreground' },
+  'bg-green-500':  { selected: 'bg-green-500/20 border border-green-500 text-green-500',   dot: 'bg-green-500',  unselected: 'bg-muted border border-transparent text-muted-foreground' },
+  'bg-orange-500': { selected: 'bg-orange-500/20 border border-orange-500 text-orange-500', dot: 'bg-orange-500', unselected: 'bg-muted border border-transparent text-muted-foreground' },
+  'bg-purple-500': { selected: 'bg-purple-500/20 border border-purple-500 text-purple-500', dot: 'bg-purple-500', unselected: 'bg-muted border border-transparent text-muted-foreground' },
+  'bg-gray-500':   { selected: 'bg-gray-500/20 border border-gray-500 text-gray-400',      dot: 'bg-gray-500',   unselected: 'bg-muted border border-transparent text-muted-foreground' },
+}
+
+const FALLBACK_PILL = { selected: 'bg-muted border border-primary text-primary', dot: 'bg-primary', unselected: 'bg-muted border border-transparent text-muted-foreground' }
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+
+interface Props {
+  onClose: () => void
+}
+
+export function TaskAddModal({ onClose }: Props) {
+  const categories = useTaskStore((s) => s.categories)
+  const addTask = useTaskStore((s) => s.addTask)
+
+  const [title, setTitle] = useState('')
+  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '')
+  const [targetFocusMinutes, setTargetFocusMinutes] = useState(25)
+  const [targetCycles, setTargetCycles] = useState(4)
+  const [targetBreakMinutes, setTargetBreakMinutes] = useState(5)
+
+  function handleSubmit() {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    addTask({ title: trimmed, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes })
+    onClose()
+  }
+
+  return (
+    <>
+      {/* 오버레이 */}
+      <div
+        className="fixed inset-0 z-60 bg-black/55 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* 폼 카드 */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="새 작업 추가"
+        className={[
+          'fixed z-70 flex flex-col bg-card border border-border shadow-2xl',
+          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[80vh]',
+          'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[400px] sm:rounded-2xl',
+        ].join(' ')}
+      >
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+          <h2 className="text-base font-semibold text-foreground">새 작업 추가</h2>
+          <button
+            onClick={onClose}
+            aria-label="닫기"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 폼 바디 */}
+        <div className="flex flex-col gap-5 p-5 overflow-y-auto flex-1">
+          {/* 작업 제목 */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">작업 제목</label>
+            <input
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+              placeholder="예) 알고리즘 문제 풀기"
+              className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+          </div>
+
+          {/* 카테고리 */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-muted-foreground">카테고리</label>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => {
+                const colors = PILL_COLORS[cat.color] ?? FALLBACK_PILL
+                const isActive = cat.id === categoryId
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategoryId(cat.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${isActive ? colors.selected : colors.unselected}`}
+                  >
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${colors.dot}`} />
+                    {cat.name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 목표 시간 */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-muted-foreground">목표 시간</label>
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">집중</span>
+                <StepperInput value={targetFocusMinutes} onChange={setTargetFocusMinutes} min={5} max={120} step={5} unit="분" />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">횟수</span>
+                <StepperInput value={targetCycles} onChange={setTargetCycles} min={1} max={20} unit="회" />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">휴식</span>
+                <StepperInput value={targetBreakMinutes} onChange={setTargetBreakMinutes} min={0} max={60} step={5} unit="분" />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground/60 pt-0.5">
+              총 집중 {targetFocusMinutes * targetCycles}분
+              {targetBreakMinutes > 0 && ` + 휴식 ${targetBreakMinutes * Math.max(0, targetCycles - 1)}분`}
+            </p>
+          </div>
+        </div>
+
+        {/* 푸터 */}
+        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
+          >
+            취소
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!title.trim()}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors hover:bg-primary/90"
+          >
+            추가
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
