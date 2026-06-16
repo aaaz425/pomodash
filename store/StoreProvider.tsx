@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useStore } from 'zustand'
 import { createTimerStore } from './timerStore'
 import { createTaskStore } from './taskStore'
@@ -32,6 +32,14 @@ export function useTaskStore<T>(selector: (state: TaskStore) => T): T {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [timerStore] = useState<TimerStoreApi>(createTimerStore)
   const [taskStore] = useState<TaskStoreApi>(createTaskStore)
+
+  // localStorage 기반 상태는 hydration 이후(클라이언트 전용)에 반영 —
+  // 렌더 중에 읽으면 SSR(기본값)과 클라이언트(저장값)가 달라져 hydration mismatch 발생
+  useEffect(() => {
+    timerStore.getState().hydrateSettings()
+    taskStore.getState().hydrate()
+  }, [timerStore, taskStore])
+
   return (
     <TimerStoreContext.Provider value={timerStore}>
       <TaskStoreContext.Provider value={taskStore}>

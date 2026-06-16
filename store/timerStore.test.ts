@@ -171,4 +171,25 @@ describe('timerStore', () => {
       expect(store.getState().sessionStarted).toBe(false)
     })
   })
+
+  describe('hydrateSettings', () => {
+    it('생성 시점에는 localStorage 값과 무관하게 항상 기본값(SSR과 동일)으로 시작함', () => {
+      localStorage.setItem('pomodash:timer-settings', JSON.stringify({ focusMinutes: 5, shortBreakMinutes: 1, totalCycles: 2 }))
+
+      const store = createTimerStore()
+
+      expect(store.getState().settings.focusMinutes).toBe(25)
+      expect(store.getState().remainingSeconds).toBe(25 * 60)
+    })
+
+    it('hydrateSettings() — localStorage 값을 읽어 settings와 remainingSeconds에 반영함', () => {
+      localStorage.setItem('pomodash:timer-settings', JSON.stringify({ focusMinutes: 5, shortBreakMinutes: 1, totalCycles: 2 }))
+
+      const store = createTimerStore()
+      store.getState().hydrateSettings()
+
+      expect(store.getState().settings.focusMinutes).toBe(5)
+      expect(store.getState().remainingSeconds).toBe(5 * 60)
+    })
+  })
 })

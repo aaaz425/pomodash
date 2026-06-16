@@ -20,6 +20,7 @@ interface TaskStore {
   deleteTask: (id: string) => void
   openModal: () => void
   closeModal: () => void
+  hydrate: () => void
 }
 
 function loadTasks(): Task[] {
@@ -51,8 +52,10 @@ function saveTasks(tasks: Task[]) {
 
 export const createTaskStore = () =>
   createStore<TaskStore>()((set, get) => ({
-    tasks: loadTasks(),
-    categories: loadCategories(),
+    // SSR과 클라이언트 첫 렌더가 항상 같도록 생성 시점엔 빈 기본값만 사용하고,
+    // localStorage 값은 마운트 후 hydrate()로 반영한다 (hydration mismatch 방지)
+    tasks: [],
+    categories: DEFAULT_CATEGORIES,
     isModalOpen: false,
 
     addTask: ({ title, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes }) => {
@@ -87,6 +90,7 @@ export const createTaskStore = () =>
 
     openModal: () => set({ isModalOpen: true }),
     closeModal: () => set({ isModalOpen: false }),
+    hydrate: () => set({ tasks: loadTasks(), categories: loadCategories() }),
   }))
 
 export type TaskStoreApi = ReturnType<typeof createTaskStore>

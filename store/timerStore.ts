@@ -27,6 +27,7 @@ interface TimerStore {
   dismissSessionRecord: () => void
   enterFocusMode: () => void
   exitFocusMode: () => void
+  hydrateSettings: () => void
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
@@ -49,7 +50,7 @@ function loadSettings(): TimerSettings {
 
 export const createTimerStore = () =>
   createStore<TimerStore>()((set, get) => {
-    const settings = loadSettings()
+    const settings = DEFAULT_TIMER_SETTINGS
     const seconds = phaseSeconds(settings)
     return {
       phase: 'focus',
@@ -116,6 +117,11 @@ export const createTimerStore = () =>
       },
       enterFocusMode: () => set({ isFocusMode: true }),
       exitFocusMode: () => set({ isFocusMode: false }),
+      hydrateSettings: () => {
+        const loaded = loadSettings()
+        const seconds = phaseSeconds(loaded)
+        set({ settings: loaded, remainingSeconds: seconds[get().phase] })
+      },
     }
   })
 
