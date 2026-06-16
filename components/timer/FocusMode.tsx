@@ -4,24 +4,32 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Square } from 'lucide-react'
 import { useTimerStore } from '@/store/StoreProvider'
+import { useTimer } from '@/hooks/useTimer'
 import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { getRandomMotivationalMessage } from '@/lib/motivationalMessages'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { TimerRing } from '@/components/timer/TimerRing'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode)
   const isRunning = useTimerStore((s) => s.startedAt !== null)
-  const cycleCount = useTimerStore((s) => s.cycleCount)
+  const settings = useTimerStore((s) => s.settings)
   const start = useTimerStore((s) => s.start)
   const pause = useTimerStore((s) => s.pause)
   const endSession = useTimerStore((s) => s.endSession)
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode)
+  const { displaySeconds, phase, cycleCount } = useTimer()
   const { task, category } = useCurrentTask()
 
   // 진입할 때만 새 메시지를 골라 고정 — 매 렌더마다 재추첨되지 않도록
   const [message] = useState(getRandomMotivationalMessage)
+  const [showEndConfirm, setShowEndConfirm] = useState(false)
+
+  const elapsedMinutes =
+    cycleCount * settings.focusMinutes +
+    (phase === 'focus' ? Math.max(0, Math.floor((settings.focusMinutes * 60 - displaySeconds) / 60)) : 0)
 
   useEffect(() => {
     if (!isFocusMode) return
@@ -30,6 +38,10 @@ export function FocusMode() {
       const target = e.target as HTMLElement | null
       if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return
 
+      if (showEndConfirm) {
+        if (e.key === 'Escape') setShowEndConfirm(false)
+        return
+      }
       if (e.code === 'Space') {
         e.preventDefault()
         if (isRunning) pause()
@@ -41,7 +53,7 @@ export function FocusMode() {
 
     document.addEventListener('keydown', handleKeydown)
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [isFocusMode, isRunning, pause, start, exitFocusMode])
+  }, [isFocusMode, isRunning, pause, start, exitFocusMode, showEndConfirm])
 
   return (
     <AnimatePresence>
@@ -98,7 +110,7 @@ export function FocusMode() {
               {isRunning ? '일시정지' : '시작'}
             </button>
             <button
-              onClick={endSession}
+              onClick={() => setShowEndConfirm(true)}
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <Square className="w-3.5 h-3.5" />
@@ -110,6 +122,22 @@ export function FocusMode() {
           <p className="absolute bottom-6 text-xs text-muted-foreground/30">
             Space · 일시정지   |   Esc · 나가기
           </p>
+
+          <ConfirmDialog
+            open={showEndConfirm}
+            title="세션을 종료할까요?"
+            description={
+              <>
+                지금까지 {elapsedMinutes}분 · {cycleCount}/{settings.totalCycles}사이클 진행했어요.
+              </>
+            }
+            confirmLabel="세션 종료"
+            onConfirm={() => {
+              endSession()
+              setShowEndConfirm(false)
+            }}
+            onCancel={() => setShowEndConfirm(false)}
+          />
         </motion.div>
       )}
     </AnimatePresence>

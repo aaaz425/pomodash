@@ -153,4 +153,22 @@ describe('timerStore', () => {
       expect(store.getState().sessionEnded).toBe(true)
     })
   })
+
+  describe('sessionStarted', () => {
+    it('start() — sessionStarted가 true로 설정됨', () => {
+      const store = createTimerStore()
+      store.getState().start()
+      expect(store.getState().sessionStarted).toBe(true)
+    })
+
+    it('dismissSessionRecord() — sessionStarted가 false로 초기화됨', () => {
+      const store = createTimerStore()
+      store.getState().start()
+      store.getState().endSession()
+
+      store.getState().dismissSessionRecord()
+
+      expect(store.getState().sessionStarted).toBe(false)
+    })
+  })
 })

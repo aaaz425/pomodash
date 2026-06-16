@@ -13,6 +13,7 @@ interface TimerStore {
   settings: TimerSettings
   sessionEnded: boolean    // true일 때 세션 기록 모달 표시
   isFocusMode: boolean     // true일 때 집중 모드 오버레이 표시
+  sessionStarted: boolean  // true일 때 작업 전환 불가(작업 관리 버튼 숨김)
 
   start: () => void
   pause: () => void
@@ -59,8 +60,9 @@ export const createTimerStore = () =>
       settings,
       sessionEnded: false,
       isFocusMode: false,
+      sessionStarted: false,
 
-      start: () => set({ startedAt: Date.now() }),
+      start: () => set({ startedAt: Date.now(), sessionStarted: true }),
       pause: () => {
         const { startedAt, remainingSeconds } = get()
         if (!startedAt) return
@@ -110,7 +112,7 @@ export const createTimerStore = () =>
       },
       dismissSessionRecord: () => {
         const seconds = phaseSeconds(get().settings)
-        set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null, sessionEnded: false })
+        set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: null, cycleCount: 0, currentTaskId: null, sessionEnded: false, sessionStarted: false })
       },
       enterFocusMode: () => set({ isFocusMode: true }),
       exitFocusMode: () => set({ isFocusMode: false }),

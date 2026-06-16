@@ -6,6 +6,7 @@ import { useTimerStore } from '@/store/StoreProvider'
 import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 
 export function SessionRecordModal() {
   const sessionEnded = useTimerStore((s) => s.sessionEnded)
@@ -15,12 +16,14 @@ export function SessionRecordModal() {
   const { task, category } = useCurrentTask()
 
   const [note, setNote] = useState('')
+  const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null)
 
   if (!sessionEnded) return null
 
-  function handleSubmit() {
+  function handleConfirmed() {
     dismissSessionRecord()
     setNote('')
+    setPendingAction(null)
   }
 
   return (
@@ -28,7 +31,7 @@ export function SessionRecordModal() {
       <div
         className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
         aria-hidden="true"
-        onClick={handleSubmit}
+        onClick={() => setPendingAction('skip')}
       />
 
       <div
@@ -96,13 +99,13 @@ export function SessionRecordModal() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-2">
             <button
-              onClick={handleSubmit}
+              onClick={() => setPendingAction('skip')}
               className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               건너뛰기
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => setPendingAction('save')}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
               <Check className="w-4 h-4" strokeWidth={2.5} />
@@ -111,6 +114,24 @@ export function SessionRecordModal() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingAction === 'skip'}
+        title="기록을 건너뛸까요?"
+        description="작성한 메모는 저장되지 않아요."
+        confirmLabel="건너뛰기"
+        onConfirm={handleConfirmed}
+        onCancel={() => setPendingAction(null)}
+      />
+
+      <ConfirmDialog
+        open={pendingAction === 'save'}
+        title="이 기록으로 저장할까요?"
+        description={`완료된 사이클 ${cycleCount} / ${totalCycles}`}
+        confirmLabel="저장"
+        onConfirm={handleConfirmed}
+        onCancel={() => setPendingAction(null)}
+      />
     </>
   )
 }

@@ -11,18 +11,21 @@ import { TimerControls } from '@/components/timer/TimerControls'
 export function TimerSection() {
   const openModal = useTaskStore((s) => s.openModal)
   const settings = useTimerStore((s) => s.settings)
+  const sessionStarted = useTimerStore((s) => s.sessionStarted)
   const { task, category } = useCurrentTask()
 
   return (
     <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
-      {/* 작업 관리 */}
-      <button
-        onClick={openModal}
-        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-violet-500/10 border-violet-500 text-violet-400 hover:bg-violet-500/20"
-      >
-        <ListChecks className="w-3.5 h-3.5" />
-        작업 관리
-      </button>
+      {/* 작업 관리 — 세션이 시작되면 작업을 바꿀 수 없으므로 숨김 */}
+      {!sessionStarted && (
+        <button
+          onClick={openModal}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border text-sm font-semibold transition-colors bg-violet-500/10 border-violet-500 text-violet-400 hover:bg-violet-500/20"
+        >
+          <ListChecks className="w-3.5 h-3.5" />
+          작업 관리
+        </button>
+      )}
 
       {/* 현재 작업 */}
       <div className="flex items-center gap-2 h-5 text-sm text-muted-foreground">
