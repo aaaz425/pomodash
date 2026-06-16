@@ -10,16 +10,16 @@
 ## Phase 1 — 타이머
 
 - [x] `chore/project-setup` — Next.js 15 + 패키지 + 폴더 구조 + 스캐폴드
-- [>] `feat/timer-core` — timerStore 완성 (절대시간 기반) + useTimer 훅
-- [ ] `feat/timer-ui` — TimerDisplay(링) + TimerControls + CycleIndicator + SessionBadge
-- [ ] `feat/focus-mode` — 집중 모드 오버레이 + framer-motion 전환 + 동기부여 메시지
+- [x] `feat/timer-core` — timerStore 완성 (절대시간 기반) + useTimer 훅
+- [x] `feat/timer-ui` — TimerDisplay(링) + TimerControls + CycleIndicator + SessionBadge
+- [>] `feat/focus-mode` — 집중 모드 오버레이 + framer-motion 전환 + 동기부여 메시지
 - [ ] `feat/session-settings` — 세션 시작 전 타이머 설정 UI (전역 설정값 기본)
 - [ ] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
 
 ## Phase 2 — 작업 관리
 
-- [ ] `feat/task-core` — taskStore + Task 타입 확정
-- [ ] `feat/task-ui` — TaskList + TaskItem + TaskForm + 카테고리 태그
+- [x] `feat/task-core` — taskStore + Task 타입 확정
+- [x] `feat/task-ui` — TaskList + TaskItem + TaskForm + 카테고리 태그
 - [ ] `feat/task-dnd` — 드래그앤드롭 순서 조정
 
 ## Phase 3 — 장기 계획
