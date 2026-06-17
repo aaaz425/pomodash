@@ -9,7 +9,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center gap-6 p-6 text-center">
       <div className="flex items-center justify-center w-16 h-16 rounded-full bg-destructive/10">
         <AlertCircle className="w-8 h-8 text-destructive" />
       </div>
