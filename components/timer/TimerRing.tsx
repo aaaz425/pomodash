@@ -39,6 +39,9 @@ export function TimerRing() {
         'short-break': s.settings.shortBreakMinutes * 60,
       })[s.phase],
   );
+  const isRunning = useTimerStore((s) => s.startedAt !== null);
+  const sessionStarted = useTimerStore((s) => s.sessionStarted);
+  const isPaused = sessionStarted && !isRunning;
 
   const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
@@ -88,12 +91,23 @@ export function TimerRing() {
         >
           {mm}:{ss}
         </time>
-        <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${badge.bg}`}>
-          <div className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-          <span className={`text-[10px] font-semibold tracking-[0.5px] ${badge.text}`}>
-            {PHASE_LABELS[phase]}
-          </span>
-        </div>
+        {isPaused ? (
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-muted/60">
+            <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+            <span className="text-[10px] font-semibold tracking-[0.5px] text-muted-foreground">
+              일시정지
+            </span>
+          </div>
+        ) : (
+          <div
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${badge.bg}`}
+          >
+            <div className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+            <span className={`text-[10px] font-semibold tracking-[0.5px] ${badge.text}`}>
+              {PHASE_LABELS[phase]}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
