@@ -35,9 +35,6 @@ export function SessionListItem({ session, task, category, isSelected, onSelect 
       </div>
       <div className="flex items-center gap-1.5">
         {category && <CategoryBadge category={category} />}
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium text-primary bg-primary/10">
-          집중
-        </span>
         <span className="text-[11px] text-muted-foreground">{duration}</span>
       </div>
     </button>
