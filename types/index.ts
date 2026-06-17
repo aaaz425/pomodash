@@ -21,13 +21,33 @@ export interface Task {
   createdAt: string // ISO 8601
 }
 
+export interface FocusPeriod {
+  start: string  // ISO 8601
+  end: string    // ISO 8601
+}
+
+export interface Session {
+  id: string
+  taskId: string | null
+  startedAt: string           // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
+  endedAt: string             // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
+  completedCycles: number
+  totalCycles: number
+  focusSeconds: number        // 집계용 — endedAt - startedAt 사용 금지
+  pausedSeconds: number
+  focusPeriods: FocusPeriod[] // 타임라인 블록용 실제 집중 구간
+  note: string | null
+}
+
+// 향후 per-phase 세분화 집계용으로 예약, 현재 미사용
 export interface TimerRecord {
   id: string
-  taskId: string
+  taskId: string | null
   phase: TimerPhase
-  startedAt: string // ISO 8601
-  endedAt: string   // ISO 8601
-  focusMinutes: number // 실제 집중한 분 수 (일시정지·중단 시 설정값보다 작을 수 있음)
+  startedAt: string
+  endedAt: string
+  focusSeconds: number
+  pausedSeconds: number
 }
 
 export interface TimerSettings {
@@ -55,13 +75,33 @@ export const TaskSchema = z.object({
   createdAt: z.string(),
 })
 
+export const FocusPeriodSchema = z.object({
+  start: z.string(),
+  end: z.string(),
+})
+
+export const SessionSchema = z.object({
+  id: z.string(),
+  taskId: z.string().nullable(),
+  startedAt: z.string(),
+  endedAt: z.string(),
+  completedCycles: z.number(),
+  totalCycles: z.number(),
+  focusSeconds: z.number(),
+  pausedSeconds: z.number(),
+  focusPeriods: z.array(FocusPeriodSchema),
+  note: z.string().nullable(),
+})
+
+// 향후 per-phase 집계용으로 예약, 현재 미사용
 export const TimerRecordSchema = z.object({
   id: z.string(),
-  taskId: z.string(),
+  taskId: z.string().nullable(),
   phase: z.enum(['focus', 'short-break']),
   startedAt: z.string(),
   endedAt: z.string(),
-  focusMinutes: z.number(),
+  focusSeconds: z.number(),
+  pausedSeconds: z.number(),
 })
 
 export const TimerSettingsSchema = z.object({
@@ -72,6 +112,7 @@ export const TimerSettingsSchema = z.object({
 
 export const CategoriesSchema = z.array(CategorySchema)
 export const TasksSchema = z.array(TaskSchema)
+export const SessionsSchema = z.array(SessionSchema)
 export const TimerRecordsSchema = z.array(TimerRecordSchema)
 
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
@@ -79,7 +120,7 @@ export const TimerRecordsSchema = z.array(TimerRecordSchema)
 export const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
-  timerRecords: 'pomodash:timer-records',
+  sessions: 'pomodash:sessions',
   timerSettings: 'pomodash:timer-settings',
   version: 'pomodash:version',
 } as const

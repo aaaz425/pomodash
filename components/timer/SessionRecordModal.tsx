@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
+import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { normalizeFocusPeriods } from '@/lib/focusPeriods'
 
 export function SessionRecordModal() {
   const sessionEnded = useTimerStore((s) => s.sessionEnded)
@@ -12,19 +15,78 @@ export function SessionRecordModal() {
   const cycleCount = useTimerStore((s) => s.cycleCount)
   const totalCycles = useTimerStore((s) => s.settings.totalCycles)
   const currentTaskId = useTimerStore((s) => s.currentTaskId)
+  const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt)
+  const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt)
+  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds)
+
+  const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods)
+
+  const { task, category } = useCurrentTask()
   const tasks = useTaskStore((s) => s.tasks)
   const categories = useTaskStore((s) => s.categories)
+  const addSession = useTaskStore((s) => s.addSession)
+  const addTask = useTaskStore((s) => s.addTask)
+
+  const activeTasks = tasks.filter((t) => !t.completed)
 
   const [note, setNote] = useState('')
+  const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
-  if (!sessionEnded) return null
+  const [showNewTaskForm, setShowNewTaskForm] = useState(false)
+  const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [newTaskCategoryId, setNewTaskCategoryId] = useState(categories[0]?.id ?? '')
 
-  const task = tasks.find((t) => t.id === currentTaskId) ?? null
-  const category = task ? (categories.find((c) => c.id === task.categoryId) ?? null) : null
+  if (!sessionEnded || sessionEndedAt === null) return null
 
-  function handleSubmit() {
+  const isTaskSession = currentTaskId !== null
+  const now = sessionEndedAt
+  const totalElapsed = sessionStartedAt ? Math.floor((now - sessionStartedAt) / 1000) : accFocusSeconds
+  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds)
+
+  function handleSave() {
+    const taskId = isTaskSession ? currentTaskId : selectedTaskId
+    const focusPeriods = normalizeFocusPeriods(
+      rawFocusPeriods.map((p) => ({
+        start: new Date(p.start).toISOString(),
+        end: new Date(p.end).toISOString(),
+      }))
+    )
+    addSession({
+      taskId,
+      startedAt: new Date(sessionStartedAt ?? now).toISOString(),
+      endedAt: new Date(now).toISOString(),
+      completedCycles: cycleCount,
+      totalCycles,
+      focusSeconds: accFocusSeconds,
+      pausedSeconds,
+      focusPeriods,
+      note: note.trim() || null,
+    })
     dismissSessionRecord()
     setNote('')
+    setSelectedTaskId(null)
+    setShowNewTaskForm(false)
+    setNewTaskTitle('')
+    setPendingAction(null)
+  }
+
+  function handleSkip() {
+    dismissSessionRecord()
+    setNote('')
+    setSelectedTaskId(null)
+    setShowNewTaskForm(false)
+    setNewTaskTitle('')
+    setPendingAction(null)
+  }
+
+  function handleAddNewTask() {
+    const trimmed = newTaskTitle.trim()
+    if (!trimmed) return
+    const newId = addTask({ title: trimmed, categoryId: newTaskCategoryId })
+    setSelectedTaskId(newId)
+    setShowNewTaskForm(false)
+    setNewTaskTitle('')
   }
 
   return (
@@ -32,7 +94,7 @@ export function SessionRecordModal() {
       <div
         className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
         aria-hidden="true"
-        onClick={handleSubmit}
+        onClick={() => setPendingAction('skip')}
       />
 
       <div
@@ -64,20 +126,122 @@ export function SessionRecordModal() {
           <div className="h-px bg-border" />
 
           {/* Session Summary */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-2 min-w-0">
-              <span className="text-lg font-semibold tracking-tight text-foreground truncate">
-                {task?.title ?? '작업 없음'}
-              </span>
-              {category && task && <CategoryBadge category={category} />}
+          {isTaskSession ? (
+            /* Case A: 작업 있는 세션 — 작업 정보 표시 */
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 min-w-0">
+                <span className="text-lg font-semibold tracking-tight text-foreground truncate">
+                  {task?.title ?? '작업 없음'}
+                </span>
+                {category && task && <CategoryBadge category={category} />}
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <span className="text-[11px] text-muted-foreground">
+                  완료된 사이클 {cycleCount} / {totalCycles}
+                </span>
+                <CycleIndicator />
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <span className="text-[11px] text-muted-foreground">
-                완료된 사이클 {cycleCount} / {totalCycles}
-              </span>
-              <CycleIndicator />
+          ) : (
+            /* Case B: 작업 없는 세션 — 작업 귀속 UI */
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground">어떤 작업을 하셨나요?</span>
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <span className="text-[11px] text-muted-foreground">
+                    완료된 사이클 {cycleCount} / {totalCycles}
+                  </span>
+                  <CycleIndicator />
+                </div>
+              </div>
+
+              {activeTasks.length === 0 && !showNewTaskForm ? (
+                <p className="text-sm text-muted-foreground/60 py-2">등록된 작업이 없습니다</p>
+              ) : !showNewTaskForm ? (
+                <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
+                  {activeTasks.map((t) => {
+                    const cat = categories.find((c) => c.id === t.categoryId)
+                    const isSelected = selectedTaskId === t.id
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setSelectedTaskId(isSelected ? null : t.id)}
+                        className={[
+                          'flex items-center gap-3 px-3.5 py-2.5 rounded-lg border text-left transition-colors',
+                          isSelected
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-card hover:bg-muted',
+                        ].join(' ')}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={2.5} />}
+                        {!isSelected && <div className="w-3.5 h-3.5 shrink-0" />}
+                        {cat && <CategoryBadge category={cat} />}
+                        <span className="text-sm text-foreground truncate">{t.title}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : null}
+
+              {/* 새 작업 인라인 폼 */}
+              {showNewTaskForm ? (
+                <div className="flex flex-col gap-3 p-3.5 rounded-lg border border-border bg-muted/50">
+                  <input
+                    autoFocus
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddNewTask()}
+                    placeholder="작업 제목"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setNewTaskCategoryId(cat.id)}
+                        className={[
+                          'px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
+                          newTaskCategoryId === cat.id
+                            ? 'bg-primary/20 border border-primary text-primary'
+                            : 'bg-muted border border-transparent text-muted-foreground hover:bg-border/50',
+                        ].join(' ')}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setShowNewTaskForm(false); setNewTaskTitle('') }}
+                      className="flex-1 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={handleAddNewTask}
+                      disabled={!newTaskTitle.trim()}
+                      className="flex-1 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                    >
+                      추가
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowNewTaskForm(true)}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors self-start"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  새 작업 만들기
+                </button>
+              )}
+
+              <p className="text-[11px] text-muted-foreground/60">
+                선택하지 않으면 미분류로 저장됩니다
+              </p>
             </div>
-          </div>
+          )}
 
           {/* Note Section */}
           <div className="flex flex-col gap-2.5">
@@ -100,13 +264,13 @@ export function SessionRecordModal() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-2">
             <button
-              onClick={handleSubmit}
+              onClick={() => setPendingAction('skip')}
               className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               건너뛰기
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => setPendingAction('save')}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
               <Check className="w-4 h-4" strokeWidth={2.5} />
@@ -115,6 +279,28 @@ export function SessionRecordModal() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingAction === 'skip'}
+        title="기록을 건너뛸까요?"
+        description="작성한 메모는 저장되지 않아요"
+        confirmLabel="건너뛰기"
+        onConfirm={handleSkip}
+        onCancel={() => setPendingAction(null)}
+      />
+
+      <ConfirmDialog
+        open={pendingAction === 'save'}
+        title="이 기록으로 저장할까요?"
+        description={
+          !isTaskSession && !selectedTaskId
+            ? `완료된 사이클 ${cycleCount} / ${totalCycles} · 미분류로 저장됩니다`
+            : `완료된 사이클 ${cycleCount} / ${totalCycles}`
+        }
+        confirmLabel="저장"
+        onConfirm={handleSave}
+        onCancel={() => setPendingAction(null)}
+      />
     </>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useTimerStore } from '@/store/StoreProvider'
+import { useTimerStore, useHydrated } from '@/store/StoreProvider'
 import { useTimer } from '@/hooks/useTimer'
 import type { TimerPhase } from '@/types'
 
@@ -30,6 +30,7 @@ const R = BASE / 2 - SW / 2
 const CIRC = 2 * Math.PI * R
 
 export function TimerRing() {
+  const hydrated = useHydrated()
   const { displaySeconds, phase } = useTimer()
   const totalSeconds = useTimerStore((s) =>
     ({
@@ -68,7 +69,7 @@ export function TimerRing() {
         />
       </svg>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+      <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2 transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}>
         <time
           className="font-mono font-bold tabular-nums text-foreground leading-none tracking-[-2px] text-[1.75rem] sm:text-[2.5rem] lg:text-[3rem]"
           dateTime={`PT${Math.floor(displaySeconds / 60)}M${displaySeconds % 60}S`}
