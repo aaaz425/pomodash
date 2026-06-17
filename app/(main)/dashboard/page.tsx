@@ -98,15 +98,18 @@ export default function DashboardPage() {
 
   return (
     <main className="flex-1 overflow-y-auto">
-      <div className="flex flex-col gap-6 p-8 md:p-10">
+      <div className="flex flex-col gap-6 p-4 pb-20 sm:pb-6 sm:p-6 md:p-8 lg:p-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">통계</h1>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">통계</h1>
+            <span className="text-sm text-muted-foreground">집중의 흐름을 한눈에</span>
+          </div>
           <DashboardTabs value={tab} onChange={setTab} />
         </div>
 
         {/* Stat Cards */}
-        <div className="flex gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
             label={focusLabel}
             Icon={Timer}
@@ -134,7 +137,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Chart Row — placeholder */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
             <p className="text-sm font-semibold text-foreground">{focusLabel}</p>
             <div className="flex-1 flex items-center justify-center">
@@ -150,7 +153,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Bottom Row */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[180px]">
             <p className="text-sm font-semibold text-foreground">카테고리별 집중</p>
             <div className="flex-1 flex items-center justify-center">
