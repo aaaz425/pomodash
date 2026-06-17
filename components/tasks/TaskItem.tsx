@@ -2,7 +2,6 @@
 
 import { GripVertical, Trash2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useTaskStore } from '@/store/StoreProvider';
 import type { Task } from '@/types';
 
