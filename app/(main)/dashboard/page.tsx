@@ -3,7 +3,9 @@
 import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { CategoryChart } from '@/components/dashboard/CategoryChart';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
+import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
 import { StatCard } from '@/components/dashboard/StatCard';
 import {
@@ -40,6 +42,8 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<TabType>('week');
 
   const sessions = useTaskStore((s) => s.sessions);
+  const tasks = useTaskStore((s) => s.tasks);
+  const categories = useTaskStore((s) => s.categories);
 
   const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
 
@@ -136,14 +140,15 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Chart Row — placeholder */}
+        {/* Chart Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
-            <p className="text-sm font-semibold text-foreground">{focusLabel}</p>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">차트 준비 중</p>
-            </div>
-          </div>
+          <FocusChart
+            sessions={filtered}
+            tasks={tasks}
+            categories={categories}
+            tab={tab}
+            focusLabel={focusLabel}
+          />
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
             <p className="text-sm font-semibold text-foreground">이달의 잔디</p>
             <div className="flex-1 flex items-center justify-center">
@@ -154,13 +159,7 @@ export default function DashboardPage() {
 
         {/* Bottom Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[180px]">
-            <p className="text-sm font-semibold text-foreground">카테고리별 집중</p>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">차트 준비 중</p>
-            </div>
-          </div>
-
+          <CategoryChart sessions={filtered} tasks={tasks} categories={categories} />
           <HourlyChart sessions={filtered} />
         </div>
       </div>
