@@ -136,7 +136,7 @@ export default function DashboardPage() {
         {/* Chart Row — placeholder */}
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
-            <p className="text-sm font-semibold text-foreground">이번 주 집중 시간</p>
+            <p className="text-sm font-semibold text-foreground">{focusLabel}</p>
             <div className="flex-1 flex items-center justify-center">
               <p className="text-sm text-muted-foreground">차트 준비 중</p>
             </div>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <HourlyChart sessions={sessions} />
+          <HourlyChart sessions={filtered} />
         </div>
       </div>
     </main>
