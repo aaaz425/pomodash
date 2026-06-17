@@ -141,7 +141,7 @@ export function JournalView() {
       {/* 데스크탑: split layout */}
       <div className="hidden lg:flex gap-6 items-start">
         <div className="w-[400px] shrink-0">{listPanel}</div>
-        <div className="flex-1 sticky top-6">
+        <div className="flex-1 sticky top-6 h-[calc(100vh-3rem)]">
           {detail ?? (
             <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
               세션을 선택하면 상세 내용을 볼 수 있어요

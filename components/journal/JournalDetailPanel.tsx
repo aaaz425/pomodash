@@ -59,7 +59,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   }
 
   return (
-    <div className="flex flex-col gap-6 bg-card border border-border rounded-xl p-6">
+    <div className="h-full flex flex-col gap-6 bg-card border border-border rounded-xl p-6 overflow-y-auto">
       {onBack && (
         <button
           onClick={onBack}
@@ -88,7 +88,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
       <div className="border-t border-border" />
 
       {/* Note Section */}
-      <div className="flex flex-col gap-3">
+      <div className="flex-1 min-h-0 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             메모
@@ -105,18 +105,17 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
         </div>
 
         {editing ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex-1 min-h-0 flex flex-col gap-2">
             <textarea
               ref={textareaRef}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               maxLength={500}
-              rows={5}
               placeholder="세션에 대한 메모를 남겨보세요..."
-              className="w-full resize-none rounded-lg bg-muted/50 border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="flex-1 min-h-0 w-full resize-none rounded-lg bg-muted/50 border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between shrink-0">
               <span className="text-xs text-muted-foreground">{draft.length} / 500</span>
               <div className="flex gap-2">
                 <button
@@ -137,7 +136,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
         ) : (
           <div
             onClick={() => setEditing(true)}
-            className="rounded-lg bg-muted/40 px-3.5 py-3 cursor-pointer hover:bg-muted/60 transition-colors min-h-[72px]"
+            className="flex-1 min-h-[72px] rounded-lg bg-muted/40 px-3.5 py-3 cursor-pointer hover:bg-muted/60 transition-colors"
           >
             {session.note ? (
               <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
