@@ -6,6 +6,7 @@ const TABS: { value: TabType; label: string }[] = [
   { value: 'today', label: '오늘' },
   { value: 'week', label: '이번 주' },
   { value: 'month', label: '이번 달' },
+  { value: 'all', label: '전체' },
 ];
 
 interface Props {

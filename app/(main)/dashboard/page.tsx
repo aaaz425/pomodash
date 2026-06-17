@@ -6,36 +6,95 @@ import { useMemo, useState } from 'react';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { formatDuration } from '@/lib/sessionUtils';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
+  getFirstSessionDate,
+  getPrevDayFocusSeconds,
+  getPrevDaySessionCount,
+  getPrevMonthFocusSeconds,
+  getPrevMonthSessionCount,
+  getPrevWeekFocusSeconds,
   getPrevWeekSessionCount,
   getSessionCount,
   getStreakDays,
   getTotalFocusSeconds,
   type TabType,
 } from '@/lib/dashboard';
+import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
+
+function makeFocusSub(diff: number, label: string): string | undefined {
+  if (diff === 0) return undefined;
+  const sign = diff > 0 ? '+' : '-';
+  return `${label} ${sign}${formatDuration(Math.abs(diff))}`;
+}
+
+function makeCountSub(diff: number, label: string): string | undefined {
+  if (diff === 0) return undefined;
+  const sign = diff > 0 ? '+' : '-';
+  return `${label} ${sign}${Math.abs(diff)}`;
+}
 
 export default function DashboardPage() {
   const [tab, setTab] = useState<TabType>('week');
 
   const sessions = useTaskStore((s) => s.sessions);
+
   const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
 
   const totalFocusSeconds = useMemo(() => getTotalFocusSeconds(filtered), [filtered]);
   const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
   const avgSessionSeconds = useMemo(() => getAvgSessionSeconds(filtered), [filtered]);
   const streakDays = useMemo(() => getStreakDays(sessions), [sessions]);
-  const prevWeekCount = useMemo(() => getPrevWeekSessionCount(sessions), [sessions]);
+  const firstSessionDate = useMemo(() => getFirstSessionDate(sessions), [sessions]);
 
-  const sessionCountSub =
-    tab === 'week'
-      ? prevWeekCount === 0
-        ? undefined
-        : `전주 대비 ${sessionCount - prevWeekCount >= 0 ? '+' : ''}${sessionCount - prevWeekCount}`
-      : undefined;
+  const prevDayFocusSec = useMemo(() => getPrevDayFocusSeconds(sessions), [sessions]);
+  const prevDayCount = useMemo(() => getPrevDaySessionCount(sessions), [sessions]);
+  const prevWeekFocusSec = useMemo(() => getPrevWeekFocusSeconds(sessions), [sessions]);
+  const prevWeekCount = useMemo(() => getPrevWeekSessionCount(sessions), [sessions]);
+  const prevMonthFocusSec = useMemo(() => getPrevMonthFocusSeconds(sessions), [sessions]);
+  const prevMonthCount = useMemo(() => getPrevMonthSessionCount(sessions), [sessions]);
+
+  const focusLabel =
+    tab === 'today'
+      ? '오늘 집중 시간'
+      : tab === 'week'
+        ? '이번 주 집중 시간'
+        : tab === 'month'
+          ? '이번 달 집중 시간'
+          : '전체 집중 시간';
+
+  const sessionLabel =
+    tab === 'today'
+      ? '오늘 세션'
+      : tab === 'week'
+        ? '이번 주 세션'
+        : tab === 'month'
+          ? '이번 달 세션'
+          : '전체 세션';
+
+  const focusSub: string | undefined = (() => {
+    if (tab === 'today' && prevDayFocusSec > 0)
+      return makeFocusSub(totalFocusSeconds - prevDayFocusSec, '어제 대비');
+    if (tab === 'week' && prevWeekFocusSec > 0)
+      return makeFocusSub(totalFocusSeconds - prevWeekFocusSec, '전주 대비');
+    if (tab === 'month' && prevMonthFocusSec > 0)
+      return makeFocusSub(totalFocusSeconds - prevMonthFocusSec, '전월 대비');
+    if (tab === 'all' && firstSessionDate)
+      return `${firstSessionDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}부터`;
+    return undefined;
+  })();
+
+  const sessionCountSub: string | undefined = (() => {
+    if (tab === 'today' && prevDayCount > 0)
+      return makeCountSub(sessionCount - prevDayCount, '어제 대비');
+    if (tab === 'week' && prevWeekCount > 0)
+      return makeCountSub(sessionCount - prevWeekCount, '전주 대비');
+    if (tab === 'month' && prevMonthCount > 0)
+      return makeCountSub(sessionCount - prevMonthCount, '전월 대비');
+    return undefined;
+  })();
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -49,18 +108,13 @@ export default function DashboardPage() {
         {/* Stat Cards */}
         <div className="flex gap-3">
           <StatCard
-            label={
-              tab === 'today'
-                ? '오늘 집중 시간'
-                : tab === 'week'
-                  ? '이번 주 집중 시간'
-                  : '이번 달 집중 시간'
-            }
+            label={focusLabel}
             Icon={Timer}
             value={totalFocusSeconds === 0 ? '0분' : formatDuration(totalFocusSeconds)}
+            sub={focusSub}
           />
           <StatCard
-            label={tab === 'today' ? '오늘 세션' : tab === 'week' ? '이번 주 세션' : '이번 달 세션'}
+            label={sessionLabel}
             Icon={CircleCheck}
             value={`${sessionCount}세션`}
             sub={sessionCountSub}
@@ -97,7 +151,6 @@ export default function DashboardPage() {
 
         {/* Bottom Row */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Category chart placeholder */}
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[180px]">
             <p className="text-sm font-semibold text-foreground">카테고리별 집중</p>
             <div className="flex-1 flex items-center justify-center">
@@ -105,7 +158,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Hourly Chart */}
           <HourlyChart sessions={sessions} />
         </div>
       </div>

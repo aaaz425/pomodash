@@ -7,14 +7,16 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
+  subDays,
+  subMonths,
   subWeeks,
 } from 'date-fns';
 
 import type { Session } from '@/types';
 
-export type TabType = 'today' | 'week' | 'month';
+export type TabType = 'today' | 'week' | 'month' | 'all';
 
-function getTabInterval(tab: TabType, today: Date) {
+function getTabInterval(tab: Exclude<TabType, 'all'>, today: Date) {
   switch (tab) {
     case 'today':
       return { start: startOfDay(today), end: endOfDay(today) };
@@ -33,6 +35,7 @@ export function filterSessionsByTab(
   tab: TabType,
   today: Date = new Date(),
 ): Session[] {
+  if (tab === 'all') return sessions;
   const interval = getTabInterval(tab, today);
   return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval));
 }
@@ -70,6 +73,33 @@ export function getStreakDays(sessions: Session[], today: Date = new Date()): nu
   return streak;
 }
 
+// 이전 기간 집계 함수들
+
+export function getPrevDayFocusSeconds(sessions: Session[], today: Date = new Date()): number {
+  const yesterday = subDays(today, 1);
+  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
+  return sessions
+    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
+    .reduce((sum, s) => sum + s.focusSeconds, 0);
+}
+
+export function getPrevDaySessionCount(sessions: Session[], today: Date = new Date()): number {
+  const yesterday = subDays(today, 1);
+  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
+  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+}
+
+export function getPrevWeekFocusSeconds(sessions: Session[], today: Date = new Date()): number {
+  const prevWeek = subWeeks(today, 1);
+  const interval = {
+    start: startOfWeek(prevWeek, { weekStartsOn: 1 }),
+    end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
+  };
+  return sessions
+    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
+    .reduce((sum, s) => sum + s.focusSeconds, 0);
+}
+
 export function getPrevWeekSessionCount(sessions: Session[], today: Date = new Date()): number {
   const prevWeek = subWeeks(today, 1);
   const interval = {
@@ -77,6 +107,26 @@ export function getPrevWeekSessionCount(sessions: Session[], today: Date = new D
     end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
   };
   return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+}
+
+export function getPrevMonthFocusSeconds(sessions: Session[], today: Date = new Date()): number {
+  const prevMonth = subMonths(today, 1);
+  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
+  return sessions
+    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
+    .reduce((sum, s) => sum + s.focusSeconds, 0);
+}
+
+export function getPrevMonthSessionCount(sessions: Session[], today: Date = new Date()): number {
+  const prevMonth = subMonths(today, 1);
+  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
+  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+}
+
+export function getFirstSessionDate(sessions: Session[]): Date | null {
+  if (sessions.length === 0) return null;
+  const earliest = sessions.reduce((min, s) => (s.startedAt < min.startedAt ? s : min));
+  return parseISO(earliest.startedAt);
 }
 
 export function getRecentSessions(sessions: Session[], limit = 3): Session[] {

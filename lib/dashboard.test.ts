@@ -4,6 +4,10 @@ import type { Session } from '@/types';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
+  getFirstSessionDate,
+  getPrevDayFocusSeconds,
+  getPrevDaySessionCount,
+  getPrevMonthSessionCount,
   getRecentSessions,
   getSessionCount,
   getStreakDays,
@@ -57,6 +61,10 @@ describe('filterSessionsByTab', () => {
 
   it('세션 없을 때 빈 배열 반환', () => {
     expect(filterSessionsByTab([], 'today', TODAY)).toHaveLength(0);
+  });
+
+  it('all 탭은 전체 반환', () => {
+    expect(filterSessionsByTab(sessions, 'all', TODAY)).toHaveLength(sessions.length);
   });
 });
 
@@ -121,5 +129,46 @@ describe('getRecentSessions', () => {
     expect(result).toHaveLength(3);
     expect(result[0].startedAt).toBe('2024-03-15T10:00:00');
     expect(result[1].startedAt).toBe('2024-03-14T10:00:00');
+  });
+});
+
+describe('이전 기간 비교 함수', () => {
+  const sessions = [
+    makeSession('2024-03-15T10:00:00', 1800), // 오늘
+    makeSession('2024-03-14T10:00:00', 900), // 어제
+    makeSession('2024-03-14T15:00:00', 600), // 어제
+    makeSession('2024-02-10T10:00:00', 1500), // 전월
+  ];
+
+  it('getPrevDayFocusSeconds — 어제 집중 초 합산', () => {
+    expect(getPrevDayFocusSeconds(sessions, TODAY)).toBe(1500); // 900 + 600
+  });
+
+  it('getPrevDaySessionCount — 어제 세션 수', () => {
+    expect(getPrevDaySessionCount(sessions, TODAY)).toBe(2);
+  });
+
+  it('getPrevMonthSessionCount — 전월 세션 수', () => {
+    expect(getPrevMonthSessionCount(sessions, TODAY)).toBe(1);
+  });
+
+  it('getPrevDayFocusSeconds — 어제 세션 없으면 0', () => {
+    expect(getPrevDayFocusSeconds([], TODAY)).toBe(0);
+  });
+});
+
+describe('getFirstSessionDate', () => {
+  it('가장 오래된 세션 날짜 반환', () => {
+    const sessions = [
+      makeSession('2024-03-15T10:00:00'),
+      makeSession('2024-01-05T10:00:00'),
+      makeSession('2024-03-01T10:00:00'),
+    ];
+    const result = getFirstSessionDate(sessions);
+    expect(result?.toISOString().startsWith('2024-01-05')).toBe(true);
+  });
+
+  it('세션 없으면 null', () => {
+    expect(getFirstSessionDate([])).toBeNull();
   });
 });
