@@ -59,7 +59,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   }
 
   return (
-    <div className="flex flex-col gap-6 h-full">
+    <div className="flex flex-col gap-6 bg-card border border-border rounded-xl p-6">
       {onBack && (
         <button
           onClick={onBack}
@@ -181,7 +181,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
       </div>
 
       {/* Delete */}
-      <div className="mt-auto pt-4 border-t border-border">
+      <div className="mt-6 pt-4 border-t border-border">
         <button
           onClick={() => setConfirmDelete(true)}
           className="text-sm text-destructive hover:text-destructive/80 transition-colors"
