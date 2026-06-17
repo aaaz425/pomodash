@@ -63,6 +63,7 @@ export function JournalFilterModal({
 
   if (!open) return null;
 
+  const today = new Date().toISOString().slice(0, 10);
   const hasActiveFilter = !!(searchQuery || selectedCategoryId || dateFrom || dateTo);
 
   const PRESETS: { label: string; preset: DatePreset }[] = [
@@ -207,16 +208,17 @@ export function JournalFilterModal({
               <DatePickerInput
                 value={dateFrom}
                 onChange={onDateFromChange}
-                max={dateTo || undefined}
+                max={dateTo && dateTo < today ? dateTo : today}
                 placeholder="시작일"
               />
             </div>
-            <span className="text-muted-foreground text-sm shrink-0">—</span>
+            <span className="text-muted-foreground text-sm shrink-0">-</span>
             <div className="flex-1">
               <DatePickerInput
                 value={dateTo}
                 onChange={onDateToChange}
                 min={dateFrom || undefined}
+                max={today}
                 placeholder="종료일"
               />
             </div>

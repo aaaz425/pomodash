@@ -61,7 +61,7 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
     ...Array<null>(firstDow).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
-  while (cells.length % 7 !== 0) cells.push(null);
+  while (cells.length < 42) cells.push(null); // 항상 6행으로 고정
 
   function dayKey(day: number) {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -79,6 +79,12 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
     onChange(dayKey(day));
     setOpen(false);
   }
+
+  const maxDate = max ? parseKey(max) : null;
+  const isAtMaxMonth =
+    maxDate !== null &&
+    viewDate.getFullYear() === maxDate.getFullYear() &&
+    viewDate.getMonth() === maxDate.getMonth();
 
   const displayText = parsed ? format(parsed, 'yyyy. M. d', { locale: ko }) : null;
 
@@ -124,7 +130,13 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
             <button
               type="button"
               onClick={() => setViewDate(addMonths(viewDate, 1))}
-              className="p-1 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"
+              disabled={isAtMaxMonth}
+              className={[
+                'p-1 rounded-md transition-colors',
+                isAtMaxMonth
+                  ? 'text-muted-foreground/30 cursor-not-allowed'
+                  : 'hover:bg-muted/60 text-muted-foreground hover:text-foreground',
+              ].join(' ')}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
