@@ -28,7 +28,7 @@
 
 ## Phase 4 — 대시보드
 
-- [ ] `feat/dashboard-core` — 일/주/월 탭 + 집중 시간 집계
+- [>] `feat/dashboard-core` — 일/주/월 탭 + 집중 시간 집계
 - [ ] `feat/dashboard-chart` — 카테고리별 색상 구분 막대 차트 (Recharts)
 - [ ] `feat/dashboard-streak` — 연속 기록 (스트릭) 계산 + 표시
 - [ ] `feat/dashboard-goal` — 목표 시간 설정 + 달성률
