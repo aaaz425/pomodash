@@ -137,13 +137,13 @@ export function JournalView() {
   ) : null;
 
   return (
-    <>
+    <div className="lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
       {/* 데스크탑: split layout */}
-      <div className="hidden lg:flex gap-6 items-start">
-        <div className="w-[400px] shrink-0">{listPanel}</div>
-        <div className="flex-1 sticky top-6 h-[calc(100vh-3rem)]">
+      <div className="hidden lg:flex flex-1 min-h-0 gap-6">
+        <div className="w-[400px] shrink-0 h-full overflow-y-auto">{listPanel}</div>
+        <div className="flex-1 h-full">
           {detail ?? (
-            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
               세션을 선택하면 상세 내용을 볼 수 있어요
             </div>
           )}
@@ -186,6 +186,6 @@ export function JournalView() {
         }}
         markedDates={markedDates}
       />
-    </>
+    </div>
   );
 }
