@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Settings } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 export function TopBar() {
   return (

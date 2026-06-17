@@ -34,6 +34,11 @@ components/
     SessionNote.tsx
     SessionHistory.tsx
   shared/                   # 여러 feature에서 공유하는 컴포넌트
+    layout/                 # 반응형 레이아웃 전용 (app 레이어에서만 사용)
+      TopBar.tsx
+      Sidebar.tsx
+      IconSidebar.tsx
+      BottomNav.tsx
     CategoryBadge.tsx
     MotivationalMessage.tsx
 store/
@@ -121,21 +126,26 @@ shared 컴포넌트 추가 시 아래 목록을 함께 업데이트한다.
 | -------- | ---- |
 | `button` | 기본 버튼 |
 
-**`components/shared/` (프로젝트 공유)**
+**`components/shared/layout/` (반응형 레이아웃 — app 레이어 전용)**
 
 | 컴포넌트 | 용도 |
 | -------- | ---- |
 | `BottomNav` | 모바일 하단 네비게이션 |
+| `IconSidebar` | 아이콘 사이드바 (태블릿) |
+| `Sidebar` | 사이드바 (데스크탑) |
+| `TopBar` | 상단 바 (모바일) |
+
+**`components/shared/` (프로젝트 공유)**
+
+| 컴포넌트 | 용도 |
+| -------- | ---- |
 | `CategoryBadge` | 카테고리 색상 뱃지 |
 | `CategoryPills` | 카테고리 선택 pill 버튼 (`variant: rich / simple`) |
 | `ConfirmDialog` | 확인/취소 대화상자 |
-| `IconSidebar` | 아이콘 사이드바 |
-| `Sidebar` | 사이드바 |
 | `StepperInput` | 숫자 증감 입력 (단위 포함) |
 | `TaskQuickAddForm` | 인라인 작업 빠른 생성 폼 (모달 내부용) |
 | `ThemeToggle` | 테마 전환 버튼 |
 | `TimerSettingsGroup` | 집중·횟수·휴식 StepperInput 3종 세트 |
-| `TopBar` | 상단 바 |
 
 ## Zustand 스토어 패턴
 
