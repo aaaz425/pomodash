@@ -40,7 +40,7 @@ export function TaskItem({ task, isSelected, onSelect }: Props) {
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         aria-label="순서 조정"
-        className="shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
+        className="shrink-0 -m-1 p-1 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
       >
         <GripVertical className="w-3.5 h-3.5" />
       </button>

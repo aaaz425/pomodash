@@ -9,6 +9,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
@@ -49,7 +50,12 @@ export function TaskList({ selectedTaskId, onSelect }: Props) {
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      modifiers={[restrictToVerticalAxis]}
+      onDragEnd={handleDragEnd}
+    >
       <SortableContext items={active.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="overflow-y-auto flex-1 py-1">
           {active.map((task) => (
