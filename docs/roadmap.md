@@ -40,6 +40,16 @@
 
 ## Phase 6 — 공통 & 마무리
 
+- [>] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
 - [ ] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 - [ ] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
+- [ ] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
+- [ ] `style/skeleton-ui` — 페이지별 스켈레톤 로딩 UI (supabase-migration 완료 후)
+
+## Phase 7 — 네이티브 앱
+
+- [ ] `chore/rn-setup` — React Native (Expo) 프로젝트 초기 설정 + 공유 로직 분리
+- [ ] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함)
+- [ ] `feat/rn-tasks` — 작업 목록 네이티브 UI
+- [ ] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
