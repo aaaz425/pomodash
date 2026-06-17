@@ -1,6 +1,7 @@
 'use client';
 
 import { createStore } from 'zustand';
+import { arrayMove } from '@dnd-kit/sortable';
 import {
   type Task,
   type Category,
@@ -28,6 +29,7 @@ interface TaskStore {
   toggleTask: (id: string) => void;
   deleteTask: (id: string) => void;
   addSession: (input: Omit<Session, 'id'>) => void;
+  reorderTasks: (activeId: string, overId: string) => void;
   openModal: () => void;
   closeModal: () => void;
   hydrate: () => void;
@@ -119,6 +121,16 @@ export const createTaskStore = () =>
       const sessions = [session, ...get().sessions];
       saveSessions(sessions);
       set({ sessions });
+    },
+
+    reorderTasks: (activeId, overId) => {
+      const { tasks } = get();
+      const from = tasks.findIndex((t) => t.id === activeId);
+      const to = tasks.findIndex((t) => t.id === overId);
+      if (from === -1 || to === -1) return;
+      const next = arrayMove(tasks, from, to);
+      saveTasks(next);
+      set({ tasks: next });
     },
 
     openModal: () => set({ isModalOpen: true }),
