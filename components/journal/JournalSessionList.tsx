@@ -32,17 +32,19 @@ export function JournalSessionList({ groups, tasks, categories, selectedId, onSe
             </span>
           </div>
           <div className="flex flex-col gap-1.5">
-            {group.sessions.map((session) => {
+            {group.sessions.map((session, displayIdx) => {
               const task = tasks.find((t) => t.id === session.taskId) ?? null;
               const category = task
                 ? (categories.find((c) => c.id === task.categoryId) ?? null)
                 : null;
+              const sessionIndex = group.sessions.length - 1 - displayIdx;
               return (
                 <SessionListItem
                   key={session.id}
                   session={session}
                   task={task}
                   category={category}
+                  sessionIndex={sessionIndex}
                   isSelected={selectedId === session.id}
                   onSelect={() => onSelect(session.id)}
                 />

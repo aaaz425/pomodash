@@ -54,6 +54,14 @@ export function groupSessionsByDate(sessions: Session[], ref?: Date): SessionGro
     }));
 }
 
+export function getSessionOrdinalTitle(startedAt: string, chronologicalIndex: number): string {
+  const d = new Date(startedAt);
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  return `${m}월 ${day}일 ${chronologicalIndex + 1}번째 세션`;
+}
+
 export function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}초`;
   const mins = Math.floor(seconds / 60);

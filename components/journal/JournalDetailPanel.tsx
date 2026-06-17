@@ -5,7 +5,12 @@ import { ArrowLeft, Pencil } from 'lucide-react';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useTaskStore } from '@/store/StoreProvider';
-import { formatDuration, formatTimeRange, formatFullDate } from '@/lib/sessionUtils';
+import {
+  formatDuration,
+  formatTimeRange,
+  formatFullDate,
+  getSessionOrdinalTitle,
+} from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -19,6 +24,15 @@ interface Props {
 export function JournalDetailPanel({ session, task, category, onBack, onDeleted }: Props) {
   const updateSessionNote = useTaskStore((s) => s.updateSessionNote);
   const deleteSession = useTaskStore((s) => s.deleteSession);
+  const sessions = useTaskStore((s) => s.sessions);
+
+  const sessionIndex = (() => {
+    const dateKey = session.startedAt.slice(0, 10);
+    const sorted = sessions
+      .filter((s) => s.startedAt.slice(0, 10) === dateKey)
+      .sort((a, b) => a.startedAt.localeCompare(b.startedAt));
+    return sorted.findIndex((s) => s.id === session.id);
+  })();
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(session.note ?? '');
@@ -72,11 +86,11 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
 
       {/* Task Section */}
       <div className="flex flex-col gap-2">
-        {category && <CategoryBadge category={category} />}
+        {category && <CategoryBadge category={category} className="self-start" />}
         <h2
           className={`text-xl font-bold tracking-tight ${!task ? 'text-muted-foreground' : 'text-foreground'}`}
         >
-          {task?.title ?? '미분류'}
+          {task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex)}
         </h2>
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <span>{formatFullDate(session.startedAt)}</span>

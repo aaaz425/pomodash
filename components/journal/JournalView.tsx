@@ -18,18 +18,18 @@ export function JournalView() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(new Set());
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  const hasActiveFilter = !!(searchQuery || selectedCategoryId || dateFrom || dateTo);
+  const hasActiveFilter = !!(searchQuery || selectedCategoryIds.size > 0 || dateFrom || dateTo);
 
   const filteredSessions = useMemo(() => {
     let result = sessions;
 
-    if (selectedCategoryId) {
+    if (selectedCategoryIds.size > 0) {
       const taskIds = new Set(
-        tasks.filter((t) => t.categoryId === selectedCategoryId).map((t) => t.id),
+        tasks.filter((t) => selectedCategoryIds.has(t.categoryId)).map((t) => t.id),
       );
       result = result.filter((s) => s.taskId && taskIds.has(s.taskId));
     }
@@ -48,7 +48,7 @@ export function JournalView() {
     if (dateTo) result = result.filter((s) => s.startedAt.slice(0, 10) <= dateTo);
 
     return result;
-  }, [sessions, tasks, selectedCategoryId, searchQuery, dateFrom, dateTo]);
+  }, [sessions, tasks, selectedCategoryIds, searchQuery, dateFrom, dateTo]);
 
   const groups = useMemo(() => groupSessionsByDate(filteredSessions), [filteredSessions]);
 
@@ -94,7 +94,7 @@ export function JournalView() {
       <button
         onClick={() => {
           setSearchQuery('');
-          setSelectedCategoryId(null);
+          setSelectedCategoryIds(new Set());
           setDateFrom('');
           setDateTo('');
         }}
@@ -171,16 +171,16 @@ export function JournalView() {
         onClose={() => setFilterOpen(false)}
         categories={categories}
         searchQuery={searchQuery}
-        selectedCategoryId={selectedCategoryId}
+        selectedCategoryIds={selectedCategoryIds}
         dateFrom={dateFrom}
         dateTo={dateTo}
         onSearchChange={setSearchQuery}
-        onCategoryChange={setSelectedCategoryId}
+        onCategoryChange={setSelectedCategoryIds}
         onDateFromChange={setDateFrom}
         onDateToChange={setDateTo}
         onReset={() => {
           setSearchQuery('');
-          setSelectedCategoryId(null);
+          setSelectedCategoryIds(new Set());
           setDateFrom('');
           setDateTo('');
         }}

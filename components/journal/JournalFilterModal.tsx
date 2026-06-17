@@ -10,11 +10,11 @@ interface Props {
   onClose: () => void;
   categories: Category[];
   searchQuery: string;
-  selectedCategoryId: string | null;
+  selectedCategoryIds: Set<string>;
   dateFrom: string;
   dateTo: string;
   onSearchChange: (v: string) => void;
-  onCategoryChange: (id: string | null) => void;
+  onCategoryChange: (ids: Set<string>) => void;
   onDateFromChange: (v: string) => void;
   onDateToChange: (v: string) => void;
   onReset: () => void;
@@ -51,7 +51,7 @@ export function JournalFilterModal({
   onClose,
   categories,
   searchQuery,
-  selectedCategoryId,
+  selectedCategoryIds,
   dateFrom,
   dateTo,
   onSearchChange,
@@ -66,7 +66,7 @@ export function JournalFilterModal({
   if (!open) return null;
 
   const today = new Date().toISOString().slice(0, 10);
-  const hasActiveFilter = !!(searchQuery || selectedCategoryId || dateFrom || dateTo);
+  const hasActiveFilter = !!(searchQuery || selectedCategoryIds.size > 0 || dateFrom || dateTo);
 
   const PRESETS: { label: string; preset: DatePreset }[] = [
     { label: '오늘', preset: 'today' },
@@ -148,10 +148,10 @@ export function JournalFilterModal({
           </span>
           <div className="flex flex-wrap gap-1.5">
             <button
-              onClick={() => onCategoryChange(null)}
+              onClick={() => onCategoryChange(new Set())}
               className={[
                 'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
-                selectedCategoryId === null
+                selectedCategoryIds.size === 0
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-transparent text-muted-foreground border-border hover:border-foreground/40',
               ].join(' ')}
@@ -159,13 +159,18 @@ export function JournalFilterModal({
               전체
             </button>
             {categories.map((cat) => {
-              const isSelected = selectedCategoryId === cat.id;
+              const isSelected = selectedCategoryIds.has(cat.id);
               const colorClass =
                 CATEGORY_COLOR_MAP[cat.color] ?? 'bg-muted text-muted-foreground border-border';
               return (
                 <button
                   key={cat.id}
-                  onClick={() => onCategoryChange(isSelected ? null : cat.id)}
+                  onClick={() => {
+                    const next = new Set(selectedCategoryIds);
+                    if (next.has(cat.id)) next.delete(cat.id);
+                    else next.add(cat.id);
+                    onCategoryChange(next);
+                  }}
                   className={[
                     'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                     isSelected
