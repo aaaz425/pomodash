@@ -4,6 +4,7 @@ import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
+import { ContributionCalendar } from '@/components/dashboard/ContributionCalendar';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
@@ -12,6 +13,8 @@ import {
   filterSessionsByTab,
   getAvgSessionSeconds,
   getFirstSessionDate,
+  getMaxStreakDays,
+  getMonthlyActivityData,
   getPrevDayFocusSeconds,
   getPrevDaySessionCount,
   getPrevMonthFocusSeconds,
@@ -51,6 +54,8 @@ export default function DashboardPage() {
   const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
   const avgSessionSeconds = useMemo(() => getAvgSessionSeconds(filtered), [filtered]);
   const streakDays = useMemo(() => getStreakDays(sessions), [sessions]);
+  const maxStreakDays = useMemo(() => getMaxStreakDays(sessions), [sessions]);
+  const monthlyActivity = useMemo(() => getMonthlyActivityData(sessions), [sessions]);
   const firstSessionDate = useMemo(() => getFirstSessionDate(sessions), [sessions]);
 
   const prevDayFocusSec = useMemo(() => getPrevDayFocusSeconds(sessions), [sessions]);
@@ -130,7 +135,7 @@ export default function DashboardPage() {
             label="연속 집중일"
             Icon={Flame}
             value={`${streakDays}일`}
-            sub="현재 연속 기록"
+            sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
           />
           <StatCard
             label="세션 평균"
@@ -149,11 +154,9 @@ export default function DashboardPage() {
             tab={tab}
             focusLabel={focusLabel}
           />
-          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
+          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card">
             <p className="text-sm font-semibold text-foreground">이달의 잔디</p>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">준비 중</p>
-            </div>
+            <ContributionCalendar data={monthlyActivity} />
           </div>
         </div>
 

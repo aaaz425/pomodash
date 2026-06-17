@@ -1,0 +1,89 @@
+import type { DayActivity } from '@/lib/dashboard';
+
+interface Props {
+  data: DayActivity[];
+}
+
+const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
+
+function intensityClass(minutes: number): string {
+  if (minutes === 0) return 'bg-muted';
+  if (minutes < 30) return 'bg-green-200 dark:bg-green-900';
+  if (minutes < 60) return 'bg-green-400 dark:bg-green-700';
+  if (minutes < 90) return 'bg-green-500 dark:bg-green-600';
+  return 'bg-green-600 dark:bg-green-400';
+}
+
+function formatTitle(dateStr: string, minutes: number): string {
+  const date = new Date(dateStr + 'T00:00:00');
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if (minutes === 0) return `${month}월 ${day}일`;
+  return `${month}월 ${day}일 · ${minutes}분`;
+}
+
+// weekStartsOn: 1 (월요일) 기준 — 월=0 ... 일=6
+function dayOfWeekIndex(dateStr: string): number {
+  const d = new Date(dateStr + 'T00:00:00');
+  return (d.getDay() + 6) % 7; // 0=월,1=화,...,6=일
+}
+
+export function ContributionCalendar({ data }: Props) {
+  if (data.length === 0) return null;
+
+  const firstDayOffset = dayOfWeekIndex(data[0].date);
+  const cells: Array<DayActivity | null> = [...Array(firstDayOffset).fill(null), ...data];
+
+  // 마지막 주를 7의 배수로 채움
+  const remainder = cells.length % 7;
+  if (remainder > 0) {
+    cells.push(...Array(7 - remainder).fill(null));
+  }
+
+  const weeks: Array<Array<DayActivity | null>> = [];
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7));
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* 요일 헤더 */}
+      <div className="grid grid-cols-7 gap-1">
+        {DAY_LABELS.map((label) => (
+          <span key={label} className="text-[10px] text-muted-foreground text-center">
+            {label}
+          </span>
+        ))}
+      </div>
+
+      {/* 날짜 셀 */}
+      <div className="flex flex-col gap-1">
+        {weeks.map((week, wi) => (
+          <div key={wi} className="grid grid-cols-7 gap-1">
+            {week.map((day, di) =>
+              day ? (
+                <div
+                  key={day.date}
+                  title={formatTitle(day.date, day.focusMinutes)}
+                  className={`w-full aspect-square rounded-sm ${intensityClass(day.focusMinutes)}`}
+                />
+              ) : (
+                <div key={`empty-${wi}-${di}`} className="w-full aspect-square" />
+              ),
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 범례 */}
+      <div className="flex items-center gap-1.5 mt-1 self-end">
+        <span className="text-[10px] text-muted-foreground">낮음</span>
+        <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900" />
+        <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700" />
+        <div className="w-3 h-3 rounded-sm bg-green-500 dark:bg-green-600" />
+        <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-400" />
+        <span className="text-[10px] text-muted-foreground">높음</span>
+      </div>
+    </div>
+  );
+}
