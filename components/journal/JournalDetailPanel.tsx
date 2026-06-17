@@ -82,8 +82,6 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
           <span>{formatFullDate(session.startedAt)}</span>
           <span className="text-muted-foreground/40">·</span>
           <span>{formatTimeRange(session.startedAt, session.endedAt)}</span>
-          <span className="text-muted-foreground/40">·</span>
-          <span>{formatDuration(session.focusSeconds)} 집중</span>
         </div>
       </div>
 
@@ -157,12 +155,6 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
       {/* Session Stats */}
       <div className="flex">
         <div className="flex-1 flex flex-col gap-1 pr-4 border-r border-border">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-            페이즈
-          </span>
-          <span className="text-base font-bold text-foreground">집중</span>
-        </div>
-        <div className="flex-1 flex flex-col gap-1 px-4 border-r border-border">
           <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
             집중 시간
           </span>
