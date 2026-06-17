@@ -29,6 +29,8 @@ interface TaskStore {
   toggleTask: (id: string) => void;
   deleteTask: (id: string) => void;
   addSession: (input: Omit<Session, 'id'>) => void;
+  updateSessionNote: (id: string, note: string | null) => void;
+  deleteSession: (id: string) => void;
   reorderTasks: (activeId: string, overId: string) => void;
   openModal: () => void;
   closeModal: () => void;
@@ -119,6 +121,20 @@ export const createTaskStore = () =>
     addSession: (input) => {
       const session: Session = { id: crypto.randomUUID(), ...input };
       const sessions = [session, ...get().sessions];
+      saveSessions(sessions);
+      set({ sessions });
+    },
+
+    updateSessionNote: (id, note) => {
+      const sessions = get().sessions.map((s) =>
+        s.id === id ? { ...s, note: note?.trim() || null } : s,
+      );
+      saveSessions(sessions);
+      set({ sessions });
+    },
+
+    deleteSession: (id) => {
+      const sessions = get().sessions.filter((s) => s.id !== id);
       saveSessions(sessions);
       set({ sessions });
     },
