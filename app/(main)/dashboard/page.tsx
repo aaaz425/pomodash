@@ -12,6 +12,7 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
+  getBusiestDayOfWeek,
   getFirstSessionDate,
   getMaxStreakDays,
   getMonthlyActivityData,
@@ -49,6 +50,7 @@ export default function DashboardPage() {
   const categories = useTaskStore((s) => s.categories);
 
   const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
+  const monthSessions = useMemo(() => filterSessionsByTab(sessions, 'month'), [sessions]);
 
   const totalFocusSeconds = useMemo(() => getTotalFocusSeconds(filtered), [filtered]);
   const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
@@ -56,6 +58,8 @@ export default function DashboardPage() {
   const streakDays = useMemo(() => getStreakDays(sessions), [sessions]);
   const maxStreakDays = useMemo(() => getMaxStreakDays(sessions), [sessions]);
   const monthlyActivity = useMemo(() => getMonthlyActivityData(sessions), [sessions]);
+  const monthFocusSeconds = useMemo(() => getTotalFocusSeconds(monthSessions), [monthSessions]);
+  const busiestDay = useMemo(() => getBusiestDayOfWeek(sessions), [sessions]);
   const firstSessionDate = useMemo(() => getFirstSessionDate(sessions), [sessions]);
 
   const prevDayFocusSec = useMemo(() => getPrevDayFocusSeconds(sessions), [sessions]);
@@ -154,9 +158,29 @@ export default function DashboardPage() {
             tab={tab}
             focusLabel={focusLabel}
           />
+
+          {/* 이달의 잔디 */}
           <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card">
             <p className="text-sm font-semibold text-foreground">이달의 잔디</p>
-            <ContributionCalendar data={monthlyActivity} />
+            <div className="flex gap-5">
+              <ContributionCalendar data={monthlyActivity} />
+              <div className="flex flex-col justify-center gap-4">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">이번달 총 집중</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {monthFocusSeconds === 0 ? '-' : formatDuration(monthFocusSeconds)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">최장 연속기록</span>
+                  <span className="text-sm font-bold text-foreground">{maxStreakDays}일</span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">가장 활발한날</span>
+                  <span className="text-sm font-bold text-foreground">{busiestDay ?? '-'}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

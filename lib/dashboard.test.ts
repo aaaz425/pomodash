@@ -4,6 +4,7 @@ import type { Session } from '@/types';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
+  getBusiestDayOfWeek,
   getFirstSessionDate,
   getMaxStreakDays,
   getMonthlyActivityData,
@@ -233,6 +234,28 @@ describe('getMaxStreakDays', () => {
   it('같은 날 여러 세션은 1일로 계산', () => {
     const sessions = [makeSession('2024-03-15T09:00:00'), makeSession('2024-03-15T14:00:00')];
     expect(getMaxStreakDays(sessions)).toBe(1);
+  });
+});
+
+describe('getBusiestDayOfWeek', () => {
+  const TODAY = new Date('2024-03-15T12:00:00');
+
+  it('세션 없으면 null', () => {
+    expect(getBusiestDayOfWeek([], TODAY)).toBeNull();
+  });
+
+  it('이달 세션 없으면 null', () => {
+    const sessions = [makeSession('2024-02-10T10:00:00', 3600)];
+    expect(getBusiestDayOfWeek(sessions, TODAY)).toBeNull();
+  });
+
+  it('가장 집중 시간이 많은 요일 반환', () => {
+    const sessions = [
+      makeSession('2024-03-11T10:00:00', 3600), // 월요일
+      makeSession('2024-03-11T14:00:00', 1800), // 월요일
+      makeSession('2024-03-12T10:00:00', 1200), // 화요일
+    ];
+    expect(getBusiestDayOfWeek(sessions, TODAY)).toBe('월요일');
   });
 });
 

@@ -183,6 +183,18 @@ export function getMaxStreakDays(sessions: Session[]): number {
   return Math.max(maxStreak, currentStreak);
 }
 
+export function getBusiestDayOfWeek(sessions: Session[], today: Date = new Date()): string | null {
+  const monthSessions = filterSessionsByTab(sessions, 'month', today);
+  if (monthSessions.length === 0) return null;
+
+  const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+  const totals = new Array(7).fill(0);
+  for (const s of monthSessions) {
+    totals[parseISO(s.startedAt).getDay()] += s.focusSeconds;
+  }
+  return DAY_NAMES[totals.indexOf(Math.max(...totals))] + '요일';
+}
+
 export function getFirstSessionDate(sessions: Session[]): Date | null {
   if (sessions.length === 0) return null;
   const earliest = sessions.reduce((min, s) => (s.startedAt < min.startedAt ? s : min));

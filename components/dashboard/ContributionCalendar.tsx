@@ -48,9 +48,9 @@ export function ContributionCalendar({ data }: Props) {
   return (
     <div className="flex flex-col gap-2">
       {/* 요일 헤더 */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="flex gap-1">
         {DAY_LABELS.map((label) => (
-          <span key={label} className="text-[10px] text-muted-foreground text-center">
+          <span key={label} className="w-3.5 shrink-0 text-[9px] text-muted-foreground text-center">
             {label}
           </span>
         ))}
@@ -59,16 +59,16 @@ export function ContributionCalendar({ data }: Props) {
       {/* 날짜 셀 */}
       <div className="flex flex-col gap-1">
         {weeks.map((week, wi) => (
-          <div key={wi} className="grid grid-cols-7 gap-1">
+          <div key={wi} className="flex gap-1">
             {week.map((day, di) =>
               day ? (
                 <div
                   key={day.date}
                   title={formatTitle(day.date, day.focusMinutes)}
-                  className={`w-full aspect-square rounded-sm ${intensityClass(day.focusMinutes)}`}
+                  className={`w-3.5 h-3.5 shrink-0 rounded-[3px] ${intensityClass(day.focusMinutes)}`}
                 />
               ) : (
-                <div key={`empty-${wi}-${di}`} className="w-full aspect-square" />
+                <div key={`empty-${wi}-${di}`} className="w-3.5 h-3.5 shrink-0" />
               ),
             )}
           </div>
@@ -77,12 +77,12 @@ export function ContributionCalendar({ data }: Props) {
 
       {/* 범례 */}
       <div className="flex items-center gap-1.5 mt-1 self-end">
-        <span className="text-[10px] text-muted-foreground">낮음</span>
-        <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900" />
-        <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700" />
-        <div className="w-3 h-3 rounded-sm bg-green-500 dark:bg-green-600" />
-        <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-400" />
-        <span className="text-[10px] text-muted-foreground">높음</span>
+        <span className="text-[10px] text-muted-foreground">적음</span>
+        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-200 dark:bg-green-900" />
+        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-400 dark:bg-green-700" />
+        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-500 dark:bg-green-600" />
+        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-600 dark:bg-green-400" />
+        <span className="text-[10px] text-muted-foreground">많음</span>
       </div>
     </div>
   );
