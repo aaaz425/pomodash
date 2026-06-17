@@ -19,6 +19,8 @@ interface Props {
   min?: string;
   max?: string;
   placeholder?: string;
+  markedDates?: Set<string>; // 세션 있는 날짜 (YYYY-MM-DD)
+  onMonthChange?: (year: number, month: number) => void; // 백엔드 연동 시 월별 fetch용
 }
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -30,7 +32,15 @@ function parseKey(key: string): Date | null {
   return new Date(y, m - 1, d);
 }
 
-export function DatePickerInput({ value, onChange, min, max, placeholder = '날짜 선택' }: Props) {
+export function DatePickerInput({
+  value,
+  onChange,
+  min,
+  max,
+  placeholder = '날짜 선택',
+  markedDates,
+  onMonthChange,
+}: Props) {
   const parsed = parseKey(value);
   const [open, setOpen] = useState(false);
   const [viewDate, setViewDate] = useState<Date>(parsed ?? new Date());
@@ -119,7 +129,11 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
           <div className="flex items-center justify-between mb-2">
             <button
               type="button"
-              onClick={() => setViewDate(subMonths(viewDate, 1))}
+              onClick={() => {
+                const next = subMonths(viewDate, 1);
+                setViewDate(next);
+                onMonthChange?.(next.getFullYear(), next.getMonth() + 1);
+              }}
               className="p-1 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -129,7 +143,11 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
             </span>
             <button
               type="button"
-              onClick={() => setViewDate(addMonths(viewDate, 1))}
+              onClick={() => {
+                const next = addMonths(viewDate, 1);
+                setViewDate(next);
+                onMonthChange?.(next.getFullYear(), next.getMonth() + 1);
+              }}
               disabled={isAtMaxMonth}
               className={[
                 'p-1 rounded-md transition-colors',
@@ -161,6 +179,7 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
               const disabled = isDisabled(day);
               const selected = value === dayKey(day);
               const today = isToday(new Date(year, month, day));
+              const marked = markedDates?.has(dayKey(day)) ?? false;
               return (
                 <button
                   key={i}
@@ -168,7 +187,7 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
                   disabled={disabled}
                   onClick={() => handleSelect(day)}
                   className={[
-                    'w-full aspect-square text-xs rounded-md flex items-center justify-center transition-colors',
+                    'relative w-full aspect-square text-xs rounded-md flex items-center justify-center transition-colors',
                     selected
                       ? 'bg-primary text-primary-foreground font-semibold'
                       : today
@@ -179,6 +198,14 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = '날�
                   ].join(' ')}
                 >
                   {day}
+                  {marked && (
+                    <span
+                      className={[
+                        'absolute bottom-[3px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full',
+                        selected ? 'bg-primary-foreground/70' : 'bg-primary',
+                      ].join(' ')}
+                    />
+                  )}
                 </button>
               );
             })}

@@ -52,6 +52,11 @@ export function JournalView() {
 
   const groups = useMemo(() => groupSessionsByDate(filteredSessions), [filteredSessions]);
 
+  const markedDates = useMemo(
+    () => new Set(sessions.map((s) => s.startedAt.slice(0, 10))),
+    [sessions],
+  );
+
   if (!hydrated) return null;
 
   if (sessions.length === 0) return <JournalEmptyState />;
@@ -179,6 +184,7 @@ export function JournalView() {
           setDateFrom('');
           setDateTo('');
         }}
+        markedDates={markedDates}
       />
     </>
   );

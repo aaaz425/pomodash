@@ -18,6 +18,7 @@ interface Props {
   onDateFromChange: (v: string) => void;
   onDateToChange: (v: string) => void;
   onReset: () => void;
+  markedDates?: Set<string>;
 }
 
 type DatePreset = 'today' | 'week' | 'month';
@@ -58,6 +59,7 @@ export function JournalFilterModal({
   onDateFromChange,
   onDateToChange,
   onReset,
+  markedDates,
 }: Props) {
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -210,6 +212,7 @@ export function JournalFilterModal({
                 onChange={onDateFromChange}
                 max={dateTo && dateTo < today ? dateTo : today}
                 placeholder="시작일"
+                markedDates={markedDates}
               />
             </div>
             <span className="text-muted-foreground text-sm shrink-0">-</span>
@@ -220,6 +223,7 @@ export function JournalFilterModal({
                 min={dateFrom || undefined}
                 max={today}
                 placeholder="종료일"
+                markedDates={markedDates}
               />
             </div>
           </div>
