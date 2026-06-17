@@ -172,8 +172,96 @@ describe('timerStore', () => {
     })
   })
 
-  describe('hydrateSettings', () => {
-    it('생성 시점에는 localStorage 값과 무관하게 항상 기본값(SSR과 동일)으로 시작함', () => {
+  describe('시간 추적 (sessionStartedAt / accFocusSeconds)', () => {
+    it('start() — sessionStartedAt이 첫 호출 시각으로 설정됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      expect(store.getState().sessionStartedAt).toBe(new Date('2024-01-01T00:00:00.000Z').getTime())
+    })
+
+    it('start() — 재개 시 sessionStartedAt을 덮어쓰지 않음', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      const first = store.getState().sessionStartedAt
+
+      vi.setSystemTime(new Date('2024-01-01T00:05:00.000Z'))
+      store.getState().pause()
+      store.getState().start()
+
+      expect(store.getState().sessionStartedAt).toBe(first)
+    })
+
+    it('pause() — focus 중 accFocusSeconds에 경과 시간 누적', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+
+      vi.setSystemTime(new Date('2024-01-01T00:05:00.000Z'))
+      store.getState().pause()
+
+      expect(store.getState().accFocusSeconds).toBe(300)
+    })
+
+    it('pause() — short-break 중에는 accFocusSeconds 변경 없음', () => {
+      const store = createTimerStore()
+      store.getState().completeCycle() // → short-break
+
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      store.getState().start()
+      vi.setSystemTime(new Date('2024-01-01T00:05:00.000Z'))
+      store.getState().pause()
+
+      expect(store.getState().accFocusSeconds).toBe(0)
+    })
+
+    it('completeCycle() — focus 경과 시간이 accFocusSeconds에 누적됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      vi.setSystemTime(new Date('2024-01-01T00:25:00.000Z'))
+      store.getState().completeCycle()
+
+      expect(store.getState().accFocusSeconds).toBe(1500)
+    })
+
+    it('completeCycle() — 마지막 사이클 완료 시 sessionEndedAt 기록', () => {
+      vi.setSystemTime(new Date('2024-01-01T01:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      for (let i = 0; i < 4; i++) store.getState().completeCycle()
+
+      expect(store.getState().sessionEndedAt).toBe(new Date('2024-01-01T01:00:00.000Z').getTime())
+    })
+
+    it('endSession() — focus 진행 중 종료 시 경과 시간 accFocusSeconds에 추가', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      vi.setSystemTime(new Date('2024-01-01T00:10:00.000Z'))
+      store.getState().endSession()
+
+      expect(store.getState().accFocusSeconds).toBe(600)
+      expect(store.getState().sessionEndedAt).toBe(new Date('2024-01-01T00:10:00.000Z').getTime())
+    })
+
+    it('dismissSessionRecord() — 시간 추적 필드 초기화', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+      const store = createTimerStore()
+      store.getState().start()
+      vi.setSystemTime(new Date('2024-01-01T00:10:00.000Z'))
+      store.getState().endSession()
+      store.getState().dismissSessionRecord()
+
+      expect(store.getState().sessionStartedAt).toBe(null)
+      expect(store.getState().sessionEndedAt).toBe(null)
+      expect(store.getState().accFocusSeconds).toBe(0)
+    })
+  })
+
+  describe('초기값 및 설정 복원', () => {
+    it('생성 시점에는 localStorage 값과 무관하게 항상 기본값으로 시작함', () => {
       localStorage.setItem('pomodash:timer-settings', JSON.stringify({ focusMinutes: 5, shortBreakMinutes: 1, totalCycles: 2 }))
 
       const store = createTimerStore()
@@ -182,14 +270,29 @@ describe('timerStore', () => {
       expect(store.getState().remainingSeconds).toBe(25 * 60)
     })
 
-    it('hydrateSettings() — localStorage 값을 읽어 settings와 remainingSeconds에 반영함', () => {
-      localStorage.setItem('pomodash:timer-settings', JSON.stringify({ focusMinutes: 5, shortBreakMinutes: 1, totalCycles: 2 }))
-
+    it('setCurrentTask(null) — 설정이 기본값으로 복원되고 remainingSeconds도 재계산됨', () => {
       const store = createTimerStore()
-      store.getState().hydrateSettings()
+      store.getState().updateSettings({ focusMinutes: 45, shortBreakMinutes: 10, totalCycles: 2 })
 
-      expect(store.getState().settings.focusMinutes).toBe(5)
-      expect(store.getState().remainingSeconds).toBe(5 * 60)
+      store.getState().setCurrentTask(null)
+
+      expect(store.getState().settings.focusMinutes).toBe(25)
+      expect(store.getState().settings.shortBreakMinutes).toBe(5)
+      expect(store.getState().settings.totalCycles).toBe(4)
+      expect(store.getState().remainingSeconds).toBe(25 * 60)
+    })
+
+    it('dismissSessionRecord() — 설정이 기본값으로 복원됨', () => {
+      const store = createTimerStore()
+      store.getState().updateSettings({ focusMinutes: 45, totalCycles: 2 })
+      store.getState().start()
+      store.getState().endSession()
+
+      store.getState().dismissSessionRecord()
+
+      expect(store.getState().settings.focusMinutes).toBe(25)
+      expect(store.getState().remainingSeconds).toBe(25 * 60)
+      expect(store.getState().currentTaskId).toBe(null)
     })
   })
 })

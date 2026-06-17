@@ -2,27 +2,72 @@
 
 import { useState } from 'react'
 import { Check } from 'lucide-react'
-import { useTimerStore } from '@/store/StoreProvider'
+import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
 import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { CycleIndicator } from '@/components/timer/CycleIndicator'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { normalizeFocusPeriods } from '@/lib/focusPeriods'
 
 export function SessionRecordModal() {
   const sessionEnded = useTimerStore((s) => s.sessionEnded)
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord)
   const cycleCount = useTimerStore((s) => s.cycleCount)
   const totalCycles = useTimerStore((s) => s.settings.totalCycles)
+  const currentTaskId = useTimerStore((s) => s.currentTaskId)
+  const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt)
+  const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt)
+  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds)
+
+  const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods)
+
   const { task, category } = useCurrentTask()
+  const tasks = useTaskStore((s) => s.tasks)
+  const categories = useTaskStore((s) => s.categories)
+  const addSession = useTaskStore((s) => s.addSession)
+
+  const activeTasks = tasks.filter((t) => !t.completed)
 
   const [note, setNote] = useState('')
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
-  if (!sessionEnded) return null
+  if (!sessionEnded || sessionEndedAt === null) return null
 
-  function handleConfirmed() {
+  const isTaskSession = currentTaskId !== null
+  const now = sessionEndedAt
+  const totalElapsed = sessionStartedAt ? Math.floor((now - sessionStartedAt) / 1000) : accFocusSeconds
+  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds)
+
+  function handleSave() {
+    const taskId = isTaskSession ? currentTaskId : selectedTaskId
+    const focusPeriods = normalizeFocusPeriods(
+      rawFocusPeriods.map((p) => ({
+        start: new Date(p.start).toISOString(),
+        end: new Date(p.end).toISOString(),
+      }))
+    )
+    addSession({
+      taskId,
+      startedAt: new Date(sessionStartedAt ?? now).toISOString(),
+      endedAt: new Date(now).toISOString(),
+      completedCycles: cycleCount,
+      totalCycles,
+      focusSeconds: accFocusSeconds,
+      pausedSeconds,
+      focusPeriods,
+      note: note.trim() || null,
+    })
     dismissSessionRecord()
     setNote('')
+    setSelectedTaskId(null)
+    setPendingAction(null)
+  }
+
+  function handleSkip() {
+    dismissSessionRecord()
+    setNote('')
+    setSelectedTaskId(null)
     setPendingAction(null)
   }
 
@@ -63,20 +108,68 @@ export function SessionRecordModal() {
           <div className="h-px bg-border" />
 
           {/* Session Summary */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-2 min-w-0">
-              <span className="text-lg font-semibold tracking-tight text-foreground truncate">
-                {task?.title ?? '작업 없음'}
-              </span>
-              {category && task && <CategoryBadge category={category} />}
+          {isTaskSession ? (
+            /* Case A: 작업 있는 세션 — 작업 정보 표시 */
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 min-w-0">
+                <span className="text-lg font-semibold tracking-tight text-foreground truncate">
+                  {task?.title ?? '작업 없음'}
+                </span>
+                {category && task && <CategoryBadge category={category} />}
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <span className="text-[11px] text-muted-foreground">
+                  완료된 사이클 {cycleCount} / {totalCycles}
+                </span>
+                <CycleIndicator />
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <span className="text-[11px] text-muted-foreground">
-                완료된 사이클 {cycleCount} / {totalCycles}
-              </span>
-              <CycleIndicator />
+          ) : (
+            /* Case B: 작업 없는 세션 — 작업 귀속 UI */
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground">어떤 작업을 하셨나요?</span>
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <span className="text-[11px] text-muted-foreground">
+                    완료된 사이클 {cycleCount} / {totalCycles}
+                  </span>
+                  <CycleIndicator />
+                </div>
+              </div>
+
+              {activeTasks.length === 0 ? (
+                <p className="text-sm text-muted-foreground/60 py-2">등록된 작업이 없습니다.</p>
+              ) : (
+                <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
+                  {activeTasks.map((t) => {
+                    const cat = categories.find((c) => c.id === t.categoryId)
+                    const isSelected = selectedTaskId === t.id
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setSelectedTaskId(isSelected ? null : t.id)}
+                        className={[
+                          'flex items-center gap-3 px-3.5 py-2.5 rounded-lg border text-left transition-colors',
+                          isSelected
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-card hover:bg-muted',
+                        ].join(' ')}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={2.5} />}
+                        {!isSelected && <div className="w-3.5 h-3.5 shrink-0" />}
+                        {cat && <CategoryBadge category={cat} />}
+                        <span className="text-sm text-foreground truncate">{t.title}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              <p className="text-[11px] text-muted-foreground/60">
+                선택하지 않으면 미분류로 저장됩니다.
+              </p>
             </div>
-          </div>
+          )}
 
           {/* Note Section */}
           <div className="flex flex-col gap-2.5">
@@ -120,16 +213,20 @@ export function SessionRecordModal() {
         title="기록을 건너뛸까요?"
         description="작성한 메모는 저장되지 않아요."
         confirmLabel="건너뛰기"
-        onConfirm={handleConfirmed}
+        onConfirm={handleSkip}
         onCancel={() => setPendingAction(null)}
       />
 
       <ConfirmDialog
         open={pendingAction === 'save'}
         title="이 기록으로 저장할까요?"
-        description={`완료된 사이클 ${cycleCount} / ${totalCycles}`}
+        description={
+          !isTaskSession && !selectedTaskId
+            ? `완료된 사이클 ${cycleCount} / ${totalCycles} · 미분류로 저장됩니다`
+            : `완료된 사이클 ${cycleCount} / ${totalCycles}`
+        }
         confirmLabel="저장"
-        onConfirm={handleConfirmed}
+        onConfirm={handleSave}
         onCancel={() => setPendingAction(null)}
       />
     </>

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, startTransition, useContext, useEffect, useState } from 'react'
 import { useStore } from 'zustand'
 import { createTimerStore } from './timerStore'
 import { createTaskStore } from './taskStore'
@@ -27,23 +27,35 @@ export function useTaskStore<T>(selector: (state: TaskStore) => T): T {
   return useStore(store, selector)
 }
 
+// ─── Hydration Context ────────────────────────────────────────────────────────
+// localStorage 기반 상태는 useEffect에서 반영되므로, 그 전까지는 기본값으로 렌더된다.
+// hydrated가 true가 되면 실제 저장된 값이 적용된다.
+
+const HydrationContext = createContext(false)
+
+export function useHydrated(): boolean {
+  return useContext(HydrationContext)
+}
+
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [timerStore] = useState<TimerStoreApi>(createTimerStore)
   const [taskStore] = useState<TaskStoreApi>(createTaskStore)
+  const [hydrated, setHydrated] = useState(false)
 
-  // localStorage 기반 상태는 hydration 이후(클라이언트 전용)에 반영 —
-  // 렌더 중에 읽으면 SSR(기본값)과 클라이언트(저장값)가 달라져 hydration mismatch 발생
+
   useEffect(() => {
-    timerStore.getState().hydrateSettings()
     taskStore.getState().hydrate()
-  }, [timerStore, taskStore])
+    startTransition(() => setHydrated(true))
+  }, [taskStore])
 
   return (
     <TimerStoreContext.Provider value={timerStore}>
       <TaskStoreContext.Provider value={taskStore}>
-        {children}
+        <HydrationContext.Provider value={hydrated}>
+          {children}
+        </HydrationContext.Provider>
       </TaskStoreContext.Provider>
     </TimerStoreContext.Provider>
   )

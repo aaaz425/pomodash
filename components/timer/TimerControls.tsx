@@ -20,6 +20,7 @@ export function TimerControls() {
 
   const [showStartConfirm, setShowStartConfirm] = useState(false)
   const [showEndConfirm, setShowEndConfirm] = useState(false)
+  const [wasRunning, setWasRunning] = useState(false)
 
   function handleStartClick() {
     if (isRunning) {
@@ -57,7 +58,12 @@ export function TimerControls() {
       </button>
 
       <button
-        onClick={() => setShowEndConfirm(true)}
+        onClick={() => {
+          const running = isRunning
+          if (running) pause()
+          setWasRunning(running)
+          setShowEndConfirm(true)
+        }}
         className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         세션 종료
@@ -93,7 +99,10 @@ export function TimerControls() {
           endSession()
           setShowEndConfirm(false)
         }}
-        onCancel={() => setShowEndConfirm(false)}
+        onCancel={() => {
+          if (wasRunning) start()
+          setShowEndConfirm(false)
+        }}
       />
     </div>
   )

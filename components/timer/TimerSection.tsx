@@ -1,7 +1,7 @@
 'use client'
 
 import { ListChecks } from 'lucide-react'
-import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
+import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider'
 import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { TimerRing } from '@/components/timer/TimerRing'
@@ -9,6 +9,7 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator'
 import { TimerControls } from '@/components/timer/TimerControls'
 
 export function TimerSection() {
+  const hydrated = useHydrated()
   const openModal = useTaskStore((s) => s.openModal)
   const settings = useTimerStore((s) => s.settings)
   const sessionStarted = useTimerStore((s) => s.sessionStarted)
@@ -35,7 +36,7 @@ export function TimerSection() {
             <span>{task.title}</span>
           </>
         ) : (
-          <span className="text-muted-foreground/50">작업 없음</span>
+          <span className="text-muted-foreground/50">선택된 작업이 없습니다</span>
         )}
       </div>
 
@@ -46,7 +47,7 @@ export function TimerSection() {
       <CycleIndicator />
 
       {/* 세션 설정 카드 */}
-      <div className="flex items-center rounded-lg border border-border bg-card divide-x divide-border">
+      <div className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}>
         {[
           { value: `${settings.focusMinutes}분`, label: '집중' },
           { value: `${settings.shortBreakMinutes}분`, label: '휴식' },
