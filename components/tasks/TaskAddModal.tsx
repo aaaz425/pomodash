@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTaskStore } from '@/store/StoreProvider';
-import { StepperInput } from '@/components/shared/StepperInput';
 import { CategoryPills } from '@/components/shared/CategoryPills';
+import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 
 interface Props {
   onClose: () => void;
@@ -88,40 +88,14 @@ export function TaskAddModal({ onClose }: Props) {
           {/* 목표 시간 */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground">목표 시간</label>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">집중</span>
-                <StepperInput
-                  value={targetFocusMinutes}
-                  onChange={setTargetFocusMinutes}
-                  min={5}
-                  max={120}
-                  step={5}
-                  unit="분"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">횟수</span>
-                <StepperInput
-                  value={targetCycles}
-                  onChange={setTargetCycles}
-                  min={1}
-                  max={20}
-                  unit="회"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">휴식</span>
-                <StepperInput
-                  value={targetBreakMinutes}
-                  onChange={setTargetBreakMinutes}
-                  min={0}
-                  max={60}
-                  step={5}
-                  unit="분"
-                />
-              </div>
-            </div>
+            <TimerSettingsGroup
+              focusMinutes={targetFocusMinutes}
+              onFocusMinutesChange={setTargetFocusMinutes}
+              totalCycles={targetCycles}
+              onTotalCyclesChange={setTargetCycles}
+              shortBreakMinutes={targetBreakMinutes}
+              onShortBreakMinutesChange={setTargetBreakMinutes}
+            />
             <p className="text-xs text-muted-foreground/60 pt-0.5">
               총 집중 {targetFocusMinutes * targetCycles}분
               {targetBreakMinutes > 0 &&

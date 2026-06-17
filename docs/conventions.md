@@ -106,9 +106,40 @@ types/
 | 한 feature 안에서만 쓰이는 서브컴포넌트 | `components/<feature>/` (같은 폴더) |
 | 2개 이상 feature에서 쓰이는 컴포넌트    | `components/shared/`                |
 
+### 컴포넌트 재활용 원칙
+
+**새 UI 코드 작성 전 반드시 다음 순서로 확인한다:**
+1. `components/ui/` — shadcn/ui 설치 컴포넌트 (수정 금지, 우선 사용)
+2. `components/shared/` — 프로젝트 공유 컴포넌트
+
+비슷한 UI 패턴이 2곳 이상 생기는 순간 즉시 `shared/`로 추출한다. 나중에 하면 누락되기 쉽다.
+shared 컴포넌트 추가 시 아래 목록을 함께 업데이트한다.
+
+**`components/ui/` (shadcn/ui — 직접 수정 금지)**
+
+| 컴포넌트 | 용도 |
+| -------- | ---- |
+| `button` | 기본 버튼 |
+
+**`components/shared/` (프로젝트 공유)**
+
+| 컴포넌트 | 용도 |
+| -------- | ---- |
+| `BottomNav` | 모바일 하단 네비게이션 |
+| `CategoryBadge` | 카테고리 색상 뱃지 |
+| `CategoryPills` | 카테고리 선택 pill 버튼 (`variant: rich / simple`) |
+| `ConfirmDialog` | 확인/취소 대화상자 |
+| `IconSidebar` | 아이콘 사이드바 |
+| `Sidebar` | 사이드바 |
+| `StepperInput` | 숫자 증감 입력 (단위 포함) |
+| `TaskQuickAddForm` | 인라인 작업 빠른 생성 폼 (모달 내부용) |
+| `ThemeToggle` | 테마 전환 버튼 |
+| `TimerSettingsGroup` | 집중·횟수·휴식 StepperInput 3종 세트 |
+| `TopBar` | 상단 바 |
+
 ## Zustand 스토어 패턴
 
-Next.js 15 SSR 환경에서 전역 싱글톤 스토어는 요청 간 상태 공유 버그를 유발한다.
+Next.js 16 SSR 환경에서 전역 싱글톤 스토어는 요청 간 상태 공유 버그를 유발한다.
 **팩토리 함수 + StoreProvider 패턴**을 반드시 사용한다.
 
 ```typescript

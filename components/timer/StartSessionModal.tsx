@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Check, Plus } from 'lucide-react';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { StepperInput } from '@/components/shared/StepperInput';
 import { TaskQuickAddForm } from '@/components/shared/TaskQuickAddForm';
+import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import type { TimerSettings } from '@/types';
 
 interface Props {
@@ -136,40 +136,17 @@ export function StartSessionModal({ onClose }: Props) {
           {/* 이번 세션 설정 */}
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-foreground">이번 세션 설정</span>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">집중</span>
-                <StepperInput
-                  value={pendingSettings.focusMinutes}
-                  onChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
-                  min={5}
-                  max={120}
-                  step={5}
-                  unit="분"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">사이클</span>
-                <StepperInput
-                  value={pendingSettings.totalCycles}
-                  onChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
-                  min={1}
-                  max={20}
-                  unit="회"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">휴식</span>
-                <StepperInput
-                  value={pendingSettings.shortBreakMinutes}
-                  onChange={(v) => setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))}
-                  min={0}
-                  max={60}
-                  step={5}
-                  unit="분"
-                />
-              </div>
-            </div>
+            <TimerSettingsGroup
+              focusMinutes={pendingSettings.focusMinutes}
+              onFocusMinutesChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
+              totalCycles={pendingSettings.totalCycles}
+              onTotalCyclesChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
+              shortBreakMinutes={pendingSettings.shortBreakMinutes}
+              onShortBreakMinutesChange={(v) =>
+                setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))
+              }
+              cyclesLabel="사이클"
+            />
             <p className="text-[11px] text-muted-foreground/60">
               이번 세션에서만 적용됩니다 · 작업 기본값은 변경되지 않아요
             </p>
