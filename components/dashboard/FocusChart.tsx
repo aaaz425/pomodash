@@ -85,7 +85,7 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
                 ]}
               />
               {usedCats.map((cat) => (
-                <Bar key={cat.name} dataKey={cat.name} stackId="a" fill={cat.color} radius={0} />
+                <Bar key={cat.name} dataKey={cat.name} stackId="a" fill={cat.color} />
               ))}
             </BarChart>
           </ResponsiveContainer>
