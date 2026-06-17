@@ -88,12 +88,13 @@ export const createTimerStore = () =>
       },
 
       complete: () => {
-        const { startedAt, phase } = get();
+        const { startedAt, phase, settings } = get();
         if (!startedAt) return;
         if (phase === 'focus') {
           get().completeCycle();
         } else {
-          get().setPhase('focus');
+          const seconds = phaseSeconds(settings);
+          set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: Date.now() });
         }
       },
 
@@ -146,7 +147,7 @@ export const createTimerStore = () =>
             cycleCount: next,
             phase: 'short-break',
             remainingSeconds: seconds['short-break'],
-            startedAt: null,
+            startedAt: Date.now(),
             accFocusSeconds: totalFocus,
             rawFocusPeriods: closedPeriods,
           });
