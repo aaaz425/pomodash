@@ -157,7 +157,7 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = 'ë‚ ì
           {/* day grid */}
           <div className="grid grid-cols-7 gap-y-0.5">
             {cells.map((day, i) => {
-              if (day === null) return <div key={i} />;
+              if (day === null) return <div key={i} className="aspect-square" />;
               const disabled = isDisabled(day);
               const selected = value === dayKey(day);
               const today = isToday(new Date(year, month, day));
