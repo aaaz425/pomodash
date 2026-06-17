@@ -9,9 +9,9 @@ export const MOTIVATIONAL_MESSAGES: string[] = [
   '잠깐의 몰입이 큰 차이를 만들어요',
   '한 번에 하나씩, 천천히 확실하게',
   '지금 집중한 시간은 사라지지 않아요',
-]
+];
 
 export function getRandomMotivationalMessage(): string {
-  const index = Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)
-  return MOTIVATIONAL_MESSAGES[index]
+  const index = Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length);
+  return MOTIVATIONAL_MESSAGES[index];
 }

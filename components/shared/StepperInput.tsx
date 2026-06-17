@@ -1,25 +1,25 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Minus, Plus } from 'lucide-react'
+import { useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 
 interface Props {
-  value: number
-  onChange: (v: number) => void
-  min: number
-  max: number
-  step?: number
-  unit: string
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  unit: string;
 }
 
 export function StepperInput({ value, onChange, min, max, step = 1, unit }: Props) {
-  const [raw, setRaw] = useState('')
-  const [editing, setEditing] = useState(false)
+  const [raw, setRaw] = useState('');
+  const [editing, setEditing] = useState(false);
 
   function commit(s: string) {
-    const n = parseInt(s, 10)
-    if (!isNaN(n)) onChange(Math.max(min, Math.min(max, n)))
-    setEditing(false)
+    const n = parseInt(s, 10);
+    if (!isNaN(n)) onChange(Math.max(min, Math.min(max, n)));
+    setEditing(false);
   }
 
   return (
@@ -38,7 +38,10 @@ export function StepperInput({ value, onChange, min, max, step = 1, unit }: Prop
           inputMode="numeric"
           pattern="[0-9]*"
           value={editing ? raw : String(value)}
-          onFocus={() => { setRaw(String(value)); setEditing(true) }}
+          onFocus={() => {
+            setRaw(String(value));
+            setEditing(true);
+          }}
           onChange={(e) => setRaw(e.target.value.replace(/\D/g, ''))}
           onBlur={() => commit(raw)}
           onKeyDown={(e) => e.key === 'Enter' && commit(raw)}
@@ -55,5 +58,5 @@ export function StepperInput({ value, onChange, min, max, step = 1, unit }: Prop
       </div>
       <span className="text-sm text-muted-foreground w-4">{unit}</span>
     </div>
-  )
+  );
 }

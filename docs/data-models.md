@@ -6,6 +6,7 @@
 ## 개념 계층 (Concept Hierarchy)
 
 ### 세션 (Session)
+
 특정 작업에 할당된 집중 작업 단위. 한 세션은 `totalCycles`회의 사이클로 구성되며,
 마지막 사이클이 끝나면 세션 기록 모달이 표시되고 세션이 마무리된다.
 사용자는 세션을 시작/종료하며 작업을 관리한다.
@@ -16,15 +17,18 @@
 **집중 시간 집계 원칙:** `endedAt - startedAt`은 일시정지를 포함한 경과 시간이므로 집계에 사용하면 가짜 집중 시간이 된다. 집중 시간 통계는 반드시 `focusSeconds`만 사용한다. 타임라인 블록 표시는 `focusPeriods` 배열을 사용한다.
 
 **focusPeriods 정규화:** 저장 전 `lib/focusPeriods.ts`의 `normalizeFocusPeriods()`를 반드시 통과시킨다.
+
 - 5초 미만 집중 구간 드롭 (노이즈)
 - 5초 이하 일시정지로 나뉜 인접 구간 병합
 - 최대 100개 구간 상한 (초과 시 뒤쪽을 하나로 합침)
 
 ### 사이클 (Cycle)
+
 세션 내의 반복 단위. focus → short-break 한 쌍.
 `totalCycles`(기본 4)회 완료 시 세션 종료.
 
 ### 타이머 기록 (TimerRecord)
+
 향후 개별 타이머 phase(focus / short-break) 1회의 세분화된 실행 기록용으로 예약된 타입.
 현재는 사용하지 않으며, 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
 
@@ -46,7 +50,7 @@ export interface Task {
   title: string
   categoryId: string
   targetFocusMinutes: number // 사이클당 집중 시간 (분)
-  targetCycles: number       // 목표 사이클 수 (회)
+  targetCycles: number // 목표 사이클 수 (회)
   targetBreakMinutes: number // 사이클 간 휴식 시간 (분)
   completed: boolean
   createdAt: string // ISO 8601
@@ -54,15 +58,15 @@ export interface Task {
 
 export interface Session {
   id: string
-  taskId: string | null       // null = 미분류
-  startedAt: string           // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
-  endedAt: string             // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
-  completedCycles: number     // 실제 완료 사이클 수
-  totalCycles: number         // 당시 설정값 스냅샷
-  focusSeconds: number        // 집계용 — 반드시 이 값만 사용 (endedAt - startedAt 금지)
-  pausedSeconds: number       // 총 일시정지 초
-  focusPeriods: Array<{ start: string; end: string }>  // 타임라인 블록용 실제 집중 구간
-  note: string | null         // 세션 회고 메모 (향후 모달에서 입력)
+  taskId: string | null // null = 미분류
+  startedAt: string // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
+  endedAt: string // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
+  completedCycles: number // 실제 완료 사이클 수
+  totalCycles: number // 당시 설정값 스냅샷
+  focusSeconds: number // 집계용 — 반드시 이 값만 사용 (endedAt - startedAt 금지)
+  pausedSeconds: number // 총 일시정지 초
+  focusPeriods: Array<{ start: string; end: string }> // 타임라인 블록용 실제 집중 구간
+  note: string | null // 세션 회고 메모 (향후 모달에서 입력)
 }
 
 // TimerRecord — 향후 per-phase 세분화 집계용으로 예약, 현재 미사용
@@ -71,7 +75,7 @@ export interface TimerRecord {
   taskId: string | null
   phase: TimerPhase
   startedAt: string // ISO 8601
-  endedAt: string   // ISO 8601
+  endedAt: string // ISO 8601
   focusSeconds: number
   pausedSeconds: number
 }
@@ -79,7 +83,7 @@ export interface TimerRecord {
 export interface TimerSettings {
   focusMinutes: number
   shortBreakMinutes: number
-  totalCycles: number        // 세션당 총 사이클 수
+  totalCycles: number // 세션당 총 사이클 수
 }
 ```
 
@@ -116,13 +120,13 @@ const TasksSchema = z.array(TaskSchema)
 
 // lib/storage.ts — 제네릭 유틸
 function loadFromStorage<T>(key: string, schema: z.ZodType<T>, fallback: T): T {
-  if (typeof window === 'undefined') return fallback  // SSR guard
+  if (typeof window === 'undefined') return fallback // SSR guard
   try {
     const raw = localStorage.getItem(key)
     if (!raw) return fallback
     return schema.parse(JSON.parse(raw))
   } catch {
-    return fallback  // 파싱 실패 시 기본값 fallback (구버전 데이터 방어)
+    return fallback // 파싱 실패 시 기본값 fallback (구버전 데이터 방어)
   }
 }
 ```

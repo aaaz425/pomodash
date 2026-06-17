@@ -1,43 +1,30 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { X } from 'lucide-react'
-import { useTaskStore } from '@/store/StoreProvider'
-import { StepperInput } from '@/components/shared/StepperInput'
-
-// ─── Category Pills ────────────────────────────────────────────────────────────
-
-const PILL_COLORS: Record<string, { selected: string; dot: string; unselected: string }> = {
-  'bg-blue-500':   { selected: 'bg-blue-500/20 border border-blue-500 text-blue-500',     dot: 'bg-blue-500',   unselected: 'bg-muted border border-transparent text-muted-foreground' },
-  'bg-green-500':  { selected: 'bg-green-500/20 border border-green-500 text-green-500',   dot: 'bg-green-500',  unselected: 'bg-muted border border-transparent text-muted-foreground' },
-  'bg-orange-500': { selected: 'bg-orange-500/20 border border-orange-500 text-orange-500', dot: 'bg-orange-500', unselected: 'bg-muted border border-transparent text-muted-foreground' },
-  'bg-purple-500': { selected: 'bg-purple-500/20 border border-purple-500 text-purple-500', dot: 'bg-purple-500', unselected: 'bg-muted border border-transparent text-muted-foreground' },
-  'bg-gray-500':   { selected: 'bg-gray-500/20 border border-gray-500 text-gray-400',      dot: 'bg-gray-500',   unselected: 'bg-muted border border-transparent text-muted-foreground' },
-}
-
-const FALLBACK_PILL = { selected: 'bg-muted border border-primary text-primary', dot: 'bg-primary', unselected: 'bg-muted border border-transparent text-muted-foreground' }
-
-// ─── Modal ────────────────────────────────────────────────────────────────────
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import { useTaskStore } from '@/store/StoreProvider';
+import { CategoryPills } from '@/components/shared/CategoryPills';
+import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 
 interface Props {
-  onClose: () => void
+  onClose: () => void;
 }
 
 export function TaskAddModal({ onClose }: Props) {
-  const categories = useTaskStore((s) => s.categories)
-  const addTask = useTaskStore((s) => s.addTask)
+  const categories = useTaskStore((s) => s.categories);
+  const addTask = useTaskStore((s) => s.addTask);
 
-  const [title, setTitle] = useState('')
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '')
-  const [targetFocusMinutes, setTargetFocusMinutes] = useState(25)
-  const [targetCycles, setTargetCycles] = useState(4)
-  const [targetBreakMinutes, setTargetBreakMinutes] = useState(5)
+  const [title, setTitle] = useState('');
+  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
+  const [targetFocusMinutes, setTargetFocusMinutes] = useState(25);
+  const [targetCycles, setTargetCycles] = useState(4);
+  const [targetBreakMinutes, setTargetBreakMinutes] = useState(5);
 
   function handleSubmit() {
-    const trimmed = title.trim()
-    if (!trimmed) return
-    addTask({ title: trimmed, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes })
-    onClose()
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    addTask({ title: trimmed, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes });
+    onClose();
   }
 
   return (
@@ -90,45 +77,29 @@ export function TaskAddModal({ onClose }: Props) {
           {/* 카테고리 */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground">카테고리</label>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => {
-                const colors = PILL_COLORS[cat.color] ?? FALLBACK_PILL
-                const isActive = cat.id === categoryId
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setCategoryId(cat.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${isActive ? colors.selected : colors.unselected}`}
-                  >
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${colors.dot}`} />
-                    {cat.name}
-                  </button>
-                )
-              })}
-            </div>
+            <CategoryPills
+              variant="rich"
+              categories={categories}
+              selectedId={categoryId}
+              onChange={setCategoryId}
+            />
           </div>
 
           {/* 목표 시간 */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground">목표 시간</label>
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">집중</span>
-                <StepperInput value={targetFocusMinutes} onChange={setTargetFocusMinutes} min={5} max={120} step={5} unit="분" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">횟수</span>
-                <StepperInput value={targetCycles} onChange={setTargetCycles} min={1} max={20} unit="회" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">휴식</span>
-                <StepperInput value={targetBreakMinutes} onChange={setTargetBreakMinutes} min={0} max={60} step={5} unit="분" />
-              </div>
-            </div>
+            <TimerSettingsGroup
+              focusMinutes={targetFocusMinutes}
+              onFocusMinutesChange={setTargetFocusMinutes}
+              totalCycles={targetCycles}
+              onTotalCyclesChange={setTargetCycles}
+              shortBreakMinutes={targetBreakMinutes}
+              onShortBreakMinutesChange={setTargetBreakMinutes}
+            />
             <p className="text-xs text-muted-foreground/60 pt-0.5">
               총 집중 {targetFocusMinutes * targetCycles}분
-              {targetBreakMinutes > 0 && ` + 휴식 ${targetBreakMinutes * Math.max(0, targetCycles - 1)}분`}
+              {targetBreakMinutes > 0 &&
+                ` + 휴식 ${targetBreakMinutes * Math.max(0, targetCycles - 1)}분`}
             </p>
           </div>
         </div>
@@ -151,5 +122,5 @@ export function TaskAddModal({ onClose }: Props) {
         </div>
       </div>
     </>
-  )
+  );
 }

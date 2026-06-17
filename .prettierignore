@@ -1,0 +1,19 @@
+# markdown — 한국어 문서는 prettier 산문 줄바꿈 규칙에서 제외
+*.md
+
+# dependencies
+node_modules
+
+# next.js build output
+.next
+out
+build
+
+# auto-generated
+next-env.d.ts
+*.tsbuildinfo
+package-lock.json
+
+# misc
+.vercel
+.DS_Store

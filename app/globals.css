@@ -1,11 +1,11 @@
-@import "@fontsource/pretendard/400.css";
-@import "@fontsource/pretendard/500.css";
-@import "@fontsource/pretendard/600.css";
-@import "@fontsource/pretendard/700.css";
+@import '@fontsource/pretendard/400.css';
+@import '@fontsource/pretendard/500.css';
+@import '@fontsource/pretendard/600.css';
+@import '@fontsource/pretendard/700.css';
 
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -136,7 +136,7 @@
 }
 
 button:not(:disabled),
-[role="button"],
+[role='button'],
 label[for],
 select:not(:disabled) {
   cursor: pointer;
