@@ -19,7 +19,7 @@
 
 - [x] `feat/task-core` — taskStore + Task 타입 확정
 - [x] `feat/task-ui` — TaskList + TaskItem + TaskForm + 카테고리 태그
-- [>] `feat/task-dnd` — 드래그앤드롭 순서 조정
+- [x] `feat/task-dnd` — 드래그앤드롭 순서 조정
 
 ## Phase 3 — 세션 기록
 
@@ -42,12 +42,16 @@
 
 - [x] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
 - [ ] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
+- [ ] `chore/vercel-deploy` — Vercel 프로젝트 연결 + 환경변수 + 도메인 설정
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 - [ ] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
+
+## Phase 7 — 백엔드 & 동기화
+
 - [ ] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
 - [ ] `style/skeleton-ui` — 페이지별 스켈레톤 로딩 UI (supabase-migration 완료 후)
 
-## Phase 7 — 네이티브 앱
+## Phase 8 — 네이티브 앱
 
 - [ ] `chore/rn-setup` — React Native (Expo) 프로젝트 초기 설정 + 공유 로직 분리
 - [ ] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함)
