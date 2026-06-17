@@ -1,12 +1,12 @@
-import type { Metadata, Viewport } from 'next'
-import { Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import type { Metadata, Viewport } from 'next';
+import { Geist_Mono } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import './globals.css';
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
-})
+});
 
 export const metadata: Metadata = {
   title: 'Pomodash — 포모도로 타이머',
@@ -28,11 +28,11 @@ export const metadata: Metadata = {
     description: '수험생과 취업준비생을 위한 무료 집중 타이머.',
   },
   robots: { index: true, follow: true },
-}
+};
 
 export const viewport: Viewport = {
   themeColor: '#0f172a',
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -42,5 +42,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Analytics />
       </body>
     </html>
-  )
+  );
 }

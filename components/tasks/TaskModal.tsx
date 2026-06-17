@@ -1,61 +1,63 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { Plus, X } from 'lucide-react'
-import { useTaskStore } from '@/store/StoreProvider'
-import { useTimerStore } from '@/store/StoreProvider'
-import { TaskList } from './TaskList'
-import { TaskAddModal } from './TaskAddModal'
+import { useEffect, useRef, useState } from 'react';
+import { Plus, X } from 'lucide-react';
+import { useTaskStore } from '@/store/StoreProvider';
+import { useTimerStore } from '@/store/StoreProvider';
+import { TaskList } from './TaskList';
+import { TaskAddModal } from './TaskAddModal';
 
 export function TaskModal() {
-  const isOpen = useTaskStore((s) => s.isModalOpen)
-  const closeModal = useTaskStore((s) => s.closeModal)
-  const tasks = useTaskStore((s) => s.tasks)
-  const currentTaskId = useTimerStore((s) => s.currentTaskId)
-  const setCurrentTask = useTimerStore((s) => s.setCurrentTask)
-  const updateSettings = useTimerStore((s) => s.updateSettings)
+  const isOpen = useTaskStore((s) => s.isModalOpen);
+  const closeModal = useTaskStore((s) => s.closeModal);
+  const tasks = useTaskStore((s) => s.tasks);
+  const currentTaskId = useTimerStore((s) => s.currentTaskId);
+  const setCurrentTask = useTimerStore((s) => s.setCurrentTask);
+  const updateSettings = useTimerStore((s) => s.updateSettings);
 
-  const [pendingTaskId, setPendingTaskId] = useState<string | null>(null)
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // 모달 열릴 때 현재 연결된 작업으로 초기화
-  const currentTaskIdRef = useRef(currentTaskId)
-  useEffect(() => { currentTaskIdRef.current = currentTaskId }, [currentTaskId])
+  const currentTaskIdRef = useRef(currentTaskId);
+  useEffect(() => {
+    currentTaskIdRef.current = currentTaskId;
+  }, [currentTaskId]);
   useEffect(() => {
     if (isOpen) {
-      setPendingTaskId(currentTaskIdRef.current)
-      setShowAddModal(false)
+      setPendingTaskId(currentTaskIdRef.current);
+      setShowAddModal(false);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // ESC 키: 추가 모달 먼저 닫고, 없으면 작업 관리 모달 닫기
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showAddModal) setShowAddModal(false)
-        else closeModal()
+        if (showAddModal) setShowAddModal(false);
+        else closeModal();
       }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, showAddModal, closeModal])
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isOpen, showAddModal, closeModal]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   function handleConfirm() {
-    setCurrentTask(pendingTaskId)
+    setCurrentTask(pendingTaskId);
     if (pendingTaskId) {
-      const task = tasks.find((t) => t.id === pendingTaskId)
+      const task = tasks.find((t) => t.id === pendingTaskId);
       if (task) {
         updateSettings({
           focusMinutes: task.targetFocusMinutes,
           shortBreakMinutes: task.targetBreakMinutes,
           totalCycles: task.targetCycles,
-        })
+        });
       }
     }
-    closeModal()
+    closeModal();
   }
 
   return (
@@ -137,5 +139,5 @@ export function TaskModal() {
       {/* 새 작업 추가 모달 */}
       {showAddModal && <TaskAddModal onClose={() => setShowAddModal(false)} />}
     </>
-  )
+  );
 }

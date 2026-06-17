@@ -1,11 +1,11 @@
-import { Sidebar } from '@/components/shared/Sidebar'
-import { IconSidebar } from '@/components/shared/IconSidebar'
-import { TopBar } from '@/components/shared/TopBar'
-import { BottomNav } from '@/components/shared/BottomNav'
-import { TimerSection } from '@/components/timer/TimerSection'
-import { TaskModal } from '@/components/tasks/TaskModal'
-import { SessionRecordModal } from '@/components/timer/SessionRecordModal'
-import { FocusMode } from '@/components/timer/FocusMode'
+import { Sidebar } from '@/components/shared/Sidebar';
+import { IconSidebar } from '@/components/shared/IconSidebar';
+import { TopBar } from '@/components/shared/TopBar';
+import { BottomNav } from '@/components/shared/BottomNav';
+import { TimerSection } from '@/components/timer/TimerSection';
+import { TaskModal } from '@/components/tasks/TaskModal';
+import { SessionRecordModal } from '@/components/timer/SessionRecordModal';
+import { FocusMode } from '@/components/timer/FocusMode';
 
 export default function HomePage() {
   return (
@@ -31,5 +31,5 @@ export default function HomePage() {
       <SessionRecordModal />
       <FocusMode />
     </div>
-  )
+  );
 }

@@ -1,5 +1,9 @@
 pre-commit:
   commands:
+    prettier:
+      glob: '*.{ts,tsx,js,jsx,json,css,md}'
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
     typecheck:
       run: npx tsc --noEmit
     lint:

@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { Settings } from 'lucide-react'
-import { ThemeToggle } from './ThemeToggle'
+import Link from 'next/link';
+import { Settings } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 export function TopBar() {
   return (
@@ -16,5 +16,5 @@ export function TopBar() {
         </Link>
       </div>
     </header>
-  )
+  );
 }
