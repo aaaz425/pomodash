@@ -107,7 +107,7 @@ export function DatePickerInput({ value, onChange, min, max, placeholder = 'ë‚ ì
       {open && (
         <div
           ref={dropdownRef}
-          className="absolute top-full mt-1.5 left-0 z-[70] w-60 bg-card border border-border rounded-xl shadow-2xl p-3 select-none"
+          className="fixed z-70 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 bg-card border border-border rounded-xl shadow-2xl p-3 select-none"
         >
           {/* month nav */}
           <div className="flex items-center justify-between mb-2">
