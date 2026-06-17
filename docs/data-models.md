@@ -12,15 +12,21 @@
 
 **세션 메모(note):** 세션이 완전히 끝난 후 사용자가 1회 작성하는 회고 메모. 최대 500자.
 사이클마다 작성하는 것이 아니라, 마지막 사이클 완료 시점에 한 번만 표시된다.
-현재 `TimerRecord`와 별개 개념으로, 향후 별도 모델로 구현 예정.
+
+**집중 시간 집계 원칙:** `endedAt - startedAt`은 일시정지를 포함한 경과 시간이므로 집계에 사용하면 가짜 집중 시간이 된다. 집중 시간 통계는 반드시 `focusSeconds`만 사용한다. 타임라인 블록 표시는 `focusPeriods` 배열을 사용한다.
+
+**focusPeriods 정규화:** 저장 전 `lib/focusPeriods.ts`의 `normalizeFocusPeriods()`를 반드시 통과시킨다.
+- 5초 미만 집중 구간 드롭 (노이즈)
+- 5초 이하 일시정지로 나뉜 인접 구간 병합
+- 최대 100개 구간 상한 (초과 시 뒤쪽을 하나로 합침)
 
 ### 사이클 (Cycle)
 세션 내의 반복 단위. focus → short-break 한 쌍.
 `totalCycles`(기본 4)회 완료 시 세션 종료.
 
 ### 타이머 기록 (TimerRecord)
-개별 타이머 phase(focus / short-break / long-break) 1회의 실행 기록.
-`focusMinutes`는 설정값이 아닌 **실제 집중한 분 수** (일시정지·중단 시 더 짧을 수 있음).
+향후 개별 타이머 phase(focus / short-break) 1회의 세분화된 실행 기록용으로 예약된 타입.
+현재는 사용하지 않으며, 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
 
 ---
 
@@ -46,13 +52,28 @@ export interface Task {
   createdAt: string // ISO 8601
 }
 
+export interface Session {
+  id: string
+  taskId: string | null       // null = 미분류
+  startedAt: string           // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
+  endedAt: string             // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
+  completedCycles: number     // 실제 완료 사이클 수
+  totalCycles: number         // 당시 설정값 스냅샷
+  focusSeconds: number        // 집계용 — 반드시 이 값만 사용 (endedAt - startedAt 금지)
+  pausedSeconds: number       // 총 일시정지 초
+  focusPeriods: Array<{ start: string; end: string }>  // 타임라인 블록용 실제 집중 구간
+  note: string | null         // 세션 회고 메모 (향후 모달에서 입력)
+}
+
+// TimerRecord — 향후 per-phase 세분화 집계용으로 예약, 현재 미사용
 export interface TimerRecord {
   id: string
-  taskId: string
+  taskId: string | null
   phase: TimerPhase
   startedAt: string // ISO 8601
   endedAt: string   // ISO 8601
-  focusMinutes: number // 실제 집중한 분 수 (일시정지·중단 시 설정값보다 작을 수 있음)
+  focusSeconds: number
+  pausedSeconds: number
 }
 
 export interface TimerSettings {
@@ -68,7 +89,7 @@ export interface TimerSettings {
 const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
-  timerRecords: 'pomodash:timer-records',
+  sessions: 'pomodash:sessions',
   timerSettings: 'pomodash:timer-settings',
   version: 'pomodash:version',
 } as const
