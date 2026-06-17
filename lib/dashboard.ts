@@ -1,4 +1,5 @@
 import {
+  eachDayOfInterval,
   endOfDay,
   endOfMonth,
   endOfWeek,
@@ -134,6 +135,64 @@ export function getPrevMonthSessionCount(sessions: Session[], today: Date = new 
   const prevMonth = subMonths(today, 1);
   const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
   return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+}
+
+export interface DayActivity {
+  date: string; // YYYY-MM-DD
+  focusMinutes: number;
+}
+
+export function getMonthlyActivityData(
+  sessions: Session[],
+  today: Date = new Date(),
+): DayActivity[] {
+  const days = eachDayOfInterval({ start: startOfMonth(today), end: endOfMonth(today) });
+
+  return days.map((day) => {
+    const dateKey = toLocalDateKey(day);
+    const focusSeconds = sessions
+      .filter((s) => toLocalDateKey(parseISO(s.startedAt)) === dateKey)
+      .reduce((sum, s) => sum + s.focusSeconds, 0);
+    return { date: dateKey, focusMinutes: Math.round(focusSeconds / 60) };
+  });
+}
+
+export function getMaxStreakDays(sessions: Session[]): number {
+  if (sessions.length === 0) return 0;
+
+  const dateSet = Array.from(
+    new Set(sessions.map((s) => toLocalDateKey(parseISO(s.startedAt)))),
+  ).sort();
+
+  let maxStreak = 0;
+  let currentStreak = 1;
+
+  for (let i = 1; i < dateSet.length; i++) {
+    const prev = new Date(dateSet[i - 1] + 'T00:00:00');
+    const curr = new Date(dateSet[i] + 'T00:00:00');
+    const diffDays = Math.round((curr.getTime() - prev.getTime()) / 86400000);
+
+    if (diffDays === 1) {
+      currentStreak++;
+    } else {
+      maxStreak = Math.max(maxStreak, currentStreak);
+      currentStreak = 1;
+    }
+  }
+
+  return Math.max(maxStreak, currentStreak);
+}
+
+export function getBusiestDayOfWeek(sessions: Session[], today: Date = new Date()): string | null {
+  const monthSessions = filterSessionsByTab(sessions, 'month', today);
+  if (monthSessions.length === 0) return null;
+
+  const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+  const totals = new Array(7).fill(0);
+  for (const s of monthSessions) {
+    totals[parseISO(s.startedAt).getDay()] += s.focusSeconds;
+  }
+  return DAY_NAMES[totals.indexOf(Math.max(...totals))] + '요일';
 }
 
 export function getFirstSessionDate(sessions: Session[]): Date | null {

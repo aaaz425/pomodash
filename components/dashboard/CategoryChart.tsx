@@ -69,7 +69,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             </ResponsiveContainer>
             {/* Center label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-sm font-bold text-foreground leading-tight">
+              <span className="text-xs font-bold text-foreground leading-tight text-center max-w-[60px] break-keep">
                 {formatDuration(totalMinutes * 60)}
               </span>
               <span className="text-[10px] text-muted-foreground">총 집중</span>
@@ -77,9 +77,9 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
           </div>
 
           {/* Legend */}
-          <div className="flex flex-col gap-2 w-[180px] shrink-0">
+          <div className="flex flex-col gap-2 flex-1 min-w-0">
             {data.map((item) => (
-              <div key={item.name} className="flex items-center justify-between gap-2">
+              <div key={item.name} className="flex items-center justify-between gap-2 min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <span
                     className="shrink-0 w-2 h-2 rounded-sm"
@@ -88,10 +88,10 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
                   <span className="text-xs font-medium text-foreground truncate">{item.name}</span>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-xs font-semibold text-foreground">
+                  <span className="text-xs font-semibold text-foreground w-[68px] text-right tabular-nums">
                     {formatDuration(item.minutes * 60)}
                   </span>
-                  <span className="text-[11px] text-muted-foreground w-8 text-right">
+                  <span className="text-[11px] text-muted-foreground w-7 text-right tabular-nums">
                     {item.percent}%
                   </span>
                 </div>

@@ -4,6 +4,7 @@ import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
+import { ContributionCalendar } from '@/components/dashboard/ContributionCalendar';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
@@ -11,7 +12,10 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
+  getBusiestDayOfWeek,
   getFirstSessionDate,
+  getMaxStreakDays,
+  getMonthlyActivityData,
   getPrevDayFocusSeconds,
   getPrevDaySessionCount,
   getPrevMonthFocusSeconds,
@@ -46,11 +50,16 @@ export default function DashboardPage() {
   const categories = useTaskStore((s) => s.categories);
 
   const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
+  const monthSessions = useMemo(() => filterSessionsByTab(sessions, 'month'), [sessions]);
 
   const totalFocusSeconds = useMemo(() => getTotalFocusSeconds(filtered), [filtered]);
   const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
   const avgSessionSeconds = useMemo(() => getAvgSessionSeconds(filtered), [filtered]);
   const streakDays = useMemo(() => getStreakDays(sessions), [sessions]);
+  const maxStreakDays = useMemo(() => getMaxStreakDays(sessions), [sessions]);
+  const monthlyActivity = useMemo(() => getMonthlyActivityData(sessions), [sessions]);
+  const monthFocusSeconds = useMemo(() => getTotalFocusSeconds(monthSessions), [monthSessions]);
+  const busiestDay = useMemo(() => getBusiestDayOfWeek(sessions), [sessions]);
   const firstSessionDate = useMemo(() => getFirstSessionDate(sessions), [sessions]);
 
   const prevDayFocusSec = useMemo(() => getPrevDayFocusSeconds(sessions), [sessions]);
@@ -130,7 +139,7 @@ export default function DashboardPage() {
             label="연속 집중일"
             Icon={Flame}
             value={`${streakDays}일`}
-            sub="현재 연속 기록"
+            sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
           />
           <StatCard
             label="세션 평균"
@@ -149,10 +158,28 @@ export default function DashboardPage() {
             tab={tab}
             focusLabel={focusLabel}
           />
-          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
+
+          {/* 이달의 잔디 */}
+          <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card">
             <p className="text-sm font-semibold text-foreground">이달의 잔디</p>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">준비 중</p>
+            <div className="flex gap-5">
+              <ContributionCalendar data={monthlyActivity} />
+              <div className="flex flex-col justify-center gap-4">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">이번달 총 집중</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {monthFocusSeconds === 0 ? '-' : formatDuration(monthFocusSeconds)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">최장 연속기록</span>
+                  <span className="text-sm font-bold text-foreground">{maxStreakDays}일</span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-muted-foreground">가장 활발한날</span>
+                  <span className="text-sm font-bold text-foreground">{busiestDay ?? '-'}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

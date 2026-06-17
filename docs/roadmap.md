@@ -30,7 +30,7 @@
 
 - [x] `feat/dashboard-core` — 일/주/월 탭 + 집중 시간 집계
 - [x] `feat/dashboard-charts` — 집중 시간 추이 차트 + 카테고리별 도넛 차트 (Recharts)
-- [ ] `feat/dashboard-streak` — 연속 기록 (스트릭) 계산 + 표시
+- [>] `feat/dashboard-streak` — 연속 기록 (스트릭) 계산 + 표시
 
 ## Phase 5 — 설정
 
