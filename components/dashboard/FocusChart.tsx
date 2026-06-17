@@ -14,7 +14,7 @@ interface Props {
   focusLabel: string;
 }
 
-const isHorizontal = (tab: TabType) => tab === 'today' || tab === 'month';
+const isHorizontal = (_tab: TabType) => true;
 
 export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Props) {
   const { data, categories: usedCats } = useMemo(
