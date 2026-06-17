@@ -69,7 +69,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             </ResponsiveContainer>
             {/* Center label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-sm font-bold text-foreground leading-tight">
+              <span className="text-xs font-bold text-foreground leading-tight text-center max-w-[60px] break-keep">
                 {formatDuration(totalMinutes * 60)}
               </span>
               <span className="text-[10px] text-muted-foreground">총 집중</span>
