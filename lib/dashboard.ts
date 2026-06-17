@@ -2,6 +2,7 @@ import {
   endOfDay,
   endOfMonth,
   endOfWeek,
+  format,
   isWithinInterval,
   parseISO,
   startOfDay,
@@ -214,9 +215,11 @@ export function getFocusTrendData(
       return labels[weekIdx];
     };
   } else {
-    // 'all': 전체 기간 단일 집계
-    labels = ['전체'];
-    getLabel = () => '전체';
+    // 'all': 연도별 집계
+    if (sessions.length === 0) return { data: [], categories: [] };
+    const yearSet = new Set(sessions.map((s) => format(parseISO(s.startedAt), 'yyyy')));
+    labels = Array.from(yearSet).sort();
+    getLabel = (s) => format(parseISO(s.startedAt), 'yyyy');
   }
 
   // Initialize data items

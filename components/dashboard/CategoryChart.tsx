@@ -27,7 +27,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
       <p className="text-sm font-semibold text-foreground">카테고리별 집중</p>
 
       {hasData ? (
-        <div className="flex items-center gap-3 flex-1">
+        <div className="flex items-center justify-center gap-4 flex-1">
           {/* Donut chart */}
           <div
             className="relative shrink-0 w-[120px] h-[120px]"
@@ -77,7 +77,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
           </div>
 
           {/* Legend */}
-          <div className="flex flex-col gap-2 min-w-0 flex-1">
+          <div className="flex flex-col gap-2 w-[180px] shrink-0">
             {data.map((item) => (
               <div key={item.name} className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">

@@ -61,7 +61,7 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
                 tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => (v === 0 ? '' : `${v}m`)}
+                tickFormatter={(v) => (v === 0 ? '' : `${v}분`)}
               />
               <YAxis
                 type="category"
