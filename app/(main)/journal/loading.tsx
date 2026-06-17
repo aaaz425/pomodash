@@ -1,7 +1,5 @@
+import { PageSpinner } from '@/components/shared/PageSpinner';
+
 export default function JournalLoading() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
-    </div>
-  );
+  return <PageSpinner />;
 }

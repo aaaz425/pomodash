@@ -1,5 +1,7 @@
 'use client';
 
+import { AlertCircle } from 'lucide-react';
+
 export default function Error({
   reset,
 }: {
@@ -7,9 +9,22 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <p className="text-muted-foreground">문제가 발생했습니다.</p>
-      <button onClick={reset} className="text-sm underline">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6 text-center">
+      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-destructive/10">
+        <AlertCircle className="w-8 h-8 text-destructive" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-xl font-semibold text-foreground">문제가 발생했습니다</h1>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          페이지를 불러오는 중 오류가 생겼어요.
+          <br />
+          다시 시도하거나 새로고침해 주세요.
+        </p>
+      </div>
+      <button
+        onClick={reset}
+        className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+      >
         다시 시도
       </button>
     </div>
