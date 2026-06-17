@@ -34,7 +34,7 @@ export function HourlyChart({ sessions }: Props) {
   const hasFocus = hourly.some((v) => v > 0);
 
   return (
-    <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card">
+    <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[180px]">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-foreground">시간대별 집중 분석</p>
         {hasFocus && (
@@ -44,9 +44,9 @@ export function HourlyChart({ sessions }: Props) {
         )}
       </div>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 flex-1">
         {/* Bars */}
-        <div className="flex items-end gap-0.5 h-12">
+        <div className="flex items-end gap-0.5 flex-1">
           {hourly.map((val, i) => {
             const ratio = val / max;
             return (
@@ -68,8 +68,13 @@ export function HourlyChart({ sessions }: Props) {
           {X_LABEL_HOURS.map((hour) => (
             <span
               key={hour}
-              className="absolute text-[10px] text-muted-foreground -translate-x-1/2"
-              style={{ left: `${(hour / 23) * 100}%` }}
+              className={`absolute text-[10px] text-muted-foreground ${
+                hour === 0 || hour === 23 ? '' : '-translate-x-1/2'
+              }`}
+              style={{
+                left: hour === 23 ? undefined : `${(hour / 23) * 100}%`,
+                right: hour === 23 ? 0 : undefined,
+              }}
             >
               {hour === 0
                 ? '자정'
