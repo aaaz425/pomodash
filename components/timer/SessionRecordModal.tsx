@@ -1,57 +1,58 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Check, Plus } from 'lucide-react'
-import { useTimerStore, useTaskStore } from '@/store/StoreProvider'
-import { useCurrentTask } from '@/hooks/useCurrentTask'
-import { CategoryBadge } from '@/components/shared/CategoryBadge'
-import { CycleIndicator } from '@/components/timer/CycleIndicator'
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
-import { normalizeFocusPeriods } from '@/lib/focusPeriods'
+import { useState } from 'react';
+import { Check, Plus } from 'lucide-react';
+import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { TaskQuickAddForm } from '@/components/shared/TaskQuickAddForm';
+import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 
 export function SessionRecordModal() {
-  const sessionEnded = useTimerStore((s) => s.sessionEnded)
-  const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord)
-  const cycleCount = useTimerStore((s) => s.cycleCount)
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles)
-  const currentTaskId = useTimerStore((s) => s.currentTaskId)
-  const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt)
-  const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt)
-  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds)
+  const sessionEnded = useTimerStore((s) => s.sessionEnded);
+  const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
+  const cycleCount = useTimerStore((s) => s.cycleCount);
+  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+  const currentTaskId = useTimerStore((s) => s.currentTaskId);
+  const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt);
+  const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt);
+  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
 
-  const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods)
+  const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods);
 
-  const { task, category } = useCurrentTask()
-  const tasks = useTaskStore((s) => s.tasks)
-  const categories = useTaskStore((s) => s.categories)
-  const addSession = useTaskStore((s) => s.addSession)
-  const addTask = useTaskStore((s) => s.addTask)
+  const { task, category } = useCurrentTask();
+  const tasks = useTaskStore((s) => s.tasks);
+  const categories = useTaskStore((s) => s.categories);
+  const addSession = useTaskStore((s) => s.addSession);
+  const addTask = useTaskStore((s) => s.addTask);
 
-  const activeTasks = tasks.filter((t) => !t.completed)
+  const activeTasks = tasks.filter((t) => !t.completed);
 
-  const [note, setNote] = useState('')
-  const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null)
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [note, setNote] = useState('');
+  const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  const [showNewTaskForm, setShowNewTaskForm] = useState(false)
-  const [newTaskTitle, setNewTaskTitle] = useState('')
-  const [newTaskCategoryId, setNewTaskCategoryId] = useState(categories[0]?.id ?? '')
+  const [showNewTaskForm, setShowNewTaskForm] = useState(false);
 
-  if (!sessionEnded || sessionEndedAt === null) return null
+  if (!sessionEnded || sessionEndedAt === null) return null;
 
-  const isTaskSession = currentTaskId !== null
-  const now = sessionEndedAt
-  const totalElapsed = sessionStartedAt ? Math.floor((now - sessionStartedAt) / 1000) : accFocusSeconds
-  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds)
+  const isTaskSession = currentTaskId !== null;
+  const now = sessionEndedAt;
+  const totalElapsed = sessionStartedAt
+    ? Math.floor((now - sessionStartedAt) / 1000)
+    : accFocusSeconds;
+  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds);
 
   function handleSave() {
-    const taskId = isTaskSession ? currentTaskId : selectedTaskId
+    const taskId = isTaskSession ? currentTaskId : selectedTaskId;
     const focusPeriods = normalizeFocusPeriods(
       rawFocusPeriods.map((p) => ({
         start: new Date(p.start).toISOString(),
         end: new Date(p.end).toISOString(),
-      }))
-    )
+      })),
+    );
     addSession({
       taskId,
       startedAt: new Date(sessionStartedAt ?? now).toISOString(),
@@ -62,31 +63,26 @@ export function SessionRecordModal() {
       pausedSeconds,
       focusPeriods,
       note: note.trim() || null,
-    })
-    dismissSessionRecord()
-    setNote('')
-    setSelectedTaskId(null)
-    setShowNewTaskForm(false)
-    setNewTaskTitle('')
-    setPendingAction(null)
+    });
+    dismissSessionRecord();
+    setNote('');
+    setSelectedTaskId(null);
+    setShowNewTaskForm(false);
+    setPendingAction(null);
   }
 
   function handleSkip() {
-    dismissSessionRecord()
-    setNote('')
-    setSelectedTaskId(null)
-    setShowNewTaskForm(false)
-    setNewTaskTitle('')
-    setPendingAction(null)
+    dismissSessionRecord();
+    setNote('');
+    setSelectedTaskId(null);
+    setShowNewTaskForm(false);
+    setPendingAction(null);
   }
 
-  function handleAddNewTask() {
-    const trimmed = newTaskTitle.trim()
-    if (!trimmed) return
-    const newId = addTask({ title: trimmed, categoryId: newTaskCategoryId })
-    setSelectedTaskId(newId)
-    setShowNewTaskForm(false)
-    setNewTaskTitle('')
+  function handleAddNewTask(title: string, categoryId: string) {
+    const newId = addTask({ title, categoryId });
+    setSelectedTaskId(newId);
+    setShowNewTaskForm(false);
   }
 
   return (
@@ -160,8 +156,8 @@ export function SessionRecordModal() {
               ) : !showNewTaskForm ? (
                 <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
                   {activeTasks.map((t) => {
-                    const cat = categories.find((c) => c.id === t.categoryId)
-                    const isSelected = selectedTaskId === t.id
+                    const cat = categories.find((c) => c.id === t.categoryId);
+                    const isSelected = selectedTaskId === t.id;
                     return (
                       <button
                         key={t.id}
@@ -173,67 +169,30 @@ export function SessionRecordModal() {
                             : 'border-border bg-card hover:bg-muted',
                         ].join(' ')}
                       >
-                        {isSelected && <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={2.5} />}
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={2.5} />
+                        )}
                         {!isSelected && <div className="w-3.5 h-3.5 shrink-0" />}
                         {cat && <CategoryBadge category={cat} />}
                         <span className="text-sm text-foreground truncate">{t.title}</span>
                       </button>
-                    )
+                    );
                   })}
                 </div>
               ) : null}
 
-              {/* 새 작업 인라인 폼 */}
               {showNewTaskForm ? (
-                <div className="flex flex-col gap-3 p-3.5 rounded-lg border border-border bg-muted/50">
-                  <input
-                    autoFocus
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddNewTask()}
-                    placeholder="작업 제목"
-                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
-                  />
-                  <div className="flex flex-wrap gap-1.5">
-                    {categories.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setNewTaskCategoryId(cat.id)}
-                        className={[
-                          'px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
-                          newTaskCategoryId === cat.id
-                            ? 'bg-primary/20 border border-primary text-primary'
-                            : 'bg-muted border border-transparent text-muted-foreground hover:bg-border/50',
-                        ].join(' ')}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => { setShowNewTaskForm(false); setNewTaskTitle('') }}
-                      className="flex-1 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-                    >
-                      취소
-                    </button>
-                    <button
-                      onClick={handleAddNewTask}
-                      disabled={!newTaskTitle.trim()}
-                      className="flex-1 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
-                    >
-                      추가
-                    </button>
-                  </div>
-                </div>
+                <TaskQuickAddForm
+                  categories={categories}
+                  onAdd={handleAddNewTask}
+                  onCancel={() => setShowNewTaskForm(false)}
+                />
               ) : (
                 <button
                   onClick={() => setShowNewTaskForm(true)}
                   className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors self-start"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  새 작업 만들기
+                  <Plus className="w-3.5 h-3.5" />새 작업 만들기
                 </button>
               )}
 
@@ -302,5 +261,5 @@ export function SessionRecordModal() {
         onCancel={() => setPendingAction(null)}
       />
     </>
-  )
+  );
 }
