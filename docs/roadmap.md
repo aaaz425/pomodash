@@ -19,7 +19,7 @@
 
 - [x] `feat/task-core` — taskStore + Task 타입 확정
 - [x] `feat/task-ui` — TaskList + TaskItem + TaskForm + 카테고리 태그
-- [ ] `feat/task-dnd` — 드래그앤드롭 순서 조정
+- [>] `feat/task-dnd` — 드래그앤드롭 순서 조정
 
 ## Phase 3 — 세션 기록
 
@@ -40,7 +40,7 @@
 
 ## Phase 6 — 공통 & 마무리
 
-- [>] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
+- [x] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
 - [ ] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 - [ ] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
