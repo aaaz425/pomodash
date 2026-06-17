@@ -18,7 +18,7 @@ interface TaskStore {
   sessions: Session[]
   isModalOpen: boolean
 
-  addTask: (input: { title: string; categoryId: string; targetFocusMinutes?: number; targetCycles?: number; targetBreakMinutes?: number }) => void
+  addTask: (input: { title: string; categoryId: string; targetFocusMinutes?: number; targetCycles?: number; targetBreakMinutes?: number }) => string
   toggleTask: (id: string) => void
   deleteTask: (id: string) => void
   addSession: (input: Omit<Session, 'id'>) => void
@@ -93,6 +93,7 @@ export const createTaskStore = () =>
       const tasks = [newTask, ...get().tasks]
       saveTasks(tasks)
       set({ tasks })
+      return newTask.id
     },
 
     toggleTask: (id) => {

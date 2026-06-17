@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Maximize2 } from 'lucide-react'
 import { useTimerStore } from '@/store/StoreProvider'
 import { useTimer } from '@/hooks/useTimer'
-import { useCurrentTask } from '@/hooks/useCurrentTask'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { StartSessionModal } from '@/components/timer/StartSessionModal'
 
 export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null)
@@ -16,9 +16,7 @@ export function TimerControls() {
   const endSession = useTimerStore((s) => s.endSession)
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode)
   const { displaySeconds, phase, cycleCount } = useTimer()
-  const { task } = useCurrentTask()
-
-  const [showStartConfirm, setShowStartConfirm] = useState(false)
+  const [showStartModal, setShowStartModal] = useState(false)
   const [showEndConfirm, setShowEndConfirm] = useState(false)
   const [wasRunning, setWasRunning] = useState(false)
 
@@ -28,7 +26,7 @@ export function TimerControls() {
       return
     }
     if (!sessionStarted) {
-      setShowStartConfirm(true)
+      setShowStartModal(true)
       return
     }
     start()
@@ -58,40 +56,28 @@ export function TimerControls() {
       </button>
 
       <button
+        disabled={!sessionStarted}
         onClick={() => {
           const running = isRunning
           if (running) pause()
           setWasRunning(running)
           setShowEndConfirm(true)
         }}
-        className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
         세션 종료
       </button>
 
-      <ConfirmDialog
-        open={showStartConfirm}
-        title="세션을 시작할까요?"
-        description={
-          <>
-            {task?.title ?? '작업 없음'} · 집중 {settings.focusMinutes}분 × {settings.totalCycles}사이클
-            (휴식 {settings.shortBreakMinutes}분)
-          </>
-        }
-        confirmLabel="시작"
-        onConfirm={() => {
-          start()
-          setShowStartConfirm(false)
-        }}
-        onCancel={() => setShowStartConfirm(false)}
-      />
+      {showStartModal && (
+        <StartSessionModal onClose={() => setShowStartModal(false)} />
+      )}
 
       <ConfirmDialog
         open={showEndConfirm}
         title="세션을 종료할까요?"
         description={
           <>
-            지금까지 {elapsedMinutes}분 · {cycleCount}/{settings.totalCycles}사이클 진행했어요.
+            지금까지 {elapsedMinutes}분 · {cycleCount} / {settings.totalCycles}사이클 진행했어요
           </>
         }
         confirmLabel="세션 종료"
