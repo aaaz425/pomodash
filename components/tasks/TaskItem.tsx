@@ -1,6 +1,7 @@
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { GripVertical, Trash2 } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
 import type { Task } from '@/types';
 
@@ -12,15 +13,37 @@ interface Props {
 
 export function TaskItem({ task, isSelected, onSelect }: Props) {
   const deleteTask = useTaskStore((s) => s.deleteTask);
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: task.id,
+  });
+
+  const style = {
+    transform: transform ? `translate3d(0px, ${transform.y}px, 0px)` : undefined,
+    transition,
+  };
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       onClick={() => onSelect(task.id)}
       className={[
         'flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer group transition-colors',
         isSelected ? 'bg-primary/10' : 'hover:bg-muted/50',
+        isDragging ? 'opacity-50 scale-[0.98]' : '',
       ].join(' ')}
     >
+      {/* drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        onClick={(e) => e.stopPropagation()}
+        aria-label="순서 조정"
+        className="shrink-0 -m-2 p-2 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
+      >
+        <GripVertical className="w-3.5 h-3.5" />
+      </button>
+
       {/* 선택 인디케이터 */}
       <div
         className={[
