@@ -148,7 +148,7 @@ select:not(:disabled) {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--foreground) 15%, transparent) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -160,10 +160,10 @@ select:not(:disabled) {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--foreground) 15%, transparent);
+  background: var(--border);
   border-radius: 99px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--foreground) 25%, transparent);
+  background: var(--muted-foreground);
 }
