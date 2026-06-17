@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { ListChecks } from 'lucide-react'
-import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider'
-import { useCurrentTask } from '@/hooks/useCurrentTask'
-import { CategoryBadge } from '@/components/shared/CategoryBadge'
-import { TimerRing } from '@/components/timer/TimerRing'
-import { CycleIndicator } from '@/components/timer/CycleIndicator'
-import { TimerControls } from '@/components/timer/TimerControls'
+import { ListChecks } from 'lucide-react';
+import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { TimerRing } from '@/components/timer/TimerRing';
+import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { TimerControls } from '@/components/timer/TimerControls';
 
 export function TimerSection() {
-  const hydrated = useHydrated()
-  const openModal = useTaskStore((s) => s.openModal)
-  const settings = useTimerStore((s) => s.settings)
-  const sessionStarted = useTimerStore((s) => s.sessionStarted)
-  const { task, category } = useCurrentTask()
+  const hydrated = useHydrated();
+  const openModal = useTaskStore((s) => s.openModal);
+  const settings = useTimerStore((s) => s.settings);
+  const sessionStarted = useTimerStore((s) => s.sessionStarted);
+  const { task, category } = useCurrentTask();
 
   return (
     <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
@@ -47,7 +47,9 @@ export function TimerSection() {
       <CycleIndicator />
 
       {/* 세션 설정 카드 */}
-      <div className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}>
+      <div
+        className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
+      >
         {[
           { value: `${settings.focusMinutes}분`, label: '집중' },
           { value: `${settings.shortBreakMinutes}분`, label: '휴식' },
@@ -63,5 +65,5 @@ export function TimerSection() {
       {/* 컨트롤 */}
       <TimerControls />
     </section>
-  )
+  );
 }

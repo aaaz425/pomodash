@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Timer, TrendingUp, NotebookPen, Settings } from 'lucide-react'
-import { ThemeToggle } from './ThemeToggle'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Timer, TrendingUp, NotebookPen, Settings } from 'lucide-react';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 const NAV_ITEMS = [
   { href: '/', icon: Timer, label: '타이머' },
   { href: '/dashboard', icon: TrendingUp, label: '통계' },
   { href: '/journal', icon: NotebookPen, label: '기록' },
-] as const
+] as const;
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <aside className="w-60 shrink-0 h-full flex flex-col justify-between bg-card border-r border-border">
@@ -24,7 +24,7 @@ export function Sidebar() {
 
         <nav className="flex flex-col gap-0.5 px-2.5 py-3">
           {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-            const isActive = pathname === href
+            const isActive = pathname === href;
             return (
               <Link
                 key={href}
@@ -44,14 +44,17 @@ export function Sidebar() {
                 />
                 {label}
               </Link>
-            )
+            );
           })}
         </nav>
       </div>
 
       {/* Bottom: Theme + Settings */}
       <div className="flex flex-col gap-0.5 px-2.5 py-3 border-t border-border">
-        <ThemeToggle showLabel className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
+        <ThemeToggle
+          showLabel
+          className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        />
         <Link
           href="/settings"
           className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
@@ -61,5 +64,5 @@ export function Sidebar() {
         </Link>
       </div>
     </aside>
-  )
+  );
 }

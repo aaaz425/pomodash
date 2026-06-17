@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface Props {
-  open: boolean
-  title: string
-  description?: ReactNode
-  confirmLabel?: string
-  cancelLabel?: string
-  onConfirm: () => void
-  onCancel: () => void
+  open: boolean;
+  title: string;
+  description?: ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
 // window.confirm 대신 쓰는 커스텀 확인 다이얼로그.
@@ -23,7 +23,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <>
@@ -64,5 +64,5 @@ export function ConfirmDialog({
         </div>
       </div>
     </>
-  )
+  );
 }

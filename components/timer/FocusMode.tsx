@@ -1,59 +1,61 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { X, Square } from 'lucide-react'
-import { useTimerStore } from '@/store/StoreProvider'
-import { useTimer } from '@/hooks/useTimer'
-import { useCurrentTask } from '@/hooks/useCurrentTask'
-import { getRandomMotivationalMessage } from '@/lib/motivationalMessages'
-import { CategoryBadge } from '@/components/shared/CategoryBadge'
-import { TimerRing } from '@/components/timer/TimerRing'
-import { CycleIndicator } from '@/components/timer/CycleIndicator'
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { X, Square } from 'lucide-react';
+import { useTimerStore } from '@/store/StoreProvider';
+import { useTimer } from '@/hooks/useTimer';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { getRandomMotivationalMessage } from '@/lib/motivationalMessages';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { TimerRing } from '@/components/timer/TimerRing';
+import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 export function FocusMode() {
-  const isFocusMode = useTimerStore((s) => s.isFocusMode)
-  const isRunning = useTimerStore((s) => s.startedAt !== null)
-  const settings = useTimerStore((s) => s.settings)
-  const start = useTimerStore((s) => s.start)
-  const pause = useTimerStore((s) => s.pause)
-  const endSession = useTimerStore((s) => s.endSession)
-  const exitFocusMode = useTimerStore((s) => s.exitFocusMode)
-  const { displaySeconds, phase, cycleCount } = useTimer()
-  const { task, category } = useCurrentTask()
+  const isFocusMode = useTimerStore((s) => s.isFocusMode);
+  const isRunning = useTimerStore((s) => s.startedAt !== null);
+  const settings = useTimerStore((s) => s.settings);
+  const start = useTimerStore((s) => s.start);
+  const pause = useTimerStore((s) => s.pause);
+  const endSession = useTimerStore((s) => s.endSession);
+  const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
+  const { displaySeconds, phase, cycleCount } = useTimer();
+  const { task, category } = useCurrentTask();
 
   // 진입할 때만 새 메시지를 골라 고정 — 매 렌더마다 재추첨되지 않도록
-  const [message] = useState(getRandomMotivationalMessage)
-  const [showEndConfirm, setShowEndConfirm] = useState(false)
+  const [message] = useState(getRandomMotivationalMessage);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const elapsedMinutes =
     cycleCount * settings.focusMinutes +
-    (phase === 'focus' ? Math.max(0, Math.floor((settings.focusMinutes * 60 - displaySeconds) / 60)) : 0)
+    (phase === 'focus'
+      ? Math.max(0, Math.floor((settings.focusMinutes * 60 - displaySeconds) / 60))
+      : 0);
 
   useEffect(() => {
-    if (!isFocusMode) return
+    if (!isFocusMode) return;
 
     function handleKeydown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement | null
-      if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return
+      const target = e.target as HTMLElement | null;
+      if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
 
       if (showEndConfirm) {
-        if (e.key === 'Escape') setShowEndConfirm(false)
-        return
+        if (e.key === 'Escape') setShowEndConfirm(false);
+        return;
       }
       if (e.code === 'Space') {
-        e.preventDefault()
-        if (isRunning) pause()
-        else start()
+        e.preventDefault();
+        if (isRunning) pause();
+        else start();
       } else if (e.key === 'Escape') {
-        exitFocusMode()
+        exitFocusMode();
       }
     }
 
-    document.addEventListener('keydown', handleKeydown)
-    return () => document.removeEventListener('keydown', handleKeydown)
-  }, [isFocusMode, isRunning, pause, start, exitFocusMode, showEndConfirm])
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [isFocusMode, isRunning, pause, start, exitFocusMode, showEndConfirm]);
 
   return (
     <AnimatePresence>
@@ -89,7 +91,9 @@ export function FocusMode() {
           </div>
 
           {/* 동기부여 메시지 */}
-          <p className="relative text-sm text-muted-foreground/80 text-center max-w-xs">{message}</p>
+          <p className="relative text-sm text-muted-foreground/80 text-center max-w-xs">
+            {message}
+          </p>
 
           {/* 타이머 링 */}
           <div className="relative">
@@ -120,7 +124,7 @@ export function FocusMode() {
 
           {/* 키보드 힌트 */}
           <p className="absolute bottom-6 text-xs text-muted-foreground/30">
-            Space · 일시정지   |   Esc · 나가기
+            Space · 일시정지 | Esc · 나가기
           </p>
 
           <ConfirmDialog
@@ -133,13 +137,13 @@ export function FocusMode() {
             }
             confirmLabel="세션 종료"
             onConfirm={() => {
-              endSession()
-              setShowEndConfirm(false)
+              endSession();
+              setShowEndConfirm(false);
             }}
             onCancel={() => setShowEndConfirm(false)}
           />
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

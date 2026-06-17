@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { Trash2 } from 'lucide-react'
-import { useTaskStore } from '@/store/StoreProvider'
-import type { Task } from '@/types'
+import { Trash2 } from 'lucide-react';
+import { useTaskStore } from '@/store/StoreProvider';
+import type { Task } from '@/types';
 
 interface Props {
-  task: Task
-  isSelected: boolean
-  onSelect: (id: string) => void
+  task: Task;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
 export function TaskItem({ task, isSelected, onSelect }: Props) {
-  const deleteTask = useTaskStore((s) => s.deleteTask)
+  const deleteTask = useTaskStore((s) => s.deleteTask);
 
   return (
     <div
@@ -25,20 +25,28 @@ export function TaskItem({ task, isSelected, onSelect }: Props) {
       <div
         className={[
           'shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors',
-          isSelected
-            ? 'bg-primary'
-            : 'border-2 border-border',
+          isSelected ? 'bg-primary' : 'border-2 border-border',
         ].join(' ')}
       >
         {isSelected && (
           <svg viewBox="0 0 10 8" className="w-2.5 h-2.5">
-            <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="text-primary-foreground" />
+            <path
+              d="M1 4l3 3 5-6"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-primary-foreground"
+            />
           </svg>
         )}
       </div>
 
       {/* 제목 */}
-      <span className={`flex-1 text-sm leading-snug truncate ${isSelected ? 'text-primary font-medium' : 'text-foreground'}`}>
+      <span
+        className={`flex-1 text-sm leading-snug truncate ${isSelected ? 'text-primary font-medium' : 'text-foreground'}`}
+      >
         {task.title}
       </span>
 
@@ -51,12 +59,15 @@ export function TaskItem({ task, isSelected, onSelect }: Props) {
 
       {/* 삭제 */}
       <button
-        onClick={(e) => { e.stopPropagation(); deleteTask(task.id) }}
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteTask(task.id);
+        }}
         aria-label="삭제"
         className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
       >
         <Trash2 className="w-3.5 h-3.5" />
       </button>
     </div>
-  )
+  );
 }

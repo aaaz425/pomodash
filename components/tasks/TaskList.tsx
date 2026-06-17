@@ -1,16 +1,16 @@
-'use client'
+'use client';
 
-import { useTaskStore } from '@/store/StoreProvider'
-import { TaskItem } from './TaskItem'
+import { useTaskStore } from '@/store/StoreProvider';
+import { TaskItem } from './TaskItem';
 
 interface Props {
-  selectedTaskId: string | null
-  onSelect: (id: string) => void
+  selectedTaskId: string | null;
+  onSelect: (id: string) => void;
 }
 
 export function TaskList({ selectedTaskId, onSelect }: Props) {
-  const tasks = useTaskStore((s) => s.tasks)
-  const active = tasks.filter((t) => !t.completed)
+  const tasks = useTaskStore((s) => s.tasks);
+  const active = tasks.filter((t) => !t.completed);
 
   if (active.length === 0) {
     return (
@@ -18,7 +18,7 @@ export function TaskList({ selectedTaskId, onSelect }: Props) {
         <p className="text-sm text-muted-foreground">아직 작업이 없어요</p>
         <p className="text-xs text-muted-foreground/60">아래에서 작업을 추가해보세요</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -32,5 +32,5 @@ export function TaskList({ selectedTaskId, onSelect }: Props) {
         />
       ))}
     </div>
-  )
+  );
 }
