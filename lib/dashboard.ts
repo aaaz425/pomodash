@@ -1,9 +1,7 @@
 import {
-  differenceInCalendarYears,
   endOfDay,
   endOfMonth,
   endOfWeek,
-  format,
   isWithinInterval,
   parseISO,
   startOfDay,
@@ -216,25 +214,9 @@ export function getFocusTrendData(
       return labels[weekIdx];
     };
   } else {
-    // 'all': dynamic — monthly if < 1 year span, yearly if >= 1 year
-    if (sessions.length === 0) {
-      return { data: [], categories: [] };
-    }
-    const earliest = sessions.reduce((min, s) => (s.startedAt < min.startedAt ? s : min));
-    const spanYears = differenceInCalendarYears(today, parseISO(earliest.startedAt));
-    if (spanYears >= 1) {
-      // yearly
-      const yearSet = new Set(sessions.map((s) => format(parseISO(s.startedAt), 'yyyy')));
-      labels = Array.from(yearSet).sort();
-      getLabel = (s) => format(parseISO(s.startedAt), 'yyyy');
-    } else {
-      // monthly
-      const monthSet = new Set(sessions.map((s) => format(parseISO(s.startedAt), 'yyyy-MM')));
-      const sorted = Array.from(monthSet).sort();
-      const monthLabels = new Map(sorted.map((key) => [key, format(parseISO(`${key}-01`), 'M월')]));
-      labels = sorted.map((k) => monthLabels.get(k)!);
-      getLabel = (s) => monthLabels.get(format(parseISO(s.startedAt), 'yyyy-MM'))!;
-    }
+    // 'all': 전체 기간 단일 집계
+    labels = ['전체'];
+    getLabel = () => '전체';
   }
 
   // Initialize data items
