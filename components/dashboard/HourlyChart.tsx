@@ -1,0 +1,93 @@
+'use client';
+
+import { useMemo } from 'react';
+
+import type { Session } from '@/types';
+
+interface Props {
+  sessions: Session[];
+}
+
+function getHourlyFocusSeconds(sessions: Session[]): number[] {
+  const totals = Array<number>(24).fill(0);
+  for (const s of sessions) {
+    const hour = new Date(s.startedAt).getHours();
+    totals[hour] += s.focusSeconds;
+  }
+  return totals;
+}
+
+function formatHourLabel(hour: number): string {
+  if (hour === 0) return '자정';
+  if (hour === 12) return '정오';
+  if (hour < 12) return `오전 ${hour}시`;
+  return `오후 ${hour - 12}시`;
+}
+
+const X_LABEL_HOURS = [0, 6, 12, 18, 23];
+
+export function HourlyChart({ sessions }: Props) {
+  const hourly = useMemo(() => getHourlyFocusSeconds(sessions), [sessions]);
+  const max = Math.max(...hourly, 1);
+
+  const peakHour = hourly.indexOf(Math.max(...hourly));
+  const hasFocus = hourly.some((v) => v > 0);
+
+  return (
+    <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-foreground">시간대별 집중 분석</p>
+        {hasFocus && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+            최다 {formatHourLabel(peakHour)}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        {/* Bars */}
+        <div className="flex items-end gap-0.5 h-12">
+          {hourly.map((val, i) => {
+            const ratio = val / max;
+            return (
+              <div
+                key={i}
+                className="flex-1 rounded-sm"
+                style={{
+                  height: val > 0 ? `${Math.max(ratio * 100, 10)}%` : '3px',
+                  backgroundColor: 'var(--primary)',
+                  opacity: val > 0 ? Math.max(0.18, 0.18 + ratio * 0.82) : 0.12,
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* X Labels */}
+        <div className="relative h-3">
+          {X_LABEL_HOURS.map((hour) => (
+            <span
+              key={hour}
+              className="absolute text-[10px] text-muted-foreground -translate-x-1/2"
+              style={{ left: `${(hour / 23) * 100}%` }}
+            >
+              {hour === 0
+                ? '자정'
+                : hour === 6
+                  ? '오전 6시'
+                  : hour === 12
+                    ? '정오'
+                    : hour === 18
+                      ? '오후 6시'
+                      : '자정'}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {!hasFocus && (
+        <p className="text-xs text-muted-foreground text-center pb-1">아직 기록된 세션이 없어요</p>
+      )}
+    </div>
+  );
+}
