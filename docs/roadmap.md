@@ -24,7 +24,7 @@
 ## Phase 3 — 세션 기록
 
 - [x] `feat/session-record` — 세션 종료 후 메모 작성 (sessionStore)
-- [ ] `feat/journal` — /journal 페이지: 히스토리 조회 + 수정 + 삭제
+- [x] `feat/journal` — /journal 페이지: 히스토리 조회 + 수정 + 삭제
 
 ## Phase 4 — 대시보드
 
