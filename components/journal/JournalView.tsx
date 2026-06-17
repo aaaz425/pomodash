@@ -76,7 +76,7 @@ export function JournalView() {
       ].join(' ')}
     >
       <SlidersHorizontal className="w-3.5 h-3.5" />
-      <span>필터</span>
+      <span>검색</span>
       {hasActiveFilter && (
         <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary" />
       )}

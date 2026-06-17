@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import { DatePickerInput } from '@/components/shared/DatePickerInput';
 import type { Category } from '@/types';
 
 interface Props {
@@ -78,7 +79,7 @@ export function JournalFilterModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-[50] bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
         aria-hidden="true"
         onClick={onClose}
       />
@@ -87,7 +88,7 @@ export function JournalFilterModal({
         role="dialog"
         aria-modal="true"
         aria-label="검색 · 필터"
-        className="fixed z-[51] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] sm:w-[480px] flex flex-col gap-5 p-6 rounded-xl bg-card border border-border shadow-2xl"
+        className="fixed z-51 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] sm:w-[480px] flex flex-col gap-5 p-6 rounded-xl bg-card border border-border shadow-2xl"
       >
         {/* 헤더 */}
         <div className="flex items-center justify-between">
@@ -202,20 +203,23 @@ export function JournalFilterModal({
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => onDateFromChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+            <div className="flex-1">
+              <DatePickerInput
+                value={dateFrom}
+                onChange={onDateFromChange}
+                max={dateTo || undefined}
+                placeholder="시작일"
+              />
+            </div>
             <span className="text-muted-foreground text-sm shrink-0">—</span>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom || undefined}
-              onChange={(e) => onDateToChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+            <div className="flex-1">
+              <DatePickerInput
+                value={dateTo}
+                onChange={onDateToChange}
+                min={dateFrom || undefined}
+                placeholder="종료일"
+              />
+            </div>
           </div>
         </div>
       </div>
