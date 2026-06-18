@@ -20,5 +20,5 @@ pre-push:
           echo "❌ main 브랜치 직접 push 금지. 기능 브랜치 → PR을 사용하세요."
           exit 1
         fi
-    # e2e: Playwright 도입 후 활성화
-    #   run: npx playwright test
+    # e2e: PR 생성 시 GitHub Actions에서 실행
+    #   run: npm run test:e2e
