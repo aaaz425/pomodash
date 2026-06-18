@@ -7,8 +7,8 @@ export default function HomePage() {
   return (
     <>
       <TimerSection />
-      {/* fixed BottomNav를 위한 스페이서 */}
-      <div className="h-16 shrink-0 sm:hidden" />
+      {/* fixed BottomNav를 위한 스페이서 (h-16 본체 + safe-area-inset-bottom) */}
+      <div className="h-[calc(6rem_+_env(safe-area-inset-bottom))] shrink-0 sm:hidden" />
       <TaskModal />
       <SessionRecordModal />
       <FocusMode />
