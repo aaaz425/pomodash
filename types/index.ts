@@ -110,6 +110,22 @@ export const TimerSettingsSchema = z.object({
   totalCycles: z.number().min(1).max(20),
 });
 
+export interface AppSettings {
+  nickname: string;
+  browserNotification: boolean;
+  soundAlert: boolean;
+  motivationalMessages: string[];
+  defaultTimerSettings: TimerSettings;
+}
+
+export const AppSettingsSchema = z.object({
+  nickname: z.string(),
+  browserNotification: z.boolean(),
+  soundAlert: z.boolean(),
+  motivationalMessages: z.array(z.string()).min(1).max(20),
+  defaultTimerSettings: TimerSettingsSchema,
+});
+
 export const CategoriesSchema = z.array(CategorySchema);
 export const TasksSchema = z.array(TaskSchema);
 export const SessionsSchema = z.array(SessionSchema);
@@ -122,6 +138,7 @@ export const STORAGE_KEYS = {
   categories: 'pomodash:categories',
   sessions: 'pomodash:sessions',
   timerSettings: 'pomodash:timer-settings',
+  settings: 'pomodash:settings',
   version: 'pomodash:version',
 } as const;
 
