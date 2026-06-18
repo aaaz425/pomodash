@@ -34,8 +34,8 @@
 
 ## Phase 5 — 설정
 
-- [>] `feat/settings` — 타이머 기본값 + 카테고리 관리 + 동기부여 메시지 관리 + 알림 on/off
-- [ ] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
+- [x] `feat/settings` — 타이머 기본값 + 카테고리 관리 + 동기부여 메시지 관리 + 알림 on/off
+- [>] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
 
 ## Phase 6 — 공통 & 마무리 (MVP 완료)
 
