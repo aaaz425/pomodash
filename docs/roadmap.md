@@ -35,12 +35,12 @@
 ## Phase 5 — 설정
 
 - [x] `feat/settings` — 타이머 기본값 + 카테고리 관리 + 동기부여 메시지 관리 + 알림 on/off
-- [>] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
+- [x] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
 
 ## Phase 6 — 공통 & 마무리 (MVP 완료)
 
 - [x] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
-- [ ] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
+- [>] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [ ] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
 - [ ] `chore/vercel-deploy` — Vercel 프로젝트 연결
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
