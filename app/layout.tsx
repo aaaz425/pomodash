@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
-import { siteUrl } from '@/lib/site';
+import { siteConfig, siteUrl } from '@/lib/site';
 import './globals.css';
 
 const geistMono = Geist_Mono({
@@ -11,32 +11,31 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'Pomodash — 포모도로 타이머',
-  description:
-    '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서. 수험생과 취업준비생을 위한 무료 집중 타이머.',
-  keywords: ['포모도로 타이머', '공부 타이머', '집중 타이머', '포모도로 기법', '무료 공부 도구'],
-  authors: [{ name: 'Pomodash' }],
+  title: siteConfig.title,
+  description: siteConfig.description,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.name }],
   icons: {
     icon: [{ url: '/icon', type: 'image/png' }],
     apple: '/apple-touch-icon.png',
   },
   appleWebApp: {
     capable: true,
-    title: 'Pomodash',
+    title: siteConfig.name,
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
-    title: 'Pomodash — 포모도로 타이머',
-    description: '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서.',
+    title: siteConfig.title,
+    description: siteConfig.ogDescription,
     url: siteUrl,
-    siteName: 'Pomodash',
-    locale: 'ko_KR',
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pomodash — 포모도로 타이머',
-    description: '수험생과 취업준비생을 위한 무료 집중 타이머.',
+    title: siteConfig.title,
+    description: siteConfig.twitterDescription,
   },
   robots: { index: true, follow: true },
 };

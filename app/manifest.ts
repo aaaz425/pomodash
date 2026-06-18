@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { siteConfig } from '@/lib/site';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Pomodash',
-    short_name: 'Pomodash',
-    description: '포모도로 타이머 — 작업 계획, 집중, 기록을 한 곳에서',
+    name: siteConfig.name,
+    short_name: siteConfig.name,
+    description: siteConfig.ogDescription,
     start_url: '/',
     scope: '/',
     display: 'standalone',
@@ -12,7 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#0f172a',
     theme_color: '#0f172a',
     categories: ['productivity'],
-    lang: 'ko',
+    lang: siteConfig.locale.split('_')[0],
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
