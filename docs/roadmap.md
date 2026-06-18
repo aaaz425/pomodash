@@ -43,7 +43,7 @@
 - [x] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [x] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
 - [x] `chore/vercel-deploy` — Vercel 프로젝트 연결
-- [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
+- [x] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 
 ## Phase 7 — 백엔드 & 동기화
 
