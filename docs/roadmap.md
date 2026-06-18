@@ -30,11 +30,11 @@
 
 - [x] `feat/dashboard-core` — 일/주/월 탭 + 집중 시간 집계
 - [x] `feat/dashboard-charts` — 집중 시간 추이 차트 + 카테고리별 도넛 차트 (Recharts)
-- [>] `feat/dashboard-streak` — 연속 기록 (스트릭) 계산 + 표시
+- [x] `feat/dashboard-streak` — 연속 기록 (스트릭) 계산 + 표시
 
 ## Phase 5 — 설정
 
-- [ ] `feat/settings` — 타이머 기본값 + 카테고리 관리 + 동기부여 메시지 관리 + 알림 on/off
+- [>] `feat/settings` — 타이머 기본값 + 카테고리 관리 + 동기부여 메시지 관리 + 알림 on/off
 - [ ] `feat/notifications` — 타이머 종료 시 소리 알람 + 브라우저 알림
 
 ## Phase 6 — 공통 & 마무리 (MVP 완료)
@@ -42,7 +42,7 @@
 - [x] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
 - [ ] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [ ] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
-- [ ] `chore/vercel-deploy` — Vercel 프로젝트 연결 + 환경변수 + 도메인 설정
+- [ ] `chore/vercel-deploy` — Vercel 프로젝트 연결
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 
 ## Phase 7 — 백엔드 & 동기화

@@ -3,10 +3,9 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Square } from 'lucide-react';
-import { useTimerStore } from '@/store/StoreProvider';
+import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
-import { getRandomMotivationalMessage } from '@/lib/motivationalMessages';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
@@ -23,8 +22,9 @@ export function FocusMode() {
   const { displaySeconds, phase, cycleCount } = useTimer();
   const { task, category } = useCurrentTask();
 
+  const messages = useSettingsStore((s) => s.motivationalMessages);
   // 진입할 때만 새 메시지를 골라 고정 — 매 렌더마다 재추첨되지 않도록
-  const [message] = useState(getRandomMotivationalMessage);
+  const [message] = useState(() => messages[Math.floor(Math.random() * messages.length)] ?? '');
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const elapsedMinutes =

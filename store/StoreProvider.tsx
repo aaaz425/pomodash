@@ -4,8 +4,10 @@ import { createContext, startTransition, useContext, useEffect, useState } from 
 import { useStore } from 'zustand';
 import { createTimerStore } from './timerStore';
 import { createTaskStore } from './taskStore';
+import { createSettingsStore } from './settingsStore';
 import type { TimerStoreApi, TimerStore } from './timerStore';
 import type { TaskStoreApi, TaskStore } from './taskStore';
+import type { SettingsStoreApi, SettingsStore } from './settingsStore';
 
 // ─── Timer Store ──────────────────────────────────────────────────────────────
 
@@ -27,6 +29,16 @@ export function useTaskStore<T>(selector: (state: TaskStore) => T): T {
   return useStore(store, selector);
 }
 
+// ─── Settings Store ───────────────────────────────────────────────────────────
+
+const SettingsStoreContext = createContext<SettingsStoreApi | null>(null);
+
+export function useSettingsStore<T>(selector: (state: SettingsStore) => T): T {
+  const store = useContext(SettingsStoreContext);
+  if (!store) throw new Error('useSettingsStore must be used within StoreProvider');
+  return useStore(store, selector);
+}
+
 // ─── Hydration Context ────────────────────────────────────────────────────────
 // localStorage 기반 상태는 useEffect에서 반영되므로, 그 전까지는 기본값으로 렌더된다.
 // hydrated가 true가 되면 실제 저장된 값이 적용된다.
@@ -42,17 +54,21 @@ export function useHydrated(): boolean {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [timerStore] = useState<TimerStoreApi>(createTimerStore);
   const [taskStore] = useState<TaskStoreApi>(createTaskStore);
+  const [settingsStore] = useState<SettingsStoreApi>(createSettingsStore);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     taskStore.getState().hydrate();
+    settingsStore.getState().hydrate();
     startTransition(() => setHydrated(true));
-  }, [taskStore]);
+  }, [taskStore, settingsStore]);
 
   return (
     <TimerStoreContext.Provider value={timerStore}>
       <TaskStoreContext.Provider value={taskStore}>
-        <HydrationContext.Provider value={hydrated}>{children}</HydrationContext.Provider>
+        <SettingsStoreContext.Provider value={settingsStore}>
+          <HydrationContext.Provider value={hydrated}>{children}</HydrationContext.Provider>
+        </SettingsStoreContext.Provider>
       </TaskStoreContext.Provider>
     </TimerStoreContext.Provider>
   );
