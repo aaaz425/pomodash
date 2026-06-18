@@ -7,6 +7,7 @@ import { TimerDefaultsSection } from '@/components/settings/TimerDefaultsSection
 import { CategorySection } from '@/components/settings/CategorySection';
 import { MotivationalSection } from '@/components/settings/MotivationalSection';
 import { NotificationSection } from '@/components/settings/NotificationSection';
+import { InstallSection } from '@/components/settings/InstallSection';
 
 function SettingCard({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -22,7 +23,7 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
 export default function SettingsPage() {
   return (
     <main className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-4 py-8 sm:px-8 sm:py-10 flex flex-col gap-6 pb-24 sm:pb-10">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:px-8 sm:py-10 flex flex-col gap-6 pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-10">
         <div>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
           <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
@@ -50,6 +51,10 @@ export default function SettingsPage() {
 
         <SettingCard title="알림">
           <NotificationSection />
+        </SettingCard>
+
+        <SettingCard title="앱 설치">
+          <InstallSection />
         </SettingCard>
       </div>
     </main>

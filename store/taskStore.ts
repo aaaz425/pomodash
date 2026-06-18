@@ -3,6 +3,7 @@
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
 import { trackEvent, EVENTS } from '@/lib/analytics';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import {
   type Task,
   type Category,
@@ -41,53 +42,10 @@ interface TaskStore {
   hydrate: () => void;
 }
 
-function loadTasks(): Task[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.tasks);
-    if (!raw) return [];
-    return TasksSchema.parse(JSON.parse(raw));
-  } catch {
-    return [];
-  }
-}
-
-function loadCategories(): Category[] {
-  if (typeof window === 'undefined') return DEFAULT_CATEGORIES;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.categories);
-    if (!raw) return DEFAULT_CATEGORIES;
-    return CategoriesSchema.parse(JSON.parse(raw));
-  } catch {
-    return DEFAULT_CATEGORIES;
-  }
-}
-
-function loadSessions(): Session[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.sessions);
-    if (!raw) return [];
-    return SessionsSchema.parse(JSON.parse(raw));
-  } catch {
-    return [];
-  }
-}
-
-function saveTasks(tasks: Task[]) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-}
-
-function saveSessions(sessions: Session[]) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(sessions));
-}
-
-function saveCategories(categories: Category[]) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.categories, JSON.stringify(categories));
-}
+const saveTasks = (tasks: Task[]) => saveToStorage(STORAGE_KEYS.tasks, tasks);
+const saveSessions = (sessions: Session[]) => saveToStorage(STORAGE_KEYS.sessions, sessions);
+const saveCategories = (categories: Category[]) =>
+  saveToStorage(STORAGE_KEYS.categories, categories);
 
 export const createTaskStore = () =>
   createStore<TaskStore>()((set, get) => ({
@@ -187,7 +145,11 @@ export const createTaskStore = () =>
     openModal: () => set({ isModalOpen: true }),
     closeModal: () => set({ isModalOpen: false }),
     hydrate: () =>
-      set({ tasks: loadTasks(), categories: loadCategories(), sessions: loadSessions() }),
+      set({
+        tasks: loadFromStorage(STORAGE_KEYS.tasks, TasksSchema, []),
+        categories: loadFromStorage(STORAGE_KEYS.categories, CategoriesSchema, DEFAULT_CATEGORIES),
+        sessions: loadFromStorage(STORAGE_KEYS.sessions, SessionsSchema, []),
+      }),
   }));
 
 export type TaskStoreApi = ReturnType<typeof createTaskStore>;
