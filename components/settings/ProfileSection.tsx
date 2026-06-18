@@ -23,7 +23,7 @@ export function ProfileSection() {
         <User className="w-6 h-6 text-primary" />
       </div>
 
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1 min-w-0 flex items-center gap-2">
         <input
           value={draft}
           onChange={(e) => {
@@ -33,7 +33,7 @@ export function ProfileSection() {
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder="닉네임 입력 (선택)"
           maxLength={20}
-          className="flex-1 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
         <button
           onClick={handleSave}
