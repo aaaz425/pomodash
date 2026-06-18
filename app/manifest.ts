@@ -6,12 +6,18 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Pomodash',
     description: '포모도로 타이머 — 작업 계획, 집중, 기록을 한 곳에서',
     start_url: '/',
+    scope: '/',
     display: 'standalone',
+    orientation: 'portrait-primary',
     background_color: '#0f172a',
     theme_color: '#0f172a',
+    categories: ['productivity'],
+    lang: 'ko',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: '/icon-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   };
 }
