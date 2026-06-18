@@ -2,6 +2,7 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
+import { trackEvent, EVENTS } from '@/lib/analytics';
 import {
   type Task,
   type Category,
@@ -111,6 +112,7 @@ export const createTaskStore = () =>
       const tasks = [newTask, ...get().tasks];
       saveTasks(tasks);
       set({ tasks });
+      trackEvent(EVENTS.TASK_CREATED);
       return newTask.id;
     },
 
@@ -139,6 +141,7 @@ export const createTaskStore = () =>
       );
       saveSessions(sessions);
       set({ sessions });
+      if (note?.trim()) trackEvent(EVENTS.SESSION_NOTE_WRITTEN);
     },
 
     deleteSession: (id) => {

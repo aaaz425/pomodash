@@ -1,7 +1,8 @@
 'use client';
 
 import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { trackEvent, EVENTS } from '@/lib/analytics';
 
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
 import { ContributionCalendar } from '@/components/dashboard/ContributionCalendar';
@@ -44,6 +45,10 @@ function makeCountSub(diff: number, label: string): string | undefined {
 
 export default function DashboardPage() {
   const [tab, setTab] = useState<TabType>('week');
+
+  useEffect(() => {
+    trackEvent(EVENTS.DASHBOARD_VIEWED);
+  }, []);
 
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
