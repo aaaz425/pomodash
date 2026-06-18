@@ -3,6 +3,7 @@
 import { createStore } from 'zustand';
 import type { TimerPhase, TimerSettings } from '@/types';
 import { DEFAULT_TIMER_SETTINGS } from '@/types';
+import { trackEvent, EVENTS } from '@/lib/analytics';
 
 interface RawFocusPeriod {
   start: number; // ms timestamp
@@ -65,11 +66,14 @@ export const createTimerStore = () =>
       rawFocusPeriods: [],
 
       start: () =>
-        set((state) => ({
-          startedAt: Date.now(),
-          sessionStarted: true,
-          sessionStartedAt: state.sessionStartedAt ?? Date.now(),
-        })),
+        set((state) => {
+          if (!state.sessionStarted) trackEvent(EVENTS.TIMER_STARTED);
+          return {
+            startedAt: Date.now(),
+            sessionStarted: true,
+            sessionStartedAt: state.sessionStartedAt ?? Date.now(),
+          };
+        }),
 
       pause: () => {
         const { startedAt, remainingSeconds, phase, accFocusSeconds, rawFocusPeriods } = get();
@@ -132,6 +136,7 @@ export const createTimerStore = () =>
           : rawFocusPeriods;
         const next = cycleCount + 1;
         if (next >= settings.totalCycles) {
+          trackEvent(EVENTS.TIMER_COMPLETED, { cycles: next });
           set({
             cycleCount: next,
             startedAt: null,
@@ -197,7 +202,10 @@ export const createTimerStore = () =>
         });
       },
 
-      enterFocusMode: () => set({ isFocusMode: true }),
+      enterFocusMode: () => {
+        trackEvent(EVENTS.FOCUS_MODE_ENTERED);
+        set({ isFocusMode: true });
+      },
       exitFocusMode: () => set({ isFocusMode: false }),
     };
   });
