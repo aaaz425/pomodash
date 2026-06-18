@@ -1,21 +1,7 @@
-import Link from 'next/link';
-import { UserRound } from 'lucide-react';
-import { ThemeToggle } from '@/components/shared/ThemeToggle';
-
 export function TopBar() {
   return (
-    <header className="h-14 shrink-0 flex items-center justify-between px-5 bg-card border-b border-border">
+    <header className="h-14 shrink-0 flex items-center px-5 bg-card border-b border-border">
       <span className="text-primary text-base font-bold">Pomodash</span>
-      <div className="flex items-center gap-1">
-        <ThemeToggle className="flex items-center justify-center w-9 h-9 rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors" />
-        <Link
-          href="/mypage"
-          aria-label="마이페이지"
-          className="flex items-center justify-center w-9 h-9 rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors"
-        >
-          <UserRound className="w-5 h-5" />
-        </Link>
-      </div>
     </header>
   );
 }

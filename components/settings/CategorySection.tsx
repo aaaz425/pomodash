@@ -7,9 +7,12 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { CategoryEditModal } from './CategoryEditModal';
 import type { Category } from '@/types';
 
+const MAX_CATEGORIES = 10;
+
 export function CategorySection() {
   const categories = useTaskStore((s) => s.categories);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);
+  const isAtLimit = categories.length >= MAX_CATEGORIES;
 
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -52,13 +55,21 @@ export function CategorySection() {
         ))}
       </div>
 
-      <button
-        onClick={() => setEditTarget('new')}
-        className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <Plus className="w-4 h-4" />
-        카테고리 추가
-      </button>
+      <div className="mt-4 flex items-center justify-between">
+        <button
+          onClick={() => !isAtLimit && setEditTarget('new')}
+          disabled={isAtLimit}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          카테고리 추가
+        </button>
+        <span
+          className={`text-xs ${isAtLimit ? 'text-destructive/70' : 'text-muted-foreground/70'}`}
+        >
+          {categories.length} / {MAX_CATEGORIES}
+        </span>
+      </div>
 
       {editTarget !== null && (
         <CategoryEditModal

@@ -122,7 +122,7 @@ export const AppSettingsSchema = z.object({
   nickname: z.string(),
   browserNotification: z.boolean(),
   soundAlert: z.boolean(),
-  motivationalMessages: z.array(z.string()).min(1),
+  motivationalMessages: z.array(z.string()).min(1).max(20),
   defaultTimerSettings: TimerSettingsSchema,
 });
 

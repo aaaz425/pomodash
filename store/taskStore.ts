@@ -158,6 +158,7 @@ export const createTaskStore = () =>
     },
 
     addCategory: ({ name, color }) => {
+      if (get().categories.length >= 10) return;
       const categories = [
         ...get().categories,
         { id: crypto.randomUUID(), name: name.trim(), color },

@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Timer, TrendingUp, NotebookPen } from 'lucide-react';
+import { Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
 
 const LINK_ITEMS = [
   { href: '/', icon: Timer, label: '타이머' },
   { href: '/dashboard', icon: TrendingUp, label: '통계' },
   { href: '/journal', icon: NotebookPen, label: '기록' },
+  { href: '/mypage', icon: UserRound, label: '마이' },
 ] as const;
 
 export function BottomNav() {

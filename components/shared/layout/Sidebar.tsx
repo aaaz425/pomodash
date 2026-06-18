@@ -3,76 +3,48 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
-import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 const NAV_ITEMS = [
   { href: '/', icon: Timer, label: '타이머' },
   { href: '/dashboard', icon: TrendingUp, label: '통계' },
   { href: '/journal', icon: NotebookPen, label: '기록' },
+  { href: '/mypage', icon: UserRound, label: '마이페이지' },
 ] as const;
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-60 shrink-0 h-full flex flex-col justify-between bg-card border-r border-border">
-      {/* Top: Logo + Nav */}
-      <div className="flex flex-col">
-        <div className="h-16 flex items-center px-5 border-b border-border">
-          <span className="text-primary text-base font-bold">Pomodash</span>
-        </div>
+    <aside className="w-60 shrink-0 h-full flex flex-col justify-start bg-card border-r border-border">
+      <div className="h-16 flex items-center px-5 border-b border-border">
+        <span className="text-primary text-base font-bold">Pomodash</span>
+      </div>
 
-        <nav className="flex flex-col gap-0.5 px-2.5 py-3">
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-            const isActive = pathname === href;
-            return (
-              <Link
-                key={href}
-                href={href}
+      <nav className="flex flex-col gap-0.5 px-2.5 py-3">
+        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={[
+                'flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium transition-colors',
+                isActive
+                  ? 'bg-primary/10 text-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              ].join(' ')}
+            >
+              <Icon
                 className={[
-                  'flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-primary/10 text-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  'w-[18px] h-[18px] shrink-0',
+                  isActive ? 'text-primary' : 'text-[#64748b]',
                 ].join(' ')}
-              >
-                <Icon
-                  className={[
-                    'w-[18px] h-[18px] shrink-0',
-                    isActive ? 'text-primary' : 'text-[#64748b]',
-                  ].join(' ')}
-                />
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Bottom: Theme + Settings */}
-      <div className="flex flex-col gap-0.5 px-2.5 py-3 border-t border-border">
-        <ThemeToggle
-          showLabel
-          className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-        />
-        <Link
-          href="/mypage"
-          className={[
-            'flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium transition-colors',
-            pathname === '/mypage'
-              ? 'bg-primary/10 text-foreground'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-          ].join(' ')}
-        >
-          <UserRound
-            className={[
-              'w-[18px] h-[18px] shrink-0',
-              pathname === '/mypage' ? 'text-primary' : 'text-[#64748b]',
-            ].join(' ')}
-          />
-          마이페이지
-        </Link>
-      </div>
+              />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
     </aside>
   );
 }

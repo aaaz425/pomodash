@@ -1,6 +1,7 @@
 'use client';
 
 import { createStore } from 'zustand';
+import { arrayMove } from '@dnd-kit/sortable';
 import {
   type TimerSettings,
   type AppSettings,
@@ -31,6 +32,7 @@ interface SettingsStore {
   setSoundAlert: (enabled: boolean) => void;
   addMessage: (message: string) => void;
   deleteMessage: (index: number) => void;
+  reorderMessages: (fromId: string, toId: string) => void;
   hydrate: () => void;
 }
 
@@ -85,7 +87,9 @@ export const createSettingsStore = () =>
     },
 
     addMessage: (message) => {
-      const motivationalMessages = [...get().motivationalMessages, message];
+      const curr = get().motivationalMessages;
+      if (curr.length >= 20) return;
+      const motivationalMessages = [...curr, message];
       set({ motivationalMessages });
       saveSettings(toAppSettings(get()));
     },
@@ -95,6 +99,13 @@ export const createSettingsStore = () =>
       if (curr.length <= 1) return;
       const motivationalMessages = curr.filter((_, i) => i !== index);
       set({ motivationalMessages });
+      saveSettings(toAppSettings(get()));
+    },
+
+    reorderMessages: (fromId, toId) => {
+      const messages = get().motivationalMessages;
+      const next = arrayMove(messages, parseInt(fromId), parseInt(toId));
+      set({ motivationalMessages: next });
       saveSettings(toAppSettings(get()));
     },
 

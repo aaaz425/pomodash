@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { ProfileSection } from '@/components/settings/ProfileSection';
+import { ThemeSection } from '@/components/settings/ThemeSection';
 import { TimerDefaultsSection } from '@/components/settings/TimerDefaultsSection';
 import { CategorySection } from '@/components/settings/CategorySection';
 import { MotivationalSection } from '@/components/settings/MotivationalSection';
@@ -29,6 +30,10 @@ export default function MyPage() {
 
         <SettingCard title="프로필">
           <ProfileSection />
+        </SettingCard>
+
+        <SettingCard title="테마">
+          <ThemeSection />
         </SettingCard>
 
         <SettingCard title="타이머 기본값">
