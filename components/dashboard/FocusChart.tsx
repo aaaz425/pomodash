@@ -48,7 +48,7 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
       {/* Chart */}
       {hasData ? (
         <div className="flex-1 min-h-[140px]">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minHeight={140}>
             <BarChart
               layout="vertical"
               data={data}
