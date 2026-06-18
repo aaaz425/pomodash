@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import { siteUrl } from '@/lib/site';
 import './globals.css';
 
 const geistMono = Geist_Mono({
@@ -9,11 +10,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000',
-  ),
+  metadataBase: new URL(siteUrl),
   title: 'Pomodash — 포모도로 타이머',
   description:
     '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서. 수험생과 취업준비생을 위한 무료 집중 타이머.',
@@ -31,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pomodash — 포모도로 타이머',
     description: '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서.',
-    url: 'https://pomodash.vercel.app',
+    url: siteUrl,
     siteName: 'Pomodash',
     locale: 'ko_KR',
     type: 'website',
