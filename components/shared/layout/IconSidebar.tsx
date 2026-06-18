@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { href: '/', icon: Timer },
   { href: '/dashboard', icon: TrendingUp },
   { href: '/journal', icon: NotebookPen },
-  { href: '/mypage', icon: UserRound },
+  { href: '/settings', icon: UserRound },
 ] as const;
 
 export function IconSidebar() {

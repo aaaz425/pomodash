@@ -8,7 +8,7 @@ const LINK_ITEMS = [
   { href: '/', icon: Timer, label: '타이머' },
   { href: '/dashboard', icon: TrendingUp, label: '통계' },
   { href: '/journal', icon: NotebookPen, label: '기록' },
-  { href: '/mypage', icon: UserRound, label: '마이' },
+  { href: '/settings', icon: UserRound, label: '설정' },
 ] as const;
 
 export function BottomNav() {
