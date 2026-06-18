@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Zap, Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
+import { MiniTimerWidget } from '@/components/timer/MiniTimerWidget';
 
 const NAV_ITEMS = [
   { href: '/', icon: Timer },
@@ -20,6 +21,7 @@ export function IconSidebar() {
         <Zap className="w-5 h-5 text-primary" />
       </div>
       <div className="w-8 h-px bg-border mb-1" />
+      <MiniTimerWidget variant="icon" />
       <nav className="flex flex-col gap-0.5">
         {NAV_ITEMS.map(({ href, icon: Icon }) => {
           const isActive = pathname === href;
