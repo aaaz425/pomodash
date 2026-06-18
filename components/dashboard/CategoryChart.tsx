@@ -33,7 +33,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             className="relative shrink-0 w-[120px] h-[120px]"
             style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minHeight={120}>
               <PieChart>
                 <Pie
                   data={data}

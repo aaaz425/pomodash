@@ -9,7 +9,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "test": "vitest",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -50,6 +51,7 @@
     "jsdom": "^29.1.1",
     "lefthook": "^2.1.9",
     "prettier": "^3.8.4",
+    "sharp": "^0.35.1",
     "tailwindcss": "^4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"

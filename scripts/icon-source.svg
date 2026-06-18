@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="512" height="512">
+  <!-- Background -->
+  <rect width="24" height="24" fill="#0f172a"/>
+
+  <!-- P stem + top bar (shared corner point for clean join) -->
+  <path d="M5 21 L5 3 L13 3"
+        stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- P bowl = clock face -->
+  <circle cx="13" cy="10" r="7" stroke="white" stroke-width="2" fill="none"/>
+
+  <!-- P bottom bar (bowl bottom → stem) -->
+  <line x1="5" y1="17" x2="13" y2="17"
+        stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Hour hand (toward 12 o'clock) -->
+  <line x1="13" y1="7.5" x2="13" y2="10"
+        stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Minute hand (toward ~2 o'clock) -->
+  <line x1="13" y1="10" x2="15.5" y2="11.5"
+        stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Red accent dot at minute hand tip -->
+  <circle cx="15.5" cy="11.5" r="1.2" fill="#ef4444"/>
+</svg>
