@@ -116,7 +116,7 @@ export default function DashboardPage() {
 
   return (
     <main className="flex-1 overflow-y-auto">
-      <div className="flex flex-col gap-6 pt-4 px-4 pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-6 sm:p-6 md:p-8 lg:p-10">
+      <div className="flex flex-col gap-6 pt-4 px-4 pb-[calc(4rem_+_env(safe-area-inset-bottom))] sm:pb-6 sm:p-6 md:p-8 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-baseline gap-3">
