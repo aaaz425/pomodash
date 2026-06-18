@@ -41,7 +41,7 @@
 
 - [x] `style/loading-error-ui` — PageSpinner 추출 + loading 개선 + error 재디자인 + 404 페이지
 - [x] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
-- [>] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
+- [x] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
 - [ ] `chore/vercel-deploy` — Vercel 프로젝트 연결
 - [ ] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 

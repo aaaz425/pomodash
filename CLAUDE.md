@@ -110,8 +110,9 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 ### 로드맵 상태 관리 (docs/roadmap.md)
 
-- 브랜치 생성 시 → 해당 항목 `[ ]` → `[>]` 로 변경
-- Squash merge 완료 직후 → 해당 항목 `[>]` → `[x]` 로 변경
+- **브랜치 생성 시** → 해당 항목 `[ ]` → `[>]` 로 변경 후 feature 브랜치에 커밋
+- **사용자 승인 후, squash merge 실행 전** → 해당 항목 `[>]` → `[x]` 로 변경 후 feature 브랜치에 커밋·push → 그 다음 merge
+  - `[x]` 변경이 squash commit 안에 포함되어 PR 번호와 함께 main에 기록됨
 - 두 시점 모두 **예외 없이** roadmap.md 업데이트 후 커밋/머지 진행
 
 ```bash
