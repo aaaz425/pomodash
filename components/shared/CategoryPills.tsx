@@ -28,6 +28,21 @@ const PILL_COLORS: Record<string, { selected: string; dot: string; unselected: s
     dot: 'bg-gray-500',
     unselected: 'bg-muted border border-transparent text-muted-foreground',
   },
+  'bg-red-500': {
+    selected: 'bg-red-500/20 border border-red-500 text-red-500',
+    dot: 'bg-red-500',
+    unselected: 'bg-muted border border-transparent text-muted-foreground',
+  },
+  'bg-pink-500': {
+    selected: 'bg-pink-500/20 border border-pink-500 text-pink-500',
+    dot: 'bg-pink-500',
+    unselected: 'bg-muted border border-transparent text-muted-foreground',
+  },
+  'bg-yellow-500': {
+    selected: 'bg-yellow-500/20 border border-yellow-500 text-yellow-500',
+    dot: 'bg-yellow-500',
+    unselected: 'bg-muted border border-transparent text-muted-foreground',
+  },
 };
 
 const FALLBACK_PILL = {
