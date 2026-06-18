@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useTaskStore } from '@/store/StoreProvider';
+import { useTaskStore, useSettingsStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 
@@ -13,12 +13,15 @@ interface Props {
 export function TaskAddModal({ onClose }: Props) {
   const categories = useTaskStore((s) => s.categories);
   const addTask = useTaskStore((s) => s.addTask);
+  const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
 
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
-  const [targetFocusMinutes, setTargetFocusMinutes] = useState(25);
-  const [targetCycles, setTargetCycles] = useState(4);
-  const [targetBreakMinutes, setTargetBreakMinutes] = useState(5);
+  const [targetFocusMinutes, setTargetFocusMinutes] = useState(defaultTimerSettings.focusMinutes);
+  const [targetCycles, setTargetCycles] = useState(defaultTimerSettings.totalCycles);
+  const [targetBreakMinutes, setTargetBreakMinutes] = useState(
+    defaultTimerSettings.shortBreakMinutes,
+  );
 
   function handleSubmit() {
     const trimmed = title.trim();

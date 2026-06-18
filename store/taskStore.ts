@@ -32,6 +32,9 @@ interface TaskStore {
   updateSessionNote: (id: string, note: string | null) => void;
   deleteSession: (id: string) => void;
   reorderTasks: (activeId: string, overId: string) => void;
+  addCategory: (input: { name: string; color: string }) => void;
+  updateCategory: (id: string, input: { name: string; color: string }) => void;
+  deleteCategory: (id: string) => void;
   openModal: () => void;
   closeModal: () => void;
   hydrate: () => void;
@@ -78,6 +81,11 @@ function saveTasks(tasks: Task[]) {
 function saveSessions(sessions: Session[]) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(sessions));
+}
+
+function saveCategories(categories: Category[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEYS.categories, JSON.stringify(categories));
 }
 
 export const createTaskStore = () =>
@@ -147,6 +155,30 @@ export const createTaskStore = () =>
       const next = arrayMove(tasks, from, to);
       saveTasks(next);
       set({ tasks: next });
+    },
+
+    addCategory: ({ name, color }) => {
+      if (get().categories.length >= 10) return;
+      const categories = [
+        ...get().categories,
+        { id: crypto.randomUUID(), name: name.trim(), color },
+      ];
+      saveCategories(categories);
+      set({ categories });
+    },
+
+    updateCategory: (id, { name, color }) => {
+      const categories = get().categories.map((c) =>
+        c.id === id ? { ...c, name: name.trim(), color } : c,
+      );
+      saveCategories(categories);
+      set({ categories });
+    },
+
+    deleteCategory: (id) => {
+      const categories = get().categories.filter((c) => c.id !== id);
+      saveCategories(categories);
+      set({ categories });
     },
 
     openModal: () => set({ isModalOpen: true }),
