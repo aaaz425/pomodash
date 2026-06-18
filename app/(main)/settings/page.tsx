@@ -7,6 +7,7 @@ import { TimerDefaultsSection } from '@/components/settings/TimerDefaultsSection
 import { CategorySection } from '@/components/settings/CategorySection';
 import { MotivationalSection } from '@/components/settings/MotivationalSection';
 import { NotificationSection } from '@/components/settings/NotificationSection';
+import { InstallSection } from '@/components/settings/InstallSection';
 
 function SettingCard({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -50,6 +51,10 @@ export default function SettingsPage() {
 
         <SettingCard title="알림">
           <NotificationSection />
+        </SettingCard>
+
+        <SettingCard title="앱 설치">
+          <InstallSection />
         </SettingCard>
       </div>
     </main>
