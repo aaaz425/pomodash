@@ -111,6 +111,7 @@ export const TimerSettingsSchema = z.object({
 });
 
 export interface AppSettings {
+  nickname: string;
   browserNotification: boolean;
   soundAlert: boolean;
   motivationalMessages: string[];
@@ -118,6 +119,7 @@ export interface AppSettings {
 }
 
 export const AppSettingsSchema = z.object({
+  nickname: z.string(),
   browserNotification: z.boolean(),
   soundAlert: z.boolean(),
   motivationalMessages: z.array(z.string()).min(1),

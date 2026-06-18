@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { ProfileSection } from '@/components/settings/ProfileSection';
 import { TimerDefaultsSection } from '@/components/settings/TimerDefaultsSection';
 import { CategorySection } from '@/components/settings/CategorySection';
 import { MotivationalSection } from '@/components/settings/MotivationalSection';
@@ -17,16 +18,18 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
   );
 }
 
-export default function SettingsPage() {
+export default function MyPage() {
   return (
     <main className="flex-1 overflow-y-auto">
       <div className="max-w-2xl mx-auto px-4 py-8 sm:px-8 sm:py-10 flex flex-col gap-6 pb-24 sm:pb-10">
         <div>
-          <h1 className="text-xl font-bold text-foreground">설정</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            타이머, 카테고리, 알림 등을 관리합니다.
-          </p>
+          <h1 className="text-xl font-bold text-foreground">마이페이지</h1>
+          <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
         </div>
+
+        <SettingCard title="프로필">
+          <ProfileSection />
+        </SettingCard>
 
         <SettingCard title="타이머 기본값">
           <TimerDefaultsSection />

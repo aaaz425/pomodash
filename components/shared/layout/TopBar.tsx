@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Settings } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 export function TopBar() {
@@ -9,10 +9,11 @@ export function TopBar() {
       <div className="flex items-center gap-1">
         <ThemeToggle className="flex items-center justify-center w-9 h-9 rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors" />
         <Link
-          href="/settings"
+          href="/mypage"
+          aria-label="마이페이지"
           className="flex items-center justify-center w-9 h-9 rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors"
         >
-          <Settings className="w-5 h-5" />
+          <UserRound className="w-5 h-5" />
         </Link>
       </div>
     </header>

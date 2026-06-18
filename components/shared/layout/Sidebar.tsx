@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Timer, TrendingUp, NotebookPen, Settings } from 'lucide-react';
+import { Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 const NAV_ITEMS = [
@@ -56,11 +56,21 @@ export function Sidebar() {
           className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         />
         <Link
-          href="/settings"
-          className="flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          href="/mypage"
+          className={[
+            'flex items-center gap-2.5 h-10 px-2.5 rounded-lg text-sm font-medium transition-colors',
+            pathname === '/mypage'
+              ? 'bg-primary/10 text-foreground'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          ].join(' ')}
         >
-          <Settings className="w-[18px] h-[18px] shrink-0 text-[#64748b]" />
-          설정
+          <UserRound
+            className={[
+              'w-[18px] h-[18px] shrink-0',
+              pathname === '/mypage' ? 'text-primary' : 'text-[#64748b]',
+            ].join(' ')}
+          />
+          마이페이지
         </Link>
       </div>
     </aside>

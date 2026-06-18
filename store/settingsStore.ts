@@ -11,6 +11,7 @@ import {
 import { MOTIVATIONAL_MESSAGES } from '@/lib/motivationalMessages';
 
 const DEFAULT_SETTINGS: AppSettings = {
+  nickname: '',
   browserNotification: false,
   soundAlert: true,
   motivationalMessages: MOTIVATIONAL_MESSAGES,
@@ -18,11 +19,13 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 interface SettingsStore {
+  nickname: string;
   browserNotification: boolean;
   soundAlert: boolean;
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
 
+  setNickname: (nickname: string) => void;
   setTimerDefaults: (settings: TimerSettings) => void;
   setBrowserNotification: (enabled: boolean) => void;
   setSoundAlert: (enabled: boolean) => void;
@@ -33,6 +36,7 @@ interface SettingsStore {
 
 function toAppSettings(s: SettingsStore): AppSettings {
   return {
+    nickname: s.nickname,
     browserNotification: s.browserNotification,
     soundAlert: s.soundAlert,
     motivationalMessages: s.motivationalMessages,
@@ -59,6 +63,11 @@ function saveSettings(data: AppSettings): void {
 export const createSettingsStore = () =>
   createStore<SettingsStore>()((set, get) => ({
     ...DEFAULT_SETTINGS,
+
+    setNickname: (nickname) => {
+      set({ nickname });
+      saveSettings(toAppSettings(get()));
+    },
 
     setTimerDefaults: (defaultTimerSettings) => {
       set({ defaultTimerSettings });

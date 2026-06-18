@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Timer, TrendingUp, NotebookPen, Settings } from 'lucide-react';
+import { Zap, Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 const NAV_ITEMS = [
@@ -45,10 +45,16 @@ export function IconSidebar() {
       <div className="flex flex-col items-center gap-0.5 pt-2 border-t border-border w-full">
         <ThemeToggle className="w-10 h-10 flex items-center justify-center rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors" />
         <Link
-          href="/settings"
-          className="w-10 h-10 flex items-center justify-center rounded-lg text-[#64748b] hover:bg-muted hover:text-foreground transition-colors"
+          href="/mypage"
+          aria-label="마이페이지"
+          className={[
+            'w-10 h-10 flex items-center justify-center rounded-lg transition-colors',
+            pathname === '/mypage'
+              ? 'bg-primary/10'
+              : 'text-[#64748b] hover:bg-muted hover:text-foreground',
+          ].join(' ')}
         >
-          <Settings className="w-5 h-5" />
+          <UserRound className={`w-5 h-5 ${pathname === '/mypage' ? 'text-primary' : ''}`} />
         </Link>
       </div>
     </aside>
