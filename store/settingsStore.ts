@@ -2,6 +2,7 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import {
   type TimerSettings,
   type AppSettings,
@@ -46,21 +47,7 @@ function toAppSettings(s: SettingsStore): AppSettings {
   };
 }
 
-function loadSettings(): AppSettings {
-  if (typeof window === 'undefined') return DEFAULT_SETTINGS;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.settings);
-    if (!raw) return DEFAULT_SETTINGS;
-    return AppSettingsSchema.parse(JSON.parse(raw));
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
-function saveSettings(data: AppSettings): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(data));
-}
+const saveSettings = (data: AppSettings): void => saveToStorage(STORAGE_KEYS.settings, data);
 
 export const createSettingsStore = () =>
   createStore<SettingsStore>()((set, get) => ({
@@ -109,7 +96,7 @@ export const createSettingsStore = () =>
       saveSettings(toAppSettings(get()));
     },
 
-    hydrate: () => set(loadSettings()),
+    hydrate: () => set(loadFromStorage(STORAGE_KEYS.settings, AppSettingsSchema, DEFAULT_SETTINGS)),
   }));
 
 export type SettingsStoreApi = ReturnType<typeof createSettingsStore>;
