@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Square } from 'lucide-react';
+import { X, Square, Play, Pause } from 'lucide-react';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
@@ -109,8 +109,9 @@ export function FocusMode() {
           <div className="relative flex items-center gap-3">
             <button
               onClick={isRunning ? pause : start}
-              className="px-7 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90 active:bg-primary/80"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90 active:bg-primary/80"
             >
+              {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               {isRunning ? '일시정지' : '시작'}
             </button>
             <button
@@ -122,8 +123,8 @@ export function FocusMode() {
             </button>
           </div>
 
-          {/* 키보드 힌트 */}
-          <p className="absolute bottom-6 text-xs text-muted-foreground/30">
+          {/* 키보드 힌트 — 데스크탑 전용 */}
+          <p className="absolute bottom-6 text-xs text-muted-foreground/30 hidden sm:block">
             Space · 일시정지 | Esc · 나가기
           </p>
 

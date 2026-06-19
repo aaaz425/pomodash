@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, Play, Pause, Square } from 'lucide-react';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -39,12 +39,12 @@ export function TimerControls() {
       : 0);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <button
         disabled={!isRunning}
         onClick={enterFocusMode}
         aria-label="집중 모드"
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+        className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-border text-sm text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
       >
         <Maximize2 className="w-3.5 h-3.5" />
         집중
@@ -52,8 +52,9 @@ export function TimerControls() {
 
       <button
         onClick={handleStartClick}
-        className="px-7 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90 active:bg-primary/80"
+        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold whitespace-nowrap transition-colors hover:bg-primary/90 active:bg-primary/80"
       >
+        {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
         {isRunning ? '일시정지' : '시작'}
       </button>
 
@@ -65,8 +66,9 @@ export function TimerControls() {
           setWasRunning(running);
           setShowEndConfirm(true);
         }}
-        className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
+        className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
+        <Square className="w-3.5 h-3.5" />
         세션 종료
       </button>
 
