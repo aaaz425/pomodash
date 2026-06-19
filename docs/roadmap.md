@@ -1,7 +1,7 @@
 # Roadmap
 
-기능 명세: `docs/features.md`
-브랜치 단위 = PR 단위. 각 항목은 `feat/`, `chore/` 브랜치 하나에 대응.
+기능 명세: `docs/specs/feature-spec.md`
+브랜치 단위 = PR 단위. 각 항목은 `feat/`, `chore/` 브랜치 하나에 대응한다.
 
 상태: `[ ]` 대기 · `[>]` 진행 중 · `[x]` 완료
 
@@ -60,3 +60,4 @@
 - [ ] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함)
 - [ ] `feat/rn-tasks` — 작업 목록 네이티브 UI
 - [ ] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
+

@@ -30,7 +30,7 @@
 ### 타이머 기록 (TimerRecord)
 
 향후 개별 타이머 phase(focus / short-break) 1회의 세분화된 실행 기록용으로 예약된 타입.
-현재는 사용하지 않으며, 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
+현재는 사용하지 않는다. 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
 
 ---
 
@@ -54,6 +54,11 @@ export interface Task {
   targetBreakMinutes: number // 사이클 간 휴식 시간 (분)
   completed: boolean
   createdAt: string // ISO 8601
+}
+
+export interface FocusPeriod {
+  start: string // ISO 8601
+  end: string // ISO 8601
 }
 
 export interface Session {
@@ -85,6 +90,14 @@ export interface TimerSettings {
   shortBreakMinutes: number
   totalCycles: number // 세션당 총 사이클 수
 }
+
+export interface AppSettings {
+  nickname: string
+  browserNotification: boolean
+  soundAlert: boolean
+  motivationalMessages: string[] // 1–20개
+  defaultTimerSettings: TimerSettings
+}
 ```
 
 ## localStorage Keys
@@ -94,6 +107,7 @@ const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
   sessions: 'pomodash:sessions',
+  settings: 'pomodash:settings',
   timerSettings: 'pomodash:timer-settings',
   version: 'pomodash:version',
 } as const
@@ -112,7 +126,7 @@ const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
   categoryId: z.string(),
-  targetMinutes: z.number(),
+  targetFocusMinutes: z.number(),
   completed: z.boolean(),
   createdAt: z.string(),
 })
@@ -155,6 +169,7 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: '2', name: '업무', color: 'bg-green-500' },
   { id: '3', name: '운동', color: 'bg-orange-500' },
   { id: '4', name: '독서', color: 'bg-purple-500' },
+  { id: '5', name: '기타', color: 'bg-gray-500' },
 ]
 
 const DEFAULT_TIMER_SETTINGS: TimerSettings = {
@@ -172,3 +187,4 @@ focusMinutes: 5–120분
 shortBreakMinutes: 0–60분
 totalCycles: 1–20회
 ```
+
