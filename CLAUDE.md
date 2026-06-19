@@ -3,7 +3,7 @@
 ## 프로젝트 개요
 
 포모도로 타이머 기반 학습 집중 도구. 작업 계획 → 집중 타이머 → 세션 기록 → 대시보드.
-자세한 내용: `docs/vision.md`, `docs/architecture.md`
+자세한 내용: `docs/specs/PRD.md`, `docs/specs/architecture-diagram.md`
 
 ## 기술 스택
 
@@ -105,7 +105,7 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 커밋 후 항상 **즉시 push**, 브랜치명 응답에 명시
 - Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
 - PR 전 rebase 누락 시 GitHub에서 충돌 발생 → **PR 생성 전 반드시 실행**
-- 커밋 메시지: `docs/commit-convention.md` 형식만 사용
+- 커밋 메시지: `docs/guides/commit-convention.md` 형식만 사용
 - PR 본문: `.github/pull_request_template.md` 형식만 사용
 
 ### 로드맵 상태 관리 (docs/roadmap.md)
@@ -123,16 +123,16 @@ git fetch origin && git rebase origin/main
 git switch main && git pull && git branch -D <merged-branch>
 ```
 
-- 자세한 내용: `docs/commit-convention.md`
+- 자세한 내용: `docs/guides/commit-convention.md`
 
 ---
 
 ## 참조 문서
 
-@docs/data-models.md
-@docs/conventions.md
-@docs/commit-convention.md
-@docs/testing.md
+@docs/guides/data-models.md
+@docs/guides/conventions.md
+@docs/guides/commit-convention.md
+@docs/guides/testing.md
 
 ## 주요 결정사항
 
