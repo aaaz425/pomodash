@@ -116,12 +116,12 @@ export default function DashboardPage() {
 
   return (
     <main className="flex-1 overflow-y-auto">
-      <div className="flex flex-col gap-6 pt-4 px-4 pb-[calc(6rem_+_env(safe-area-inset-bottom))] sm:pb-6 sm:p-6 md:p-8 lg:p-10">
+      <div className="flex flex-col gap-6 pt-8 px-4 pb-24 standalone:pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-6 sm:p-6 md:p-8 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">통계</h1>
-            <span className="text-sm text-muted-foreground">집중의 흐름을 한눈에</span>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">통계</h1>
+            <p className="mt-1 text-sm text-muted-foreground">집중의 흐름을 한눈에</p>
           </div>
           <DashboardTabs value={tab} onChange={setTab} />
         </div>
