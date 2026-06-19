@@ -15,6 +15,10 @@ app/                        # 라우팅 세그먼트만 — 비즈니스 로직 
     journal/
       page.tsx
       loading.tsx
+    settings/
+      page.tsx
+  landing/
+    page.tsx                # 랜딩 페이지
   api/
     ai/route.ts             # Claude API (선택적)
 components/
@@ -44,7 +48,7 @@ components/
 store/
   timerStore.ts
   taskStore.ts
-  sessionStore.ts
+  settingsStore.ts
   StoreProvider.tsx         # SSR 안전 초기화용 Provider — app/layout.tsx에 마운트
 hooks/
   useTimer.ts               # 타이머 tick 로직 + visibilitychange 처리
@@ -139,9 +143,12 @@ shared 컴포넌트 추가 시 아래 목록을 함께 업데이트한다.
 
 | 컴포넌트 | 용도 |
 | -------- | ---- |
+| `AnalyticsProvider` | Posthog 초기화 클라이언트 래퍼 |
 | `CategoryBadge` | 카테고리 색상 뱃지 |
 | `CategoryPills` | 카테고리 선택 pill 버튼 (`variant: rich / simple`) |
 | `ConfirmDialog` | 확인/취소 대화상자 |
+| `DatePickerInput` | 날짜 선택 입력 |
+| `PageSpinner` | 페이지 로딩 스피너 |
 | `StepperInput` | 숫자 증감 입력 (단위 포함) |
 | `TaskQuickAddForm` | 인라인 작업 빠른 생성 폼 (모달 내부용) |
 | `ThemeToggle` | 테마 전환 버튼 |
