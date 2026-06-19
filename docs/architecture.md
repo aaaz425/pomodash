@@ -50,8 +50,26 @@ const remaining = targetSeconds - elapsed
 > Web Worker 방식(워커 스레드 타이머)이 정확도는 더 높지만 구현 복잡도가 높다.
 > MVP에서는 절대 시간 기반으로 충분하며, 드리프트 문제 재발 시 Web Worker로 전환한다.
 
+## 라우트 구조
+
+| 경로 | 페이지 |
+|------|--------|
+| `/` | 랜딩 페이지 (미사용 사용자 대상) |
+| `/(main)` | 메인 — 타이머 + 작업 목록 |
+| `/(main)/dashboard` | 대시보드 — 집중 시간 차트 + 스트릭 |
+| `/(main)/journal` | 세션 기록 — 히스토리 조회 및 필터 |
+| `/(main)/settings` | 설정 — 타이머 기본값, 알림, 카테고리 등 |
+
+## 스토어 구성
+
+| 스토어 | 역할 |
+|--------|------|
+| `timerStore.ts` | 타이머 phase, 진행 시각, 사이클 상태 |
+| `taskStore.ts` | 작업 목록 CRUD, 선택된 작업 |
+| `settingsStore.ts` | 타이머 기본값, 알림/소리 설정, 동기부여 메시지 |
+
 ## 배포 전략
 
-1. Vercel 무료 tier로 시작 (`pomodash.vercel.app`)
+1. Vercel — `https://pomodash-three.vercel.app`
 2. GitHub `main` 브랜치 push 시 Vercel 자동 배포
 3. 커스텀 도메인은 유저 확보 후 도입

@@ -6,10 +6,10 @@ version: 1.0
 
 ## 두 레이어 전략
 
-| 레이어 | 도구       | 실행 시점                     |
-| ------ | ---------- | ----------------------------- |
-| Unit   | Vitest     | 기능 개발 중, pre-commit hook |
-| E2E    | Playwright | PR 생성 전, pre-push hook     |
+| 레이어 | 도구       | 실행 시점                                        |
+| ------ | ---------- | ------------------------------------------------ |
+| Unit   | Vitest     | 기능 개발 중, pre-commit hook (vitest 도입 후)   |
+| E2E    | Playwright | PR 생성 시 GitHub Actions 자동 실행, 로컬 수동 가능 |
 
 ---
 
@@ -66,7 +66,12 @@ pre-commit:
 
 ### 언제 실행하는가
 
-PR 생성 전. pre-push hook 또는 수동으로 실행.
+PR 생성 시 GitHub Actions(`.github/workflows/e2e.yml`)에서 자동 실행.
+로컬에서 수동 실행도 가능.
+
+```bash
+npm run test:e2e
+```
 
 ### 핵심 플로우
 
@@ -77,24 +82,16 @@ tests/e2e/
   dashboard.spec.ts # 집계 데이터 표시 확인
 ```
 
-### lefthook 연동 (playwright 설치 후 lefthook.yml에서 주석 해제)
+### 브라우저 설정
 
-```yaml
-pre-push:
-  commands:
-    e2e:
-      run: npx playwright test
-```
+Chromium 단일 브라우저 실행. `playwright.config.ts` 참고.
+CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 재사용.
 
 ---
 
-## 패키지 설치 순서 (참고)
+## 패키지 설치 현황
 
-```bash
-# Unit (vitest 도입 시)
-npm install -D vitest @vitejs/plugin-react
-
-# E2E (playwright 도입 시)
-npm install -D @playwright/test
-npx playwright install
-```
+| 패키지 | 상태 |
+|--------|------|
+| `@playwright/test` | 설치됨 |
+| `vitest` | 미설치 — 도입 시 `npm install -D vitest @vitejs/plugin-react` |
