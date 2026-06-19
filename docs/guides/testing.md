@@ -44,7 +44,7 @@ store/
 
 ### 테스트 퍼스트 패턴
 
-구현 요청 전에 실패하는 테스트를 먼저 작성하고, Claude에게 통과시키도록 지시한다.
+구현 요청 전에 실패하는 테스트를 먼저 작성한 뒤 Claude에게 통과시키도록 지시한다.
 
 ```
 "timerStore의 pause() 호출 시 startedAt이 null이 되어야 한다는
@@ -95,3 +95,4 @@ CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 
 |--------|------|
 | `@playwright/test` | 설치됨 |
 | `vitest` | 미설치 — 도입 시 `npm install -D vitest @vitejs/plugin-react` |
+

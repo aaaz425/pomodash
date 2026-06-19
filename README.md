@@ -4,14 +4,15 @@
 
 계획하고, 집중하고, 기록한다
 
-수험생과 취업 준비생을 위한 포모도로 기반 집중 도구. 로그인 없이 바로 쓸 수 있으며, 모든 데이터는 브라우저에 저장된다.
+수험생과 취업 준비생을 위한 포모도로 기반 집중 도구. 로그인 없이 바로 쓸 수 있고 모든 데이터는 브라우저에 저장된다.
 
 ## 스크린샷
 
-<!-- TODO: public/screenshots/ 폴더에 이미지 추가 후 아래 주석을 해제하세요 -->
-<!-- ![메인 화면](public/screenshots/main.png) -->
-<!-- ![집중 모드](public/screenshots/focus-mode.png) -->
-<!-- ![대시보드](public/screenshots/dashboard.png) -->
+<div align="center">
+  <img width="32%" alt="메인 화면" src="docs/specs/images/main.png" />
+  <img width="32%" alt="집중 모드" src="docs/specs/images/focus-mode.png" />
+  <img width="32%" alt="대시보드" src="docs/specs/images/dashboard.png" />
+</div>
 
 ## 주요 기능
 
@@ -72,17 +73,26 @@ types/         # 공유 TypeScript 타입 (index.ts 단일 파일)
 docs/          # 프로젝트 문서
 ```
 
-### 문서
+### 산출물 (Specs)
 
 | 문서 | 내용 |
 |------|------|
-| [docs/conventions.md](docs/conventions.md) | 폴더 구조, 네이밍, 컴포넌트 재활용 원칙 |
-| [docs/data-models.md](docs/data-models.md) | 타입 정의, localStorage 스키마 및 접근 패턴 |
-| [docs/design.md](docs/design.md) | 색상, 타이포, 컴포넌트 디자인 시스템 |
-| [docs/architecture.md](docs/architecture.md) | 기술 선택 이유, 타이머 정확도 전략 |
-| [docs/commit-convention.md](docs/commit-convention.md) | 브랜치 전략, 커밋 컨벤션, PR 규칙 |
-| [docs/testing.md](docs/testing.md) | Vitest + Playwright 테스트 전략 |
-| [docs/roadmap.md](docs/roadmap.md) | 구현 로드맵 및 진행 현황 |
+| [PRD](docs/specs/PRD.md) | 제품 목표, 사용자 페르소나, 핵심 기능 요구사항 |
+| [ERD](docs/specs/ERD.md) | 데이터 모델 및 관계도 |
+| [기능 명세](docs/specs/feature-spec.md) | 기능별 상세 명세 및 유저 스토리 |
+| [화면 명세](docs/specs/screen-spec.md) | 화면별 레이아웃 및 상호작용 |
+| [아키텍처](docs/specs/architecture-diagram.md) | 기술 선택 이유, Mermaid 구조도 |
+
+### 개발 가이드 (Guides)
+
+| 문서 | 내용 |
+|------|------|
+| [컨벤션](docs/guides/conventions.md) | 폴더 구조, 네이밍, 컴포넌트 재활용 원칙 |
+| [데이터 모델](docs/guides/data-models.md) | 타입 정의, localStorage 스키마 및 접근 패턴 |
+| [디자인 시스템](docs/guides/design.md) | 색상, 타이포, 컴포넌트 디자인 시스템 |
+| [커밋 컨벤션](docs/guides/commit-convention.md) | 브랜치 전략, 커밋 컨벤션, PR 규칙 |
+| [테스트 전략](docs/guides/testing.md) | Vitest + Playwright 테스트 전략 |
+| [로드맵](docs/roadmap.md) | 구현 로드맵 및 진행 현황 |
 
 ## 기술 스택
 
@@ -100,3 +110,4 @@ docs/          # 프로젝트 문서
 ## 라이선스
 
 [MIT](./LICENSE) © 2026
+
