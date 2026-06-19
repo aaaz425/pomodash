@@ -47,7 +47,7 @@
 
 ## Phase 6-a — 서비스 고도화
 
-- [>] `style/landing-and-ui-polish` — 랜딩 페이지, 모바일 레이아웃/버튼/모달 UI 개선, 설정 앱 정보
+- [x] `style/landing-and-ui-polish` — 랜딩 페이지, 모바일 레이아웃/버튼/모달 UI 개선, 설정 앱 정보
 
 ## Phase 7 — 백엔드 & 동기화
 
