@@ -45,6 +45,10 @@
 - [x] `chore/vercel-deploy` — Vercel 프로젝트 연결
 - [x] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
 
+## Phase 6-a — 서비스 고도화
+
+- [>] `style/landing-and-ui-polish` — 랜딩 페이지, 모바일 레이아웃/버튼/모달 UI 개선, 설정 앱 정보
+
 ## Phase 7 — 백엔드 & 동기화
 
 - [ ] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
