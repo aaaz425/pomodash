@@ -94,17 +94,20 @@ export function SessionRecordModal() {
         aria-label="세션 기록"
         className={[
           'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto',
-          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[90vh]',
+          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh]',
           'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
           'sm:w-[600px] sm:rounded-xl sm:max-h-[85vh]',
         ].join(' ')}
       >
-        <div className="flex flex-col gap-7 p-8 sm:p-10">
+        <div className="flex flex-col gap-5 p-5 sm:gap-7 sm:p-10">
           {/* Header */}
           <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center justify-center w-[72px] h-[72px] rounded-full bg-primary/20">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                <Check className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+            <div className="flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-full bg-primary/20">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary">
+                <Check
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground"
+                  strokeWidth={2.5}
+                />
               </div>
             </div>
             <div className="flex flex-col items-center gap-1.5 text-center">
@@ -153,7 +156,7 @@ export function SessionRecordModal() {
               onChange={(e) => setNote(e.target.value.slice(0, 500))}
               placeholder="무엇을 집중해서 했나요? 짧게 메모해두면 나중에 돌아볼 수 있어요."
               className={[
-                'w-full h-[120px] resize-none rounded-md border border-border',
+                'w-full h-[90px] sm:h-[120px] resize-none rounded-md border border-border',
                 'bg-card px-3.5 py-3 text-sm text-foreground',
                 'placeholder:text-muted-foreground/50',
                 'focus:outline-none focus:ring-2 focus:ring-ring/50',
