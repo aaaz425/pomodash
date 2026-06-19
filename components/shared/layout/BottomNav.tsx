@@ -15,7 +15,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 sm:hidden bg-card border-t border-border pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 sm:hidden bg-card border-t border-border standalone:pb-[env(safe-area-inset-bottom)]">
       <div className="h-16 flex items-center justify-around">
         {LINK_ITEMS.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;
