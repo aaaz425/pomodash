@@ -2,14 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Timer, TrendingUp, NotebookPen, UserRound } from 'lucide-react';
-
-const NAV_ITEMS = [
-  { href: '/', icon: Timer },
-  { href: '/dashboard', icon: TrendingUp },
-  { href: '/journal', icon: NotebookPen },
-  { href: '/settings', icon: UserRound },
-] as const;
+import { Zap } from 'lucide-react';
+import { NAV_ITEMS } from './navItems';
 
 export function IconSidebar() {
   const pathname = usePathname();
