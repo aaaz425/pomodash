@@ -111,14 +111,18 @@ export function FocusMode() {
               onClick={isRunning ? pause : start}
               className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90 active:bg-primary/80"
             >
-              {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              {isRunning ? (
+                <Pause className="w-3.5 h-3.5" fill="currentColor" />
+              ) : (
+                <Play className="w-3.5 h-3.5" fill="currentColor" />
+              )}
               {isRunning ? '일시정지' : '시작'}
             </button>
             <button
               onClick={() => setShowEndConfirm(true)}
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              <Square className="w-3.5 h-3.5" />
+              <Square className="w-3.5 h-3.5" fill="currentColor" />
               세션종료
             </button>
           </div>
