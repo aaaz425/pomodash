@@ -127,7 +127,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
               onKeyDown={handleKeyDown}
               maxLength={500}
               placeholder="세션에 대한 메모를 남겨보세요..."
-              className="flex-1 min-h-0 w-full resize-none rounded-lg bg-muted/50 border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="flex-1 min-h-0 w-full resize-none rounded-lg bg-muted/50 border border-border px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <div className="flex items-center justify-between shrink-0">
               <span className="text-xs text-muted-foreground">{draft.length} / 500</span>

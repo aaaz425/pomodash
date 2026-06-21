@@ -157,7 +157,7 @@ export function SessionRecordModal() {
               placeholder="무엇을 집중해서 했나요? 짧게 메모해두면 나중에 돌아볼 수 있어요."
               className={[
                 'w-full h-[90px] sm:h-[120px] resize-none rounded-md border border-border',
-                'bg-card px-3.5 py-3 text-sm text-foreground',
+                'bg-card px-3.5 py-3 text-base text-foreground',
                 'placeholder:text-muted-foreground/50',
                 'focus:outline-none focus:ring-2 focus:ring-ring/50',
               ].join(' ')}

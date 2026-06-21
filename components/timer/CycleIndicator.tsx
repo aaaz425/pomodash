@@ -11,7 +11,7 @@ export function CycleIndicator() {
 
   return (
     <div
-      className={`flex items-center gap-2 transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
+      className={`flex flex-wrap items-center justify-center gap-2 transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
     >
       {Array.from({ length: totalCycles }).map((_, i) => {
         const isCompleted = i < cycleCount;
