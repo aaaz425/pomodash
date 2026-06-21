@@ -7,7 +7,7 @@ import { MiniTimerWidget } from '@/components/timer/MiniTimerWidget';
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <StoreProvider>
-      <div className="flex flex-col sm:flex-row h-[100dvh] overflow-hidden bg-background pt-[env(safe-area-inset-top)] sm:pt-0">
+      <div className="flex flex-col sm:flex-row h-dvh overflow-hidden bg-background pt-[env(safe-area-inset-top)] sm:pt-0">
         <div className="hidden sm:block lg:hidden">
           <IconSidebar />
         </div>
