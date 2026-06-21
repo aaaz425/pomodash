@@ -36,7 +36,7 @@ export function SessionTaskSelector({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-foreground">어떤 작업을 하셨나요?</span>
+        <span className="text-sm font-semibold text-foreground min-w-0">어떤 작업을 하셨나요?</span>
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <span className="text-[11px] text-muted-foreground">
             완료된 사이클 {cycleCount} / {totalCycles}

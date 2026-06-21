@@ -45,7 +45,7 @@ export function StepperInput({ value, onChange, min, max, step = 1, unit }: Prop
           onChange={(e) => setRaw(e.target.value.replace(/\D/g, ''))}
           onBlur={() => commit(raw)}
           onKeyDown={(e) => e.key === 'Enter' && commit(raw)}
-          className="w-10 text-center text-sm font-semibold text-foreground bg-transparent focus:outline-none py-2"
+          className="w-10 text-center text-base font-semibold text-foreground bg-transparent focus:outline-none py-2"
         />
         <button
           type="button"
