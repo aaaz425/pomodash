@@ -128,7 +128,7 @@ export function JournalFilterModal({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="작업명 검색..."
-              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              className="flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
             {searchQuery && (
               <button

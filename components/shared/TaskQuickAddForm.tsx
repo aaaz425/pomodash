@@ -28,7 +28,7 @@ export function TaskQuickAddForm({ categories, onAdd, onCancel }: Props) {
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
         placeholder="작업 제목"
-        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
+        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
       />
       <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
       <div className="flex gap-2">

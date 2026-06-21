@@ -56,7 +56,7 @@ function MessageRow({ id, message, onDelete, canDelete }: MessageRowProps) {
       >
         <GripVertical className="w-3.5 h-3.5" />
       </button>
-      <span className="text-sm text-foreground flex-1 pr-2">{message}</span>
+      <span className="text-sm text-foreground flex-1 min-w-0 truncate pr-2">{message}</span>
       <button
         onClick={onDelete}
         disabled={!canDelete}
@@ -131,7 +131,7 @@ export function MotivationalSection() {
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="새 동기부여 메시지 입력"
           disabled={isAtLimit}
-          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
         />
         <button
           onClick={handleAdd}
