@@ -4,6 +4,7 @@ import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { generateId } from '@/lib/id';
 import {
   type Task,
   type Category,
@@ -58,7 +59,7 @@ export const createTaskStore = () =>
 
     addTask: ({ title, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes }) => {
       const newTask: Task = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: title.trim(),
         categoryId,
         targetFocusMinutes: targetFocusMinutes ?? 25,
@@ -87,7 +88,7 @@ export const createTaskStore = () =>
     },
 
     addSession: (input) => {
-      const session: Session = { id: crypto.randomUUID(), ...input };
+      const session: Session = { id: generateId(), ...input };
       const sessions = [session, ...get().sessions];
       saveSessions(sessions);
       set({ sessions });
@@ -120,10 +121,7 @@ export const createTaskStore = () =>
 
     addCategory: ({ name, color }) => {
       if (get().categories.length >= 10) return;
-      const categories = [
-        ...get().categories,
-        { id: crypto.randomUUID(), name: name.trim(), color },
-      ];
+      const categories = [...get().categories, { id: generateId(), name: name.trim(), color }];
       saveCategories(categories);
       set({ categories });
     },
