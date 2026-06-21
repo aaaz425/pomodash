@@ -16,8 +16,11 @@ export function BottomNav() {
     // iOS WebKit이 standalone PWA에서 window.innerHeight를 실제 화면보다 작게
     // 보고하는 버그가 있어 bottom:0 기준으로는 네비바가 화면 끝에 못 붙는 경우가 있다.
     // top은 뷰포트 높이 계산과 무관하게 항상 정확하므로, top 기준으로 직접 위치를 고정한다.
+    // 이 버그는 iOS WebKit 전용이라, 다른 플랫폼(Android 등)에서는 screen.height의
+    // 의미가 달라 같은 보정이 오히려 네비바를 화면 밖으로 밀어낼 수 있어 iOS에서만 적용한다.
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
     const update = () => {
-      if (!window.matchMedia('(display-mode: standalone)').matches) {
+      if (!isIOS || !window.matchMedia('(display-mode: standalone)').matches) {
         nav.style.top = '';
         nav.style.bottom = '';
         return;

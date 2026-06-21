@@ -128,12 +128,12 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html {
-    @apply font-sans bg-card;
-    min-height: calc(100% + env(safe-area-inset-bottom));
-  }
+  html,
   body {
-    @apply bg-card text-foreground;
+    @apply font-sans text-foreground bg-card;
+  }
+  html {
+    min-height: calc(100% + env(safe-area-inset-bottom));
   }
 }
 
