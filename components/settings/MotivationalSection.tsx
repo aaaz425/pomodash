@@ -100,6 +100,7 @@ export function MotivationalSection() {
   return (
     <div className="flex flex-col gap-4">
       <DndContext
+        id="motivational-messages"
         sensors={sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis]}

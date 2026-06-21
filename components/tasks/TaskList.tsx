@@ -51,6 +51,7 @@ export function TaskList({ selectedTaskId, onSelect }: Props) {
 
   return (
     <DndContext
+      id="task-list"
       sensors={sensors}
       collisionDetection={closestCenter}
       modifiers={[restrictToVerticalAxis]}
