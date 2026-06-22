@@ -42,6 +42,9 @@ export function TimerRing() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
   const isPaused = sessionStarted && !isRunning;
+  const isIdle = !sessionStarted && !isRunning;
+  const isNeutral = isIdle || isPaused;
+  const statusLabel = isIdle ? '대기 중' : isPaused ? '일시정지' : PHASE_LABELS[phase];
 
   const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
@@ -91,11 +94,11 @@ export function TimerRing() {
         >
           {mm}:{ss}
         </time>
-        {isPaused ? (
+        {isNeutral ? (
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-muted/60">
             <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
             <span className="text-[10px] font-semibold tracking-[0.5px] text-muted-foreground">
-              일시정지
+              {statusLabel}
             </span>
           </div>
         ) : (
@@ -104,7 +107,7 @@ export function TimerRing() {
           >
             <div className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
             <span className={`text-[10px] font-semibold tracking-[0.5px] ${badge.text}`}>
-              {PHASE_LABELS[phase]}
+              {statusLabel}
             </span>
           </div>
         )}
