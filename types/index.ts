@@ -110,6 +110,27 @@ export const TimerSettingsSchema = z.object({
   totalCycles: z.number().min(1).max(20),
 });
 
+// 새로고침 복구용 — 진행 중이거나 아직 기록 안 한(sessionEnded) 활성 타이머 1개의 스냅샷
+export const RawFocusPeriodSchema = z.object({
+  start: z.number(),
+  end: z.number(),
+});
+
+export const ActiveTimerStateSchema = z.object({
+  phase: z.enum(['focus', 'short-break']),
+  remainingSeconds: z.number(),
+  startedAt: z.number().nullable(),
+  cycleCount: z.number(),
+  currentTaskId: z.string().nullable(),
+  settings: TimerSettingsSchema,
+  sessionEnded: z.boolean(),
+  sessionStarted: z.boolean(),
+  sessionStartedAt: z.number().nullable(),
+  sessionEndedAt: z.number().nullable(),
+  accFocusSeconds: z.number(),
+  rawFocusPeriods: z.array(RawFocusPeriodSchema),
+});
+
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;
@@ -139,6 +160,7 @@ export const STORAGE_KEYS = {
   sessions: 'pomodash:sessions',
   timerSettings: 'pomodash:timer-settings',
   settings: 'pomodash:settings',
+  activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
 } as const;
 

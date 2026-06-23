@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
+import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
@@ -11,6 +11,7 @@ import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 
 export function SessionRecordModal() {
+  const hydrated = useHydrated();
   const sessionEnded = useTimerStore((s) => s.sessionEnded);
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
   const cycleCount = useTimerStore((s) => s.cycleCount);
@@ -34,7 +35,7 @@ export function SessionRecordModal() {
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  if (!sessionEnded || sessionEndedAt === null) return null;
+  if (!hydrated || !sessionEnded || sessionEndedAt === null) return null;
 
   const isTaskSession = currentTaskId !== null;
   const now = sessionEndedAt;
@@ -127,7 +128,7 @@ export function SessionRecordModal() {
                 <span className="text-lg font-semibold tracking-tight text-foreground truncate">
                   {task?.title ?? '작업 없음'}
                 </span>
-                {category && task && <CategoryBadge category={category} />}
+                {category && task && <CategoryBadge category={category} className="self-start" />}
               </div>
               <div className="flex flex-col items-end gap-1.5 shrink-0">
                 <span className="text-[11px] text-muted-foreground">

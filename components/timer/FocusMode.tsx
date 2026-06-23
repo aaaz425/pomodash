@@ -11,6 +11,8 @@ import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
+const MESSAGE_ROTATE_INTERVAL_MS = 5000;
+
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
@@ -23,9 +25,27 @@ export function FocusMode() {
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
-  // 진입할 때만 새 메시지를 골라 고정 — 매 렌더마다 재추첨되지 않도록
-  const [message] = useState(() => messages[Math.floor(Math.random() * messages.length)] ?? '');
+  const [message, setMessage] = useState(
+    () => messages[Math.floor(Math.random() * messages.length)] ?? '',
+  );
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+
+  useEffect(() => {
+    if (!isFocusMode || messages.length === 0) return;
+
+    const interval = setInterval(() => {
+      setMessage((prev) => {
+        if (messages.length === 1) return messages[0];
+        let next = prev;
+        while (next === prev) {
+          next = messages[Math.floor(Math.random() * messages.length)];
+        }
+        return next;
+      });
+    }, MESSAGE_ROTATE_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [isFocusMode, messages]);
 
   const elapsedMinutes =
     cycleCount * settings.focusMinutes +
@@ -91,9 +111,18 @@ export function FocusMode() {
           </div>
 
           {/* 동기부여 메시지 */}
-          <p className="relative text-sm text-muted-foreground/80 text-center max-w-xs">
-            {message}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={message}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="text-sm text-muted-foreground/80 text-center max-w-xs"
+            >
+              {message}
+            </motion.p>
+          </AnimatePresence>
 
           {/* 타이머 링 */}
           <div className="relative">

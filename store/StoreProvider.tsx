@@ -60,8 +60,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     taskStore.getState().hydrate();
     settingsStore.getState().hydrate();
+    timerStore.getState().hydrate();
     startTransition(() => setHydrated(true));
-  }, [taskStore, settingsStore]);
+  }, [taskStore, settingsStore, timerStore]);
 
   return (
     <TimerStoreContext.Provider value={timerStore}>
