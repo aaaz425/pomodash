@@ -128,7 +128,7 @@ export function SessionRecordModal() {
                 <span className="text-lg font-semibold tracking-tight text-foreground truncate">
                   {task?.title ?? '작업 없음'}
                 </span>
-                {category && task && <CategoryBadge category={category} />}
+                {category && task && <CategoryBadge category={category} className="self-start" />}
               </div>
               <div className="flex flex-col items-end gap-1.5 shrink-0">
                 <span className="text-[11px] text-muted-foreground">
