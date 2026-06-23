@@ -2,8 +2,9 @@
 
 import { createStore } from 'zustand';
 import type { TimerPhase, TimerSettings } from '@/types';
-import { DEFAULT_TIMER_SETTINGS } from '@/types';
+import { DEFAULT_TIMER_SETTINGS, ActiveTimerStateSchema, STORAGE_KEYS } from '@/types';
 import { trackEvent, EVENTS } from '@/lib/analytics';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
 interface RawFocusPeriod {
   start: number; // ms timestamp
@@ -37,6 +38,7 @@ interface TimerStore {
   dismissSessionRecord: () => void;
   enterFocusMode: () => void;
   exitFocusMode: () => void;
+  hydrate: () => void;
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
@@ -46,8 +48,26 @@ function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
   };
 }
 
-export const createTimerStore = () =>
-  createStore<TimerStore>()((set, get) => {
+// 새로고침 복구용 스냅샷 — isFocusMode(순수 UI 토글)는 제외
+function toActiveTimerSnapshot(s: TimerStore) {
+  return {
+    phase: s.phase,
+    remainingSeconds: s.remainingSeconds,
+    startedAt: s.startedAt,
+    cycleCount: s.cycleCount,
+    currentTaskId: s.currentTaskId,
+    settings: s.settings,
+    sessionEnded: s.sessionEnded,
+    sessionStarted: s.sessionStarted,
+    sessionStartedAt: s.sessionStartedAt,
+    sessionEndedAt: s.sessionEndedAt,
+    accFocusSeconds: s.accFocusSeconds,
+    rawFocusPeriods: s.rawFocusPeriods,
+  };
+}
+
+export const createTimerStore = () => {
+  const store = createStore<TimerStore>()((set, get) => {
     const settings = DEFAULT_TIMER_SETTINGS;
     const seconds = phaseSeconds(settings);
     return {
@@ -207,8 +227,23 @@ export const createTimerStore = () =>
         set({ isFocusMode: true });
       },
       exitFocusMode: () => set({ isFocusMode: false }),
+
+      hydrate: () => {
+        const fallback = toActiveTimerSnapshot(get());
+        set(loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback));
+      },
     };
   });
+
+  // 활성 타이머 스냅샷을 상태 변경마다 자동 저장 — 액션별로 직접 호출하지 않아도
+  // 누락 없이 항상 최신 상태가 반영된다 (complete()→completeCycle() 같은 위임 구조 때문에
+  // 액션마다 수동 호출하면 빠뜨리기 쉬움)
+  store.subscribe((state) => {
+    saveToStorage(STORAGE_KEYS.activeTimer, toActiveTimerSnapshot(state));
+  });
+
+  return store;
+};
 
 export type TimerStoreApi = ReturnType<typeof createTimerStore>;
 export type { TimerStore };
