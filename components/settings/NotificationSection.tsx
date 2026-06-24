@@ -1,10 +1,11 @@
 'use client';
 
-import { Bell, Volume2, Play } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Volume2, Play, Square } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
-import { playAlarm } from '@/lib/notifications';
-import { SOUND_TYPE_LABELS, type SoundType } from '@/types';
+import { playAlarm, stopAlarm } from '@/lib/notifications';
 import { StepperInput } from '@/components/shared/StepperInput';
+import { SoundTypeSelect } from './SoundTypeSelect';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -37,6 +38,8 @@ export function NotificationSection() {
   const setSoundVolume = useSettingsStore((s) => s.setSoundVolume);
   const setSoundRepeatCount = useSettingsStore((s) => s.setSoundRepeatCount);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+
   async function handleBrowserNotification(enabled: boolean) {
     if (enabled && typeof window !== 'undefined' && 'Notification' in window) {
       const perm = await Notification.requestPermission();
@@ -46,7 +49,30 @@ export function NotificationSection() {
   }
 
   function handlePreview() {
-    playAlarm({ type: soundType, volume: soundVolume, repeatCount: soundRepeatCount });
+    if (isPlaying) {
+      stopAlarm();
+      setIsPlaying(false);
+      return;
+    }
+    setIsPlaying(true);
+    playAlarm({
+      type: soundType,
+      volume: soundVolume,
+      repeatCount: soundRepeatCount,
+      onEnded: () => setIsPlaying(false),
+    });
+  }
+
+  useEffect(() => {
+    return () => stopAlarm();
+  }, []);
+
+  function handleSoundAlertToggle(enabled: boolean) {
+    if (!enabled && isPlaying) {
+      stopAlarm();
+      setIsPlaying(false);
+    }
+    setSoundAlert(enabled);
   }
 
   return (
@@ -70,7 +96,7 @@ export function NotificationSection() {
             <p className="text-xs text-muted-foreground mt-0.5">타이머 종료 시 소리 재생</p>
           </div>
         </div>
-        <Toggle checked={soundAlert} onChange={setSoundAlert} />
+        <Toggle checked={soundAlert} onChange={handleSoundAlertToggle} />
       </div>
 
       <fieldset
@@ -84,25 +110,18 @@ export function NotificationSection() {
             소리 종류
           </label>
           <div className="flex items-center gap-2">
-            <select
-              id="sound-type"
-              value={soundType}
-              onChange={(e) => setSoundType(e.target.value as SoundType)}
-              className="text-sm bg-muted border border-border rounded-lg px-2.5 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed"
-            >
-              {Object.entries(SOUND_TYPE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <SoundTypeSelect value={soundType} onChange={setSoundType} />
             <button
               type="button"
               onClick={handlePreview}
-              aria-label="미리 듣기"
+              aria-label={isPlaying ? '미리듣기 정지' : '미리 듣기'}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
             >
-              <Play className="w-3.5 h-3.5" />
+              {isPlaying ? (
+                <Square className="w-3.5 h-3.5" fill="currentColor" />
+              ) : (
+                <Play className="w-3.5 h-3.5" />
+              )}
             </button>
           </div>
         </div>
