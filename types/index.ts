@@ -131,10 +131,22 @@ export const ActiveTimerStateSchema = z.object({
   rawFocusPeriods: z.array(RawFocusPeriodSchema),
 });
 
+export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
+
+export const SOUND_TYPE_LABELS: Record<SoundType, string> = {
+  sine: '기본',
+  chime: '차임',
+  bell: '벨',
+  digital: '디지털',
+};
+
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;
   soundAlert: boolean;
+  soundType: SoundType;
+  soundVolume: number; // 0-100
+  soundRepeatCount: number; // 1-5
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
 }
@@ -143,6 +155,10 @@ export const AppSettingsSchema = z.object({
   nickname: z.string(),
   browserNotification: z.boolean(),
   soundAlert: z.boolean(),
+  // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수 — 없으면 parse 실패 시 전체 설정이 초기화됨
+  soundType: z.enum(['sine', 'chime', 'bell', 'digital']).default('sine'),
+  soundVolume: z.number().min(0).max(100).default(70),
+  soundRepeatCount: z.number().min(1).max(5).default(2),
   motivationalMessages: z.array(z.string()).min(1).max(20),
   defaultTimerSettings: TimerSettingsSchema,
 });
