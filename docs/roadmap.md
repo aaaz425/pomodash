@@ -49,7 +49,7 @@
 
 - [x] `style/landing-and-ui-polish` — 랜딩 페이지, 모바일 레이아웃/버튼/모달 UI 개선, 설정 앱 정보
 - [x] `fix/desktop-bottom-padding` — PC/태블릿 화면 하단 여백 부족 수정 (macOS Dock 가림 등)
-- [ ] `refactor/settings-modal` — 설정 페이지 타이머/카테고리/동기부여/알림을 모달 메뉴 방식으로 정리
+- [x] `refactor/settings-modal` — 설정 페이지 타이머/카테고리/동기부여/알림을 모달 메뉴 방식으로 정리
 - [ ] `feat/notification-sound-options` — 알림 소리 종류 선택 + 음량 조절 (localStorage 영속)
 
 ## Phase 7 — 백엔드 & 동기화

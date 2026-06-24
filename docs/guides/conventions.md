@@ -148,7 +148,9 @@ shared 컴포넌트를 추가할 때 아래 목록도 함께 갱신한다.
 | `CategoryPills` | 카테고리 선택 pill 버튼 (`variant: rich / simple`) |
 | `ConfirmDialog` | 확인/취소 대화상자 |
 | `DatePickerInput` | 날짜 선택 입력 |
+| `Modal` | 범용 모달 셸 (모바일 bottom-sheet / 데스크탑 중앙 팝업) |
 | `PageSpinner` | 페이지 로딩 스피너 |
+| `SettingsMenuRow` | 설정 메뉴 행 (아이콘 + 라벨 + 값 미리보기 + 모달 오픈) |
 | `StepperInput` | 숫자 증감 입력 (단위 포함) |
 | `TaskQuickAddForm` | 인라인 작업 빠른 생성 폼 (모달 내부용) |
 | `ThemeToggle` | 테마 전환 버튼 |
