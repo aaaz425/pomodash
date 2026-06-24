@@ -13,6 +13,9 @@ export function useTimer() {
   const complete = useTimerStore((s) => s.complete);
 
   const soundAlert = useSettingsStore((s) => s.soundAlert);
+  const soundType = useSettingsStore((s) => s.soundType);
+  const soundVolume = useSettingsStore((s) => s.soundVolume);
+  const soundRepeatCount = useSettingsStore((s) => s.soundRepeatCount);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
 
   // 같은 완료 이벤트에서 중복 알림 방지
@@ -34,7 +37,8 @@ export function useTimer() {
       if (remaining === 0) {
         if (!notifiedRef.current) {
           notifiedRef.current = true;
-          if (soundAlert) playAlarm();
+          if (soundAlert)
+            playAlarm({ type: soundType, volume: soundVolume, repeatCount: soundRepeatCount });
           if (browserNotification) {
             const isLastCycle = phase === 'focus' && cycleCount + 1 >= totalCycles;
             let title: string;
@@ -78,6 +82,9 @@ export function useTimer() {
     cycleCount,
     totalCycles,
     soundAlert,
+    soundType,
+    soundVolume,
+    soundRepeatCount,
     browserNotification,
   ]);
 
