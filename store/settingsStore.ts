@@ -6,6 +6,7 @@ import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import {
   type TimerSettings,
   type AppSettings,
+  type SoundType,
   AppSettingsSchema,
   DEFAULT_TIMER_SETTINGS,
   STORAGE_KEYS,
@@ -16,6 +17,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',
   browserNotification: false,
   soundAlert: true,
+  soundType: 'sine',
+  soundVolume: 70,
+  soundRepeatCount: 2,
   motivationalMessages: MOTIVATIONAL_MESSAGES,
   defaultTimerSettings: DEFAULT_TIMER_SETTINGS,
 };
@@ -24,6 +28,9 @@ interface SettingsStore {
   nickname: string;
   browserNotification: boolean;
   soundAlert: boolean;
+  soundType: SoundType;
+  soundVolume: number;
+  soundRepeatCount: number;
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
 
@@ -31,6 +38,9 @@ interface SettingsStore {
   setTimerDefaults: (settings: TimerSettings) => void;
   setBrowserNotification: (enabled: boolean) => void;
   setSoundAlert: (enabled: boolean) => void;
+  setSoundType: (type: SoundType) => void;
+  setSoundVolume: (volume: number) => void;
+  setSoundRepeatCount: (count: number) => void;
   addMessage: (message: string) => void;
   deleteMessage: (index: number) => void;
   reorderMessages: (fromId: string, toId: string) => void;
@@ -42,6 +52,9 @@ function toAppSettings(s: SettingsStore): AppSettings {
     nickname: s.nickname,
     browserNotification: s.browserNotification,
     soundAlert: s.soundAlert,
+    soundType: s.soundType,
+    soundVolume: s.soundVolume,
+    soundRepeatCount: s.soundRepeatCount,
     motivationalMessages: s.motivationalMessages,
     defaultTimerSettings: s.defaultTimerSettings,
   };
@@ -70,6 +83,21 @@ export const createSettingsStore = () =>
 
     setSoundAlert: (soundAlert) => {
       set({ soundAlert });
+      saveSettings(toAppSettings(get()));
+    },
+
+    setSoundType: (soundType) => {
+      set({ soundType });
+      saveSettings(toAppSettings(get()));
+    },
+
+    setSoundVolume: (soundVolume) => {
+      set({ soundVolume: Math.max(0, Math.min(100, Math.round(soundVolume))) });
+      saveSettings(toAppSettings(get()));
+    },
+
+    setSoundRepeatCount: (soundRepeatCount) => {
+      set({ soundRepeatCount: Math.max(1, Math.min(5, Math.round(soundRepeatCount))) });
       saveSettings(toAppSettings(get()));
     },
 
