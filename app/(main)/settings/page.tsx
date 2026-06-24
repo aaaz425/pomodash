@@ -1,14 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { Bell, ListTodo, Sparkles, Timer } from 'lucide-react';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
-import { TimerDefaultsSection } from '@/components/settings/TimerDefaultsSection';
-import { CategorySection } from '@/components/settings/CategorySection';
-import { MotivationalSection } from '@/components/settings/MotivationalSection';
-import { NotificationSection } from '@/components/settings/NotificationSection';
 import { InstallSection } from '@/components/settings/InstallSection';
 import { AboutSection } from '@/components/settings/AboutSection';
+import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
+import { CategoryModal } from '@/components/settings/CategoryModal';
+import { MotivationalModal } from '@/components/settings/MotivationalModal';
+import { NotificationModal } from '@/components/settings/NotificationModal';
+import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
+import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
+
+type MenuKey = 'timer' | 'category' | 'motivational' | 'notification';
 
 function SettingCard({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -22,6 +28,14 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
 }
 
 export default function SettingsPage() {
+  const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
+
+  const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
+  const categoryCount = useTaskStore((s) => s.categories.length);
+  const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
+  const browserNotification = useSettingsStore((s) => s.browserNotification);
+  const soundAlert = useSettingsStore((s) => s.soundAlert);
+
   return (
     <main className="flex-1 overflow-y-auto">
       <div className="max-w-2xl mx-auto px-4 pt-8 sm:px-8 sm:pt-10 flex flex-col gap-6 pb-24 standalone:pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-20">
@@ -38,21 +52,32 @@ export default function SettingsPage() {
           <ThemeSection />
         </SettingCard>
 
-        <SettingCard title="타이머 기본값">
-          <TimerDefaultsSection />
-        </SettingCard>
-
-        <SettingCard title="카테고리 관리">
-          <CategorySection />
-        </SettingCard>
-
-        <SettingCard title="동기부여 메시지">
-          <MotivationalSection />
-        </SettingCard>
-
-        <SettingCard title="알림">
-          <NotificationSection />
-        </SettingCard>
+        <div className="rounded-xl border border-border bg-card divide-y divide-border">
+          <SettingsMenuRow
+            Icon={Timer}
+            label="타이머 기본값"
+            value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
+            onClick={() => setOpenMenu('timer')}
+          />
+          <SettingsMenuRow
+            Icon={ListTodo}
+            label="카테고리 관리"
+            value={`${categoryCount}개`}
+            onClick={() => setOpenMenu('category')}
+          />
+          <SettingsMenuRow
+            Icon={Sparkles}
+            label="동기부여 메시지"
+            value={`${motivationalCount}개`}
+            onClick={() => setOpenMenu('motivational')}
+          />
+          <SettingsMenuRow
+            Icon={Bell}
+            label="알림"
+            value={browserNotification || soundAlert ? '켜짐' : '꺼짐'}
+            onClick={() => setOpenMenu('notification')}
+          />
+        </div>
 
         <SettingCard title="앱 설치">
           <InstallSection />
@@ -62,6 +87,11 @@ export default function SettingsPage() {
           <AboutSection />
         </SettingCard>
       </div>
+
+      {openMenu === 'timer' && <TimerDefaultsModal onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'category' && <CategoryModal onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'motivational' && <MotivationalModal onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'notification' && <NotificationModal onClose={() => setOpenMenu(null)} />}
     </main>
   );
 }
