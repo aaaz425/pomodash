@@ -125,12 +125,14 @@ export function TaskModal() {
           <Button onClick={closeModal} variant="secondary" size="lg" className="px-4">
             취소
           </Button>
-          <button
+          <Button
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            variant="default"
+            size="lg"
+            className="px-4 font-semibold hover:bg-primary/90"
           >
             선택 완료
-          </button>
+          </Button>
         </div>
       </div>
 

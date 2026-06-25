@@ -113,13 +113,15 @@ export function TaskAddModal({ onClose }: Props) {
           <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
             취소
           </Button>
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={!title.trim()}
-            className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors hover:bg-primary/90"
+            variant="default"
+            size="lg"
+            className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             추가
-          </button>
+          </Button>
         </div>
       </div>
     </>

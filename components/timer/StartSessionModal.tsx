@@ -158,12 +158,14 @@ export function StartSessionModal({ onClose }: Props) {
             <Button onClick={onClose} variant="ghost" size="lg" className="px-4 py-2.5">
               취소
             </Button>
-            <button
+            <Button
               onClick={handleStart}
-              className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              variant="default"
+              size="lg"
+              className="px-6 py-2.5 font-semibold hover:bg-primary/90"
             >
               시작
-            </button>
+            </Button>
           </div>
         </div>
       </div>

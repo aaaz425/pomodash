@@ -36,13 +36,15 @@ export function TaskQuickAddForm({ categories, onAdd, onCancel }: Props) {
         <Button onClick={onCancel} variant="secondary" size="lg" className="flex-1 py-2">
           취소
         </Button>
-        <button
+        <Button
           onClick={handleAdd}
           disabled={!title.trim()}
-          className="flex-1 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+          variant="default"
+          size="lg"
+          className="flex-1 py-2 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           추가
-        </button>
+        </Button>
       </div>
     </div>
   );

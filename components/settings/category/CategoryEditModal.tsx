@@ -56,13 +56,15 @@ export function CategoryEditModal({ category, onClose }: Props) {
           <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
             취소
           </Button>
-          <button
+          <Button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+            variant="default"
+            size="lg"
+            className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             저장
-          </button>
+          </Button>
         </>
       }
     >
