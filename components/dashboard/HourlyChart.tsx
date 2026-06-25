@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 
 import { Badge } from '@/components/shared/Badge';
+import { EmptyState } from '@/components/shared/EmptyState';
 import type { Session } from '@/types';
 
 interface Props {
@@ -92,7 +93,11 @@ export function HourlyChart({ sessions }: Props) {
       </div>
 
       {!hasFocus && (
-        <p className="text-xs text-muted-foreground text-center pb-1">아직 기록된 세션이 없어요</p>
+        <EmptyState
+          message="아직 기록된 세션이 없어요"
+          className="pb-1"
+          messageClassName="text-xs"
+        />
       )}
     </div>
   );

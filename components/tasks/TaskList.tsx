@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { TaskItem } from './TaskItem';
 
 interface Props {
@@ -42,10 +43,11 @@ export function TaskList({ selectedTaskId, onSelect }: Props) {
 
   if (active.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-1.5 text-center py-10">
-        <p className="text-sm text-muted-foreground">아직 작업이 없어요</p>
-        <p className="text-xs text-muted-foreground/60">아래에서 작업을 추가해보세요</p>
-      </div>
+      <EmptyState
+        message="아직 작업이 없어요"
+        subMessage="아래에서 작업을 추가해보세요"
+        className="py-10"
+      />
     );
   }
 

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { getFocusTrendData, type TabType } from '@/lib/dashboard';
+import { EmptyState } from '@/components/shared/EmptyState';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -91,9 +92,11 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-xs text-muted-foreground">아직 기록된 세션이 없어요</p>
-        </div>
+        <EmptyState
+          message="아직 기록된 세션이 없어요"
+          className="flex-1"
+          messageClassName="text-xs"
+        />
       )}
     </div>
   );
