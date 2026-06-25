@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Check } from 'lucide-react';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { SOUND_TYPE_LABELS, type SoundType } from '@/types';
 
 interface Props {
@@ -40,19 +41,7 @@ export function SoundTypeSelect({ value, onChange }: Props) {
     setOpen(true);
   }
 
-  useEffect(() => {
-    if (!open) return;
-    function handleDown(e: MouseEvent) {
-      if (
-        triggerRef.current?.contains(e.target as Node) ||
-        dropdownRef.current?.contains(e.target as Node)
-      )
-        return;
-      setOpen(false);
-    }
-    document.addEventListener('mousedown', handleDown);
-    return () => document.removeEventListener('mousedown', handleDown);
-  }, [open]);
+  useClickOutside(triggerRef, dropdownRef, () => setOpen(false), open);
 
   return (
     <div>
