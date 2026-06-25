@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { siteConfig } from '@/lib/site';
+import { Badge } from '@/components/shared/Badge';
 
 export function AboutSection() {
   const version = process.env.NEXT_PUBLIC_APP_VERSION ?? '—';
@@ -8,9 +9,7 @@ export function AboutSection() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-foreground">{siteConfig.name}</span>
-        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-          v{version}
-        </span>
+        <Badge className="text-muted-foreground bg-muted">v{version}</Badge>
       </div>
 
       <p className="text-sm text-muted-foreground leading-relaxed">{siteConfig.description}</p>

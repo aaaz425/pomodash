@@ -1,6 +1,7 @@
 'use client';
 
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { Badge } from '@/components/shared/Badge';
 import { formatDuration, formatTimeRange, getSessionOrdinalTitle } from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
 
@@ -45,9 +46,7 @@ export function SessionListItem({
         {category ? (
           <CategoryBadge category={category} />
         ) : (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground">
-            기타
-          </span>
+          <Badge className="rounded-md font-medium bg-muted text-muted-foreground">기타</Badge>
         )}
         <span className="text-[11px] text-muted-foreground">{duration}</span>
       </div>
