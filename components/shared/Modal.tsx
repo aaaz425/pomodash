@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   title: string;
@@ -45,13 +46,9 @@ export function Modal({
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <h3 className="text-base font-semibold text-foreground">{title}</h3>
-          <button
-            onClick={onClose}
-            aria-label="닫기"
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onClose} aria-label="닫기" variant="ghost" size="icon">
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         <div className="flex flex-col gap-5 p-5 overflow-y-auto">{children}</div>

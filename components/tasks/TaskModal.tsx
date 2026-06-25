@@ -84,13 +84,9 @@ export function TaskModal() {
         {/* 헤더 */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <h2 className="text-base font-semibold text-foreground">작업 관리</h2>
-          <button
-            onClick={closeModal}
-            aria-label="닫기"
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={closeModal} aria-label="닫기" variant="ghost" size="icon">
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         {/* 섹션 레이블 */}
