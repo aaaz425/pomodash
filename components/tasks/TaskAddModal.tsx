@@ -36,8 +36,6 @@ export function TaskAddModal({ onClose }: Props) {
     <Modal
       title="새 작업 추가"
       onClose={onClose}
-      backdropZIndexClassName="z-[60]"
-      dialogZIndexClassName="z-[70]"
       backdropClassName="bg-black/55 backdrop-blur-sm"
       maxHeightClassName="max-h-[80vh]"
       footer={
