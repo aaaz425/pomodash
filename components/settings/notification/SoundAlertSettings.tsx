@@ -7,6 +7,7 @@ import { playAlarm, stopAlarm } from '@/lib/notifications';
 import { StepperInput } from '@/components/shared/StepperInput';
 import { Toggle } from './Toggle';
 import { SoundTypeSelect } from './SoundTypeSelect';
+import type { SoundType } from '@/types';
 
 export function SoundAlertSettings() {
   const soundAlert = useSettingsStore((s) => s.soundAlert);
@@ -47,6 +48,14 @@ export function SoundAlertSettings() {
     setSoundAlert(enabled);
   }
 
+  function handleSoundTypeChange(type: SoundType) {
+    if (isPlaying && type !== soundType) {
+      stopAlarm();
+      setIsPlaying(false);
+    }
+    setSoundType(type);
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-4">
@@ -71,7 +80,7 @@ export function SoundAlertSettings() {
             소리 종류
           </label>
           <div className="flex items-center gap-2">
-            <SoundTypeSelect value={soundType} onChange={setSoundType} />
+            <SoundTypeSelect value={soundType} onChange={handleSoundTypeChange} />
             <button
               type="button"
               onClick={handlePreview}
