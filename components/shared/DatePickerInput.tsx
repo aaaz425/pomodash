@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   addMonths,
@@ -12,6 +12,7 @@ import {
   format,
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface Props {
   value: string; // YYYY-MM-DD
@@ -48,19 +49,7 @@ export function DatePickerInput({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    function handleDown(e: MouseEvent) {
-      if (
-        triggerRef.current?.contains(e.target as Node) ||
-        dropdownRef.current?.contains(e.target as Node)
-      )
-        return;
-      setOpen(false);
-    }
-    document.addEventListener('mousedown', handleDown);
-    return () => document.removeEventListener('mousedown', handleDown);
-  }, [open]);
+  useClickOutside(triggerRef, dropdownRef, () => setOpen(false), open);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
