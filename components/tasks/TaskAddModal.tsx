@@ -6,6 +6,7 @@ import { CategoryPills } from '@/components/shared/CategoryPills';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
+import { TextInput } from '@/components/shared/TextInput';
 
 interface Props {
   onClose: () => void;
@@ -59,13 +60,13 @@ export function TaskAddModal({ onClose }: Props) {
       {/* 작업 제목 */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-muted-foreground">작업 제목</label>
-        <input
+        <TextInput
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           placeholder="예) 알고리즘 문제 풀기"
-          className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="w-full"
         />
       </div>
 

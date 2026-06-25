@@ -19,6 +19,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { useSettingsStore } from '@/store/StoreProvider';
+import { TextInput } from '@/components/shared/TextInput';
 
 const MAX_MESSAGES = 20;
 
@@ -125,13 +126,13 @@ export function MotivationalSection() {
       </DndContext>
 
       <div className="flex items-center gap-2">
-        <input
+        <TextInput
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="새 동기부여 메시지 입력"
           disabled={isAtLimit}
-          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+          className="flex-1 min-w-0 py-2 disabled:opacity-50"
         />
         <button
           onClick={handleAdd}
