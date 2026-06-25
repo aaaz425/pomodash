@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { useTaskStore } from '@/store/StoreProvider';
 import {
   formatDuration,
@@ -120,12 +121,11 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
 
         {editing ? (
           <div className="flex-1 min-h-0 flex flex-col gap-2">
-            <textarea
+            <MemoTextarea
               ref={textareaRef}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
-              maxLength={500}
               placeholder="세션에 대한 메모를 남겨보세요..."
               className="flex-1 min-h-0 w-full resize-none rounded-lg bg-muted/50 border border-border px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />

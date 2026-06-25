@@ -9,6 +9,7 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
 import { Button } from '@/components/ui/button';
+import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 
 export function SessionRecordModal() {
@@ -153,9 +154,9 @@ export function SessionRecordModal() {
 
           {/* Note Section */}
           <div className="flex flex-col gap-2.5">
-            <textarea
+            <MemoTextarea
               value={note}
-              onChange={(e) => setNote(e.target.value.slice(0, 500))}
+              onChange={(e) => setNote(e.target.value)}
               placeholder="무엇을 집중해서 했나요? 짧게 메모해두면 나중에 돌아볼 수 있어요."
               className={[
                 'w-full h-[90px] sm:h-[120px] resize-none rounded-md border border-border',
