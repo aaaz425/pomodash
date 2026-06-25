@@ -9,7 +9,7 @@ export function AboutSection() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-foreground">{siteConfig.name}</span>
-        <Badge className="text-muted-foreground bg-muted">v{version}</Badge>
+        <Badge className="font-normal text-muted-foreground bg-muted">v{version}</Badge>
       </div>
 
       <p className="text-sm text-muted-foreground leading-relaxed">{siteConfig.description}</p>
