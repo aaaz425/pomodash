@@ -229,13 +229,18 @@ describe('reorderMessages', () => {
     expect(store.getState().motivationalMessages).toEqual(['b', 'c', 'a']);
   });
 
-  it('파싱 불가능한 id를 전달하면 arrayMove의 NaN 처리 동작을 따름 (현재 별도 가드 없음)', () => {
+  it('파싱 불가능한 id를 전달하면 아무 동작도 하지 않음', () => {
     const store = createSettingsStore();
     setMessages(store, ['a', 'b', 'c']);
-    // parseInt('x') === NaN — reorderTasks/reorderCategories와 달리 이 함수는
-    // invalid id에 대한 no-op 가드가 없어 arrayMove의 NaN 처리 결과를 그대로 반영한다.
     store.getState().reorderMessages('x', '1');
-    expect(store.getState().motivationalMessages).toHaveLength(3);
+    expect(store.getState().motivationalMessages).toEqual(['a', 'b', 'c']);
+  });
+
+  it('index가 배열 범위를 벗어나면 아무 동작도 하지 않음', () => {
+    const store = createSettingsStore();
+    setMessages(store, ['a', 'b', 'c']);
+    store.getState().reorderMessages('5', '0');
+    expect(store.getState().motivationalMessages).toEqual(['a', 'b', 'c']);
   });
 });
 
