@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { User } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
+import { Button } from '@/components/ui/button';
+import { TextInput } from '@/components/shared/TextInput';
 
 export function ProfileSection() {
   const nickname = useSettingsStore((s) => s.nickname);
@@ -24,7 +26,7 @@ export function ProfileSection() {
       </div>
 
       <div className="flex-1 min-w-0 flex items-center gap-2">
-        <input
+        <TextInput
           value={draft}
           onChange={(e) => {
             setDraft(e.target.value);
@@ -33,15 +35,17 @@ export function ProfileSection() {
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder="닉네임 입력 (선택)"
           maxLength={20}
-          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="flex-1 min-w-0 py-2"
         />
-        <button
+        <Button
           onClick={handleSave}
           disabled={draft.trim() === nickname}
-          className="px-3 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors shrink-0"
+          variant="default"
+          size="default"
+          className="px-3 shrink-0 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saved ? '저장됨' : '저장'}
-        </button>
+        </Button>
       </div>
     </div>
   );

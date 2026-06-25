@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Pencil, Check, X } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -19,25 +19,89 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { useSettingsStore } from '@/store/StoreProvider';
+import { TextInput } from '@/components/shared/TextInput';
 
 const MAX_MESSAGES = 20;
 
 interface MessageRowProps {
   id: string;
   message: string;
+  isEditing: boolean;
+  dragDisabled: boolean;
+  onStartEdit: () => void;
+  onSaveEdit: (text: string) => void;
+  onCancelEdit: () => void;
   onDelete: () => void;
   canDelete: boolean;
 }
 
-function MessageRow({ id, message, onDelete, canDelete }: MessageRowProps) {
+function MessageRow({
+  id,
+  message,
+  isEditing,
+  dragDisabled,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete,
+  canDelete,
+}: MessageRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
+    disabled: dragDisabled,
   });
+  const [draft, setDraft] = useState(message);
+  const [prevIsEditing, setPrevIsEditing] = useState(isEditing);
+
+  if (isEditing !== prevIsEditing) {
+    setPrevIsEditing(isEditing);
+    if (isEditing) setDraft(message);
+  }
 
   const style = {
     transform: transform ? `translate3d(0px, ${transform.y}px, 0px)` : undefined,
     transition,
   };
+
+  function handleSave() {
+    if (draft.trim()) onSaveEdit(draft.trim());
+  }
+
+  if (isEditing) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center gap-2 py-2 px-1 border-b border-border/50 last:border-0"
+      >
+        <TextInput
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave();
+            if (e.key === 'Escape') onCancelEdit();
+          }}
+          className="flex-1 min-w-0 py-1.5"
+        />
+        <button
+          onClick={handleSave}
+          disabled={!draft.trim()}
+          aria-label="메시지 저장"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-primary hover:bg-primary/10 disabled:pointer-events-none disabled:opacity-40 transition-colors shrink-0"
+        >
+          <Check className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={onCancelEdit}
+          aria-label="편집 취소"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -58,6 +122,13 @@ function MessageRow({ id, message, onDelete, canDelete }: MessageRowProps) {
       </button>
       <span className="text-sm text-foreground flex-1 min-w-0 truncate pr-2">{message}</span>
       <button
+        onClick={onStartEdit}
+        aria-label="메시지 편집"
+        className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground transition-all shrink-0"
+      >
+        <Pencil className="w-3.5 h-3.5" />
+      </button>
+      <button
         onClick={onDelete}
         disabled={!canDelete}
         aria-label="메시지 삭제"
@@ -72,10 +143,12 @@ function MessageRow({ id, message, onDelete, canDelete }: MessageRowProps) {
 export function MotivationalSection() {
   const messages = useSettingsStore((s) => s.motivationalMessages);
   const addMessage = useSettingsStore((s) => s.addMessage);
+  const updateMessage = useSettingsStore((s) => s.updateMessage);
   const deleteMessage = useSettingsStore((s) => s.deleteMessage);
   const reorderMessages = useSettingsStore((s) => s.reorderMessages);
 
   const [input, setInput] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const isAtLimit = messages.length >= MAX_MESSAGES;
 
   const sensors = useSensors(
@@ -113,9 +186,17 @@ export function MotivationalSection() {
           <div className="flex flex-col">
             {messages.map((msg, i) => (
               <MessageRow
-                key={`${i}-${msg}`}
+                key={i}
                 id={String(i)}
                 message={msg}
+                isEditing={editingIndex === i}
+                dragDisabled={editingIndex !== null}
+                onStartEdit={() => setEditingIndex(i)}
+                onSaveEdit={(text) => {
+                  updateMessage(i, text);
+                  setEditingIndex(null);
+                }}
+                onCancelEdit={() => setEditingIndex(null)}
                 onDelete={() => deleteMessage(i)}
                 canDelete={messages.length > 1}
               />
@@ -125,13 +206,13 @@ export function MotivationalSection() {
       </DndContext>
 
       <div className="flex items-center gap-2">
-        <input
+        <TextInput
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="새 동기부여 메시지 입력"
           disabled={isAtLimit}
-          className="flex-1 min-w-0 rounded-lg border border-border bg-muted px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+          className="flex-1 min-w-0 py-2 disabled:opacity-50"
         />
         <button
           onClick={handleAdd}

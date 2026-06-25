@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Button } from '@/components/ui/button';
+import { TextInput } from '@/components/shared/TextInput';
 import type { Category } from '@/types';
 
 const COLOR_PALETTE = [
@@ -52,31 +54,30 @@ export function CategoryEditModal({ category, onClose }: Props) {
       dialogZIndexClassName="z-[51]"
       footer={
         <>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
             취소
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+            variant="default"
+            size="lg"
+            className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             저장
-          </button>
+          </Button>
         </>
       }
     >
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-muted-foreground">이름</label>
-        <input
+        <TextInput
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder="카테고리 이름"
-          className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="w-full"
         />
       </div>
 

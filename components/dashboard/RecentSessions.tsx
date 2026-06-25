@@ -1,4 +1,5 @@
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { formatDuration, formatTimeRange } from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
 
@@ -13,9 +14,7 @@ export function RecentSessions({ sessions, tasks, categories }: Props) {
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
   if (sessions.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground text-center py-6">아직 기록된 세션이 없어요</p>
-    );
+    return <EmptyState message="아직 기록된 세션이 없어요" className="py-6" />;
   }
 
   return (

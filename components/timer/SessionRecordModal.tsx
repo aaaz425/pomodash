@@ -8,6 +8,8 @@ import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
+import { Button } from '@/components/ui/button';
+import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 
 export function SessionRecordModal() {
@@ -152,15 +154,15 @@ export function SessionRecordModal() {
 
           {/* Note Section */}
           <div className="flex flex-col gap-2.5">
-            <textarea
+            <MemoTextarea
               value={note}
-              onChange={(e) => setNote(e.target.value.slice(0, 500))}
+              onChange={(e) => setNote(e.target.value)}
               placeholder="무엇을 집중해서 했나요? 짧게 메모해두면 나중에 돌아볼 수 있어요."
               className={[
-                'w-full h-[90px] sm:h-[120px] resize-none rounded-md border border-border',
-                'bg-card px-3.5 py-3 text-base text-foreground',
+                'w-full h-[90px] sm:h-[120px] resize-none rounded-md border-border',
+                'bg-card dark:bg-card px-3.5 py-3 text-base text-foreground',
                 'placeholder:text-muted-foreground/50',
-                'focus:outline-none focus:ring-2 focus:ring-ring/50',
+                'outline-none focus-visible:border-border focus-visible:ring-2 focus-visible:ring-ring/50',
               ].join(' ')}
             />
             <div className="flex justify-end">
@@ -170,19 +172,23 @@ export function SessionRecordModal() {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-2">
-            <button
+            <Button
               onClick={() => setPendingAction('skip')}
-              className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              variant="ghost"
+              size="lg"
+              className="px-4 py-2.5"
             >
               건너뛰기
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setPendingAction('save')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              variant="default"
+              size="lg"
+              className="gap-2 px-5 py-2.5 font-semibold hover:bg-primary/90"
             >
               <Check className="w-4 h-4" strokeWidth={2.5} />
               기록 완료
-            </button>
+            </Button>
           </div>
         </div>
       </div>

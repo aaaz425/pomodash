@@ -10,6 +10,7 @@ import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { Button } from '@/components/ui/button';
 
 const MESSAGE_ROTATE_INTERVAL_MS = 5000;
 
@@ -147,13 +148,15 @@ export function FocusMode() {
               )}
               {isRunning ? '일시정지' : '시작'}
             </button>
-            <button
+            <Button
               onClick={() => setShowEndConfirm(true)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              variant="outline"
+              size="lg"
+              className="gap-1.5 px-4 py-2.5 text-muted-foreground"
             >
               <Square className="w-3.5 h-3.5" fill="currentColor" />
               세션종료
-            </button>
+            </Button>
           </div>
 
           {/* 키보드 힌트 — 데스크탑 전용 */}
