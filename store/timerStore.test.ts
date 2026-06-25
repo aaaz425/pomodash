@@ -43,7 +43,8 @@ describe('timerStore', () => {
 
     expect(store.getState().cycleCount).toBe(1);
     expect(store.getState().phase).toBe('short-break');
-    expect(store.getState().startedAt).toBe(null);
+    // 자동 연속 전환 — short-break가 멈춰있지 않고 바로 시작됨
+    expect(typeof store.getState().startedAt).toBe('number');
   });
 
   it('completeCycle() — totalCycles(4)회 완료 후 sessionEnded가 true로 설정', () => {
@@ -62,7 +63,8 @@ describe('timerStore', () => {
     vi.setSystemTime(new Date('2024-01-01T00:25:00.000Z'));
     store.getState().complete();
 
-    expect(store.getState().startedAt).toBe(null);
+    // 자동 연속 전환 — short-break가 멈춰있지 않고 현재 시각으로 바로 시작됨
+    expect(store.getState().startedAt).toBe(new Date('2024-01-01T00:25:00.000Z').getTime());
     expect(store.getState().phase).toBe('short-break');
     expect(store.getState().cycleCount).toBe(1);
     expect(store.getState().remainingSeconds).toBe(5 * 60);
@@ -77,7 +79,8 @@ describe('timerStore', () => {
     vi.setSystemTime(new Date('2024-01-01T00:05:00.000Z'));
     store.getState().complete();
 
-    expect(store.getState().startedAt).toBe(null);
+    // 자동 연속 전환 — focus가 멈춰있지 않고 현재 시각으로 바로 시작됨
+    expect(store.getState().startedAt).toBe(new Date('2024-01-01T00:05:00.000Z').getTime());
     expect(store.getState().phase).toBe('focus');
     expect(store.getState().cycleCount).toBe(1);
     expect(store.getState().remainingSeconds).toBe(25 * 60);

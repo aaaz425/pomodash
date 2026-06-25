@@ -22,6 +22,7 @@
 | `docs/`     | 문서 수정                  |
 | `refactor/` | 기능 변경 없는 코드 개선   |
 | `style/`    | UI 스타일 (기능 변경 없음) |
+| `test/`     | 테스트 코드 추가/보강 (기능 변경 없음) |
 
 ```
 feat/timer-core
@@ -30,6 +31,7 @@ feat/task-crud
 fix/timer-drift
 chore/project-setup
 refactor/storage-abstraction
+test/timer-store-coverage
 ```
 
 ### 브랜치 단위 기준
@@ -128,6 +130,7 @@ type: 설명
 | `perf`     | 성능 개선                             |
 | `chore`    | 패키지 설치, 설정 변경, 빌드 등       |
 | `ci`       | CI/CD 설정 변경                       |
+| `test`     | 테스트 코드 추가/수정                 |
 
 ### 규칙
 
