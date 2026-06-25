@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useTaskStore } from '@/store/StoreProvider';
 import { useTimerStore } from '@/store/StoreProvider';
+import { Button } from '@/components/ui/button';
 import { TaskList } from './TaskList';
 import { TaskAddModal } from './TaskAddModal';
 
@@ -121,12 +122,9 @@ export function TaskModal() {
 
         {/* 푸터 */}
         <div className="flex items-center justify-end gap-2 px-4 py-3 shrink-0">
-          <button
-            onClick={closeModal}
-            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={closeModal} variant="secondary" size="lg" className="px-4">
             취소
-          </button>
+          </Button>
           <button
             onClick={handleConfirm}
             className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"

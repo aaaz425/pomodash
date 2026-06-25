@@ -6,6 +6,7 @@ import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { TaskQuickAddForm } from '@/components/shared/TaskQuickAddForm';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
+import { Button } from '@/components/ui/button';
 import type { TimerSettings } from '@/types';
 
 interface Props {
@@ -154,12 +155,9 @@ export function StartSessionModal({ onClose }: Props) {
 
           {/* 액션 */}
           <div className="flex items-center justify-end gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            >
+            <Button onClick={onClose} variant="ghost" size="lg" className="px-4 py-2.5">
               취소
-            </button>
+            </Button>
             <button
               onClick={handleStart}
               className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"

@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { useTaskStore, useSettingsStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   onClose: () => void;
@@ -109,12 +110,9 @@ export function TaskAddModal({ onClose }: Props) {
 
         {/* 푸터 */}
         <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
             취소
-          </button>
+          </Button>
           <button
             onClick={handleSubmit}
             disabled={!title.trim()}

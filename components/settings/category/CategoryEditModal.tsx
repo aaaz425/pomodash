@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Button } from '@/components/ui/button';
 import type { Category } from '@/types';
 
 const COLOR_PALETTE = [
@@ -52,12 +53,9 @@ export function CategoryEditModal({ category, onClose }: Props) {
       dialogZIndexClassName="z-[51]"
       footer={
         <>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
             취소
-          </button>
+          </Button>
           <button
             onClick={handleSave}
             disabled={!name.trim()}

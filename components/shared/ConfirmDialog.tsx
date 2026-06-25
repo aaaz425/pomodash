@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   open: boolean;
@@ -49,12 +50,9 @@ export function ConfirmDialog({
         </div>
 
         <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
             {cancelLabel}
-          </button>
+          </Button>
           <button
             onClick={onConfirm}
             className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"

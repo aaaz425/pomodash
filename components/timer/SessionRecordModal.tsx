@@ -8,6 +8,7 @@ import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
+import { Button } from '@/components/ui/button';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 
 export function SessionRecordModal() {
@@ -170,12 +171,14 @@ export function SessionRecordModal() {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-2">
-            <button
+            <Button
               onClick={() => setPendingAction('skip')}
-              className="px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              variant="ghost"
+              size="lg"
+              className="px-4 py-2.5"
             >
               건너뛰기
-            </button>
+            </Button>
             <button
               onClick={() => setPendingAction('save')}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"

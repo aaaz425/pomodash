@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CategoryPills } from '@/components/shared/CategoryPills';
+import { Button } from '@/components/ui/button';
 import type { Category } from '@/types';
 
 interface Props {
@@ -32,12 +33,9 @@ export function TaskQuickAddForm({ categories, onAdd, onCancel }: Props) {
       />
       <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
       <div className="flex gap-2">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-        >
+        <Button onClick={onCancel} variant="secondary" size="lg" className="flex-1 py-2">
           취소
-        </button>
+        </Button>
         <button
           onClick={handleAdd}
           disabled={!title.trim()}
