@@ -6,6 +6,7 @@ import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { StartSessionModal } from '@/components/timer/StartSessionModal';
+import { Button } from '@/components/ui/button';
 
 export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
@@ -40,15 +41,17 @@ export function TimerControls() {
 
   return (
     <div className="flex items-center gap-1.5">
-      <button
+      <Button
         disabled={!isRunning}
         onClick={enterFocusMode}
         aria-label="집중 모드"
-        className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-border text-sm text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground hover:bg-muted disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+        variant="outline"
+        size="lg"
+        className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
       >
         <Maximize2 className="w-3.5 h-3.5" />
         집중
-      </button>
+      </Button>
 
       <button
         onClick={handleStartClick}
@@ -62,7 +65,7 @@ export function TimerControls() {
         {isRunning ? '일시정지' : '시작'}
       </button>
 
-      <button
+      <Button
         disabled={!sessionStarted}
         onClick={() => {
           const running = isRunning;
@@ -70,11 +73,13 @@ export function TimerControls() {
           setWasRunning(running);
           setShowEndConfirm(true);
         }}
-        className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg border border-border text-sm text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
+        variant="outline"
+        size="lg"
+        className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap hover:bg-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
         <Square className="w-3.5 h-3.5" fill="currentColor" />
         세션 종료
-      </button>
+      </Button>
 
       {showStartModal && <StartSessionModal onClose={() => setShowStartModal(false)} />}
 
