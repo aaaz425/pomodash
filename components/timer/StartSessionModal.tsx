@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Plus } from 'lucide-react';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
-import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { TaskQuickAddForm } from '@/components/shared/TaskQuickAddForm';
+import { TaskPickerList } from '@/components/timer/TaskPickerList';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { Button } from '@/components/ui/button';
 import type { TimerSettings } from '@/types';
@@ -27,8 +25,6 @@ export function StartSessionModal({ onClose }: Props) {
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(currentTaskId);
   const [pendingSettings, setPendingSettings] = useState<TimerSettings>({ ...storeSettings });
 
-  const [showNewTaskForm, setShowNewTaskForm] = useState(false);
-
   const activeTasks = tasks.filter((t) => !t.completed);
 
   function handleTaskSelect(taskId: string | null) {
@@ -48,7 +44,6 @@ export function StartSessionModal({ onClose }: Props) {
   function handleAddNewTask(title: string, categoryId: string) {
     const newId = addTask({ title, categoryId });
     handleTaskSelect(newId);
-    setShowNewTaskForm(false);
   }
 
   function handleStart() {
@@ -82,54 +77,14 @@ export function StartSessionModal({ onClose }: Props) {
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-foreground">어떤 작업을 할까요?</span>
 
-            {activeTasks.length === 0 && !showNewTaskForm && (
-              <p className="text-sm text-muted-foreground/60 py-1">등록된 작업이 없습니다</p>
-            )}
-
-            {activeTasks.length > 0 && !showNewTaskForm && (
-              <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto">
-                {activeTasks.map((t) => {
-                  const cat = categories.find((c) => c.id === t.categoryId);
-                  const isSelected = pendingTaskId === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => handleTaskSelect(isSelected ? null : t.id)}
-                      className={[
-                        'flex items-center gap-3 px-3.5 py-2.5 rounded-lg border text-left transition-colors',
-                        isSelected
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border bg-card hover:bg-muted',
-                      ].join(' ')}
-                    >
-                      {isSelected ? (
-                        <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={2.5} />
-                      ) : (
-                        <div className="w-3.5 h-3.5 shrink-0" />
-                      )}
-                      {cat && <CategoryBadge category={cat} />}
-                      <span className="text-sm text-foreground truncate">{t.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {showNewTaskForm ? (
-              <TaskQuickAddForm
-                categories={categories}
-                onAdd={handleAddNewTask}
-                onCancel={() => setShowNewTaskForm(false)}
-              />
-            ) : (
-              <button
-                onClick={() => setShowNewTaskForm(true)}
-                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors self-start"
-              >
-                <Plus className="w-3.5 h-3.5" />새 작업 만들기
-              </button>
-            )}
+            <TaskPickerList
+              activeTasks={activeTasks}
+              categories={categories}
+              selectedTaskId={pendingTaskId}
+              onSelect={handleTaskSelect}
+              onAddTask={handleAddNewTask}
+              emptyMessageClassName="text-sm text-muted-foreground/60 py-1"
+            />
           </div>
 
           <div className="h-px bg-border" />
