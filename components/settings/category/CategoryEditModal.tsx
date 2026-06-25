@@ -50,8 +50,6 @@ export function CategoryEditModal({ category, onClose }: Props) {
       title={title}
       onClose={onClose}
       widthClassName="sm:w-[360px]"
-      backdropZIndexClassName="z-[50]"
-      dialogZIndexClassName="z-[51]"
       footer={
         <>
           <Button onClick={onClose} variant="secondary" size="lg" className="px-4">

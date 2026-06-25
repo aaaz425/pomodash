@@ -32,19 +32,6 @@ export function TaskModal() {
     }
   }, [isOpen]);
 
-  // ESC 키: 추가 모달 먼저 닫고, 없으면 작업 관리 모달 닫기
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showAddModal) setShowAddModal(false);
-        else closeModal();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, showAddModal, closeModal]);
-
   if (!isOpen) return null;
 
   function handleConfirm() {
@@ -67,8 +54,6 @@ export function TaskModal() {
       <Modal
         title="작업 관리"
         onClose={closeModal}
-        backdropZIndexClassName="z-40"
-        dialogZIndexClassName="z-50"
         widthClassName="sm:w-[480px] sm:max-h-[70vh]"
         maxHeightClassName="max-h-[80vh]"
         bodyClassName="flex flex-col flex-1 min-h-0 overflow-hidden"

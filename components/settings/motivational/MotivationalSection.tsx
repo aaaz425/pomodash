@@ -80,7 +80,10 @@ function MessageRow({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSave();
-            if (e.key === 'Escape') onCancelEdit();
+            if (e.key === 'Escape') {
+              e.stopPropagation();
+              onCancelEdit();
+            }
           }}
           className="flex-1 min-w-0 py-1.5"
         />

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { AlertDialog as AlertDialogPrimitive } from '@base-ui/react/alert-dialog';
 import { Button } from '@/components/ui/button';
 
 interface Props {
@@ -13,8 +14,8 @@ interface Props {
   onCancel: () => void;
 }
 
-// window.confirm 대신 쓰는 커스텀 확인 다이얼로그.
-// 다른 모달(z-40/50) 위에 떠야 하는 경우가 있어 z-index를 더 높게 잡는다.
+// AlertDialog는 바깥 클릭으로 안 닫히는 게 기본 동작(의도적 — 실수로 안 닫히게).
+// ESC는 onOpenChange를 통해 onCancel로 연결한다.
 export function ConfirmDialog({
   open,
   title,
@@ -24,45 +25,44 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  if (!open) return null;
-
   return (
-    <>
-      <div
-        className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
-        aria-hidden="true"
-        onClick={onCancel}
-      />
+    <AlertDialogPrimitive.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onCancel();
+      }}
+    >
+      <AlertDialogPrimitive.Portal>
+        <AlertDialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+        <AlertDialogPrimitive.Popup
+          aria-label={title}
+          className={[
+            'fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+            'w-[90vw] sm:w-[400px] flex flex-col gap-4 p-6 rounded-xl outline-none',
+            'bg-card border border-border shadow-2xl',
+          ].join(' ')}
+        >
+          <div className="flex flex-col gap-1.5">
+            <AlertDialogPrimitive.Title className="text-base font-semibold text-foreground">
+              {title}
+            </AlertDialogPrimitive.Title>
+            {description && (
+              <AlertDialogPrimitive.Description className="text-sm text-muted-foreground">
+                {description}
+              </AlertDialogPrimitive.Description>
+            )}
+          </div>
 
-      <div
-        role="alertdialog"
-        aria-modal="true"
-        aria-label={title}
-        className={[
-          'fixed z-[61] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-          'w-[90vw] sm:w-[400px] flex flex-col gap-4 p-6 rounded-xl',
-          'bg-card border border-border shadow-2xl',
-        ].join(' ')}
-      >
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-base font-semibold text-foreground">{title}</h2>
-          {description && <div className="text-sm text-muted-foreground">{description}</div>}
-        </div>
-
-        <div className="flex items-center justify-end gap-2">
-          <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
-            {cancelLabel}
-          </Button>
-          <Button
-            onClick={onConfirm}
-            variant="default"
-            size="lg"
-            className="px-4 font-semibold hover:bg-primary/90"
-          >
-            {confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </>
+          <div className="flex items-center justify-end gap-2">
+            <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
+              {cancelLabel}
+            </Button>
+            <Button onClick={onConfirm} variant="default" size="lg" className="px-4 font-semibold">
+              {confirmLabel}
+            </Button>
+          </div>
+        </AlertDialogPrimitive.Popup>
+      </AlertDialogPrimitive.Portal>
+    </AlertDialogPrimitive.Root>
   );
 }
