@@ -7,10 +7,10 @@ import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { InstallSection } from '@/components/settings/InstallSection';
 import { AboutSection } from '@/components/settings/AboutSection';
-import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
-import { CategoryModal } from '@/components/settings/CategoryModal';
-import { MotivationalModal } from '@/components/settings/MotivationalModal';
-import { NotificationModal } from '@/components/settings/NotificationModal';
+import { TimerDefaultsModal } from '@/components/settings/timer-defaults/TimerDefaultsModal';
+import { CategoryModal } from '@/components/settings/category/CategoryModal';
+import { MotivationalModal } from '@/components/settings/motivational/MotivationalModal';
+import { NotificationModal } from '@/components/settings/notification/NotificationModal';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 

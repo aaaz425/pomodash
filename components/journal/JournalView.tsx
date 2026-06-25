@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { JournalSessionList } from '@/components/journal/JournalSessionList';
 import { JournalDetailPanel } from '@/components/journal/JournalDetailPanel';
 import { JournalEmptyState } from '@/components/journal/JournalEmptyState';
 import { JournalFilterModal } from '@/components/journal/JournalFilterModal';
-import { groupSessionsByDate } from '@/lib/sessionUtils';
+import { useJournalFilters } from '@/hooks/useJournalFilters';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
 
 export function JournalView() {
@@ -17,45 +17,22 @@ export function JournalView() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(new Set());
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
 
-  const hasActiveFilter = !!(searchQuery || selectedCategoryIds.size > 0 || dateFrom || dateTo);
-
-  const filteredSessions = useMemo(() => {
-    let result = sessions;
-
-    if (selectedCategoryIds.size > 0) {
-      const taskIds = new Set(
-        tasks.filter((t) => selectedCategoryIds.has(t.categoryId)).map((t) => t.id),
-      );
-      result = result.filter((s) => s.taskId && taskIds.has(s.taskId));
-    }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter((s) =>
-        tasks
-          .find((t) => t.id === s.taskId)
-          ?.title.toLowerCase()
-          .includes(q),
-      );
-    }
-
-    if (dateFrom) result = result.filter((s) => s.startedAt.slice(0, 10) >= dateFrom);
-    if (dateTo) result = result.filter((s) => s.startedAt.slice(0, 10) <= dateTo);
-
-    return result;
-  }, [sessions, tasks, selectedCategoryIds, searchQuery, dateFrom, dateTo]);
-
-  const groups = useMemo(() => groupSessionsByDate(filteredSessions), [filteredSessions]);
-
-  const markedDates = useMemo(
-    () => new Set(sessions.map((s) => s.startedAt.slice(0, 10))),
-    [sessions],
-  );
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedCategoryIds,
+    setSelectedCategoryIds,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    hasActiveFilter,
+    filteredSessions,
+    groups,
+    markedDates,
+    reset: resetFilters,
+  } = useJournalFilters(sessions, tasks);
 
   if (!hydrated) return null;
 
@@ -91,15 +68,7 @@ export function JournalView() {
   const emptyFiltered = (
     <div className="flex flex-col items-center gap-2 py-16 text-center">
       <p className="text-sm text-muted-foreground">검색 결과가 없어요</p>
-      <button
-        onClick={() => {
-          setSearchQuery('');
-          setSelectedCategoryIds(new Set());
-          setDateFrom('');
-          setDateTo('');
-        }}
-        className="text-sm text-primary hover:underline"
-      >
+      <button onClick={resetFilters} className="text-sm text-primary hover:underline">
         필터 초기화
       </button>
     </div>
@@ -178,12 +147,7 @@ export function JournalView() {
         onCategoryChange={setSelectedCategoryIds}
         onDateFromChange={setDateFrom}
         onDateToChange={setDateTo}
-        onReset={() => {
-          setSearchQuery('');
-          setSelectedCategoryIds(new Set());
-          setDateFrom('');
-          setDateTo('');
-        }}
+        onReset={resetFilters}
         markedDates={markedDates}
       />
     </div>
