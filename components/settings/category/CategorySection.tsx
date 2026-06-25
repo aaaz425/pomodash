@@ -1,7 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { CategoryEditModal } from './CategoryEditModal';
@@ -9,13 +25,83 @@ import type { Category } from '@/types';
 
 const MAX_CATEGORIES = 10;
 
+interface CategoryRowProps {
+  category: Category;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: category.id,
+  });
+
+  const style = {
+    transform: transform ? `translate3d(0px, ${transform.y}px, 0px)` : undefined,
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={[
+        'flex items-center justify-between py-2.5 px-1 group border-b border-border/50 last:border-0',
+        isDragging ? 'opacity-50' : '',
+      ].join(' ')}
+    >
+      <div className="flex items-center gap-3">
+        <button
+          {...attributes}
+          {...listeners}
+          aria-label="순서 조정"
+          className="shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
+        >
+          <GripVertical className="w-3.5 h-3.5" />
+        </button>
+        <span className={`w-3 h-3 rounded-full shrink-0 ${category.color}`} />
+        <span className="text-sm text-foreground">{category.name}</span>
+      </div>
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={onEdit}
+          aria-label={`${category.name} 편집`}
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={onDelete}
+          aria-label={`${category.name} 삭제`}
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function CategorySection() {
   const categories = useTaskStore((s) => s.categories);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);
+  const reorderCategories = useTaskStore((s) => s.reorderCategories);
   const isAtLimit = categories.length >= MAX_CATEGORIES;
 
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      reorderCategories(String(active.id), String(over.id));
+    }
+  }
 
   function handleDelete() {
     if (!deleteTargetId) return;
@@ -25,35 +111,26 @@ export function CategorySection() {
 
   return (
     <>
-      <div className="flex flex-col">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className="flex items-center justify-between py-2.5 px-1 group border-b border-border/50 last:border-0"
-          >
-            <div className="flex items-center gap-3">
-              <span className={`w-3 h-3 rounded-full shrink-0 ${cat.color}`} />
-              <span className="text-sm text-foreground">{cat.name}</span>
-            </div>
-            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => setEditTarget(cat)}
-                aria-label={`${cat.name} 편집`}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setDeleteTargetId(cat.id)}
-                aria-label={`${cat.name} 삭제`}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
+      <DndContext
+        id="categories"
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis]}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+          <div className="flex flex-col">
+            {categories.map((cat) => (
+              <CategoryRow
+                key={cat.id}
+                category={cat}
+                onEdit={() => setEditTarget(cat)}
+                onDelete={() => setDeleteTargetId(cat.id)}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
 
       <div className="mt-4 flex items-center justify-between">
         <button

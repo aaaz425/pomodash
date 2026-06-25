@@ -38,6 +38,7 @@ interface TaskStore {
   addCategory: (input: { name: string; color: string }) => void;
   updateCategory: (id: string, input: { name: string; color: string }) => void;
   deleteCategory: (id: string) => void;
+  reorderCategories: (activeId: string, overId: string) => void;
   openModal: () => void;
   closeModal: () => void;
   hydrate: () => void;
@@ -138,6 +139,16 @@ export const createTaskStore = () =>
       const categories = get().categories.filter((c) => c.id !== id);
       saveCategories(categories);
       set({ categories });
+    },
+
+    reorderCategories: (activeId, overId) => {
+      const { categories } = get();
+      const from = categories.findIndex((c) => c.id === activeId);
+      const to = categories.findIndex((c) => c.id === overId);
+      if (from === -1 || to === -1) return;
+      const next = arrayMove(categories, from, to);
+      saveCategories(next);
+      set({ categories: next });
     },
 
     openModal: () => set({ isModalOpen: true }),
