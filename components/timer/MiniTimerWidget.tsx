@@ -5,12 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Pause, Play } from 'lucide-react';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
-import type { TimerPhase } from '@/types';
-
-const PHASE_COLOR: Record<TimerPhase, string> = {
-  focus: '#10d9a0',
-  'short-break': '#60a5fa',
-};
+import { PHASE_HEX_COLORS } from '@/lib/timerColors';
 
 function fmt(seconds: number): string {
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -29,7 +24,7 @@ export function MiniTimerWidget() {
 
   if (!hydrated || !sessionStarted || pathname === '/') return null;
 
-  const color = PHASE_COLOR[phase];
+  const color = PHASE_HEX_COLORS[phase];
 
   return (
     // 모바일: BottomNav 위 중앙 / 태블릿·데스크톱: 상단 중앙

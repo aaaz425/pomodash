@@ -1,6 +1,7 @@
+import type { CategoryColorKey } from '@/lib/categoryColors';
 import type { Category } from '@/types';
 
-const COLOR_MAP: Record<string, string> = {
+const COLOR_MAP: Record<CategoryColorKey, string> = {
   'bg-blue-500': 'bg-blue-500/15 text-blue-400',
   'bg-green-500': 'bg-green-500/15 text-green-400',
   'bg-orange-500': 'bg-orange-500/15 text-orange-400',
@@ -17,7 +18,8 @@ interface Props {
 }
 
 export function CategoryBadge({ category, className = '' }: Props) {
-  const colorClass = COLOR_MAP[category.color] ?? 'bg-muted text-muted-foreground';
+  const colorClass =
+    COLOR_MAP[category.color as CategoryColorKey] ?? 'bg-muted text-muted-foreground';
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${colorClass} ${className}`}
