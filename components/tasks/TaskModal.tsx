@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTaskStore } from '@/store/StoreProvider';
 import { useTimerStore } from '@/store/StoreProvider';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/shared/Modal';
 import { TaskList } from './TaskList';
 import { TaskAddModal } from './TaskAddModal';
 
@@ -63,32 +64,15 @@ export function TaskModal() {
 
   return (
     <>
-      {/* 오버레이 */}
-      <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-        onClick={closeModal}
-        aria-hidden="true"
-      />
-
-      {/* 모달 패널 */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="작업 관리"
-        className={[
-          'fixed z-50 flex flex-col bg-card border border-border shadow-2xl',
-          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[80vh]',
-          'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[480px] sm:rounded-2xl sm:max-h-[70vh]',
-        ].join(' ')}
+      <Modal
+        title="작업 관리"
+        onClose={closeModal}
+        backdropZIndexClassName="z-40"
+        dialogZIndexClassName="z-50"
+        widthClassName="sm:w-[480px] sm:max-h-[70vh]"
+        maxHeightClassName="max-h-[80vh]"
+        bodyClassName="flex flex-col flex-1 min-h-0 overflow-hidden"
       >
-        {/* 헤더 */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-          <h2 className="text-base font-semibold text-foreground">작업 관리</h2>
-          <Button onClick={closeModal} aria-label="닫기" variant="ghost" size="icon">
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
         {/* 섹션 레이블 */}
         <div className="px-5 pt-2.5 pb-1 shrink-0">
           <span className="text-[11px] font-medium text-muted-foreground/60">진행 중인 작업</span>
@@ -130,7 +114,7 @@ export function TaskModal() {
             선택 완료
           </Button>
         </div>
-      </div>
+      </Modal>
 
       {/* 새 작업 추가 모달 */}
       {showAddModal && <TaskAddModal onClose={() => setShowAddModal(false)} />}

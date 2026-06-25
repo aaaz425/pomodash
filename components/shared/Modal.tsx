@@ -14,6 +14,7 @@ interface Props {
   dialogZIndexClassName?: string;
   backdropClassName?: string;
   maxHeightClassName?: string;
+  bodyClassName?: string;
 }
 
 // 기본 z-40/41 — ConfirmDialog(z-60)보다 낮다.
@@ -29,6 +30,7 @@ export function Modal({
   dialogZIndexClassName = 'z-[41]',
   backdropClassName = 'bg-black/50 backdrop-blur-sm',
   maxHeightClassName = 'max-h-[85vh]',
+  bodyClassName = 'flex flex-col gap-5 p-5 overflow-y-auto',
 }: Props) {
   return (
     <>
@@ -55,7 +57,7 @@ export function Modal({
           </Button>
         </div>
 
-        <div className="flex flex-col gap-5 p-5 overflow-y-auto">{children}</div>
+        <div className={bodyClassName}>{children}</div>
 
         {footer && (
           <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border shrink-0">
