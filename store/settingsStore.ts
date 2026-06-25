@@ -129,7 +129,18 @@ export const createSettingsStore = () =>
 
     reorderMessages: (fromId, toId) => {
       const messages = get().motivationalMessages;
-      const next = arrayMove(messages, parseInt(fromId), parseInt(toId));
+      const from = parseInt(fromId);
+      const to = parseInt(toId);
+      if (
+        Number.isNaN(from) ||
+        Number.isNaN(to) ||
+        from < 0 ||
+        from >= messages.length ||
+        to < 0 ||
+        to >= messages.length
+      )
+        return;
+      const next = arrayMove(messages, from, to);
       set({ motivationalMessages: next });
       saveSettings(toAppSettings(get()));
     },
