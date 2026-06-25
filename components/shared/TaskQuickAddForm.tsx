@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { CategoryPills } from '@/components/shared/CategoryPills';
+import { Button } from '@/components/ui/button';
+import { TextInput } from '@/components/shared/TextInput';
 import type { Category } from '@/types';
 
 interface Props {
@@ -22,29 +24,28 @@ export function TaskQuickAddForm({ categories, onAdd, onCancel }: Props) {
 
   return (
     <div className="flex flex-col gap-3 p-3.5 rounded-lg border border-border bg-muted/50">
-      <input
+      <TextInput
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
         placeholder="작업 제목"
-        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
+        className="w-full py-2 bg-card placeholder:text-muted-foreground/50 focus:ring-ring/50"
       />
       <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
       <div className="flex gap-2">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2 rounded-lg text-sm text-muted-foreground bg-muted hover:text-foreground transition-colors"
-        >
+        <Button onClick={onCancel} variant="secondary" size="lg" className="flex-1 py-2">
           취소
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleAdd}
           disabled={!title.trim()}
-          className="flex-1 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+          variant="default"
+          size="lg"
+          className="flex-1 py-2 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           추가
-        </button>
+        </Button>
       </div>
     </div>
   );

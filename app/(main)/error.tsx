@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Error({
   reset,
@@ -21,12 +22,14 @@ export default function Error({
           다시 시도하거나 새로고침해 주세요.
         </p>
       </div>
-      <button
+      <Button
         onClick={reset}
-        className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+        variant="default"
+        size="lg"
+        className="px-5 py-2.5 font-semibold hover:bg-primary/90"
       >
         다시 시도
-      </button>
+      </Button>
     </div>
   );
 }

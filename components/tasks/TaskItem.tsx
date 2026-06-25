@@ -3,6 +3,7 @@
 import { GripVertical, Trash2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
+import { Badge } from '@/components/shared/Badge';
 import type { Task } from '@/types';
 
 interface Props {
@@ -75,9 +76,9 @@ export function TaskItem({ task, isSelected, onSelect }: Props) {
 
       {/* 현재 세션 뱃지 */}
       {isSelected && (
-        <span className="shrink-0 text-[10px] font-semibold bg-primary text-primary-foreground px-2 py-0.5 rounded">
+        <Badge className="shrink-0 rounded text-[10px] font-semibold bg-primary text-primary-foreground">
           현재 세션
-        </span>
+        </Badge>
       )}
 
       {/* 삭제 */}

@@ -3,6 +3,7 @@
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { PHASE_HEX_COLORS } from '@/lib/timerColors';
+import { Badge } from '@/components/shared/Badge';
 import type { TimerPhase } from '@/types';
 
 const PHASE_BADGE: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
@@ -91,21 +92,19 @@ export function TimerRing() {
           {mm}:{ss}
         </time>
         {isNeutral ? (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-muted/60">
+          <Badge className="gap-1.5 px-2.5 bg-muted/60">
             <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
             <span className="text-[10px] font-semibold tracking-[0.5px] text-muted-foreground">
               {statusLabel}
             </span>
-          </div>
+          </Badge>
         ) : (
-          <div
-            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${badge.bg}`}
-          >
+          <Badge className={`gap-1.5 px-2.5 ${badge.bg}`}>
             <div className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
             <span className={`text-[10px] font-semibold tracking-[0.5px] ${badge.text}`}>
               {statusLabel}
             </span>
-          </div>
+          </Badge>
         )}
       </div>
     </div>

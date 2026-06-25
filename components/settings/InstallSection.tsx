@@ -2,6 +2,7 @@
 
 import { Download, CheckCircle2, Smartphone } from 'lucide-react';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { Button } from '@/components/ui/button';
 
 export function InstallSection() {
   const { canInstall, isInstalled, triggerInstall } = useInstallPrompt();
@@ -21,12 +22,14 @@ export function InstallSection() {
         <p className="text-sm text-muted-foreground">
           홈 화면에 추가하면 브라우저 없이 바로 실행할 수 있습니다.
         </p>
-        <button
+        <Button
           onClick={triggerInstall}
-          className="flex items-center gap-2 self-start px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+          variant="default"
+          size="lg"
+          className="gap-2 self-start px-4 font-semibold hover:bg-primary/90"
         >
           <Download className="w-4 h-4" />앱 설치
-        </button>
+        </Button>
       </div>
     );
   }

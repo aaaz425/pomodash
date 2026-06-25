@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   title: string;
@@ -11,6 +12,9 @@ interface Props {
   widthClassName?: string;
   backdropZIndexClassName?: string;
   dialogZIndexClassName?: string;
+  backdropClassName?: string;
+  maxHeightClassName?: string;
+  bodyClassName?: string;
 }
 
 // 기본 z-40/41 — ConfirmDialog(z-60)보다 낮다.
@@ -24,11 +28,14 @@ export function Modal({
   widthClassName = 'sm:w-[400px]',
   backdropZIndexClassName = 'z-[40]',
   dialogZIndexClassName = 'z-[41]',
+  backdropClassName = 'bg-black/50 backdrop-blur-sm',
+  maxHeightClassName = 'max-h-[85vh]',
+  bodyClassName = 'flex flex-col gap-5 p-5 overflow-y-auto',
 }: Props) {
   return (
     <>
       <div
-        className={`fixed inset-0 ${backdropZIndexClassName} bg-black/50 backdrop-blur-sm`}
+        className={`fixed inset-0 ${backdropZIndexClassName} ${backdropClassName}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -38,23 +45,19 @@ export function Modal({
         aria-label={title}
         className={[
           `fixed ${dialogZIndexClassName} flex flex-col bg-card border border-border shadow-2xl`,
-          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[85vh]',
+          `bottom-0 left-0 right-0 rounded-t-2xl ${maxHeightClassName}`,
           'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl',
           widthClassName,
         ].join(' ')}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <h3 className="text-base font-semibold text-foreground">{title}</h3>
-          <button
-            onClick={onClose}
-            aria-label="닫기"
-            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
+          <Button onClick={onClose} aria-label="닫기" variant="ghost" size="icon">
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
-        <div className="flex flex-col gap-5 p-5 overflow-y-auto">{children}</div>
+        <div className={bodyClassName}>{children}</div>
 
         {footer && (
           <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border shrink-0">
