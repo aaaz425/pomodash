@@ -2,12 +2,8 @@
 
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
+import { PHASE_HEX_COLORS } from '@/lib/timerColors';
 import type { TimerPhase } from '@/types';
-
-const PHASE_COLORS: Record<TimerPhase, string> = {
-  focus: '#10d9a0',
-  'short-break': '#60a5fa',
-};
 
 const PHASE_BADGE: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
   focus: { bg: 'bg-[#10d9a01a]', dot: 'bg-[#10d9a0]', text: 'text-[#10d9a0]' },
@@ -48,7 +44,7 @@ export function TimerRing() {
 
   const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
-  const color = PHASE_COLORS[phase];
+  const color = PHASE_HEX_COLORS[phase];
   const badge = PHASE_BADGE[phase];
 
   const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0');
