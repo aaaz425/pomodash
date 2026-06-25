@@ -42,6 +42,7 @@ interface SettingsStore {
   setSoundVolume: (volume: number) => void;
   setSoundRepeatCount: (count: number) => void;
   addMessage: (message: string) => void;
+  updateMessage: (index: number, message: string) => void;
   deleteMessage: (index: number) => void;
   reorderMessages: (fromId: string, toId: string) => void;
   hydrate: () => void;
@@ -105,6 +106,15 @@ export const createSettingsStore = () =>
       const curr = get().motivationalMessages;
       if (curr.length >= 20) return;
       const motivationalMessages = [...curr, message];
+      set({ motivationalMessages });
+      saveSettings(toAppSettings(get()));
+    },
+
+    updateMessage: (index, message) => {
+      const curr = get().motivationalMessages;
+      const trimmed = message.trim();
+      if (!trimmed || index < 0 || index >= curr.length) return;
+      const motivationalMessages = curr.map((m, i) => (i === index ? trimmed : m));
       set({ motivationalMessages });
       saveSettings(toAppSettings(get()));
     },
