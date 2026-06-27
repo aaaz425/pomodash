@@ -12,9 +12,11 @@ test('작업 생성 → 타이머 완료 → 메모 작성 → journal/dashboard
   await expect(startModal).toBeVisible();
 
   // 2. 모달 내에서 새 작업 생성 (자동 선택됨)
-  await startModal.getByRole('button', { name: '새 작업 만들기' }).click();
-  await startModal.getByPlaceholder('작업 제목').fill(TASK_TITLE);
-  await startModal.getByRole('button', { name: '추가' }).click();
+  await startModal.getByRole('button', { name: '새 작업 추가' }).click();
+  const addModal = page.getByRole('dialog', { name: '새 작업 추가' });
+  await addModal.getByPlaceholder('예) 알고리즘 문제 풀기').fill(TASK_TITLE);
+  await addModal.getByRole('button', { name: '추가' }).click();
+  await expect(addModal).not.toBeVisible();
 
   // 3. 이번 세션 설정 — 집중 5분(최솟값), 사이클 1회로 낮춰서 대기 시간 최소화
   const decreaseButtons = startModal.getByRole('button', { name: '감소' });
