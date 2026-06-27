@@ -26,12 +26,7 @@ export function SessionRecordModal() {
   const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods);
 
   const { task, category } = useCurrentTask();
-  const tasks = useTaskStore((s) => s.tasks);
-  const categories = useTaskStore((s) => s.categories);
   const addSession = useTaskStore((s) => s.addSession);
-  const addTask = useTaskStore((s) => s.addTask);
-
-  const activeTasks = tasks.filter((t) => !t.completed);
 
   const [note, setNote] = useState('');
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
@@ -76,11 +71,6 @@ export function SessionRecordModal() {
     setNote('');
     setSelectedTaskId(null);
     setPendingAction(null);
-  }
-
-  function handleAddNewTask(title: string, categoryId: string) {
-    const newId = addTask({ title, categoryId });
-    setSelectedTaskId(newId);
   }
 
   return (
@@ -142,13 +132,10 @@ export function SessionRecordModal() {
           ) : (
             /* Case B: 작업 없는 세션 — 작업 귀속 UI */
             <SessionTaskSelector
-              activeTasks={activeTasks}
-              categories={categories}
               selectedTaskId={selectedTaskId}
               cycleCount={cycleCount}
               totalCycles={totalCycles}
               onSelect={setSelectedTaskId}
-              onAddTask={handleAddNewTask}
             />
           )}
 
