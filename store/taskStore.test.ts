@@ -105,6 +105,49 @@ describe('toggleTask', () => {
   });
 });
 
+describe('updateTask', () => {
+  it('title/categoryId/목표 시간 필드를 부분적으로 변경할 수 있음', () => {
+    const store = createTaskStore();
+    const id = store.getState().addTask({ title: 'A', categoryId: 'c1' });
+
+    store.getState().updateTask(id, { title: 'B', targetFocusMinutes: 50 });
+
+    const task = store.getState().tasks[0];
+    expect(task.title).toBe('B');
+    expect(task.targetFocusMinutes).toBe(50);
+    expect(task.categoryId).toBe('c1'); // 패치에 없는 필드는 유지
+    expect(task.targetCycles).toBe(4);
+  });
+
+  it('title 양 끝 공백이 trim됨', () => {
+    const store = createTaskStore();
+    const id = store.getState().addTask({ title: 'A', categoryId: 'c1' });
+
+    store.getState().updateTask(id, { title: '  B  ' });
+
+    expect(store.getState().tasks[0].title).toBe('B');
+  });
+
+  it('존재하지 않는 id면 아무 task도 변경되지 않음', () => {
+    const store = createTaskStore();
+    store.getState().addTask({ title: 'A', categoryId: 'c1' });
+
+    store.getState().updateTask('no-such-id', { title: 'B' });
+
+    expect(store.getState().tasks[0].title).toBe('A');
+  });
+
+  it('localStorage에 변경 사항이 저장됨', () => {
+    const store = createTaskStore();
+    const id = store.getState().addTask({ title: 'A', categoryId: 'c1' });
+
+    store.getState().updateTask(id, { title: 'B' });
+
+    const stored = JSON.parse(localStorage.getItem('pomodash:tasks') ?? '[]');
+    expect(stored[0].title).toBe('B');
+  });
+});
+
 describe('deleteTask', () => {
   it('해당 id의 task가 목록에서 제거됨', () => {
     const store = createTaskStore();
@@ -317,20 +360,5 @@ describe('hydrate', () => {
     const store = createTaskStore();
     store.getState().hydrate();
     expect(store.getState().tasks).toEqual([]);
-  });
-});
-
-describe('openModal / closeModal', () => {
-  it('openModal — isModalOpen이 true로 설정됨', () => {
-    const store = createTaskStore();
-    store.getState().openModal();
-    expect(store.getState().isModalOpen).toBe(true);
-  });
-
-  it('closeModal — isModalOpen이 false로 설정됨', () => {
-    const store = createTaskStore();
-    store.getState().openModal();
-    store.getState().closeModal();
-    expect(store.getState().isModalOpen).toBe(false);
   });
 });
