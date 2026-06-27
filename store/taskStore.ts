@@ -20,7 +20,6 @@ interface TaskStore {
   tasks: Task[];
   categories: Category[];
   sessions: Session[];
-  isModalOpen: boolean;
 
   addTask: (input: {
     title: string;
@@ -30,6 +29,15 @@ interface TaskStore {
     targetBreakMinutes?: number;
   }) => string;
   toggleTask: (id: string) => void;
+  updateTask: (
+    id: string,
+    patch: Partial<
+      Pick<
+        Task,
+        'title' | 'categoryId' | 'targetFocusMinutes' | 'targetCycles' | 'targetBreakMinutes'
+      >
+    >,
+  ) => void;
   deleteTask: (id: string) => void;
   addSession: (input: Omit<Session, 'id'>) => void;
   updateSessionNote: (id: string, note: string | null) => void;
@@ -39,8 +47,6 @@ interface TaskStore {
   updateCategory: (id: string, input: { name: string; color: string }) => void;
   deleteCategory: (id: string) => void;
   reorderCategories: (activeId: string, overId: string) => void;
-  openModal: () => void;
-  closeModal: () => void;
   hydrate: () => void;
 }
 
@@ -56,7 +62,6 @@ export const createTaskStore = () =>
     tasks: [],
     categories: DEFAULT_CATEGORIES,
     sessions: [],
-    isModalOpen: false,
 
     addTask: ({ title, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes }) => {
       const newTask: Task = {
@@ -78,6 +83,14 @@ export const createTaskStore = () =>
 
     toggleTask: (id) => {
       const tasks = get().tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
+      saveTasks(tasks);
+      set({ tasks });
+    },
+
+    updateTask: (id, patch) => {
+      const tasks = get().tasks.map((t) =>
+        t.id === id ? { ...t, ...patch, title: patch.title?.trim() ?? t.title } : t,
+      );
       saveTasks(tasks);
       set({ tasks });
     },
@@ -151,8 +164,6 @@ export const createTaskStore = () =>
       set({ categories: next });
     },
 
-    openModal: () => set({ isModalOpen: true }),
-    closeModal: () => set({ isModalOpen: false }),
     hydrate: () =>
       set({
         tasks: loadFromStorage(STORAGE_KEYS.tasks, TasksSchema, []),

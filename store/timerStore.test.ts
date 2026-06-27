@@ -118,6 +118,73 @@ describe('timerStore', () => {
     expect(store.getState().remainingSeconds).toBe(30 * 60);
   });
 
+  describe('applyActiveTaskTimeUpdate()', () => {
+    it('일시정지 중 focusMinutes 증가 시 remainingSeconds가 증가분만큼 늘어남 (경과 시간 보존)', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:10:00.000Z')); // 10분 경과
+      store.getState().pause();
+      expect(store.getState().remainingSeconds).toBe(25 * 60 - 10 * 60);
+
+      store.getState().applyActiveTaskTimeUpdate({ focusMinutes: 30 }); // 25 → 30분
+
+      expect(store.getState().settings.focusMinutes).toBe(30);
+      expect(store.getState().remainingSeconds).toBe(30 * 60 - 10 * 60);
+    });
+
+    it('focusMinutes 감소로 남은 시간이 음수가 되면 0으로 clamp', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:20:00.000Z')); // 20분 경과
+      store.getState().pause();
+
+      store.getState().applyActiveTaskTimeUpdate({ focusMinutes: 10 }); // 이미 20분 지남
+
+      expect(store.getState().remainingSeconds).toBe(0);
+    });
+
+    it('현재 phase(focus)와 무관한 필드(shortBreakMinutes) 변경은 remainingSeconds에 영향 없음', () => {
+      const store = createTimerStore();
+      store.getState().pause(); // 시작도 안 했지만 remainingSeconds는 기본값 유지
+
+      store.getState().applyActiveTaskTimeUpdate({ shortBreakMinutes: 20 });
+
+      expect(store.getState().settings.shortBreakMinutes).toBe(20);
+      expect(store.getState().remainingSeconds).toBe(25 * 60);
+    });
+
+    it('totalCycles 변경은 settings에만 반영되고 remainingSeconds는 변하지 않음', () => {
+      const store = createTimerStore();
+
+      store.getState().applyActiveTaskTimeUpdate({ totalCycles: 2 });
+
+      expect(store.getState().settings.totalCycles).toBe(2);
+      expect(store.getState().remainingSeconds).toBe(25 * 60);
+    });
+
+    it('실행 중(startedAt이 null이 아님)이면 아무 동작도 하지 않음', () => {
+      const store = createTimerStore();
+      store.getState().start();
+
+      store.getState().applyActiveTaskTimeUpdate({ focusMinutes: 50 });
+
+      expect(store.getState().settings.focusMinutes).toBe(25);
+      expect(store.getState().remainingSeconds).toBe(25 * 60);
+    });
+
+    it('short-break phase 중에는 focusMinutes 변경이 remainingSeconds에 영향 없고 shortBreakMinutes만 영향', () => {
+      const store = createTimerStore();
+      store.getState().completeCycle(); // focus 완료 → short-break, remainingSeconds = 5*60
+      store.getState().pause();
+
+      store.getState().applyActiveTaskTimeUpdate({ focusMinutes: 50, shortBreakMinutes: 8 });
+
+      expect(store.getState().remainingSeconds).toBe(8 * 60);
+    });
+  });
+
   describe('focus mode', () => {
     it('enterFocusMode() — isFocusMode가 true로 설정됨', () => {
       const store = createTimerStore();

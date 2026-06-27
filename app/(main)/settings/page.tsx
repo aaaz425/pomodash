@@ -2,19 +2,20 @@
 
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Bell, ListTodo, Sparkles, Timer } from 'lucide-react';
+import { Bell, ListChecks, ListTodo, Sparkles, Timer } from 'lucide-react';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { InstallSection } from '@/components/settings/InstallSection';
 import { AboutSection } from '@/components/settings/AboutSection';
 import { TimerDefaultsModal } from '@/components/settings/timer-defaults/TimerDefaultsModal';
 import { CategoryModal } from '@/components/settings/category/CategoryModal';
+import { TaskManageModal } from '@/components/settings/task/TaskManageModal';
 import { MotivationalModal } from '@/components/settings/motivational/MotivationalModal';
 import { NotificationModal } from '@/components/settings/notification/NotificationModal';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 
-type MenuKey = 'timer' | 'category' | 'motivational' | 'notification';
+type MenuKey = 'timer' | 'task' | 'category' | 'motivational' | 'notification';
 
 function SettingCard({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
 
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
+  const taskCount = useTaskStore((s) => s.tasks.length);
   const categoryCount = useTaskStore((s) => s.categories.length);
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
@@ -58,6 +60,12 @@ export default function SettingsPage() {
             label="타이머 기본값"
             value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
             onClick={() => setOpenMenu('timer')}
+          />
+          <SettingsMenuRow
+            Icon={ListChecks}
+            label="작업 관리"
+            value={`${taskCount}개`}
+            onClick={() => setOpenMenu('task')}
           />
           <SettingsMenuRow
             Icon={ListTodo}
@@ -89,6 +97,7 @@ export default function SettingsPage() {
       </div>
 
       {openMenu === 'timer' && <TimerDefaultsModal onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'task' && <TaskManageModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'category' && <CategoryModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'motivational' && <MotivationalModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'notification' && <NotificationModal onClose={() => setOpenMenu(null)} />}

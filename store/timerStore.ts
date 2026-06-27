@@ -34,6 +34,7 @@ interface TimerStore {
   setCurrentTask: (taskId: string | null) => void;
   completeCycle: () => void;
   updateSettings: (patch: Partial<TimerSettings>) => void;
+  applyActiveTaskTimeUpdate: (patch: Partial<TimerSettings>) => void;
   endSession: () => void;
   dismissSessionRecord: () => void;
   enterFocusMode: () => void;
@@ -184,6 +185,17 @@ export const createTimerStore = () => {
         const next = { ...get().settings, ...patch };
         const seconds = phaseSeconds(next);
         set({ settings: next, remainingSeconds: seconds[get().phase] });
+      },
+
+      // 일시정지 중인 활성 작업의 목표 시간을 수정했을 때 호출 — 이미 진행한 시간은
+      // 보존하고 현재 phase의 남은 시간만 새 목표와의 차이만큼 보정한다.
+      // (예: 25분 집중 중 10분 경과 후 목표를 30분으로 늘리면 남은 시간도 5분 늘어남)
+      applyActiveTaskTimeUpdate: (patch) => {
+        const { settings, phase, remainingSeconds, startedAt } = get();
+        if (startedAt !== null) return; // 실행 중에는 무시 — 호출 측에서 막아야 하는 안전망
+        const next = { ...settings, ...patch };
+        const delta = phaseSeconds(next)[phase] - phaseSeconds(settings)[phase];
+        set({ settings: next, remainingSeconds: Math.max(0, remainingSeconds + delta) });
       },
 
       endSession: () => {

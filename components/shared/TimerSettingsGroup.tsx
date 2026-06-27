@@ -10,6 +10,7 @@ interface Props {
   shortBreakMinutes: number;
   onShortBreakMinutesChange: (v: number) => void;
   cyclesLabel?: string;
+  disabled?: boolean;
 }
 
 export function TimerSettingsGroup({
@@ -20,6 +21,7 @@ export function TimerSettingsGroup({
   shortBreakMinutes,
   onShortBreakMinutesChange,
   cyclesLabel = '횟수',
+  disabled = false,
 }: Props) {
   return (
     <div className="flex flex-col gap-2.5">
@@ -32,6 +34,7 @@ export function TimerSettingsGroup({
           max={120}
           step={5}
           unit="분"
+          disabled={disabled}
         />
       </div>
       <div className="flex items-center justify-between">
@@ -42,6 +45,7 @@ export function TimerSettingsGroup({
           min={1}
           max={20}
           unit="회"
+          disabled={disabled}
         />
       </div>
       <div className="flex items-center justify-between">
@@ -53,6 +57,7 @@ export function TimerSettingsGroup({
           max={60}
           step={5}
           unit="분"
+          disabled={disabled}
         />
       </div>
     </div>
