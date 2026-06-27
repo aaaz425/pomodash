@@ -1,21 +1,35 @@
 'use client';
 
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, Pencil, Trash2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Badge } from '@/components/shared/Badge';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import type { Task } from '@/types';
 
 interface Props {
   task: Task;
-  isSelected: boolean;
-  onSelect: (id: string) => void;
+  mode: 'select' | 'manage';
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
+  onEdit?: (task: Task) => void;
+  onDeleteRequest?: (id: string) => void;
 }
 
-export function TaskItem({ task, isSelected, onSelect }: Props) {
-  const deleteTask = useTaskStore((s) => s.deleteTask);
+export function TaskItem({
+  task,
+  mode,
+  isSelected = false,
+  onSelect,
+  onEdit,
+  onDeleteRequest,
+}: Props) {
+  const categories = useTaskStore((s) => s.categories);
+  const category = categories.find((c) => c.id === task.categoryId);
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
+    disabled: mode !== 'manage',
   });
 
   const style = {
@@ -27,71 +41,96 @@ export function TaskItem({ task, isSelected, onSelect }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      onClick={() => onSelect(task.id)}
+      onClick={mode === 'select' ? () => onSelect?.(task.id) : undefined}
       className={[
-        'flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer group transition-colors',
+        'flex items-center gap-2.5 px-3 py-2.5 rounded-lg group transition-colors',
+        mode === 'select' ? 'cursor-pointer' : '',
         isSelected ? 'bg-primary/10' : 'hover:bg-muted/50',
         isDragging ? 'opacity-50 scale-[0.98]' : '',
       ].join(' ')}
     >
-      {/* drag handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        onClick={(e) => e.stopPropagation()}
-        aria-label="순서 조정"
-        className="shrink-0 -m-2 p-2 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
-      >
-        <GripVertical className="w-3.5 h-3.5" />
-      </button>
+      {/* drag handle — 관리 모드에서만 */}
+      {mode === 'manage' && (
+        <button
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+          aria-label="순서 조정"
+          className="shrink-0 -m-2 p-2 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing transition-colors touch-none"
+        >
+          <GripVertical className="w-3.5 h-3.5" />
+        </button>
+      )}
 
-      {/* 선택 인디케이터 */}
-      <div
-        className={[
-          'shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors',
-          isSelected ? 'bg-primary' : 'border-2 border-border',
-        ].join(' ')}
-      >
-        {isSelected && (
-          <svg viewBox="0 0 10 8" className="w-2.5 h-2.5">
-            <path
-              d="M1 4l3 3 5-6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-primary-foreground"
-            />
-          </svg>
-        )}
-      </div>
+      {/* 선택 인디케이터 — 선택 모드 */}
+      {mode === 'select' && (
+        <div
+          className={[
+            'shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors',
+            isSelected ? 'bg-primary' : 'border-2 border-border',
+          ].join(' ')}
+        >
+          {isSelected && (
+            <svg viewBox="0 0 10 8" className="w-2.5 h-2.5">
+              <path
+                d="M1 4l3 3 5-6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-primary-foreground"
+              />
+            </svg>
+          )}
+        </div>
+      )}
+
+      {/* 카테고리 */}
+      {category && <CategoryBadge category={category} className="shrink-0" />}
 
       {/* 제목 */}
       <span
-        className={`flex-1 text-sm leading-snug truncate ${isSelected ? 'text-primary font-medium' : 'text-foreground'}`}
+        className={[
+          'flex-1 text-sm leading-snug truncate',
+          isSelected ? 'text-primary font-medium' : 'text-foreground',
+        ].join(' ')}
       >
         {task.title}
       </span>
 
-      {/* 현재 세션 뱃지 */}
-      {isSelected && (
+      {/* 현재 세션 뱃지 — 선택 모드 */}
+      {mode === 'select' && isSelected && (
         <Badge className="shrink-0 rounded text-[10px] font-semibold bg-primary text-primary-foreground">
           현재 세션
         </Badge>
       )}
 
-      {/* 삭제 */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteTask(task.id);
-        }}
-        aria-label="삭제"
-        className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </button>
+      {/* 수정/삭제 — 관리 모드 */}
+      {mode === 'manage' && (
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.(task);
+            }}
+            aria-label="수정"
+            className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteRequest?.(task.id);
+            }}
+            aria-label="삭제"
+            className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
