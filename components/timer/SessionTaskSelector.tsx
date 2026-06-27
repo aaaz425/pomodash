@@ -1,28 +1,16 @@
 'use client';
 
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
-import { TaskPickerList } from '@/components/timer/TaskPickerList';
-import type { Task, Category } from '@/types';
+import { TaskList } from '@/components/tasks/TaskList';
 
 interface Props {
-  activeTasks: Task[];
-  categories: Category[];
   selectedTaskId: string | null;
   cycleCount: number;
   totalCycles: number;
-  onSelect: (id: string | null) => void;
-  onAddTask: (title: string, categoryId: string) => void;
+  onSelect: (id: string) => void;
 }
 
-export function SessionTaskSelector({
-  activeTasks,
-  categories,
-  selectedTaskId,
-  cycleCount,
-  totalCycles,
-  onSelect,
-  onAddTask,
-}: Props) {
+export function SessionTaskSelector({ selectedTaskId, cycleCount, totalCycles, onSelect }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -35,12 +23,11 @@ export function SessionTaskSelector({
         </div>
       </div>
 
-      <TaskPickerList
-        activeTasks={activeTasks}
-        categories={categories}
+      <TaskList
+        mode="select"
         selectedTaskId={selectedTaskId}
         onSelect={onSelect}
-        onAddTask={onAddTask}
+        listClassName="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto"
       />
 
       <p className="text-[11px] text-muted-foreground/60">선택하지 않으면 미분류로 저장됩니다</p>
