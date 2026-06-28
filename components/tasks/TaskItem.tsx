@@ -108,7 +108,7 @@ export function TaskItem({
 
       {/* 수정/삭제 — 관리 모드 */}
       {mode === 'manage' && (
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => {
               e.stopPropagation();

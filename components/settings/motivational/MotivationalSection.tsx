@@ -127,7 +127,7 @@ function MessageRow({
       <button
         onClick={onStartEdit}
         aria-label="메시지 편집"
-        className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground transition-all shrink-0"
+        className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-muted hover:text-foreground transition-all shrink-0"
       >
         <Pencil className="w-3.5 h-3.5" />
       </button>
@@ -135,7 +135,7 @@ function MessageRow({
         onClick={onDelete}
         disabled={!canDelete}
         aria-label="메시지 삭제"
-        className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-20 transition-all shrink-0"
+        className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-20 transition-all shrink-0"
       >
         <Trash2 className="w-3.5 h-3.5" />
       </button>
