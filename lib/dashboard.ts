@@ -204,10 +204,6 @@ export function getFirstSessionDate(sessions: Session[]): Date | null {
   return parseISO(earliest.startedAt);
 }
 
-export function getRecentSessions(sessions: Session[], limit = 3): Session[] {
-  return [...sessions].sort((a, b) => b.startedAt.localeCompare(a.startedAt)).slice(0, limit);
-}
-
 // ─── Chart data ────────────────────────────────────────────────────────────
 
 export interface FocusTrendItem {
