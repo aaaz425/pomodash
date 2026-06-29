@@ -50,8 +50,6 @@ test('작업 생성 → 타이머 완료 → 메모 작성 → journal/dashboard
   await expect(page.getByText(TASK_TITLE).first()).toBeVisible();
 
   // 9. dashboard 집계에 새 세션이 반영되는지 확인
-  // (RecentSessions 컴포넌트는 어디서도 import되지 않아 실제로 렌더링되지 않으므로,
-  //  세션 상세가 아니라 집계 수치로 데이터 연동을 검증한다)
   await page.goto('/dashboard');
   await expect(page.getByText('이번 주 세션').first()).toBeVisible();
   await expect(page.getByText('1세션', { exact: true }).first()).toBeVisible();
