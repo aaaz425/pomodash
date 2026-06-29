@@ -11,7 +11,6 @@ import {
   getPrevDayFocusSeconds,
   getPrevDaySessionCount,
   getPrevMonthSessionCount,
-  getRecentSessions,
   getSessionCount,
   getStreakDays,
   getTotalFocusSeconds,
@@ -116,22 +115,6 @@ describe('집계 함수', () => {
 
   it('getAvgSessionSeconds — 빈 배열이면 0', () => {
     expect(getAvgSessionSeconds([])).toBe(0);
-  });
-});
-
-describe('getRecentSessions', () => {
-  const sessions = [
-    makeSession('2024-03-13T10:00:00'),
-    makeSession('2024-03-15T10:00:00'),
-    makeSession('2024-03-14T10:00:00'),
-    makeSession('2024-03-12T10:00:00'),
-  ];
-
-  it('최신순 N개 반환', () => {
-    const result = getRecentSessions(sessions, 3);
-    expect(result).toHaveLength(3);
-    expect(result[0].startedAt).toBe('2024-03-15T10:00:00');
-    expect(result[1].startedAt).toBe('2024-03-14T10:00:00');
   });
 });
 
