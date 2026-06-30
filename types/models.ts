@@ -54,13 +54,6 @@ export interface TimerSettings {
 
 export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
 
-export const SOUND_TYPE_LABELS: Record<SoundType, string> = {
-  sine: '기본',
-  chime: '차임',
-  bell: '벨',
-  digital: '디지털',
-};
-
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;
