@@ -43,7 +43,7 @@ export function TimerSettingsGroup({
           value={totalCycles}
           onChange={onTotalCyclesChange}
           min={1}
-          max={20}
+          max={10}
           unit="회"
           disabled={disabled}
         />

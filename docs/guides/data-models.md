@@ -185,6 +185,6 @@ const DEFAULT_TIMER_SETTINGS: TimerSettings = {
 // TimerSettingsSchema 허용 범위
 focusMinutes: 5–120분
 shortBreakMinutes: 0–60분
-totalCycles: 1–20회
+totalCycles: 1–10회
 ```
 

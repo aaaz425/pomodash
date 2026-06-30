@@ -107,7 +107,7 @@ export const TimerRecordSchema = z.object({
 export const TimerSettingsSchema = z.object({
   focusMinutes: z.number().min(5).max(120),
   shortBreakMinutes: z.number().min(0).max(60),
-  totalCycles: z.number().min(1).max(20),
+  totalCycles: z.number().min(1).max(10),
 });
 
 // 새로고침 복구용 — 진행 중이거나 아직 기록 안 한(sessionEnded) 활성 타이머 1개의 스냅샷
