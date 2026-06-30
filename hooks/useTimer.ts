@@ -10,6 +10,7 @@ export function useTimer() {
   const phase = useTimerStore((s) => s.phase);
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+  const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
   const complete = useTimerStore((s) => s.complete);
 
   const soundAlert = useSettingsStore((s) => s.soundAlert);
@@ -91,10 +92,15 @@ export function useTimer() {
   // 실행 중이 아닐 때는 store 값을 그대로 사용 (Date.now() 렌더 중 호출 금지 회피)
   const displaySeconds = startedAt !== null ? runningDisplay : remainingSeconds;
 
+  const elapsedMinutes =
+    cycleCount * focusMinutes +
+    (phase === 'focus' ? Math.max(0, Math.floor((focusMinutes * 60 - displaySeconds) / 60)) : 0);
+
   return {
     displaySeconds,
     isRunning: startedAt !== null,
     phase,
     cycleCount,
+    elapsedMinutes,
   };
 }

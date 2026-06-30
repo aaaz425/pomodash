@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Volume2, Play, Pause } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
-import { playAlarm, stopAlarm } from '@/lib/notifications';
+import { useSoundPreview } from '@/hooks/useSoundPreview';
 import { StepperInput } from '@/components/shared/StepperInput';
 import { Toggle } from './Toggle';
 import { SoundTypeSelect } from './SoundTypeSelect';
@@ -20,40 +19,15 @@ export function SoundAlertSettings() {
   const setSoundVolume = useSettingsStore((s) => s.setSoundVolume);
   const setSoundRepeatCount = useSettingsStore((s) => s.setSoundRepeatCount);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  function handlePreview() {
-    if (isPlaying) {
-      stopAlarm();
-      setIsPlaying(false);
-      return;
-    }
-    setIsPlaying(true);
-    playAlarm({
-      type: soundType,
-      volume: soundVolume,
-      repeatCount: soundRepeatCount,
-      onEnded: () => setIsPlaying(false),
-    });
-  }
-
-  useEffect(() => {
-    return () => stopAlarm();
-  }, []);
+  const { isPlaying, toggle, stop } = useSoundPreview(soundType, soundVolume, soundRepeatCount);
 
   function handleSoundAlertToggle(enabled: boolean) {
-    if (!enabled && isPlaying) {
-      stopAlarm();
-      setIsPlaying(false);
-    }
+    if (!enabled && isPlaying) stop();
     setSoundAlert(enabled);
   }
 
   function handleSoundTypeChange(type: SoundType) {
-    if (isPlaying && type !== soundType) {
-      stopAlarm();
-      setIsPlaying(false);
-    }
+    if (isPlaying && type !== soundType) stop();
     setSoundType(type);
   }
 
@@ -84,14 +58,19 @@ export function SoundAlertSettings() {
             <SoundTypeSelect value={soundType} onChange={handleSoundTypeChange} />
             <button
               type="button"
-              onClick={handlePreview}
+              onClick={toggle}
               aria-label={isPlaying ? '미리듣기 정지' : '미리 듣기'}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
             >
               {isPlaying ? (
-                <Pause className="w-3.5 h-3.5" fill="currentColor" />
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
               ) : (
-                <Play className="w-3.5 h-3.5" fill="currentColor" />
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
               )}
             </button>
           </div>

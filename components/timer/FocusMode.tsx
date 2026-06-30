@@ -1,17 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Square, Play, Pause } from 'lucide-react';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { useRotatingMessage } from '@/hooks/useRotatingMessage';
+import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
-
 import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
 
 export function FocusMode() {
@@ -20,39 +21,15 @@ export function FocusMode() {
   const settings = useTimerStore((s) => s.settings);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
-  const endSession = useTimerStore((s) => s.endSession);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { displaySeconds, phase, cycleCount } = useTimer();
+  const { cycleCount, elapsedMinutes } = useTimer();
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
-  const [message, setMessage] = useState(
-    () => messages[Math.floor(Math.random() * messages.length)] ?? '',
-  );
-  const [showEndConfirm, setShowEndConfirm] = useState(false);
-
-  useEffect(() => {
-    if (!isFocusMode || messages.length === 0) return;
-
-    const interval = setInterval(() => {
-      setMessage((prev) => {
-        if (messages.length === 1) return messages[0];
-        let next = prev;
-        while (next === prev) {
-          next = messages[Math.floor(Math.random() * messages.length)];
-        }
-        return next;
-      });
-    }, MESSAGE_ROTATE_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [isFocusMode, messages]);
-
-  const elapsedMinutes =
-    cycleCount * settings.focusMinutes +
-    (phase === 'focus'
-      ? Math.max(0, Math.floor((settings.focusMinutes * 60 - displaySeconds) / 60))
-      : 0);
+  const message = useRotatingMessage(messages, MESSAGE_ROTATE_INTERVAL_MS, isFocusMode);
+  const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow({
+    pauseOnRequest: false,
+  });
 
   useEffect(() => {
     if (!isFocusMode) return;
@@ -62,7 +39,7 @@ export function FocusMode() {
       if (target && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
 
       if (showEndConfirm) {
-        if (e.key === 'Escape') setShowEndConfirm(false);
+        if (e.key === 'Escape') cancelEnd();
         return;
       }
       if (e.code === 'Space') {
@@ -76,7 +53,7 @@ export function FocusMode() {
 
     document.addEventListener('keydown', handleKeydown);
     return () => document.removeEventListener('keydown', handleKeydown);
-  }, [isFocusMode, isRunning, pause, start, exitFocusMode, showEndConfirm]);
+  }, [isFocusMode, isRunning, pause, start, exitFocusMode, showEndConfirm, cancelEnd]);
 
   return (
     <AnimatePresence>
@@ -149,7 +126,7 @@ export function FocusMode() {
               {isRunning ? '일시정지' : '시작'}
             </button>
             <Button
-              onClick={() => setShowEndConfirm(true)}
+              onClick={requestEnd}
               variant="outline"
               size="lg"
               className="gap-1.5 px-4 py-2.5 text-muted-foreground"
@@ -173,11 +150,8 @@ export function FocusMode() {
               </>
             }
             confirmLabel="세션 종료"
-            onConfirm={() => {
-              endSession();
-              setShowEndConfirm(false);
-            }}
-            onCancel={() => setShowEndConfirm(false)}
+            onConfirm={confirmEnd}
+            onCancel={cancelEnd}
           />
         </motion.div>
       )}

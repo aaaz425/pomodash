@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Maximize2, Play, Pause, Square } from 'lucide-react';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
+import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { StartSessionModal } from '@/components/timer/StartSessionModal';
 import { Button } from '@/components/ui/button';
@@ -14,12 +15,10 @@ export function TimerControls() {
   const settings = useTimerStore((s) => s.settings);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
-  const endSession = useTimerStore((s) => s.endSession);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
-  const { displaySeconds, phase, cycleCount } = useTimer();
+  const { cycleCount, elapsedMinutes } = useTimer();
+  const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
   const [showStartModal, setShowStartModal] = useState(false);
-  const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const [wasRunning, setWasRunning] = useState(false);
 
   function handleStartClick() {
     if (isRunning) {
@@ -32,12 +31,6 @@ export function TimerControls() {
     }
     start();
   }
-
-  const elapsedMinutes =
-    cycleCount * settings.focusMinutes +
-    (phase === 'focus'
-      ? Math.max(0, Math.floor((settings.focusMinutes * 60 - displaySeconds) / 60))
-      : 0);
 
   return (
     <div className="flex items-center gap-1.5">
@@ -67,12 +60,7 @@ export function TimerControls() {
 
       <Button
         disabled={!sessionStarted}
-        onClick={() => {
-          const running = isRunning;
-          if (running) pause();
-          setWasRunning(running);
-          setShowEndConfirm(true);
-        }}
+        onClick={requestEnd}
         variant="outline"
         size="lg"
         className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap hover:bg-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
@@ -92,14 +80,8 @@ export function TimerControls() {
           </>
         }
         confirmLabel="세션 종료"
-        onConfirm={() => {
-          endSession();
-          setShowEndConfirm(false);
-        }}
-        onCancel={() => {
-          if (wasRunning) start();
-          setShowEndConfirm(false);
-        }}
+        onConfirm={confirmEnd}
+        onCancel={cancelEnd}
       />
     </div>
   );
