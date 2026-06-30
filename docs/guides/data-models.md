@@ -1,7 +1,7 @@
 # Data Models
 
 프로젝트 전체에서 사용하는 TypeScript 타입 정의.
-실제 코드는 `types/index.ts`에 위치한다.
+인터페이스는 `types/models.ts`, Zod 스키마와 기본값은 `types/schemas.ts`에 위치한다. `types/index.ts`는 둘을 re-export하는 barrel이다.
 
 ## 개념 계층 (Concept Hierarchy)
 
@@ -95,6 +95,9 @@ export interface AppSettings {
   nickname: string
   browserNotification: boolean
   soundAlert: boolean
+  soundType: SoundType         // 'sine' | 'chime' | 'bell' | 'digital'
+  soundVolume: number          // 0–100
+  soundRepeatCount: number     // 1–5
   motivationalMessages: string[] // 1–20개
   defaultTimerSettings: TimerSettings
 }
@@ -107,8 +110,9 @@ const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
   sessions: 'pomodash:sessions',
-  settings: 'pomodash:settings',
   timerSettings: 'pomodash:timer-settings',
+  settings: 'pomodash:settings',
+  activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
 } as const
 ```

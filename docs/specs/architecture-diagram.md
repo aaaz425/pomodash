@@ -59,15 +59,21 @@ flowchart LR
         SettingsStore["settingsStore"]
     end
 
-    subgraph lib["lib/ (순수 유틸)"]
-        Storage["storage.ts\n(localStorage 추상화)"]
-        Notifications["notifications.ts"]
+    subgraph config["config/ (앱 설정)"]
+        Site["site.ts"]
         Analytics["analytics.ts"]
+    end
+
+    subgraph lib["lib/ (도메인 로직·유틸)"]
+        Constants["constants/\n(상수 SSOT)"]
+        Storage["storage.ts"]
+        Notifications["notifications.ts"]
         FocusPeriods["focusPeriods.ts"]
     end
 
     subgraph types["types/"]
-        Index["index.ts\n(모든 타입 + Zod 스키마)"]
+        Models["models.ts\n(인터페이스)"]
+        Schemas["schemas.ts\n(Zod 스키마)"]
     end
 
     Pages --> Feature
