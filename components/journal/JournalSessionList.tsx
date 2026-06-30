@@ -2,7 +2,7 @@
 
 import { SessionListItem } from '@/components/journal/SessionListItem';
 import { formatDuration } from '@/lib/sessionUtils';
-import type { SessionGroup } from '@/lib/sessionUtils';
+import type { SessionGroup } from '@/types';
 import type { Category, Task } from '@/types';
 
 interface Props {

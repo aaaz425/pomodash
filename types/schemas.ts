@@ -114,6 +114,7 @@ export const STORAGE_KEYS = {
   settings: 'pomodash:settings',
   activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
+  theme: 'theme',
 } as const;
 
 export const DEFAULT_CATEGORIES: Category[] = [

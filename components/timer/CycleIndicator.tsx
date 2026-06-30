@@ -2,6 +2,7 @@
 
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
+import { PHASE_BADGE_STYLES } from '@/lib/constants/timerColors';
 
 export function CycleIndicator() {
   const hydrated = useHydrated();
@@ -22,8 +23,8 @@ export function CycleIndicator() {
             key={i}
             className={[
               'w-2 h-2 rounded-full transition-all duration-300',
-              isCompleted ? 'bg-[#10d9a0]' : '',
-              isCurrent ? 'bg-[#10d9a0] animate-pulse' : '',
+              isCompleted ? PHASE_BADGE_STYLES.focus.dot : '',
+              isCurrent ? `${PHASE_BADGE_STYLES.focus.dot} animate-pulse` : '',
               !isCompleted && !isCurrent ? 'border-[1.5px] border-border' : '',
             ]
               .filter(Boolean)

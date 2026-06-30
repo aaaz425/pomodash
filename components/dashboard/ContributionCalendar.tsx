@@ -1,4 +1,4 @@
-import type { DayActivity } from '@/lib/dashboard';
+import type { DayActivity } from '@/types';
 
 interface Props {
   data: DayActivity[];

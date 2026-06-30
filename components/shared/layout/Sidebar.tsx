@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -30,7 +30,7 @@ export function Sidebar() {
               <Icon
                 className={[
                   'w-[18px] h-[18px] shrink-0',
-                  isActive ? 'text-primary' : 'text-[#64748b]',
+                  isActive ? 'text-primary' : 'text-muted-foreground',
                 ].join(' ')}
               />
               {label}

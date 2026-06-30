@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { getFocusTrendData, type TabType } from '@/lib/dashboard';
+import { getFocusTrendData } from '@/lib/dashboard';
+import type { TabType } from '@/types';
 import { EmptyState } from '@/components/shared/EmptyState';
 import type { Category, Session, Task } from '@/types';
 

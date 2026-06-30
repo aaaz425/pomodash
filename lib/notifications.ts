@@ -1,17 +1,18 @@
+import type { SoundType } from '@/types';
+import { SOUND_SEQUENCE_INTERVAL } from '@/lib/constants/ux';
+
 export async function requestNotificationPermission(): Promise<boolean> {
-  if (!('Notification' in window)) return false;
+  if (typeof window === 'undefined' || !('Notification' in window)) return false;
   if (Notification.permission === 'granted') return true;
   const result = await Notification.requestPermission();
   return result === 'granted';
 }
 
 export function sendNotification(title: string, body: string): void {
+  if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;
   new Notification(title, { body, icon: '/icon-192.png' });
 }
-
-import type { SoundType } from '@/types';
-import { SOUND_SEQUENCE_INTERVAL } from '@/lib/constants/ux';
 
 let sharedCtx: AudioContext | null = null;
 let activeNodes: { osc: OscillatorNode; gain: GainNode }[] = [];

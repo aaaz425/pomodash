@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Zap } from 'lucide-react';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function IconSidebar() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export function IconSidebar() {
                 isActive ? 'bg-primary/10' : 'hover:bg-muted',
               ].join(' ')}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-[#64748b]'}`} />
+              <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
             </Link>
           );
         })}
