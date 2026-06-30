@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { User } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { Button } from '@/components/ui/button';
@@ -13,11 +13,15 @@ export function ProfileSection() {
 
   const [draft, setDraft] = useState(nickname);
   const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(savedTimerRef.current), []);
 
   function handleSave() {
     setNickname(draft.trim());
     setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
+    clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 1500);
   }
 
   return (
