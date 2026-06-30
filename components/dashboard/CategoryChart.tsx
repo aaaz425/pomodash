@@ -30,10 +30,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
       {hasData ? (
         <div className="flex items-center justify-center gap-4 flex-1">
           {/* Donut chart */}
-          <div
-            className="relative shrink-0 w-[120px] h-[120px]"
-            style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }}
-          >
+          <div className="relative shrink-0 w-[120px] h-[120px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]">
             <ResponsiveContainer width="100%" height="100%" minHeight={120}>
               <PieChart>
                 <Pie

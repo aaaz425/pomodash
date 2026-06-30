@@ -2,7 +2,7 @@
 
 import { Bell } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
-import { Toggle } from './Toggle';
+import { Toggle } from '@/components/settings/notification/Toggle';
 
 export function BrowserNotificationRow() {
   const browserNotification = useSettingsStore((s) => s.browserNotification);

@@ -4,8 +4,8 @@ import { Volume2, Play, Pause } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { useSoundPreview } from '@/hooks/useSoundPreview';
 import { StepperInput } from '@/components/shared/StepperInput';
-import { Toggle } from './Toggle';
-import { SoundTypeSelect } from './SoundTypeSelect';
+import { Toggle } from '@/components/settings/notification/Toggle';
+import { SoundTypeSelect } from '@/components/settings/notification/SoundTypeSelect';
 import type { SoundType } from '@/types';
 import { SOUND_LIMITS } from '@/lib/constants/limits';
 

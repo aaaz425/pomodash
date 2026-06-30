@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import { createTaskStore } from './taskStore';
+import { createTaskStore } from '@/store/taskStore';
 import { DEFAULT_CATEGORIES, STORAGE_KEYS } from '@/types';
 import type { Session } from '@/types';
 

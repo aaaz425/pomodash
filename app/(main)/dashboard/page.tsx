@@ -26,8 +26,8 @@ import {
   getSessionCount,
   getStreakDays,
   getTotalFocusSeconds,
-  type TabType,
 } from '@/lib/dashboard';
+import type { TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
 

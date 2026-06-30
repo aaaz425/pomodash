@@ -1,11 +1,4 @@
-import type { Session } from '@/types';
-
-export interface SessionGroup {
-  dateKey: string;
-  displayLabel: string;
-  totalFocusSeconds: number;
-  sessions: Session[];
-}
+import type { Session, SessionGroup } from '@/types';
 
 function toLocalDateKey(isoString: string): string {
   const d = new Date(isoString);

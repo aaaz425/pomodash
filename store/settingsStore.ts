@@ -12,6 +12,7 @@ import {
   STORAGE_KEYS,
 } from '@/types';
 import { MOTIVATIONAL_MESSAGES } from '@/lib/constants/messages';
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 
 const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',
@@ -104,7 +105,7 @@ export const createSettingsStore = () =>
 
     addMessage: (message) => {
       const curr = get().motivationalMessages;
-      if (curr.length >= 20) return;
+      if (curr.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX) return;
       const motivationalMessages = [...curr, message];
       set({ motivationalMessages });
       saveSettings(toAppSettings(get()));
@@ -121,7 +122,7 @@ export const createSettingsStore = () =>
 
     deleteMessage: (index) => {
       const curr = get().motivationalMessages;
-      if (curr.length <= 1) return;
+      if (curr.length <= INPUT_LIMITS.MESSAGE_COUNT_MIN) return;
       const motivationalMessages = curr.filter((_, i) => i !== index);
       set({ motivationalMessages });
       saveSettings(toAppSettings(get()));

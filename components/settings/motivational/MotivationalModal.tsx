@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/shared/Modal';
-import { MotivationalSection } from './MotivationalSection';
+import { MotivationalSection } from '@/components/settings/motivational/MotivationalSection';
 
 interface Props {
   onClose: () => void;

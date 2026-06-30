@@ -4,7 +4,8 @@ import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Check } from 'lucide-react';
 import { useClickOutside } from '@/hooks/useClickOutside';
-import { SOUND_TYPE_LABELS, type SoundType } from '@/types';
+import { SOUND_TYPE_LABELS } from '@/lib/constants';
+import type { SoundType } from '@/types';
 
 interface Props {
   value: SoundType;

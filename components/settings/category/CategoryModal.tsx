@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/shared/Modal';
-import { CategorySection } from './CategorySection';
+import { CategorySection } from '@/components/settings/category/CategorySection';
 
 interface Props {
   onClose: () => void;

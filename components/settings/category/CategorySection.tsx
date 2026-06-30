@@ -20,7 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { CategoryEditModal } from './CategoryEditModal';
+import { CategoryEditModal } from '@/components/settings/category/CategoryEditModal';
 import type { Category } from '@/types';
 
 import { INPUT_LIMITS } from '@/lib/constants/limits';

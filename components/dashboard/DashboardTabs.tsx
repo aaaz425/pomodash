@@ -1,6 +1,6 @@
 'use client';
 
-import type { TabType } from '@/lib/dashboard';
+import type { TabType } from '@/types';
 
 const TABS: { value: TabType; label: string }[] = [
   { value: 'today', label: '오늘' },

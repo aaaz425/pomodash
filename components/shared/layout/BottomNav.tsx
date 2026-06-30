@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -56,10 +56,10 @@ export function BottomNav() {
               className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-colors"
             >
               <Icon
-                className={`w-[22px] h-[22px] ${isActive ? 'text-primary' : 'text-[#64748b]'}`}
+                className={`w-[22px] h-[22px] ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
               />
               <span
-                className={`text-[10px] font-medium ${isActive ? 'text-primary font-semibold' : 'text-[#64748b]'}`}
+                className={`text-[10px] font-medium ${isActive ? 'text-primary font-semibold' : 'text-muted-foreground'}`}
               >
                 {label}
               </span>
