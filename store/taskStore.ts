@@ -2,9 +2,9 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
-import { trackEvent, EVENTS } from '@/lib/analytics';
+import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
-import { generateId } from '@/lib/id';
+import { generateId } from '@/lib/utils';
 import {
   type Task,
   type Category,

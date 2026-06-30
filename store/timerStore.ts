@@ -3,7 +3,7 @@
 import { createStore } from 'zustand';
 import type { TimerPhase, TimerSettings } from '@/types';
 import { DEFAULT_TIMER_SETTINGS, ActiveTimerStateSchema, STORAGE_KEYS } from '@/types';
-import { trackEvent, EVENTS } from '@/lib/analytics';
+import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
 interface RawFocusPeriod {
