@@ -5,6 +5,7 @@ import { User } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/shared/TextInput';
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 
 export function ProfileSection() {
   const nickname = useSettingsStore((s) => s.nickname);
@@ -34,7 +35,7 @@ export function ProfileSection() {
           }}
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder="닉네임 입력 (선택)"
-          maxLength={20}
+          maxLength={INPUT_LIMITS.NICKNAME_MAX_LENGTH}
           className="flex-1 min-w-0 py-2"
         />
         <Button

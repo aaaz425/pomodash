@@ -2,7 +2,7 @@
 
 import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { trackEvent, EVENTS } from '@/lib/analytics';
+import { trackEvent, EVENTS } from '@/config/analytics';
 
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
 import { ContributionCalendar } from '@/components/dashboard/ContributionCalendar';

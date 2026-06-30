@@ -1,0 +1,3 @@
+export const MESSAGE_ROTATE_INTERVAL_MS = 5000;
+
+export const SOUND_SEQUENCE_INTERVAL = 1.9;

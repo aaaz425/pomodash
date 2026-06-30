@@ -63,13 +63,20 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 - `app/ → components/ → lib/` 단방향만 허용
 - `lib/`에서 `components/` 또는 `app/` import **금지**
-- 타입은 반드시 `types/index.ts`에서만 import (인라인 타입 정의 금지)
+- 인라인 타입 정의 금지 — 아래 위치에서만 import:
+  - 도메인 인터페이스: `types/models.ts`
+  - Zod 스키마/기본값: `types/schemas.ts`
+  - 검증·비즈니스 상수: `lib/constants/limits.ts` 또는 `lib/constants` barrel
+  - 카테고리 색상: `lib/constants/categoryColors.ts`
+  - 타이머 페이즈 색상/라벨: `lib/constants/timerColors.ts`
+  - `@/types`와 `@/lib/constants` barrel import도 허용 (re-export함)
 
 ### 코드 스타일
 
 - 색상은 Tailwind 클래스만 사용, 인라인 `style={}` 금지
 - 절대 경로 import 사용 (`@/components/...`), 상대 경로 금지
 - shadcn/ui `components/ui/` 파일 직접 수정 금지 — 래퍼 컴포넌트 사용
+- 주석은 코드에서 자명하지 않은 **WHY**(제약, 불변식, 비자명한 동작)에만 작성. 단위/포맷 힌트(`// 분`, `// ISO 8601`)는 허용. 코드를 한국어로 번역하는 주석, 장황한 설명 주석은 금지.
 
 ### 보안
 

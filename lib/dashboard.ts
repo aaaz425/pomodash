@@ -15,20 +15,10 @@ import {
 } from 'date-fns';
 
 import type { Category, Session, Task } from '@/types';
-
-const TAILWIND_COLOR_MAP: Record<string, string> = {
-  'bg-blue-500': '#3b82f6',
-  'bg-green-500': '#22c55e',
-  'bg-orange-500': '#f97316',
-  'bg-purple-500': '#a855f7',
-  'bg-gray-500': '#6b7280',
-  'bg-red-500': '#ef4444',
-  'bg-pink-500': '#ec4899',
-  'bg-yellow-500': '#eab308',
-};
+import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
 
 function tailwindToHex(colorClass: string): string {
-  return TAILWIND_COLOR_MAP[colorClass] ?? '#6b7280';
+  return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
 }
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
@@ -89,8 +79,6 @@ export function getStreakDays(sessions: Session[], today: Date = new Date()): nu
 
   return streak;
 }
-
-// 이전 기간 집계 함수들
 
 export function getPrevDayFocusSeconds(sessions: Session[], today: Date = new Date()): number {
   const yesterday = subDays(today, 1);
@@ -204,8 +192,6 @@ export function getFirstSessionDate(sessions: Session[]): Date | null {
   return parseISO(earliest.startedAt);
 }
 
-// ─── Chart data ────────────────────────────────────────────────────────────
-
 export interface FocusTrendItem {
   label: string;
   [key: string]: number | string;
@@ -248,7 +234,6 @@ export function getFocusTrendData(
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
-  // Build label array based on tab
   let labels: string[];
   let getLabel: (session: Session) => string;
 
@@ -273,17 +258,13 @@ export function getFocusTrendData(
       return labels[weekIdx];
     };
   } else {
-    // 'all': 연도별 집계
     if (sessions.length === 0) return { data: [], categories: [] };
     const yearSet = new Set(sessions.map((s) => format(parseISO(s.startedAt), 'yyyy')));
     labels = Array.from(yearSet).sort();
     getLabel = (s) => format(parseISO(s.startedAt), 'yyyy');
   }
 
-  // Initialize data items
   const dataMap = new Map<string, FocusTrendItem>(labels.map((l) => [l, { label: l }]));
-
-  // Track which categories appear
   const catColorMap = new Map<string, string>();
 
   for (const session of sessions) {
@@ -296,7 +277,6 @@ export function getFocusTrendData(
     catColorMap.set(name, color);
   }
 
-  // Build categories list (only those with data, sorted by total desc)
   const catTotals = new Map<string, number>();
   for (const item of dataMap.values()) {
     for (const [k, v] of Object.entries(item)) {

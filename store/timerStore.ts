@@ -3,7 +3,7 @@
 import { createStore } from 'zustand';
 import type { TimerPhase, TimerSettings } from '@/types';
 import { DEFAULT_TIMER_SETTINGS, ActiveTimerStateSchema, STORAGE_KEYS } from '@/types';
-import { trackEvent, EVENTS } from '@/lib/analytics';
+import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
 interface RawFocusPeriod {
@@ -180,16 +180,14 @@ export const createTimerStore = () => {
         }
       },
 
-      // localStorage에 저장하지 않음 — 설정은 작업 선택 시에만 적용, 세션 간 유지하지 않음
+      // localStorage 미저장 — 작업 선택 시에만 적용
       updateSettings: (patch) => {
         const next = { ...get().settings, ...patch };
         const seconds = phaseSeconds(next);
         set({ settings: next, remainingSeconds: seconds[get().phase] });
       },
 
-      // 일시정지 중인 활성 작업의 목표 시간을 수정했을 때 호출 — 이미 진행한 시간은
-      // 보존하고 현재 phase의 남은 시간만 새 목표와의 차이만큼 보정한다.
-      // (예: 25분 집중 중 10분 경과 후 목표를 30분으로 늘리면 남은 시간도 5분 늘어남)
+      // 일시정지 중 목표 시간 변경 시 호출 — 진행 시간 보존, 남은 시간만 보정
       applyActiveTaskTimeUpdate: (patch) => {
         const { settings, phase, remainingSeconds, startedAt } = get();
         if (startedAt !== null) return; // 실행 중에는 무시 — 호출 측에서 막아야 하는 안전망
@@ -247,9 +245,7 @@ export const createTimerStore = () => {
     };
   });
 
-  // 활성 타이머 스냅샷을 상태 변경마다 자동 저장 — 액션별로 직접 호출하지 않아도
-  // 누락 없이 항상 최신 상태가 반영된다 (complete()→completeCycle() 같은 위임 구조 때문에
-  // 액션마다 수동 호출하면 빠뜨리기 쉬움)
+  // 상태 변경마다 자동 저장 — complete→completeCycle 위임 구조상 subscribe가 더 안전
   store.subscribe((state) => {
     saveToStorage(STORAGE_KEYS.activeTimer, toActiveTimerSnapshot(state));
   });

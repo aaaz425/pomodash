@@ -1,6 +1,7 @@
 'use client';
 
 import { StepperInput } from '@/components/shared/StepperInput';
+import { TIMER_LIMITS } from '@/lib/constants/limits';
 
 interface Props {
   focusMinutes: number;
@@ -30,8 +31,8 @@ export function TimerSettingsGroup({
         <StepperInput
           value={focusMinutes}
           onChange={onFocusMinutesChange}
-          min={5}
-          max={120}
+          min={TIMER_LIMITS.FOCUS_MINUTES_MIN}
+          max={TIMER_LIMITS.FOCUS_MINUTES_MAX}
           step={5}
           unit="분"
           disabled={disabled}
@@ -42,8 +43,8 @@ export function TimerSettingsGroup({
         <StepperInput
           value={totalCycles}
           onChange={onTotalCyclesChange}
-          min={1}
-          max={20}
+          min={TIMER_LIMITS.CYCLES_MIN}
+          max={TIMER_LIMITS.CYCLES_MAX}
           unit="회"
           disabled={disabled}
         />
@@ -53,8 +54,8 @@ export function TimerSettingsGroup({
         <StepperInput
           value={shortBreakMinutes}
           onChange={onShortBreakMinutesChange}
-          min={0}
-          max={60}
+          min={TIMER_LIMITS.BREAK_MINUTES_MIN}
+          max={TIMER_LIMITS.BREAK_MINUTES_MAX}
           step={5}
           unit="분"
           disabled={disabled}

@@ -2,24 +2,13 @@
 
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
-import { PHASE_HEX_COLORS } from '@/lib/timerColors';
+import {
+  PHASE_HEX_COLORS,
+  PHASE_LABELS,
+  PHASE_BADGE_STYLES,
+  PHASE_GLOW,
+} from '@/lib/constants/timerColors';
 import { Badge } from '@/components/shared/Badge';
-import type { TimerPhase } from '@/types';
-
-const PHASE_BADGE: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
-  focus: { bg: 'bg-[#10d9a01a]', dot: 'bg-[#10d9a0]', text: 'text-[#10d9a0]' },
-  'short-break': { bg: 'bg-[#60a5fa1a]', dot: 'bg-[#60a5fa]', text: 'text-[#60a5fa]' },
-};
-
-const PHASE_LABELS: Record<TimerPhase, string> = {
-  focus: '집중 중',
-  'short-break': '휴식 중',
-};
-
-const PHASE_GLOW: Record<TimerPhase, string> = {
-  focus: 'bg-[radial-gradient(circle,_#10d9a030_0%,_transparent_70%)]',
-  'short-break': 'bg-[radial-gradient(circle,_#60a5fa30_0%,_transparent_70%)]',
-};
 
 const BASE = 240;
 const SW = 18;
@@ -46,7 +35,7 @@ export function TimerRing() {
   const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
   const color = PHASE_HEX_COLORS[phase];
-  const badge = PHASE_BADGE[phase];
+  const badge = PHASE_BADGE_STYLES[phase];
 
   const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0');
   const ss = String(displaySeconds % 60).padStart(2, '0');

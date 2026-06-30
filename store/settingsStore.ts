@@ -11,7 +11,7 @@ import {
   DEFAULT_TIMER_SETTINGS,
   STORAGE_KEYS,
 } from '@/types';
-import { MOTIVATIONAL_MESSAGES } from '@/lib/motivationalMessages';
+import { MOTIVATIONAL_MESSAGES } from '@/lib/constants/messages';
 
 const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',

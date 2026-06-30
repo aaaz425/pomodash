@@ -11,6 +11,7 @@ export function sendNotification(title: string, body: string): void {
 }
 
 import type { SoundType } from '@/types';
+import { SOUND_SEQUENCE_INTERVAL } from '@/lib/constants/ux';
 
 let sharedCtx: AudioContext | null = null;
 let activeNodes: { osc: OscillatorNode; gain: GainNode }[] = [];
@@ -26,7 +27,7 @@ function getAudioContext(): AudioContext {
   return sharedCtx;
 }
 
-// 재생 중인 노드를 짧게 페이드시켜 끈다 — 하드 컷은 클릭/팝 노이즈를 유발한다
+// 페이드 종료 — 하드 컷은 클릭/팝 노이즈 유발
 function stopActiveSequence(ctx: AudioContext, atTime: number): void {
   for (const { osc, gain } of activeNodes) {
     try {
@@ -36,7 +37,7 @@ function stopActiveSequence(ctx: AudioContext, atTime: number): void {
       gain.gain.linearRampToValueAtTime(0.0001, atTime + 0.03);
       osc.stop(atTime + 0.03);
     } catch {
-      // 이미 정지된 노드 — 무시
+      // ignore
     }
   }
   activeNodes = [];
@@ -74,12 +75,12 @@ function playTone(
   return osc;
 }
 
-// 기본 — 단일 사인파 (기존 동작과 동일한 음색, 길이만 1.5초로 연장)
+// 사인파
 function playSine(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   return playTone(ctx, { type: 'sine', freq: 880, startTime, duration: 1.5, peakGain });
 }
 
-// 차임 — C6 → E6 상승 2음 레가토 (트라이앵글파)
+// 차임 — C6→E6 2음
 function playChime(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   playTone(ctx, { type: 'triangle', freq: 1046.5, startTime, duration: 0.9, peakGain });
   return playTone(ctx, {
@@ -91,7 +92,7 @@ function playChime(ctx: AudioContext, peakGain: number, startTime: number): Osci
   });
 }
 
-// 벨 — 기본음 + 비정수배 배음 2개를 동시에 울려 종 특유의 금속성 음색 모사
+// 벨 — 기본음 + 비정수배 배음
 function playBell(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   const last = playTone(ctx, { type: 'sine', freq: 660, startTime, duration: 1.5, peakGain });
   playTone(ctx, {
@@ -111,7 +112,7 @@ function playBell(ctx: AudioContext, peakGain: number, startTime: number): Oscil
   return last;
 }
 
-// 디지털 — 짧은 사각파 틱 4회로 전자기기 비프음 모사
+// 디지털 — 사각파 틱 4회
 function playDigital(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   let last: OscillatorNode;
   for (let i = 0; i < 4; i++) {
@@ -137,9 +138,6 @@ const SOUND_PLAYERS: Record<
   digital: playDigital,
 };
 
-// 사운드 1회 재생 길이(~1.5s) + 반복 간 간격(0.4s)
-const SEQUENCE_INTERVAL = 1.9;
-
 export function playAlarm({
   type,
   volume,
@@ -160,7 +158,7 @@ export function playAlarm({
     const play = SOUND_PLAYERS[type];
     let lastOsc: OscillatorNode | null = null;
     for (let i = 0; i < repeatCount; i++) {
-      lastOsc = play(ctx, peakGain, ctx.currentTime + i * SEQUENCE_INTERVAL);
+      lastOsc = play(ctx, peakGain, ctx.currentTime + i * SOUND_SEQUENCE_INTERVAL);
     }
     if (lastOsc) {
       lastOsc.onended = () => {
@@ -168,12 +166,12 @@ export function playAlarm({
       };
     }
   } catch {
-    // 지원 안 하는 환경에서 조용히 실패
+    // ignore
   }
 }
 
 export function stopAlarm(): void {
-  if (!sharedCtx) return; // 한 번도 재생한 적 없으면 안전하게 무시
+  if (!sharedCtx) return;
   try {
     stopActiveSequence(sharedCtx, sharedCtx.currentTime);
   } catch {
