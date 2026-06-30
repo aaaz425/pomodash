@@ -5,6 +5,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 import {
   type Task,
   type Category,
@@ -133,7 +134,7 @@ export const createTaskStore = () =>
     },
 
     addCategory: ({ name, color }) => {
-      if (get().categories.length >= 10) return;
+      if (get().categories.length >= INPUT_LIMITS.CATEGORIES_MAX) return;
       const categories = [...get().categories, { id: generateId(), name: name.trim(), color }];
       saveCategories(categories);
       set({ categories });
