@@ -58,7 +58,7 @@ feat/timer-ui     (TimerDisplay, TimerControls 컴포넌트)
 **Pomodash MVP 브랜치 계획 예시:**
 
 ```
-chore/project-setup          # Next.js 15 + 패키지 초기 설정
+chore/project-setup          # Next.js 16 + 패키지 초기 설정
 feat/timer-core              # timerStore + 절대시간 기반 로직
 feat/timer-ui                # 타이머 디스플레이 + 집중 모드 전환
 feat/task-crud               # 작업 목록 CRUD + 카테고리
@@ -145,7 +145,7 @@ type: 설명
 feat: 포모도로 타이머 기본 구현
 feat: 작업 목록 CRUD 구현
 fix: 백그라운드 탭 타이머 드리프트 수정
-chore: Next.js 15, shadcn/ui, Zustand 초기 설정
+chore: Next.js 16, shadcn/ui, Zustand 초기 설정
 style: 대시보드 다크모드 색상 보정
 refactor: localStorage 로직을 lib/storage로 분리
 ```

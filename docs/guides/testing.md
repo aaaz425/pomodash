@@ -8,7 +8,7 @@ version: 1.0
 
 | 레이어 | 도구       | 실행 시점                                        |
 | ------ | ---------- | ------------------------------------------------ |
-| Unit   | Vitest     | 기능 개발 중, pre-commit hook (vitest 도입 후)   |
+| Unit   | Vitest     | 기능 개발 중 (pre-commit hook은 현재 미활성화)   |
 | E2E    | Playwright | PR 생성 시 GitHub Actions 자동 실행, 로컬 수동 가능 |
 
 ---
@@ -51,7 +51,9 @@ store/
 테스트를 먼저 작성해줘. 그 다음에 통과시켜줘."
 ```
 
-### lefthook 연동 (vitest 설치 후 lefthook.yml에서 주석 해제)
+### lefthook 연동
+
+vitest는 설치되어 있으나 pre-commit hook은 현재 주석 처리 상태. 활성화하려면 `lefthook.yml`에서 주석 해제:
 
 ```yaml
 pre-commit:
@@ -77,9 +79,11 @@ npm run test:e2e
 
 ```
 tests/e2e/
-  timer.spec.ts     # 타이머 시작 → 일시정지 → 재개 → 완료
-  tasks.spec.ts     # 작업 생성 → 타이머 연결 → 세션 종료
-  dashboard.spec.ts # 집계 데이터 표시 확인
+  full-flow.spec.ts   # 작업 생성 → 타이머 → 세션 기록 → 대시보드 집계 전체 흐름
+  settings.spec.ts    # 설정 페이지 스모크 테스트
+  timer.spec.ts       # 타이머 시작 → 일시정지 → 재개 → 완료
+  tasks.spec.ts       # 작업 생성 → 타이머 연결 → 세션 종료
+  dashboard.spec.ts   # 집계 데이터 표시 확인
 ```
 
 ### 브라우저 설정
@@ -94,5 +98,5 @@ CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 
 | 패키지 | 상태 |
 |--------|------|
 | `@playwright/test` | 설치됨 |
-| `vitest` | 미설치 — 도입 시 `npm install -D vitest @vitejs/plugin-react` |
+| `vitest` | 설치됨 (v4.1.9) |
 

@@ -125,7 +125,7 @@ Zod 스키마로 파싱 + 타입 추론을 일원화하고, SSR 환경을 방어
 ```typescript
 import { z } from 'zod'
 
-// 스키마 정의 (types/index.ts의 interface와 1:1 대응)
+// 스키마 정의 (types/models.ts의 interface와 1:1 대응)
 const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
