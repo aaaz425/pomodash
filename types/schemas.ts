@@ -106,8 +106,6 @@ export const TasksSchema = z.array(TaskSchema);
 export const SessionsSchema = z.array(SessionSchema);
 export const TimerRecordsSchema = z.array(TimerRecordSchema);
 
-// ─── Storage Keys ─────────────────────────────────────────────────────────────
-
 export const STORAGE_KEYS = {
   tasks: 'pomodash:tasks',
   categories: 'pomodash:categories',
@@ -117,8 +115,6 @@ export const STORAGE_KEYS = {
   activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
 } as const;
-
-// ─── Default Values ───────────────────────────────────────────────────────────
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: '1', name: '공부', color: 'bg-blue-500' },

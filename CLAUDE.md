@@ -76,6 +76,7 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 색상은 Tailwind 클래스만 사용, 인라인 `style={}` 금지
 - 절대 경로 import 사용 (`@/components/...`), 상대 경로 금지
 - shadcn/ui `components/ui/` 파일 직접 수정 금지 — 래퍼 컴포넌트 사용
+- 주석은 코드에서 자명하지 않은 **WHY**(제약, 불변식, 비자명한 동작)에만 작성. 단위/포맷 힌트(`// 분`, `// ISO 8601`)는 허용. 코드를 한국어로 번역하는 주석, 장황한 설명 주석은 금지.
 
 ### 보안
 

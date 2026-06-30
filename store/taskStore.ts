@@ -57,8 +57,7 @@ const saveCategories = (categories: Category[]) =>
 
 export const createTaskStore = () =>
   createStore<TaskStore>()((set, get) => ({
-    // SSR과 클라이언트 첫 렌더가 항상 같도록 생성 시점엔 빈 기본값만 사용하고,
-    // localStorage 값은 마운트 후 hydrate()로 반영한다 (hydration mismatch 방지)
+    // SSR hydration mismatch 방지 — localStorage는 hydrate()로 반영
     tasks: [],
     categories: DEFAULT_CATEGORIES,
     sessions: [],

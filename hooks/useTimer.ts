@@ -22,11 +22,11 @@ export function useTimer() {
   // 같은 완료 이벤트에서 중복 알림 방지
   const notifiedRef = useRef(false);
 
-  // 실행 중일 때만 사용하는 디스플레이 값 — 인터벌 콜백에서만 업데이트
+  // tick에서만 업데이트하는 디스플레이 값
   const [runningDisplay, setRunningDisplay] = useState(remainingSeconds);
 
   useEffect(() => {
-    notifiedRef.current = false; // 새 실행 구간 시작 시 리셋
+    notifiedRef.current = false;
 
     if (!startedAt) return;
 
@@ -61,7 +61,7 @@ export function useTimer() {
       }
     };
 
-    // setTimeout(0)으로 비동기 첫 tick — effect body 내 동기 setState 금지 회피
+    // 첫 tick 비동기화 — effect 내 동기 setState 방지
     const firstTick = setTimeout(tick, 0);
     const id = setInterval(tick, 1000);
 
@@ -89,7 +89,7 @@ export function useTimer() {
     browserNotification,
   ]);
 
-  // 실행 중이 아닐 때는 store 값을 그대로 사용 (Date.now() 렌더 중 호출 금지 회피)
+  // 정지 중엔 store 값 직접 사용 (렌더 중 Date.now() 금지)
   const displaySeconds = startedAt !== null ? runningDisplay : remainingSeconds;
 
   const elapsedMinutes =

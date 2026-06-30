@@ -80,8 +80,6 @@ export function getStreakDays(sessions: Session[], today: Date = new Date()): nu
   return streak;
 }
 
-// 이전 기간 집계 함수들
-
 export function getPrevDayFocusSeconds(sessions: Session[], today: Date = new Date()): number {
   const yesterday = subDays(today, 1);
   const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
@@ -194,8 +192,6 @@ export function getFirstSessionDate(sessions: Session[]): Date | null {
   return parseISO(earliest.startedAt);
 }
 
-// ─── Chart data ────────────────────────────────────────────────────────────
-
 export interface FocusTrendItem {
   label: string;
   [key: string]: number | string;
@@ -238,7 +234,6 @@ export function getFocusTrendData(
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
-  // Build label array based on tab
   let labels: string[];
   let getLabel: (session: Session) => string;
 
@@ -263,17 +258,13 @@ export function getFocusTrendData(
       return labels[weekIdx];
     };
   } else {
-    // 'all': 연도별 집계
     if (sessions.length === 0) return { data: [], categories: [] };
     const yearSet = new Set(sessions.map((s) => format(parseISO(s.startedAt), 'yyyy')));
     labels = Array.from(yearSet).sort();
     getLabel = (s) => format(parseISO(s.startedAt), 'yyyy');
   }
 
-  // Initialize data items
   const dataMap = new Map<string, FocusTrendItem>(labels.map((l) => [l, { label: l }]));
-
-  // Track which categories appear
   const catColorMap = new Map<string, string>();
 
   for (const session of sessions) {
@@ -286,7 +277,6 @@ export function getFocusTrendData(
     catColorMap.set(name, color);
   }
 
-  // Build categories list (only those with data, sorted by total desc)
   const catTotals = new Map<string, number>();
   for (const item of dataMap.values()) {
     for (const [k, v] of Object.entries(item)) {

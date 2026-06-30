@@ -9,8 +9,6 @@ import type { TimerStoreApi, TimerStore } from './timerStore';
 import type { TaskStoreApi, TaskStore } from './taskStore';
 import type { SettingsStoreApi, SettingsStore } from './settingsStore';
 
-// ─── Timer Store ──────────────────────────────────────────────────────────────
-
 const TimerStoreContext = createContext<TimerStoreApi | null>(null);
 
 export function useTimerStore<T>(selector: (state: TimerStore) => T): T {
@@ -18,8 +16,6 @@ export function useTimerStore<T>(selector: (state: TimerStore) => T): T {
   if (!store) throw new Error('useTimerStore must be used within StoreProvider');
   return useStore(store, selector);
 }
-
-// ─── Task Store ───────────────────────────────────────────────────────────────
 
 const TaskStoreContext = createContext<TaskStoreApi | null>(null);
 
@@ -29,8 +25,6 @@ export function useTaskStore<T>(selector: (state: TaskStore) => T): T {
   return useStore(store, selector);
 }
 
-// ─── Settings Store ───────────────────────────────────────────────────────────
-
 const SettingsStoreContext = createContext<SettingsStoreApi | null>(null);
 
 export function useSettingsStore<T>(selector: (state: SettingsStore) => T): T {
@@ -39,17 +33,12 @@ export function useSettingsStore<T>(selector: (state: SettingsStore) => T): T {
   return useStore(store, selector);
 }
 
-// ─── Hydration Context ────────────────────────────────────────────────────────
-// localStorage 기반 상태는 useEffect에서 반영되므로, 그 전까지는 기본값으로 렌더된다.
-// hydrated가 true가 되면 실제 저장된 값이 적용된다.
-
+// localStorage는 마운트 후 hydrate()로 반영 (SSR 기본값 → 실제 저장값)
 const HydrationContext = createContext(false);
 
 export function useHydrated(): boolean {
   return useContext(HydrationContext);
 }
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [timerStore] = useState<TimerStoreApi>(createTimerStore);
