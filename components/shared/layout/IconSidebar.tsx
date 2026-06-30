@@ -26,7 +26,7 @@ export function IconSidebar() {
                 isActive ? 'bg-primary/10' : 'hover:bg-muted',
               ].join(' ')}
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-[#64748b]'}`} />
+              <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
             </Link>
           );
         })}
