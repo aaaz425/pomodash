@@ -68,9 +68,9 @@ export const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
   categoryId: z.string(),
-  targetFocusMinutes: z.number().default(25),
-  targetCycles: z.number().default(4),
-  targetBreakMinutes: z.number().default(5),
+  targetFocusMinutes: z.number().min(5).max(120).default(25),
+  targetCycles: z.number().min(1).max(10).default(4),
+  targetBreakMinutes: z.number().min(0).max(60).default(5),
   completed: z.boolean(),
   createdAt: z.string(),
 });
@@ -90,7 +90,7 @@ export const SessionSchema = z.object({
   focusSeconds: z.number(),
   pausedSeconds: z.number(),
   focusPeriods: z.array(FocusPeriodSchema),
-  note: z.string().nullable(),
+  note: z.string().max(500).nullable(),
 });
 
 // 향후 per-phase 집계용으로 예약, 현재 미사용
@@ -152,14 +152,14 @@ export interface AppSettings {
 }
 
 export const AppSettingsSchema = z.object({
-  nickname: z.string(),
+  nickname: z.string().max(20),
   browserNotification: z.boolean(),
   soundAlert: z.boolean(),
   // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수 — 없으면 parse 실패 시 전체 설정이 초기화됨
   soundType: z.enum(['sine', 'chime', 'bell', 'digital']).default('sine'),
   soundVolume: z.number().min(0).max(100).default(70),
   soundRepeatCount: z.number().min(1).max(5).default(2),
-  motivationalMessages: z.array(z.string()).min(1).max(20),
+  motivationalMessages: z.array(z.string().max(200)).min(1).max(20),
   defaultTimerSettings: TimerSettingsSchema,
 });
 
