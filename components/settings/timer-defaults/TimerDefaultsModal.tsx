@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/shared/Modal';
-import { TimerDefaultsSection } from './TimerDefaultsSection';
+import { TimerDefaultsSection } from '@/components/settings/timer-defaults/TimerDefaultsSection';
 
 interface Props {
   onClose: () => void;

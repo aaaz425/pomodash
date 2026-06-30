@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 
-import { createSettingsStore } from './settingsStore';
+import { createSettingsStore } from '@/store/settingsStore';
 import { DEFAULT_TIMER_SETTINGS, STORAGE_KEYS } from '@/types';
 import type { AppSettings } from '@/types';
 

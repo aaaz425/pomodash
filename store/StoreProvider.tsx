@@ -2,12 +2,12 @@
 
 import { createContext, startTransition, useContext, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
-import { createTimerStore } from './timerStore';
-import { createTaskStore } from './taskStore';
-import { createSettingsStore } from './settingsStore';
-import type { TimerStoreApi, TimerStore } from './timerStore';
-import type { TaskStoreApi, TaskStore } from './taskStore';
-import type { SettingsStoreApi, SettingsStore } from './settingsStore';
+import { createTimerStore } from '@/store/timerStore';
+import { createTaskStore } from '@/store/taskStore';
+import { createSettingsStore } from '@/store/settingsStore';
+import type { TimerStoreApi, TimerStore } from '@/store/timerStore';
+import type { TaskStoreApi, TaskStore } from '@/store/taskStore';
+import type { SettingsStoreApi, SettingsStore } from '@/store/settingsStore';
 
 const TimerStoreContext = createContext<TimerStoreApi | null>(null);
 

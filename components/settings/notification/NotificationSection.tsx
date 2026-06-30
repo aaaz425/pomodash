@@ -1,7 +1,7 @@
 'use client';
 
-import { BrowserNotificationRow } from './BrowserNotificationRow';
-import { SoundAlertSettings } from './SoundAlertSettings';
+import { BrowserNotificationRow } from '@/components/settings/notification/BrowserNotificationRow';
+import { SoundAlertSettings } from '@/components/settings/notification/SoundAlertSettings';
 
 export function NotificationSection() {
   return (

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Zap } from 'lucide-react';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function IconSidebar() {
   const pathname = usePathname();

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createTimerStore } from './timerStore';
+import { createTimerStore } from '@/store/timerStore';
 
 beforeEach(() => {
   vi.useFakeTimers();

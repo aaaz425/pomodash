@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/shared/Modal';
-import { NotificationSection } from './NotificationSection';
+import { NotificationSection } from '@/components/settings/notification/NotificationSection';
 
 interface Props {
   onClose: () => void;

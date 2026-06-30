@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function Sidebar() {
   const pathname = usePathname();

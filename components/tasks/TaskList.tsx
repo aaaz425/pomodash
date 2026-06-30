@@ -20,8 +20,8 @@ import { Plus } from 'lucide-react';
 import { useTaskStore } from '@/store/StoreProvider';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { TaskItem } from './TaskItem';
-import { TaskFormModal } from './TaskFormModal';
+import { TaskItem } from '@/components/tasks/TaskItem';
+import { TaskFormModal } from '@/components/tasks/TaskFormModal';
 import type { Task } from '@/types';
 
 interface Props {

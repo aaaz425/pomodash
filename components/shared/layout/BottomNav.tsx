@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS } from '@/components/shared/layout/navItems';
 
 export function BottomNav() {
   const pathname = usePathname();
