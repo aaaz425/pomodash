@@ -17,7 +17,6 @@ export function trackEvent(event: string, properties?: Record<string, unknown>):
   posthog.capture(event, properties);
 }
 
-// 추적 이벤트 상수
 export const EVENTS = {
   TIMER_STARTED: 'timer_started',
   TIMER_COMPLETED: 'timer_completed',

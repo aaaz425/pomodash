@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { DatePickerInput } from '@/components/shared/DatePickerInput';
-import type { CategoryColorKey } from '@/lib/categoryColors';
+import { type CategoryColorKey, CATEGORY_FILTER_STYLES } from '@/lib/constants/categoryColors';
 import type { Category } from '@/types';
 
 interface Props {
@@ -35,17 +35,6 @@ function getDateRange(preset: DatePreset): { from: string; to: string } {
   }
   return { from: `${toKey.slice(0, 7)}-01`, to: toKey };
 }
-
-const CATEGORY_COLOR_MAP: Record<CategoryColorKey, string> = {
-  'bg-blue-500': 'bg-blue-500/15 text-blue-400 border-blue-400/40',
-  'bg-green-500': 'bg-green-500/15 text-green-400 border-green-400/40',
-  'bg-orange-500': 'bg-orange-500/15 text-orange-400 border-orange-400/40',
-  'bg-purple-500': 'bg-purple-500/15 text-purple-400 border-purple-400/40',
-  'bg-gray-500': 'bg-gray-500/15 text-gray-400 border-gray-400/40',
-  'bg-red-500': 'bg-red-500/15 text-red-400 border-red-400/40',
-  'bg-pink-500': 'bg-pink-500/15 text-pink-400 border-pink-400/40',
-  'bg-yellow-500': 'bg-yellow-500/15 text-yellow-400 border-yellow-400/40',
-};
 
 export function JournalFilterModal({
   open,
@@ -162,7 +151,7 @@ export function JournalFilterModal({
             {categories.map((cat) => {
               const isSelected = selectedCategoryIds.has(cat.id);
               const colorClass =
-                CATEGORY_COLOR_MAP[cat.color as CategoryColorKey] ??
+                CATEGORY_FILTER_STYLES[cat.color as CategoryColorKey] ??
                 'bg-muted text-muted-foreground border-border';
               return (
                 <button

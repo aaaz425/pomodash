@@ -7,18 +7,7 @@ import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/shared/TextInput';
 import type { Category } from '@/types';
 
-const COLOR_PALETTE = [
-  'bg-blue-500',
-  'bg-green-500',
-  'bg-orange-500',
-  'bg-purple-500',
-  'bg-red-500',
-  'bg-pink-500',
-  'bg-yellow-500',
-  'bg-teal-500',
-  'bg-indigo-500',
-  'bg-gray-500',
-];
+import { CATEGORY_COLOR_KEYS } from '@/lib/constants/categoryColors';
 
 interface Props {
   category: Category | null; // null = 새 카테고리
@@ -30,7 +19,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
   const updateCategory = useTaskStore((s) => s.updateCategory);
 
   const [name, setName] = useState(category?.name ?? '');
-  const [color, setColor] = useState(category?.color ?? COLOR_PALETTE[0]);
+  const [color, setColor] = useState(category?.color ?? (CATEGORY_COLOR_KEYS[0] as string));
 
   function handleSave() {
     const trimmed = name.trim();
@@ -82,7 +71,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
       <div className="flex flex-col gap-2">
         <label className="text-xs font-medium text-muted-foreground">색상</label>
         <div className="flex gap-2 flex-wrap">
-          {COLOR_PALETTE.map((c) => (
+          {CATEGORY_COLOR_KEYS.map((c) => (
             <button
               key={c}
               onClick={() => setColor(c)}

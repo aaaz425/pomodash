@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AnalyticsProvider } from '@/components/shared/AnalyticsProvider';
 import { ThemeInit } from '@/components/shared/ThemeInit';
-import { siteConfig, siteUrl } from '@/lib/site';
+import { siteConfig, siteUrl } from '@/config/site';
 import './globals.css';
 
 const geistMono = Geist_Mono({

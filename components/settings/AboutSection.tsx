@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { siteConfig } from '@/lib/site';
+import { siteConfig } from '@/config/site';
 import { Badge } from '@/components/shared/Badge';
 
 export function AboutSection() {

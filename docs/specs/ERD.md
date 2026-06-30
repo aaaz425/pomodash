@@ -26,7 +26,7 @@ erDiagram
         string title
         string categoryId FK
         number targetFocusMinutes "기본 25, 범위 5-120"
-        number targetCycles "기본 4, 범위 1-20"
+        number targetCycles "기본 4, 범위 1-10"
         number targetBreakMinutes "기본 5, 범위 0-60"
         boolean completed
         string createdAt "ISO 8601"
@@ -52,7 +52,7 @@ erDiagram
     TIMER_SETTINGS {
         number focusMinutes "5-120"
         number shortBreakMinutes "0-60"
-        number totalCycles "1-20"
+        number totalCycles "1-10"
     }
 
     APP_SETTINGS {
@@ -92,7 +92,7 @@ erDiagram
 | `title` | string | - | 작업 이름 |
 | `categoryId` | string | FK → Category | 카테고리 참조 |
 | `targetFocusMinutes` | number | 5–120 | 사이클당 집중 시간 |
-| `targetCycles` | number | 1–20 | 목표 사이클 수 |
+| `targetCycles` | number | 1–10 | 목표 사이클 수 |
 | `targetBreakMinutes` | number | 0–60 | 사이클 간 휴식 시간 |
 | `completed` | boolean | - | 완료 여부 |
 | `createdAt` | string | ISO 8601 | 생성 시각 |
@@ -140,7 +140,7 @@ Session의 `focusPeriods` 배열 원소. 별도 localStorage 키 없음.
 |------|------|------|--------|
 | `focusMinutes` | number | 5–120 | 25 |
 | `shortBreakMinutes` | number | 0–60 | 5 |
-| `totalCycles` | number | 1–20 | 4 |
+| `totalCycles` | number | 1–10 | 4 |
 
 ---
 

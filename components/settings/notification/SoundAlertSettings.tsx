@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Volume2, Play, Pause } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
-import { playAlarm, stopAlarm } from '@/lib/notifications';
+import { useSoundPreview } from '@/hooks/useSoundPreview';
 import { StepperInput } from '@/components/shared/StepperInput';
 import { Toggle } from './Toggle';
 import { SoundTypeSelect } from './SoundTypeSelect';
 import type { SoundType } from '@/types';
+import { SOUND_LIMITS } from '@/lib/constants/limits';
 
 export function SoundAlertSettings() {
   const soundAlert = useSettingsStore((s) => s.soundAlert);
@@ -19,40 +19,15 @@ export function SoundAlertSettings() {
   const setSoundVolume = useSettingsStore((s) => s.setSoundVolume);
   const setSoundRepeatCount = useSettingsStore((s) => s.setSoundRepeatCount);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  function handlePreview() {
-    if (isPlaying) {
-      stopAlarm();
-      setIsPlaying(false);
-      return;
-    }
-    setIsPlaying(true);
-    playAlarm({
-      type: soundType,
-      volume: soundVolume,
-      repeatCount: soundRepeatCount,
-      onEnded: () => setIsPlaying(false),
-    });
-  }
-
-  useEffect(() => {
-    return () => stopAlarm();
-  }, []);
+  const { isPlaying, toggle, stop } = useSoundPreview(soundType, soundVolume, soundRepeatCount);
 
   function handleSoundAlertToggle(enabled: boolean) {
-    if (!enabled && isPlaying) {
-      stopAlarm();
-      setIsPlaying(false);
-    }
+    if (!enabled && isPlaying) stop();
     setSoundAlert(enabled);
   }
 
   function handleSoundTypeChange(type: SoundType) {
-    if (isPlaying && type !== soundType) {
-      stopAlarm();
-      setIsPlaying(false);
-    }
+    if (isPlaying && type !== soundType) stop();
     setSoundType(type);
   }
 
@@ -83,7 +58,7 @@ export function SoundAlertSettings() {
             <SoundTypeSelect value={soundType} onChange={handleSoundTypeChange} />
             <button
               type="button"
-              onClick={handlePreview}
+              onClick={toggle}
               aria-label={isPlaying ? '미리듣기 정지' : '미리 듣기'}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
             >
@@ -104,8 +79,8 @@ export function SoundAlertSettings() {
             <input
               id="sound-volume"
               type="range"
-              min={0}
-              max={100}
+              min={SOUND_LIMITS.VOLUME_MIN}
+              max={SOUND_LIMITS.VOLUME_MAX}
               step={5}
               value={soundVolume}
               onChange={(e) => setSoundVolume(Number(e.target.value))}
@@ -122,8 +97,8 @@ export function SoundAlertSettings() {
           <StepperInput
             value={soundRepeatCount}
             onChange={setSoundRepeatCount}
-            min={1}
-            max={5}
+            min={SOUND_LIMITS.REPEAT_MIN}
+            max={SOUND_LIMITS.REPEAT_MAX}
             unit="회"
           />
         </div>

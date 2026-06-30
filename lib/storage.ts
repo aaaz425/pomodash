@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { STORAGE_KEYS } from '@/types';
-
-const STORAGE_VERSION = 1;
+import { STORAGE_VERSION } from '@/lib/constants/limits';
 
 export function initStorage(): void {
   if (typeof window === 'undefined') return;
