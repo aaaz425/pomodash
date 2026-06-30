@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Pause, Play } from 'lucide-react';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
-import { PHASE_HEX_COLORS } from '@/lib/constants/timerColors';
+import { PHASE_BADGE_STYLES } from '@/lib/constants/timerColors';
 
 function fmt(seconds: number): string {
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -24,14 +24,14 @@ export function MiniTimerWidget() {
 
   if (!hydrated || !sessionStarted || pathname === '/') return null;
 
-  const color = PHASE_HEX_COLORS[phase];
+  const phaseStyles = PHASE_BADGE_STYLES[phase];
 
   return (
     // 모바일: BottomNav 위 중앙 / 태블릿·데스크톱: 상단 중앙
     <div className="fixed bottom-18 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-4 z-40">
       <div className="flex items-center gap-2 rounded-full bg-card border border-border shadow-lg px-3 py-1.5 whitespace-nowrap">
         <Link href="/" className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+          <span className={`w-2 h-2 rounded-full shrink-0 ${phaseStyles.dot}`} />
           <span className="font-mono text-sm font-semibold tabular-nums">
             {fmt(displaySeconds)}
           </span>
@@ -45,9 +45,9 @@ export function MiniTimerWidget() {
           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
         >
           {isRunning ? (
-            <Pause className="w-3 h-3" style={{ color }} />
+            <Pause className={`w-3 h-3 ${phaseStyles.text}`} />
           ) : (
-            <Play className="w-3 h-3" style={{ color }} />
+            <Play className={`w-3 h-3 ${phaseStyles.text}`} />
           )}
         </button>
       </div>

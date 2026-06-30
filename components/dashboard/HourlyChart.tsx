@@ -54,10 +54,9 @@ export function HourlyChart({ sessions }: Props) {
             return (
               <div
                 key={i}
-                className="flex-1 rounded-sm"
+                className="flex-1 rounded-sm bg-primary"
                 style={{
                   height: val > 0 ? `${Math.max(ratio * 100, 10)}%` : '3px',
-                  backgroundColor: 'var(--primary)',
                   opacity: val > 0 ? Math.max(0.18, 0.18 + ratio * 0.82) : 0.12,
                 }}
               />
