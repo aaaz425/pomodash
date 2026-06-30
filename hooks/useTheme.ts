@@ -1,10 +1,12 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { z } from 'zod';
+import { STORAGE_KEYS } from '@/types';
 
-export type ThemeMode = 'dark' | 'light' | 'system';
+const ThemeModeSchema = z.enum(['dark', 'light', 'system']);
+export type ThemeMode = z.infer<typeof ThemeModeSchema>;
 
-const STORAGE_KEY = 'theme';
 const listeners = new Set<() => void>();
 
 function notify() {
@@ -13,9 +15,8 @@ function notify() {
 
 function getStoredMode(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
-  const v = localStorage.getItem(STORAGE_KEY);
-  if (v === 'dark' || v === 'light' || v === 'system') return v;
-  return 'system';
+  const result = ThemeModeSchema.safeParse(localStorage.getItem(STORAGE_KEYS.theme));
+  return result.success ? result.data : 'system';
 }
 
 function resolveIsDark(mode: ThemeMode): boolean {
@@ -57,7 +58,7 @@ export function useTheme() {
   );
 
   function setTheme(newMode: ThemeMode): void {
-    localStorage.setItem(STORAGE_KEY, newMode);
+    localStorage.setItem(STORAGE_KEYS.theme, newMode);
     applyTheme(resolveIsDark(newMode));
     notify();
   }
