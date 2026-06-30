@@ -2,14 +2,17 @@
 
 import { createStore } from 'zustand';
 import type { TimerPhase, TimerSettings } from '@/types';
-import { DEFAULT_TIMER_SETTINGS, ActiveTimerStateSchema, STORAGE_KEYS } from '@/types';
+import {
+  DEFAULT_TIMER_SETTINGS,
+  ActiveTimerStateSchema,
+  STORAGE_KEYS,
+  RawFocusPeriodSchema,
+} from '@/types';
+import type { z } from 'zod';
 import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
-interface RawFocusPeriod {
-  start: number; // ms timestamp
-  end: number; // ms timestamp
-}
+type RawFocusPeriod = z.infer<typeof RawFocusPeriodSchema>;
 
 interface TimerStore {
   phase: TimerPhase;

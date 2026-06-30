@@ -54,6 +54,37 @@ export interface TimerSettings {
 
 export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
 
+export type TabType = 'today' | 'week' | 'month' | 'all';
+
+export interface DayActivity {
+  date: string; // YYYY-MM-DD
+  focusMinutes: number;
+}
+
+export interface FocusTrendItem {
+  label: string;
+  [key: string]: number | string;
+}
+
+export interface FocusTrendMeta {
+  data: FocusTrendItem[];
+  categories: Array<{ name: string; color: string }>;
+}
+
+export interface CategoryFocusItem {
+  name: string;
+  minutes: number;
+  percent: number;
+  color: string;
+}
+
+export interface SessionGroup {
+  dateKey: string;
+  displayLabel: string;
+  totalFocusSeconds: number;
+  sessions: Session[];
+}
+
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;

@@ -14,14 +14,21 @@ import {
   subWeeks,
 } from 'date-fns';
 
-import type { Category, Session, Task } from '@/types';
+import type {
+  Category,
+  Session,
+  Task,
+  TabType,
+  DayActivity,
+  FocusTrendItem,
+  FocusTrendMeta,
+  CategoryFocusItem,
+} from '@/types';
 import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
 
 function tailwindToHex(colorClass: string): string {
   return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
 }
-
-export type TabType = 'today' | 'week' | 'month' | 'all';
 
 function getTabInterval(tab: Exclude<TabType, 'all'>, today: Date) {
   switch (tab) {
@@ -128,11 +135,6 @@ export function getPrevMonthSessionCount(sessions: Session[], today: Date = new 
   return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
 }
 
-export interface DayActivity {
-  date: string; // YYYY-MM-DD
-  focusMinutes: number;
-}
-
 export function getMonthlyActivityData(
   sessions: Session[],
   today: Date = new Date(),
@@ -190,23 +192,6 @@ export function getFirstSessionDate(sessions: Session[]): Date | null {
   if (sessions.length === 0) return null;
   const earliest = sessions.reduce((min, s) => (s.startedAt < min.startedAt ? s : min));
   return parseISO(earliest.startedAt);
-}
-
-export interface FocusTrendItem {
-  label: string;
-  [key: string]: number | string;
-}
-
-export interface FocusTrendMeta {
-  data: FocusTrendItem[];
-  categories: Array<{ name: string; color: string }>;
-}
-
-export interface CategoryFocusItem {
-  name: string;
-  minutes: number;
-  percent: number;
-  color: string;
 }
 
 function resolveCategory(
