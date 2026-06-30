@@ -5,7 +5,7 @@ import { TIMER_LIMITS, INPUT_LIMITS, SOUND_LIMITS } from '@/lib/constants/limits
 export const CategorySchema = z.object({
   id: z.string(),
   name: z.string(),
-  color: z.string(),
+  color: z.string().refine((v) => v.startsWith('bg-'), { message: 'Tailwind bg class required' }),
 });
 
 export const TaskSchema = z.object({
