@@ -6,12 +6,17 @@ interface Props {
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
+const INTENSITY_LEVELS = [
+  { minMinutes: 1, maxMinutes: 29, className: 'bg-green-200 dark:bg-green-900' },
+  { minMinutes: 30, maxMinutes: 59, className: 'bg-green-400 dark:bg-green-700' },
+  { minMinutes: 60, maxMinutes: 89, className: 'bg-green-500 dark:bg-green-600' },
+  { minMinutes: 90, maxMinutes: Infinity, className: 'bg-green-600 dark:bg-green-400' },
+] as const;
+
 function intensityClass(minutes: number): string {
   if (minutes === 0) return 'bg-muted';
-  if (minutes < 30) return 'bg-green-200 dark:bg-green-900';
-  if (minutes < 60) return 'bg-green-400 dark:bg-green-700';
-  if (minutes < 90) return 'bg-green-500 dark:bg-green-600';
-  return 'bg-green-600 dark:bg-green-400';
+  return INTENSITY_LEVELS.find((l) => minutes >= l.minMinutes && minutes <= l.maxMinutes)!
+    .className;
 }
 
 function formatTitle(dateStr: string, minutes: number): string {
@@ -78,10 +83,9 @@ export function ContributionCalendar({ data }: Props) {
       {/* 범례 */}
       <div className="flex items-center gap-1.5 mt-1 self-end">
         <span className="text-[10px] text-muted-foreground">적음</span>
-        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-200 dark:bg-green-900" />
-        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-400 dark:bg-green-700" />
-        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-500 dark:bg-green-600" />
-        <div className="w-3.5 h-3.5 rounded-[3px] bg-green-600 dark:bg-green-400" />
+        {INTENSITY_LEVELS.map((l) => (
+          <div key={l.minMinutes} className={`w-3.5 h-3.5 rounded-[3px] ${l.className}`} />
+        ))}
         <span className="text-[10px] text-muted-foreground">많음</span>
       </div>
     </div>

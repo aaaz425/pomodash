@@ -18,7 +18,7 @@ import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
-  const settings = useTimerStore((s) => s.settings);
+  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
@@ -146,7 +146,7 @@ export function FocusMode() {
             title="세션을 종료할까요?"
             description={
               <>
-                지금까지 {elapsedMinutes}분 · {cycleCount}/{settings.totalCycles}사이클 진행했어요.
+                지금까지 {elapsedMinutes}분 · {cycleCount}/{totalCycles}사이클 진행했어요.
               </>
             }
             confirmLabel="세션 종료"

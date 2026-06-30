@@ -18,12 +18,8 @@ const CIRC = 2 * Math.PI * R;
 export function TimerRing() {
   const hydrated = useHydrated();
   const { displaySeconds, phase } = useTimer();
-  const totalSeconds = useTimerStore(
-    (s) =>
-      ({
-        focus: s.settings.focusMinutes * 60,
-        'short-break': s.settings.shortBreakMinutes * 60,
-      })[s.phase],
+  const totalSeconds = useTimerStore((s) =>
+    s.phase === 'focus' ? s.settings.focusMinutes * 60 : s.settings.shortBreakMinutes * 60,
   );
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
