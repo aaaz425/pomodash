@@ -26,9 +26,9 @@ export function useTimer() {
   const [runningDisplay, setRunningDisplay] = useState(remainingSeconds);
 
   useEffect(() => {
-    notifiedRef.current = false;
-
     if (!startedAt) return;
+
+    notifiedRef.current = false;
 
     const tick = () => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
