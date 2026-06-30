@@ -12,7 +12,7 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 
-const MESSAGE_ROTATE_INTERVAL_MS = 5000;
+import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
 
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);

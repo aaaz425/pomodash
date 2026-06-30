@@ -8,6 +8,7 @@ import { StepperInput } from '@/components/shared/StepperInput';
 import { Toggle } from './Toggle';
 import { SoundTypeSelect } from './SoundTypeSelect';
 import type { SoundType } from '@/types';
+import { SOUND_LIMITS } from '@/lib/constants/limits';
 
 export function SoundAlertSettings() {
   const soundAlert = useSettingsStore((s) => s.soundAlert);
@@ -104,8 +105,8 @@ export function SoundAlertSettings() {
             <input
               id="sound-volume"
               type="range"
-              min={0}
-              max={100}
+              min={SOUND_LIMITS.VOLUME_MIN}
+              max={SOUND_LIMITS.VOLUME_MAX}
               step={5}
               value={soundVolume}
               onChange={(e) => setSoundVolume(Number(e.target.value))}
@@ -122,8 +123,8 @@ export function SoundAlertSettings() {
           <StepperInput
             value={soundRepeatCount}
             onChange={setSoundRepeatCount}
-            min={1}
-            max={5}
+            min={SOUND_LIMITS.REPEAT_MIN}
+            max={SOUND_LIMITS.REPEAT_MAX}
             unit="회"
           />
         </div>

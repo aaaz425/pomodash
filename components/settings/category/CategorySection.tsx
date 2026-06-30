@@ -23,7 +23,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { CategoryEditModal } from './CategoryEditModal';
 import type { Category } from '@/types';
 
-const MAX_CATEGORIES = 10;
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 
 interface CategoryRowProps {
   category: Category;
@@ -86,7 +86,7 @@ export function CategorySection() {
   const categories = useTaskStore((s) => s.categories);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);
   const reorderCategories = useTaskStore((s) => s.reorderCategories);
-  const isAtLimit = categories.length >= MAX_CATEGORIES;
+  const isAtLimit = categories.length >= INPUT_LIMITS.CATEGORIES_MAX;
 
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -144,7 +144,7 @@ export function CategorySection() {
         <span
           className={`text-xs ${isAtLimit ? 'text-destructive/70' : 'text-muted-foreground/70'}`}
         >
-          {categories.length} / {MAX_CATEGORIES}
+          {categories.length} / {INPUT_LIMITS.CATEGORIES_MAX}
         </span>
       </div>
 

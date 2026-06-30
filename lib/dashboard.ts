@@ -15,20 +15,10 @@ import {
 } from 'date-fns';
 
 import type { Category, Session, Task } from '@/types';
-
-const TAILWIND_COLOR_MAP: Record<string, string> = {
-  'bg-blue-500': '#3b82f6',
-  'bg-green-500': '#22c55e',
-  'bg-orange-500': '#f97316',
-  'bg-purple-500': '#a855f7',
-  'bg-gray-500': '#6b7280',
-  'bg-red-500': '#ef4444',
-  'bg-pink-500': '#ec4899',
-  'bg-yellow-500': '#eab308',
-};
+import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
 
 function tailwindToHex(colorClass: string): string {
-  return TAILWIND_COLOR_MAP[colorClass] ?? '#6b7280';
+  return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
 }
 
 export type TabType = 'today' | 'week' | 'month' | 'all';

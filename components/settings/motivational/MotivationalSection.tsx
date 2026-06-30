@@ -21,7 +21,7 @@ import {
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
 
-const MAX_MESSAGES = 20;
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 
 interface MessageRowProps {
   id: string;
@@ -152,7 +152,7 @@ export function MotivationalSection() {
 
   const [input, setInput] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const isAtLimit = messages.length >= MAX_MESSAGES;
+  const isAtLimit = messages.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -230,7 +230,7 @@ export function MotivationalSection() {
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground/70">최소 1개는 유지해야 합니다.</p>
         <p className={`text-xs ${isAtLimit ? 'text-destructive/70' : 'text-muted-foreground/70'}`}>
-          {messages.length} / {MAX_MESSAGES}
+          {messages.length} / {INPUT_LIMITS.MESSAGE_COUNT_MAX}
         </p>
       </div>
     </div>

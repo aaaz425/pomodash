@@ -11,6 +11,7 @@ export function sendNotification(title: string, body: string): void {
 }
 
 import type { SoundType } from '@/types';
+import { SOUND_SEQUENCE_INTERVAL } from '@/lib/constants/ux';
 
 let sharedCtx: AudioContext | null = null;
 let activeNodes: { osc: OscillatorNode; gain: GainNode }[] = [];
@@ -137,9 +138,6 @@ const SOUND_PLAYERS: Record<
   digital: playDigital,
 };
 
-// 사운드 1회 재생 길이(~1.5s) + 반복 간 간격(0.4s)
-const SEQUENCE_INTERVAL = 1.9;
-
 export function playAlarm({
   type,
   volume,
@@ -160,7 +158,7 @@ export function playAlarm({
     const play = SOUND_PLAYERS[type];
     let lastOsc: OscillatorNode | null = null;
     for (let i = 0; i < repeatCount; i++) {
-      lastOsc = play(ctx, peakGain, ctx.currentTime + i * SEQUENCE_INTERVAL);
+      lastOsc = play(ctx, peakGain, ctx.currentTime + i * SOUND_SEQUENCE_INTERVAL);
     }
     if (lastOsc) {
       lastOsc.onended = () => {

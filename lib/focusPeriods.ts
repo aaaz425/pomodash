@@ -1,8 +1,7 @@
 import type { FocusPeriod } from '@/types';
+import { FOCUS_PERIOD_LIMITS } from '@/lib/constants/limits';
 
-const MIN_FOCUS_SECONDS = 5;
-const MAX_PAUSE_MERGE_SECONDS = 5;
-const MAX_PERIODS = 100;
+const { MIN_FOCUS_SECONDS, MAX_PAUSE_MERGE_SECONDS, MAX_PERIODS } = FOCUS_PERIOD_LIMITS;
 
 /**
  * 저장 전 focusPeriods 배열을 정리한다.

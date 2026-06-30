@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Pause, Play } from 'lucide-react';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
-import { PHASE_HEX_COLORS } from '@/lib/timerColors';
+import { PHASE_HEX_COLORS } from '@/lib/constants/timerColors';
 
 function fmt(seconds: number): string {
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');

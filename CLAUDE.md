@@ -63,7 +63,13 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 - `app/ → components/ → lib/` 단방향만 허용
 - `lib/`에서 `components/` 또는 `app/` import **금지**
-- 타입은 반드시 `types/index.ts`에서만 import (인라인 타입 정의 금지)
+- 인라인 타입 정의 금지 — 아래 위치에서만 import:
+  - 도메인 인터페이스: `types/models.ts`
+  - Zod 스키마/기본값: `types/schemas.ts`
+  - 검증·비즈니스 상수: `lib/constants/limits.ts` 또는 `lib/constants` barrel
+  - 카테고리 색상: `lib/constants/categoryColors.ts`
+  - 타이머 페이즈 색상/라벨: `lib/constants/timerColors.ts`
+  - `@/types`와 `@/lib/constants` barrel import도 허용 (re-export함)
 
 ### 코드 스타일
 
