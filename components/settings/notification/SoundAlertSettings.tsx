@@ -1,6 +1,6 @@
 'use client';
 
-import { Volume2 } from 'lucide-react';
+import { Volume2, Play, Pause } from 'lucide-react';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { useSoundPreview } from '@/hooks/useSoundPreview';
 import { StepperInput } from '@/components/shared/StepperInput';
@@ -63,14 +63,9 @@ export function SoundAlertSettings() {
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
             >
               {isPlaying ? (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" />
-                  <rect x="14" y="4" width="4" height="16" />
-                </svg>
+                <Pause className="w-3.5 h-3.5" fill="currentColor" />
               ) : (
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
+                <Play className="w-3.5 h-3.5" fill="currentColor" />
               )}
             </button>
           </div>
