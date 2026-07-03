@@ -134,6 +134,18 @@
   }
   html {
     min-height: calc(100% + env(safe-area-inset-bottom));
+    overscroll-behavior: none;
+  }
+
+  body {
+    overflow-y: scroll;
+  }
+
+  @media (display-mode: standalone) {
+    body {
+      height: 100vh;
+      overflow-y: scroll;
+    }
   }
 }
 

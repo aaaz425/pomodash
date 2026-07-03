@@ -69,7 +69,7 @@ export function FocusMode() {
           <button
             onClick={exitFocusMode}
             aria-label="집중 모드 나가기"
-            className="absolute top-6 right-6 flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <X className="w-3.5 h-3.5" />
             나가기
