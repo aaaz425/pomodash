@@ -137,9 +137,13 @@
   }
 
   @media (display-mode: standalone) {
-    html,
+    html {
+      overscroll-behavior: none;
+    }
+
     body {
       height: 100vh;
+      overflow-y: scroll;
     }
   }
 }
