@@ -87,8 +87,8 @@ export function SessionRecordModal() {
         aria-label="세션 기록"
         className={[
           'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto',
-          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh]',
-          'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
+          'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',
+          'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:pb-0',
           'sm:w-[600px] sm:rounded-xl sm:max-h-[85vh]',
         ].join(' ')}
       >

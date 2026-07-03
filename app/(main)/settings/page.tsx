@@ -40,7 +40,7 @@ export default function SettingsPage() {
 
   return (
     <main className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-4 pt-8 sm:px-8 sm:pt-10 flex flex-col gap-6 pb-24 standalone:pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-20">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6">
         <div>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
           <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>

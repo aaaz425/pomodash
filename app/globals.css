@@ -130,10 +130,17 @@
   }
   html,
   body {
-    @apply font-sans text-foreground bg-card;
+    @apply font-sans text-foreground bg-background;
   }
   html {
     min-height: calc(100% + env(safe-area-inset-bottom));
+  }
+
+  @media (display-mode: standalone) {
+    html,
+    body {
+      height: 100vh;
+    }
   }
 }
 

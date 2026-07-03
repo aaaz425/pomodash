@@ -16,8 +16,6 @@ interface Props {
   bodyClassName?: string;
 }
 
-// Base UI Dialog는 portal로 렌더링되고 z-50 + DOM 순서로 자동 스태킹되므로
-// 기존의 수동 z-index 티어 props(backdropZIndexClassName 등)는 더 이상 필요 없다.
 export function Modal({
   title,
   onClose,
@@ -41,8 +39,8 @@ export function Modal({
           aria-label={title}
           className={[
             'fixed z-50 flex flex-col bg-card border border-border shadow-2xl outline-none',
-            `bottom-0 left-0 right-0 rounded-t-2xl ${maxHeightClassName}`,
-            'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl',
+            `bottom-0 left-0 right-0 rounded-t-2xl standalone:pb-[env(safe-area-inset-bottom)] ${maxHeightClassName}`,
+            'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:pb-0',
             widthClassName,
           ].join(' ')}
         >
