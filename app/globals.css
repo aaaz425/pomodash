@@ -130,17 +130,18 @@
   }
   html,
   body {
-    @apply font-sans text-foreground bg-background;
+    @apply font-sans text-foreground bg-card;
   }
   html {
     min-height: calc(100% + env(safe-area-inset-bottom));
+    overscroll-behavior: none;
+  }
+
+  body {
+    overflow-y: scroll;
   }
 
   @media (display-mode: standalone) {
-    html {
-      overscroll-behavior: none;
-    }
-
     body {
       height: 100vh;
       overflow-y: scroll;
