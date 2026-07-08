@@ -3,6 +3,7 @@ import { Sidebar } from '@/components/shared/layout/Sidebar';
 import { IconSidebar } from '@/components/shared/layout/IconSidebar';
 import { BottomNav } from '@/components/shared/layout/BottomNav';
 import { MiniTimerWidget } from '@/components/timer/MiniTimerWidget';
+import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialog';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
         <BottomNav />
         <MiniTimerWidget />
+        <AbandonedSessionDialog />
       </div>
     </StoreProvider>
   );

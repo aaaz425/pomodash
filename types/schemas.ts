@@ -84,6 +84,8 @@ export const ActiveTimerStateSchema = z.object({
   sessionEndedAt: z.number().nullable(),
   accFocusSeconds: z.number(),
   rawFocusPeriods: z.array(RawFocusPeriodSchema),
+  // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수 — 없으면 parse 실패 시 진행 중이던 세션이 전부 초기화됨
+  lastActiveAt: z.number().nullable().default(null),
 });
 
 export const AppSettingsSchema = z.object({

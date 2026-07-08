@@ -30,4 +30,9 @@ export const FOCUS_PERIOD_LIMITS = {
   MAX_PERIODS: 100,
 } as const;
 
+export const SESSION_LIMITS = {
+  STALE_THRESHOLD_HOURS: 3,
+  STALE_THRESHOLD_MS: 3 * 60 * 60 * 1000,
+} as const;
+
 export const STORAGE_VERSION = 1;
