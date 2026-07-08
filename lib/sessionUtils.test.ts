@@ -182,6 +182,25 @@ describe('formatFocusPeriodRanges', () => {
     const periods = [period('2024-03-15T09:00:00', '2024-03-15T15:00:00')];
     expect(formatFocusPeriodRanges(periods)).toBe('09:00 — 11:00');
   });
+
+  it('구간이 maxShown 이하면 전부 표시하고 "외 N개"는 붙지 않음', () => {
+    const periods = [
+      period('2024-03-15T09:00:00', '2024-03-15T09:05:00'),
+      period('2024-03-15T10:00:00', '2024-03-15T10:05:00'),
+    ];
+    expect(formatFocusPeriodRanges(periods, 2)).toBe('09:00 — 09:05, 10:00 — 10:05');
+  });
+
+  it('구간이 maxShown을 초과하면 앞쪽만 보여주고 나머지는 "외 N개"로 축약됨', () => {
+    const periods = [
+      period('2024-03-15T09:00:00', '2024-03-15T09:05:00'),
+      period('2024-03-15T10:00:00', '2024-03-15T10:05:00'),
+      period('2024-03-15T11:00:00', '2024-03-15T11:05:00'),
+      period('2024-03-15T12:00:00', '2024-03-15T12:05:00'),
+      period('2024-03-15T13:00:00', '2024-03-15T13:05:00'),
+    ];
+    expect(formatFocusPeriodRanges(periods, 2)).toBe('09:00 — 09:05, 10:00 — 10:05 외 3개');
+  });
 });
 
 describe('formatSessionTimeSummary', () => {

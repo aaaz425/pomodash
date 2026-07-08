@@ -84,12 +84,15 @@ export function formatFullDate(isoString: string): string {
   });
 }
 
-export function formatFocusPeriodRanges(periods: FocusPeriod[]): string {
+export function formatFocusPeriodRanges(periods: FocusPeriod[], maxShown = 4): string {
   if (periods.length === 0) return '';
-  return periods
+  const ranges = periods
+    .slice(0, maxShown)
     .map((p) => clampPeriodDuration(p, TIMER_LIMITS.FOCUS_MINUTES_MAX * 60))
     .map((p) => formatTimeRange(p.start, p.end))
     .join(', ');
+  const rest = periods.length - maxShown;
+  return rest > 0 ? `${ranges} 외 ${rest}개` : ranges;
 }
 
 // 정상 설정으로는 나올 수 없는 간격(휴식 시간 상한 초과)이 구간 사이에 있는지 — 다사이클 세션의 정상 휴식과 구분하기 위함
