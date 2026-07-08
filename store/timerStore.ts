@@ -24,13 +24,13 @@ interface TimerStore {
   settings: TimerSettings;
   sessionEnded: boolean; // true일 때 세션 기록 모달 표시
   isFocusMode: boolean; // true일 때 집중 모드 오버레이 표시
-  showAbandonedPrompt: boolean; // true일 때 방치된 세션 처리 다이얼로그 표시
+  showAbandonedPrompt: boolean;
   sessionStarted: boolean; // true일 때 작업 전환 불가(작업 관리 버튼 숨김)
   sessionStartedAt: number | null; // 세션 첫 start() 시각
   sessionEndedAt: number | null; // 세션 종료 시각 (모달 노출 시점)
   accFocusSeconds: number; // 일시정지 제외 누적 집중 초
   rawFocusPeriods: RawFocusPeriod[]; // 집중 구간 기록 (저장 전 normalizeFocusPeriods 통과 필요)
-  lastActiveAt: number | null; // 마지막 실제 활동(시작/일시정지/사이클완료/종료) 시각 — 방치 감지 기준
+  lastActiveAt: number | null; // 방치 감지 기준 시각
 
   start: () => void;
   pause: () => void;
@@ -278,8 +278,7 @@ export const createTimerStore = () => {
       hydrate: () => {
         const fallback = toActiveTimerSnapshot(get());
         const loaded = loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback);
-        // hydrate() 자체는 활동이 아니므로 lastActiveAt은 그대로 두고 판단만 함
-        // (dev StrictMode 등으로 hydrate가 여러 번 불려도 판단이 흔들리지 않도록)
+        // lastActiveAt은 여기서 갱신하지 않음 — StrictMode 이중 마운트로 hydrate가 두 번 불려도 판단이 흔들리지 않아야 함
         const stale =
           loaded.sessionStarted &&
           !loaded.sessionEnded &&

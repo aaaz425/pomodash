@@ -12,7 +12,6 @@ interface Props {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  // 3번째 선택지가 필요한 경우에만 지정 — 미지정 시 기존 2버튼 레이아웃과 동일
   tertiaryLabel?: string;
   onTertiary?: () => void;
 }
