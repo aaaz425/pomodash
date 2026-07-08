@@ -2,7 +2,11 @@
 
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { Badge } from '@/components/shared/Badge';
-import { formatDuration, formatTimeRange, getSessionOrdinalTitle } from '@/lib/sessionUtils';
+import {
+  formatDuration,
+  formatSessionTimeSummary,
+  getSessionOrdinalTitle,
+} from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -23,7 +27,11 @@ export function SessionListItem({
   onSelect,
 }: Props) {
   const taskTitle = task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
-  const timeRange = formatTimeRange(session.startedAt, session.endedAt);
+  const timeRange = formatSessionTimeSummary(
+    session.startedAt,
+    session.endedAt,
+    session.focusPeriods,
+  );
   const duration = formatDuration(session.focusSeconds);
 
   return (

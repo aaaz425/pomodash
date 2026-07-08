@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Session } from '@/types';
+import type { FocusPeriod, Session } from '@/types';
 import {
   formatDuration,
+  formatFocusPeriodRanges,
   formatFullDate,
+  formatSessionTimeSummary,
   formatTimeRange,
   getSessionOrdinalTitle,
   groupSessionsByDate,
+  hasAbnormalFocusGap,
 } from './sessionUtils';
 
 function makeSession(startedAt: string, focusSeconds = 1500): Session {
@@ -150,5 +153,95 @@ describe('formatTimeRange', () => {
 describe('formatFullDate', () => {
   it('"YYYY년 M월 D일" 형식으로 반환', () => {
     expect(formatFullDate('2024-03-15T09:00:00')).toBe('2024년 3월 15일');
+  });
+});
+
+describe('formatFocusPeriodRanges', () => {
+  function period(start: string, end: string): FocusPeriod {
+    return { start, end };
+  }
+
+  it('빈 배열이면 빈 문자열 반환', () => {
+    expect(formatFocusPeriodRanges([])).toBe('');
+  });
+
+  it('구간이 하나면 해당 구간의 시간 범위만 반환', () => {
+    const periods = [period('2024-03-15T09:00:00', '2024-03-15T09:25:00')];
+    expect(formatFocusPeriodRanges(periods)).toBe('09:00 — 09:25');
+  });
+
+  it('구간이 여러 개면 쉼표로 이어붙임', () => {
+    const periods = [
+      period('2024-03-15T09:00:00', '2024-03-15T09:05:00'),
+      period('2024-03-15T18:00:00', '2024-03-15T18:23:00'),
+    ];
+    expect(formatFocusPeriodRanges(periods)).toBe('09:00 — 09:05, 18:00 — 18:23');
+  });
+
+  it('120분을 초과하는 구간은 120분으로 잘려서 표시됨', () => {
+    const periods = [period('2024-03-15T09:00:00', '2024-03-15T15:00:00')];
+    expect(formatFocusPeriodRanges(periods)).toBe('09:00 — 11:00');
+  });
+});
+
+describe('formatSessionTimeSummary', () => {
+  it('구간이 1개 이하면 formatTimeRange와 동일하게 표시', () => {
+    const result = formatSessionTimeSummary('2024-03-15T09:00:00', '2024-03-15T09:25:00', [
+      { start: '2024-03-15T09:00:00', end: '2024-03-15T09:25:00' },
+    ]);
+    expect(result).toBe('09:00 — 09:25');
+  });
+
+  it('구간 사이 간격이 휴식 시간 상한을 넘으면 전체 범위 뒤에 구간 수가 붙음', () => {
+    const focusPeriods: FocusPeriod[] = [
+      { start: '2024-03-15T12:00:00', end: '2024-03-15T12:05:00' },
+      { start: '2024-03-15T18:00:00', end: '2024-03-15T18:23:00' },
+    ];
+    const result = formatSessionTimeSummary(
+      '2024-03-15T12:00:00',
+      '2024-03-15T18:23:00',
+      focusPeriods,
+    );
+    expect(result).toBe('12:00 — 18:23 · 2구간');
+  });
+
+  it('정상적인 다사이클 세션(구간 사이 간격이 휴식 시간 이내)은 마커가 붙지 않음', () => {
+    const focusPeriods: FocusPeriod[] = [
+      { start: '2024-03-15T09:00:00', end: '2024-03-15T09:25:00' },
+      { start: '2024-03-15T09:30:00', end: '2024-03-15T09:55:00' },
+      { start: '2024-03-15T10:00:00', end: '2024-03-15T10:25:00' },
+      { start: '2024-03-15T10:30:00', end: '2024-03-15T10:55:00' },
+    ];
+    const result = formatSessionTimeSummary(
+      '2024-03-15T09:00:00',
+      '2024-03-15T10:55:00',
+      focusPeriods,
+    );
+    expect(result).toBe('09:00 — 10:55');
+  });
+});
+
+describe('hasAbnormalFocusGap', () => {
+  it('구간이 0~1개면 false', () => {
+    expect(hasAbnormalFocusGap([])).toBe(false);
+    expect(
+      hasAbnormalFocusGap([{ start: '2024-03-15T09:00:00', end: '2024-03-15T09:25:00' }]),
+    ).toBe(false);
+  });
+
+  it('구간 사이 간격이 휴식 시간 상한(60분) 이내면 false', () => {
+    const periods: FocusPeriod[] = [
+      { start: '2024-03-15T09:00:00', end: '2024-03-15T09:25:00' },
+      { start: '2024-03-15T10:25:00', end: '2024-03-15T10:50:00' }, // 60분 간격
+    ];
+    expect(hasAbnormalFocusGap(periods)).toBe(false);
+  });
+
+  it('구간 사이 간격이 휴식 시간 상한을 넘으면 true', () => {
+    const periods: FocusPeriod[] = [
+      { start: '2024-03-15T09:00:00', end: '2024-03-15T09:25:00' },
+      { start: '2024-03-15T10:25:01', end: '2024-03-15T10:50:00' }, // 60분 1초 간격
+    ];
+    expect(hasAbnormalFocusGap(periods)).toBe(true);
   });
 });

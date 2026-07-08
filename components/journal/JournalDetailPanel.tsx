@@ -9,8 +9,10 @@ import { useTaskStore } from '@/store/StoreProvider';
 import {
   formatDuration,
   formatTimeRange,
+  formatFocusPeriodRanges,
   formatFullDate,
   getSessionOrdinalTitle,
+  hasAbnormalFocusGap,
 } from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
 
@@ -96,7 +98,11 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <span>{formatFullDate(session.startedAt)}</span>
           <span className="text-muted-foreground/40">·</span>
-          <span>{formatTimeRange(session.startedAt, session.endedAt)}</span>
+          <span>
+            {hasAbnormalFocusGap(session.focusPeriods)
+              ? formatFocusPeriodRanges(session.focusPeriods)
+              : formatTimeRange(session.startedAt, session.endedAt)}
+          </span>
         </div>
       </div>
 

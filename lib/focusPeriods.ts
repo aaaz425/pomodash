@@ -27,11 +27,15 @@ export function normalizeFocusPeriods(periods: FocusPeriod[]): FocusPeriod[] {
     }
   }
 
-  // 상한 초과: 나머지를 마지막 구간에 합침
+  // 상한 초과: 병합하지 않고 초과분을 그대로 드롭 (병합하면 그 안의 공백까지 집중 구간처럼 보임)
   if (merged.length <= MAX_PERIODS) return merged;
+  return merged.slice(0, MAX_PERIODS);
+}
 
-  const capped = merged.slice(0, MAX_PERIODS - 1);
-  const last = merged[merged.length - 1];
-  capped.push({ start: merged[MAX_PERIODS - 1].start, end: last.end });
-  return capped;
+// 앱에서 설정 가능한 최대 집중 시간보다 긴 구간은 저장 시점의 버그로 생긴 것 — 소비 시점에 방어적으로 잘라냄
+export function clampPeriodDuration(period: FocusPeriod, maxSeconds: number): FocusPeriod {
+  const start = new Date(period.start).getTime();
+  const end = new Date(period.end).getTime();
+  const maxEnd = start + maxSeconds * 1000;
+  return end > maxEnd ? { start: period.start, end: new Date(maxEnd).toISOString() } : period;
 }
