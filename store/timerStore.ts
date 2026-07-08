@@ -11,6 +11,7 @@ import {
 import type { z } from 'zod';
 import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { isSessionStale } from '@/lib/sessionStale';
 
 type RawFocusPeriod = z.infer<typeof RawFocusPeriodSchema>;
 
@@ -23,11 +24,13 @@ interface TimerStore {
   settings: TimerSettings;
   sessionEnded: boolean; // true일 때 세션 기록 모달 표시
   isFocusMode: boolean; // true일 때 집중 모드 오버레이 표시
+  showAbandonedPrompt: boolean; // true일 때 방치된 세션 처리 다이얼로그 표시
   sessionStarted: boolean; // true일 때 작업 전환 불가(작업 관리 버튼 숨김)
   sessionStartedAt: number | null; // 세션 첫 start() 시각
   sessionEndedAt: number | null; // 세션 종료 시각 (모달 노출 시점)
   accFocusSeconds: number; // 일시정지 제외 누적 집중 초
   rawFocusPeriods: RawFocusPeriod[]; // 집중 구간 기록 (저장 전 normalizeFocusPeriods 통과 필요)
+  lastActiveAt: number | null; // 마지막 실제 활동(시작/일시정지/사이클완료/종료) 시각 — 방치 감지 기준
 
   start: () => void;
   pause: () => void;
@@ -42,6 +45,7 @@ interface TimerStore {
   dismissSessionRecord: () => void;
   enterFocusMode: () => void;
   exitFocusMode: () => void;
+  dismissAbandonedPrompt: () => void;
   hydrate: () => void;
 }
 
@@ -67,6 +71,7 @@ function toActiveTimerSnapshot(s: TimerStore) {
     sessionEndedAt: s.sessionEndedAt,
     accFocusSeconds: s.accFocusSeconds,
     rawFocusPeriods: s.rawFocusPeriods,
+    lastActiveAt: s.lastActiveAt,
   };
 }
 
@@ -83,19 +88,23 @@ export const createTimerStore = () => {
       settings,
       sessionEnded: false,
       isFocusMode: false,
+      showAbandonedPrompt: false,
       sessionStarted: false,
       sessionStartedAt: null,
       sessionEndedAt: null,
       accFocusSeconds: 0,
       rawFocusPeriods: [],
+      lastActiveAt: null,
 
       start: () =>
         set((state) => {
           if (!state.sessionStarted) trackEvent(EVENTS.TIMER_STARTED);
+          const now = Date.now();
           return {
-            startedAt: Date.now(),
+            startedAt: now,
             sessionStarted: true,
-            sessionStartedAt: state.sessionStartedAt ?? Date.now(),
+            sessionStartedAt: state.sessionStartedAt ?? now,
+            lastActiveAt: now,
           };
         }),
 
@@ -112,6 +121,7 @@ export const createTimerStore = () => {
             phase === 'focus'
               ? [...rawFocusPeriods, { start: startedAt, end: now }]
               : rawFocusPeriods,
+          lastActiveAt: now,
         });
       },
 
@@ -122,7 +132,13 @@ export const createTimerStore = () => {
           get().completeCycle();
         } else {
           const seconds = phaseSeconds(settings);
-          set({ phase: 'focus', remainingSeconds: seconds.focus, startedAt: Date.now() });
+          const now = Date.now();
+          set({
+            phase: 'focus',
+            remainingSeconds: seconds.focus,
+            startedAt: now,
+            lastActiveAt: now,
+          });
         }
       },
 
@@ -151,12 +167,21 @@ export const createTimerStore = () => {
       },
 
       completeCycle: () => {
-        const { cycleCount, settings, startedAt, accFocusSeconds, rawFocusPeriods } = get();
+        const {
+          cycleCount,
+          settings,
+          startedAt,
+          remainingSeconds,
+          accFocusSeconds,
+          rawFocusPeriods,
+        } = get();
         const now = Date.now();
-        const elapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
+        const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
+        // 탭 방치 등으로 실제 경과가 목표 시간을 넘어도, 목표 시간만큼만 집중 시간으로 인정
+        const elapsed = Math.min(rawElapsed, remainingSeconds);
         const totalFocus = accFocusSeconds + elapsed;
         const closedPeriods = startedAt
-          ? [...rawFocusPeriods, { start: startedAt, end: now }]
+          ? [...rawFocusPeriods, { start: startedAt, end: startedAt + elapsed * 1000 }]
           : rawFocusPeriods;
         const next = cycleCount + 1;
         if (next >= settings.totalCycles) {
@@ -169,6 +194,7 @@ export const createTimerStore = () => {
             accFocusSeconds: totalFocus,
             sessionEndedAt: now,
             rawFocusPeriods: closedPeriods,
+            lastActiveAt: now,
           });
         } else {
           const seconds = phaseSeconds(settings);
@@ -176,9 +202,10 @@ export const createTimerStore = () => {
             cycleCount: next,
             phase: 'short-break',
             remainingSeconds: seconds['short-break'],
-            startedAt: Date.now(),
+            startedAt: now,
             accFocusSeconds: totalFocus,
             rawFocusPeriods: closedPeriods,
+            lastActiveAt: now,
           });
         }
       },
@@ -200,12 +227,14 @@ export const createTimerStore = () => {
       },
 
       endSession: () => {
-        const { startedAt, phase, accFocusSeconds, rawFocusPeriods } = get();
+        const { startedAt, phase, remainingSeconds, accFocusSeconds, rawFocusPeriods } = get();
         const now = Date.now();
-        const elapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
+        const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
+        // 탭 방치 등으로 실제 경과가 목표 시간을 넘어도, 목표 시간만큼만 집중 시간으로 인정
+        const elapsed = Math.min(rawElapsed, remainingSeconds);
         const closedPeriods =
           startedAt && phase === 'focus'
-            ? [...rawFocusPeriods, { start: startedAt, end: now }]
+            ? [...rawFocusPeriods, { start: startedAt, end: startedAt + elapsed * 1000 }]
             : rawFocusPeriods;
         set({
           startedAt: null,
@@ -214,6 +243,7 @@ export const createTimerStore = () => {
           accFocusSeconds: phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds,
           sessionEndedAt: now,
           rawFocusPeriods: closedPeriods,
+          lastActiveAt: now,
         });
       },
 
@@ -226,12 +256,14 @@ export const createTimerStore = () => {
           cycleCount: 0,
           currentTaskId: null,
           sessionEnded: false,
+          showAbandonedPrompt: false,
           sessionStarted: false,
           settings: DEFAULT_TIMER_SETTINGS,
           sessionStartedAt: null,
           sessionEndedAt: null,
           accFocusSeconds: 0,
           rawFocusPeriods: [],
+          lastActiveAt: null,
         });
       },
 
@@ -241,9 +273,21 @@ export const createTimerStore = () => {
       },
       exitFocusMode: () => set({ isFocusMode: false }),
 
+      dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false }),
+
       hydrate: () => {
         const fallback = toActiveTimerSnapshot(get());
-        set(loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback));
+        const loaded = loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback);
+        // hydrate() 자체는 활동이 아니므로 lastActiveAt은 그대로 두고 판단만 함
+        // (dev StrictMode 등으로 hydrate가 여러 번 불려도 판단이 흔들리지 않도록)
+        const stale =
+          loaded.sessionStarted &&
+          !loaded.sessionEnded &&
+          isSessionStale({
+            lastActiveAt: loaded.lastActiveAt,
+            sessionStartedAt: loaded.sessionStartedAt,
+          });
+        set({ ...loaded, showAbandonedPrompt: stale });
       },
     };
   });

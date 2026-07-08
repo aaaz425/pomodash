@@ -12,6 +12,9 @@ interface Props {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  // 3번째 선택지가 필요한 경우에만 지정 — 미지정 시 기존 2버튼 레이아웃과 동일
+  tertiaryLabel?: string;
+  onTertiary?: () => void;
 }
 
 // AlertDialog는 바깥 클릭으로 안 닫히는 게 기본 동작(의도적 — 실수로 안 닫히게).
@@ -24,7 +27,10 @@ export function ConfirmDialog({
   cancelLabel = '취소',
   onConfirm,
   onCancel,
+  tertiaryLabel,
+  onTertiary,
 }: Props) {
+  const hasTertiary = Boolean(tertiaryLabel && onTertiary);
   return (
     <AlertDialogPrimitive.Root
       open={open}
@@ -53,13 +59,27 @@ export function ConfirmDialog({
             )}
           </div>
 
-          <div className="flex items-center justify-end gap-2">
-            <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
-              {cancelLabel}
-            </Button>
-            <Button onClick={onConfirm} variant="default" size="lg" className="px-4 font-semibold">
-              {confirmLabel}
-            </Button>
+          <div
+            className={`flex items-center gap-2 ${hasTertiary ? 'justify-between' : 'justify-end'}`}
+          >
+            {hasTertiary && (
+              <Button onClick={onTertiary} variant="destructive" size="lg" className="px-4">
+                {tertiaryLabel}
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
+                {cancelLabel}
+              </Button>
+              <Button
+                onClick={onConfirm}
+                variant="default"
+                size="lg"
+                className="px-4 font-semibold"
+              >
+                {confirmLabel}
+              </Button>
+            </div>
           </div>
         </AlertDialogPrimitive.Popup>
       </AlertDialogPrimitive.Portal>

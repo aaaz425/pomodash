@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createTimerStore } from '@/store/timerStore';
+import { STORAGE_KEYS } from '@/types';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -298,6 +299,29 @@ describe('timerStore', () => {
       expect(store.getState().accFocusSeconds).toBe(1500);
     });
 
+    it('completeCycle() — 탭 방치로 목표 시간을 초과해도 accFocusSeconds는 목표 시간만큼만 증가', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T03:00:00.000Z')); // 3시간 방치 (목표는 25분)
+      store.getState().completeCycle();
+
+      expect(store.getState().accFocusSeconds).toBe(25 * 60);
+    });
+
+    it('completeCycle() — 방치 시 rawFocusPeriods의 end도 목표 시간만큼만 캡됨', () => {
+      const startedAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      vi.setSystemTime(startedAt);
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T03:00:00.000Z'));
+      store.getState().completeCycle();
+
+      expect(store.getState().rawFocusPeriods).toEqual([
+        { start: startedAt, end: startedAt + 25 * 60 * 1000 },
+      ]);
+    });
+
     it('completeCycle() — 마지막 사이클 완료 시 sessionEndedAt 기록', () => {
       vi.setSystemTime(new Date('2024-01-01T01:00:00.000Z'));
       const store = createTimerStore();
@@ -316,6 +340,16 @@ describe('timerStore', () => {
 
       expect(store.getState().accFocusSeconds).toBe(600);
       expect(store.getState().sessionEndedAt).toBe(new Date('2024-01-01T00:10:00.000Z').getTime());
+    });
+
+    it('endSession() — 탭 방치로 목표 시간을 초과해도 accFocusSeconds는 목표 시간만큼만 증가', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T03:00:00.000Z')); // 3시간 방치 (목표는 25분)
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(25 * 60);
     });
 
     it('dismissSessionRecord() — 시간 추적 필드 초기화', () => {
@@ -368,6 +402,96 @@ describe('timerStore', () => {
       expect(store.getState().settings.focusMinutes).toBe(25);
       expect(store.getState().remainingSeconds).toBe(25 * 60);
       expect(store.getState().currentTaskId).toBe(null);
+    });
+  });
+
+  describe('hydrate() — 방치된 세션 감지', () => {
+    function savedActiveTimer(overrides: Record<string, unknown>) {
+      return {
+        phase: 'focus',
+        remainingSeconds: 25 * 60,
+        startedAt: null,
+        cycleCount: 0,
+        currentTaskId: null,
+        settings: { focusMinutes: 25, shortBreakMinutes: 5, totalCycles: 4 },
+        sessionEnded: false,
+        sessionStarted: true,
+        sessionStartedAt: new Date('2024-01-01T00:00:00.000Z').getTime(),
+        sessionEndedAt: null,
+        accFocusSeconds: 0,
+        rawFocusPeriods: [],
+        ...overrides,
+      };
+    }
+
+    it('lastActiveAt이 3시간을 초과하면 showAbandonedPrompt가 true로 설정됨', () => {
+      const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      localStorage.setItem(
+        STORAGE_KEYS.activeTimer,
+        JSON.stringify(savedActiveTimer({ lastActiveAt })),
+      );
+      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z')); // 3시간 1초 경과
+
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      expect(store.getState().showAbandonedPrompt).toBe(true);
+    });
+
+    it('lastActiveAt이 3시간 이내면 showAbandonedPrompt는 false', () => {
+      const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      localStorage.setItem(
+        STORAGE_KEYS.activeTimer,
+        JSON.stringify(savedActiveTimer({ lastActiveAt })),
+      );
+      vi.setSystemTime(new Date('2024-01-01T02:00:00.000Z')); // 2시간 경과
+
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('진행 중인 세션이 없으면(sessionStarted: false) 오래됐어도 showAbandonedPrompt는 false', () => {
+      const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      localStorage.setItem(
+        STORAGE_KEYS.activeTimer,
+        JSON.stringify(savedActiveTimer({ lastActiveAt, sessionStarted: false })),
+      );
+      vi.setSystemTime(new Date('2024-01-02T00:00:00.000Z')); // 하루 경과
+
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('lastActiveAt이 없는(마이그레이션 이전) 데이터는 sessionStartedAt으로 폴백해 판단', () => {
+      const sessionStartedAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      const raw = savedActiveTimer({ sessionStartedAt });
+      delete (raw as { lastActiveAt?: unknown }).lastActiveAt;
+      localStorage.setItem(STORAGE_KEYS.activeTimer, JSON.stringify(raw));
+      vi.setSystemTime(new Date('2024-01-01T04:00:00.000Z')); // 4시간 경과
+
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      expect(store.getState().showAbandonedPrompt).toBe(true);
+    });
+
+    it('dismissAbandonedPrompt() — showAbandonedPrompt를 false로 되돌림', () => {
+      const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      localStorage.setItem(
+        STORAGE_KEYS.activeTimer,
+        JSON.stringify(savedActiveTimer({ lastActiveAt })),
+      );
+      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z'));
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      store.getState().dismissAbandonedPrompt();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
     });
   });
 });
