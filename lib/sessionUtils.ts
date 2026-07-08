@@ -1,4 +1,6 @@
-import type { Session, SessionGroup } from '@/types';
+import type { FocusPeriod, Session, SessionGroup } from '@/types';
+import { TIMER_LIMITS } from '@/lib/constants/limits';
+import { clampPeriodDuration } from '@/lib/focusPeriods';
 
 function toLocalDateKey(isoString: string): string {
   const d = new Date(isoString);
@@ -80,4 +82,34 @@ export function formatFullDate(isoString: string): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+export function formatFocusPeriodRanges(periods: FocusPeriod[], maxShown = 4): string {
+  if (periods.length === 0) return '';
+  const ranges = periods
+    .slice(0, maxShown)
+    .map((p) => clampPeriodDuration(p, TIMER_LIMITS.FOCUS_MINUTES_MAX * 60))
+    .map((p) => formatTimeRange(p.start, p.end))
+    .join(', ');
+  const rest = periods.length - maxShown;
+  return rest > 0 ? `${ranges} 외 ${rest}개` : ranges;
+}
+
+// 정상 설정으로는 나올 수 없는 간격(휴식 시간 상한 초과)이 구간 사이에 있는지 — 다사이클 세션의 정상 휴식과 구분하기 위함
+export function hasAbnormalFocusGap(periods: FocusPeriod[]): boolean {
+  const maxBreakMs = TIMER_LIMITS.BREAK_MINUTES_MAX * 60 * 1000;
+  for (let i = 1; i < periods.length; i++) {
+    const gapMs = new Date(periods[i].start).getTime() - new Date(periods[i - 1].end).getTime();
+    if (gapMs > maxBreakMs) return true;
+  }
+  return false;
+}
+
+export function formatSessionTimeSummary(
+  startedAt: string,
+  endedAt: string,
+  focusPeriods: FocusPeriod[],
+): string {
+  const range = formatTimeRange(startedAt, endedAt);
+  return hasAbnormalFocusGap(focusPeriods) ? `${range} · ${focusPeriods.length}구간` : range;
 }

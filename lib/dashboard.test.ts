@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Session } from '@/types';
+import type { FocusPeriod, Session } from '@/types';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
   getBusiestDayOfWeek,
   getFirstSessionDate,
+  getHourlyFocusSeconds,
   getMaxStreakDays,
   getMonthlyActivityData,
   getPrevDayFocusSeconds,
@@ -255,5 +256,97 @@ describe('getFirstSessionDate', () => {
 
   it('세션 없으면 null', () => {
     expect(getFirstSessionDate([])).toBeNull();
+  });
+});
+
+describe('getHourlyFocusSeconds', () => {
+  function period(start: string, end: string): FocusPeriod {
+    return { start, end };
+  }
+
+  function makeSessionWithPeriods(
+    startedAt: string,
+    focusSeconds: number,
+    focusPeriods: FocusPeriod[],
+  ): Session {
+    return {
+      ...makeSession(startedAt, focusSeconds),
+      focusPeriods,
+    };
+  }
+
+  it('한 시간 안에 들어오는 단일 구간은 해당 시간대에 전부 반영됨', () => {
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 1800, [
+        period('2024-03-15T09:10:00', '2024-03-15T09:40:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(1800);
+    expect(result.reduce((a, b) => a + b, 0)).toBe(1800);
+  });
+
+  it('정확히 시 경계에서 시작해 시 경계에서 끝나는 구간은 다음 시간대로 새지 않음', () => {
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 3600, [
+        period('2024-03-15T09:00:00', '2024-03-15T10:00:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(3600);
+    expect(result[10]).toBe(0);
+  });
+
+  it('시 경계를 걸치는 구간은 두 시간대로 정확히 분배됨', () => {
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 1200, [
+        period('2024-03-15T09:50:00', '2024-03-15T10:10:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(600);
+    expect(result[10]).toBe(600);
+  });
+
+  it('여러 시간대에 걸친 구간은 걸친 만큼 각 시간대로 분배됨', () => {
+    // 09:30~11:15 (105분, 120분 상한 이내) — 9/10/11시 세 시간대에 걸침
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 6300, [
+        period('2024-03-15T09:30:00', '2024-03-15T11:15:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(30 * 60);
+    expect(result[10]).toBe(60 * 60);
+    expect(result[11]).toBe(15 * 60);
+  });
+
+  it('한 세션에 구간이 여러 개면 각각 반영됨', () => {
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 1200, [
+        period('2024-03-15T09:00:00', '2024-03-15T09:10:00'),
+        period('2024-03-15T14:00:00', '2024-03-15T14:10:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(600);
+    expect(result[14]).toBe(600);
+  });
+
+  it('focusPeriods가 비어있으면 startedAt의 시간대에 focusSeconds 전체가 반영됨', () => {
+    const sessions = [makeSessionWithPeriods('2024-03-15T09:00:00', 1500, [])];
+    const result = getHourlyFocusSeconds(sessions);
+    expect(result[9]).toBe(1500);
+  });
+
+  it('120분을 초과하는(오염된) 구간은 120분으로 잘려서 반영됨', () => {
+    const sessions = [
+      makeSessionWithPeriods('2024-03-15T09:00:00', 21600, [
+        period('2024-03-15T09:00:00', '2024-03-15T15:00:00'),
+      ]),
+    ];
+    const result = getHourlyFocusSeconds(sessions);
+    const total = result.reduce((a, b) => a + b, 0);
+    expect(total).toBe(120 * 60);
   });
 });

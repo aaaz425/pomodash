@@ -424,13 +424,13 @@ describe('timerStore', () => {
       };
     }
 
-    it('lastActiveAt이 3시간을 초과하면 showAbandonedPrompt가 true로 설정됨', () => {
+    it('lastActiveAt이 세션의 집중 시간(focusMinutes)을 초과하면 showAbandonedPrompt가 true로 설정됨', () => {
       const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
       localStorage.setItem(
         STORAGE_KEYS.activeTimer,
         JSON.stringify(savedActiveTimer({ lastActiveAt })),
       );
-      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z')); // 3시간 1초 경과
+      vi.setSystemTime(new Date('2024-01-01T00:25:01.000Z')); // focusMinutes(25분) 초과
 
       const store = createTimerStore();
       store.getState().hydrate();
@@ -438,13 +438,32 @@ describe('timerStore', () => {
       expect(store.getState().showAbandonedPrompt).toBe(true);
     });
 
-    it('lastActiveAt이 3시간 이내면 showAbandonedPrompt는 false', () => {
+    it('lastActiveAt이 세션의 집중 시간 이내면 showAbandonedPrompt는 false', () => {
       const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
       localStorage.setItem(
         STORAGE_KEYS.activeTimer,
         JSON.stringify(savedActiveTimer({ lastActiveAt })),
       );
-      vi.setSystemTime(new Date('2024-01-01T02:00:00.000Z')); // 2시간 경과
+      vi.setSystemTime(new Date('2024-01-01T00:20:00.000Z')); // focusMinutes(25분) 이내
+
+      const store = createTimerStore();
+      store.getState().hydrate();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('focusMinutes를 길게 설정한 세션은 그만큼 임계값도 늘어남', () => {
+      const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();
+      localStorage.setItem(
+        STORAGE_KEYS.activeTimer,
+        JSON.stringify(
+          savedActiveTimer({
+            lastActiveAt,
+            settings: { focusMinutes: 90, shortBreakMinutes: 5, totalCycles: 4 },
+          }),
+        ),
+      );
+      vi.setSystemTime(new Date('2024-01-01T01:00:00.000Z')); // 60분 경과 — 25분 기준이면 stale이지만 90분 기준이면 아님
 
       const store = createTimerStore();
       store.getState().hydrate();
@@ -471,7 +490,7 @@ describe('timerStore', () => {
       const raw = savedActiveTimer({ sessionStartedAt });
       delete (raw as { lastActiveAt?: unknown }).lastActiveAt;
       localStorage.setItem(STORAGE_KEYS.activeTimer, JSON.stringify(raw));
-      vi.setSystemTime(new Date('2024-01-01T04:00:00.000Z')); // 4시간 경과
+      vi.setSystemTime(new Date('2024-01-01T00:30:00.000Z')); // focusMinutes(25분) 초과
 
       const store = createTimerStore();
       store.getState().hydrate();
@@ -485,11 +504,59 @@ describe('timerStore', () => {
         STORAGE_KEYS.activeTimer,
         JSON.stringify(savedActiveTimer({ lastActiveAt })),
       );
-      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z'));
+      vi.setSystemTime(new Date('2024-01-01T00:25:01.000Z'));
       const store = createTimerStore();
       store.getState().hydrate();
 
       store.getState().dismissAbandonedPrompt();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+  });
+
+  describe('checkAbandoned() — 탭을 안 닫고 방치된 경우 주기 체크', () => {
+    it('일시정지 후 세션의 집중 시간(focusMinutes)을 넘게 지나면 showAbandonedPrompt가 true로 설정됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T00:25:01.000Z')); // 기본 focusMinutes(25분) 초과
+      store.getState().checkAbandoned();
+
+      expect(store.getState().showAbandonedPrompt).toBe(true);
+    });
+
+    it('일시정지 후 세션의 집중 시간 이내면 showAbandonedPrompt가 false로 유지됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T00:20:00.000Z')); // 기본 focusMinutes(25분) 이내
+      store.getState().checkAbandoned();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('진행 중인 세션이 없으면(sessionStarted: false) 검사하지 않음', () => {
+      const store = createTimerStore();
+
+      store.getState().checkAbandoned();
+
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('dismissAbandonedPrompt() 이후에는 lastActiveAt이 갱신돼 즉시 재검사해도 false', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T00:25:01.000Z'));
+      store.getState().checkAbandoned();
+      store.getState().dismissAbandonedPrompt();
+      store.getState().checkAbandoned();
 
       expect(store.getState().showAbandonedPrompt).toBe(false);
     });

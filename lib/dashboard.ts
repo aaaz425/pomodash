@@ -1,12 +1,15 @@
 import {
+  addHours,
   eachDayOfInterval,
   endOfDay,
   endOfMonth,
   endOfWeek,
   format,
   isWithinInterval,
+  min as minDate,
   parseISO,
   startOfDay,
+  startOfHour,
   startOfMonth,
   startOfWeek,
   subDays,
@@ -20,11 +23,14 @@ import type {
   Task,
   TabType,
   DayActivity,
+  FocusPeriod,
   FocusTrendItem,
   FocusTrendMeta,
   CategoryFocusItem,
 } from '@/types';
 import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
+import { TIMER_LIMITS } from '@/lib/constants/limits';
+import { clampPeriodDuration } from '@/lib/focusPeriods';
 
 function tailwindToHex(colorClass: string): string {
   return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
@@ -56,6 +62,30 @@ export function filterSessionsByTab(
 
 export function getTotalFocusSeconds(sessions: Session[]): number {
   return sessions.reduce((sum, s) => sum + s.focusSeconds, 0);
+}
+
+function addPeriodToHourlyTotals(totals: number[], period: FocusPeriod): void {
+  const clamped = clampPeriodDuration(period, TIMER_LIMITS.FOCUS_MINUTES_MAX * 60);
+  const periodEnd = parseISO(clamped.end);
+  let cursor = parseISO(clamped.start);
+  while (cursor < periodEnd) {
+    const nextHour = addHours(startOfHour(cursor), 1);
+    const segmentEnd = minDate([nextHour, periodEnd]);
+    totals[cursor.getHours()] += (segmentEnd.getTime() - cursor.getTime()) / 1000;
+    cursor = segmentEnd;
+  }
+}
+
+export function getHourlyFocusSeconds(sessions: Session[]): number[] {
+  const totals = Array<number>(24).fill(0);
+  for (const s of sessions) {
+    if (s.focusPeriods.length === 0) {
+      totals[parseISO(s.startedAt).getHours()] += s.focusSeconds;
+      continue;
+    }
+    for (const period of s.focusPeriods) addPeriodToHourlyTotals(totals, period);
+  }
+  return totals;
 }
 
 export function getSessionCount(sessions: Session[]): number {

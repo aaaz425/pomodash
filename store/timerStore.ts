@@ -46,6 +46,7 @@ interface TimerStore {
   enterFocusMode: () => void;
   exitFocusMode: () => void;
   dismissAbandonedPrompt: () => void;
+  checkAbandoned: () => void;
   hydrate: () => void;
 }
 
@@ -273,20 +274,24 @@ export const createTimerStore = () => {
       },
       exitFocusMode: () => set({ isFocusMode: false }),
 
-      dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false }),
+      // lastActiveAt도 함께 갱신 — 안 그러면 재생 버튼을 다시 눌렀을 때 start()의 방치 검사가 즉시 재발동함
+      dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false, lastActiveAt: Date.now() }),
+
+      checkAbandoned: () => {
+        const { sessionStarted, sessionEnded, lastActiveAt, sessionStartedAt, settings } = get();
+        if (!sessionStarted || sessionEnded) return;
+        const thresholdMs = phaseSeconds(settings).focus * 1000;
+        if (isSessionStale({ lastActiveAt, sessionStartedAt, thresholdMs })) {
+          set({ showAbandonedPrompt: true });
+        }
+      },
 
       hydrate: () => {
         const fallback = toActiveTimerSnapshot(get());
         const loaded = loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback);
         // lastActiveAt은 여기서 갱신하지 않음 — StrictMode 이중 마운트로 hydrate가 두 번 불려도 판단이 흔들리지 않아야 함
-        const stale =
-          loaded.sessionStarted &&
-          !loaded.sessionEnded &&
-          isSessionStale({
-            lastActiveAt: loaded.lastActiveAt,
-            sessionStartedAt: loaded.sessionStartedAt,
-          });
-        set({ ...loaded, showAbandonedPrompt: stale });
+        set({ ...loaded, showAbandonedPrompt: false });
+        get().checkAbandoned();
       },
     };
   });

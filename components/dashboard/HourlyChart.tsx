@@ -4,19 +4,11 @@ import { useMemo } from 'react';
 
 import { Badge } from '@/components/shared/Badge';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { getHourlyFocusSeconds } from '@/lib/dashboard';
 import type { Session } from '@/types';
 
 interface Props {
   sessions: Session[];
-}
-
-function getHourlyFocusSeconds(sessions: Session[]): number[] {
-  const totals = Array<number>(24).fill(0);
-  for (const s of sessions) {
-    const hour = new Date(s.startedAt).getHours();
-    totals[hour] += s.focusSeconds;
-  }
-  return totals;
 }
 
 function formatHourLabel(hour: number): string {
