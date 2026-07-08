@@ -494,4 +494,59 @@ describe('timerStore', () => {
       expect(store.getState().showAbandonedPrompt).toBe(false);
     });
   });
+
+  describe('start() — 탭을 안 닫고 방치했다 재개하는 경우', () => {
+    it('일시정지 후 3시간 넘게 방치했다 재생을 누르면 재개되지 않고 showAbandonedPrompt가 true로 설정됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z')); // 3시간 1초 방치
+      store.getState().start();
+
+      expect(store.getState().startedAt).toBe(null);
+      expect(store.getState().showAbandonedPrompt).toBe(true);
+    });
+
+    it('일시정지 후 3시간 이내에 재생을 누르면 정상적으로 재개됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T02:00:00.000Z')); // 2시간 경과
+      store.getState().start();
+
+      expect(store.getState().startedAt).toBe(new Date('2024-01-01T02:00:00.000Z').getTime());
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('다이얼로그에서 이어가기(dismissAbandonedPrompt) 이후 재생을 누르면 정상적으로 재개됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      store.getState().pause();
+
+      vi.setSystemTime(new Date('2024-01-01T03:00:01.000Z'));
+      store.getState().start();
+      store.getState().dismissAbandonedPrompt();
+
+      vi.setSystemTime(new Date('2024-01-01T03:00:02.000Z'));
+      store.getState().start();
+
+      expect(store.getState().startedAt).toBe(new Date('2024-01-01T03:00:02.000Z').getTime());
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+
+    it('세션이 시작되지 않은 최초 start()는 방치 검사 없이 항상 정상 동작함', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+
+      store.getState().start();
+
+      expect(store.getState().startedAt).toBe(new Date('2024-01-01T00:00:00.000Z').getTime());
+      expect(store.getState().showAbandonedPrompt).toBe(false);
+    });
+  });
 });

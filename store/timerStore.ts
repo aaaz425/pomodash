@@ -98,6 +98,17 @@ export const createTimerStore = () => {
 
       start: () =>
         set((state) => {
+          const isResuming =
+            state.sessionStarted && !state.sessionEnded && state.startedAt === null;
+          if (
+            isResuming &&
+            isSessionStale({
+              lastActiveAt: state.lastActiveAt,
+              sessionStartedAt: state.sessionStartedAt,
+            })
+          ) {
+            return { showAbandonedPrompt: true };
+          }
           if (!state.sessionStarted) trackEvent(EVENTS.TIMER_STARTED);
           const now = Date.now();
           return {
@@ -273,7 +284,8 @@ export const createTimerStore = () => {
       },
       exitFocusMode: () => set({ isFocusMode: false }),
 
-      dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false }),
+      // lastActiveAt도 함께 갱신 — 안 그러면 재생 버튼을 다시 눌렀을 때 start()의 방치 검사가 즉시 재발동함
+      dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false, lastActiveAt: Date.now() }),
 
       hydrate: () => {
         const fallback = toActiveTimerSnapshot(get());
