@@ -49,8 +49,15 @@ describe('timerStore', () => {
   });
 
   it('completeCycle() — totalCycles(4)회 완료 후 sessionEnded가 true로 설정', () => {
+    let now = new Date('2024-01-01T00:00:00.000Z').getTime();
+    vi.setSystemTime(now);
     const store = createTimerStore();
-    for (let i = 0; i < 4; i++) store.getState().completeCycle();
+    for (let i = 0; i < 4; i++) {
+      store.getState().start();
+      now += 6000; // 5초 미만 노이즈로 드롭되지 않도록 충분히 경과
+      vi.setSystemTime(now);
+      store.getState().completeCycle();
+    }
 
     expect(store.getState().cycleCount).toBe(4);
     expect(store.getState().sessionEnded).toBe(true);
@@ -206,8 +213,11 @@ describe('timerStore', () => {
     });
 
     it('endSession() — isFocusMode도 함께 false로 닫힘', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
       const store = createTimerStore();
       store.getState().enterFocusMode();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:00:10.000Z'));
 
       store.getState().endSession();
 
@@ -216,9 +226,16 @@ describe('timerStore', () => {
     });
 
     it('completeCycle() — 마지막 사이클 완료 시 isFocusMode도 함께 false로 닫힘', () => {
+      let now = new Date('2024-01-01T00:00:00.000Z').getTime();
+      vi.setSystemTime(now);
       const store = createTimerStore();
       store.getState().enterFocusMode();
-      for (let i = 0; i < 4; i++) store.getState().completeCycle();
+      for (let i = 0; i < 4; i++) {
+        store.getState().start();
+        now += 6000;
+        vi.setSystemTime(now);
+        store.getState().completeCycle();
+      }
 
       expect(store.getState().isFocusMode).toBe(false);
       expect(store.getState().sessionEnded).toBe(true);
@@ -277,6 +294,41 @@ describe('timerStore', () => {
       expect(store.getState().accFocusSeconds).toBe(300);
     });
 
+    it('pause() — 경과 시간이 5초 미만이면 accFocusSeconds/rawFocusPeriods에 반영 안 됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+
+      vi.setSystemTime(new Date('2024-01-01T00:00:04.000Z'));
+      store.getState().pause();
+
+      expect(store.getState().accFocusSeconds).toBe(0);
+      expect(store.getState().rawFocusPeriods).toEqual([]);
+    });
+
+    it('pause() — 경과 시간이 정확히 5초면 정상 반영됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+
+      vi.setSystemTime(new Date('2024-01-01T00:00:05.000Z'));
+      store.getState().pause();
+
+      expect(store.getState().accFocusSeconds).toBe(5);
+      expect(store.getState().rawFocusPeriods).toHaveLength(1);
+    });
+
+    it('pause() — remainingSeconds는 5초 미만이어도 실제 경과만큼 정상 감소', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+
+      vi.setSystemTime(new Date('2024-01-01T00:00:03.000Z'));
+      store.getState().pause();
+
+      expect(store.getState().remainingSeconds).toBe(25 * 60 - 3);
+    });
+
     it('pause() — short-break 중에는 accFocusSeconds 변경 없음', () => {
       const store = createTimerStore();
       store.getState().completeCycle(); // → short-break
@@ -322,13 +374,44 @@ describe('timerStore', () => {
       ]);
     });
 
-    it('completeCycle() — 마지막 사이클 완료 시 sessionEndedAt 기록', () => {
-      vi.setSystemTime(new Date('2024-01-01T01:00:00.000Z'));
+    it('completeCycle() — 남은 시간이 5초 미만이면 accFocusSeconds/rawFocusPeriods에 반영 안 됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
       const store = createTimerStore();
+      store.getState().updateSettings({ focusMinutes: 3 / 60 }); // 3초짜리 focus phase
       store.getState().start();
-      for (let i = 0; i < 4; i++) store.getState().completeCycle();
+      vi.setSystemTime(new Date('2024-01-01T00:00:03.000Z'));
+      store.getState().completeCycle();
 
-      expect(store.getState().sessionEndedAt).toBe(new Date('2024-01-01T01:00:00.000Z').getTime());
+      expect(store.getState().accFocusSeconds).toBe(0);
+      expect(store.getState().rawFocusPeriods).toEqual([]);
+    });
+
+    it('completeCycle() — 자동 완료 시에는 총 집중 시간이 5초 미만이어도 세션이 정상 종료됨', () => {
+      // 자연 완료로는 사실상 재현 불가능한 케이스라(목표 시간 자체가 최소 5분)
+      // endSession()과 달리 여기서는 5초 미만 세션 폐기를 적용하지 않기로 결정함
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().updateSettings({ focusMinutes: 3 / 60, totalCycles: 1 }); // 3초짜리 단일 사이클
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:00:03.000Z'));
+      store.getState().completeCycle();
+
+      expect(store.getState().sessionEnded).toBe(true);
+      expect(store.getState().accFocusSeconds).toBe(0);
+    });
+
+    it('completeCycle() — 마지막 사이클 완료 시 sessionEndedAt 기록', () => {
+      let now = new Date('2024-01-01T01:00:00.000Z').getTime();
+      vi.setSystemTime(now);
+      const store = createTimerStore();
+      for (let i = 0; i < 4; i++) {
+        store.getState().start();
+        now += 6000;
+        vi.setSystemTime(now);
+        store.getState().completeCycle();
+      }
+
+      expect(store.getState().sessionEndedAt).toBe(now);
     });
 
     it('endSession() — focus 진행 중 종료 시 경과 시간 accFocusSeconds에 추가', () => {
@@ -350,6 +433,45 @@ describe('timerStore', () => {
       store.getState().endSession();
 
       expect(store.getState().accFocusSeconds).toBe(25 * 60);
+    });
+
+    it('endSession() — 세션 전체 집중 시간이 5초 미만이면 기록되지 않고 초기 상태로 리셋됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().updateSettings({ focusMinutes: 3 / 60 }); // 3초짜리 focus phase
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:00:03.000Z'));
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(0);
+      expect(store.getState().sessionEnded).toBe(false);
+      expect(store.getState().sessionStarted).toBe(false);
+    });
+
+    it('endSession() — 세션 전체 집중 시간이 정확히 5초면 정상적으로 종료됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:00:05.000Z'));
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(5);
+      expect(store.getState().sessionEnded).toBe(true);
+    });
+
+    it('endSession() — 여러 사이클 누적으로 5초 이상이면 마지막 구간이 짧아도 정상 종료됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:10:00.000Z'));
+      store.getState().pause(); // accFocusSeconds = 600
+
+      store.getState().start();
+      vi.setSystemTime(new Date('2024-01-01T00:10:02.000Z')); // 이번 구간은 2초(5초 미만)
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(600); // 앞선 누적은 유지, 마지막 2초만 미반영
+      expect(store.getState().sessionEnded).toBe(true);
     });
 
     it('dismissSessionRecord() — 시간 추적 필드 초기화', () => {

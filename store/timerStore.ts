@@ -9,9 +9,11 @@ import {
   RawFocusPeriodSchema,
 } from '@/types';
 import type { z } from 'zod';
+import { toast } from 'sonner';
 import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { isSessionStale } from '@/lib/sessionStale';
+import { FOCUS_PERIOD_LIMITS } from '@/lib/constants/limits';
 
 type RawFocusPeriod = z.infer<typeof RawFocusPeriodSchema>;
 
@@ -54,6 +56,31 @@ function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
   return {
     focus: settings.focusMinutes * 60,
     'short-break': settings.shortBreakMinutes * 60,
+  };
+}
+
+function creditableElapsed(elapsed: number): number {
+  return elapsed < FOCUS_PERIOD_LIMITS.MIN_FOCUS_SECONDS ? 0 : elapsed;
+}
+
+// 세션 전체 집중 시간이 노이즈 수준이면 기록 자체를 만들지 않고 초기 상태로 되돌림
+function resetSessionState() {
+  const seconds = phaseSeconds(DEFAULT_TIMER_SETTINGS);
+  return {
+    phase: 'focus' as const,
+    remainingSeconds: seconds.focus,
+    startedAt: null,
+    cycleCount: 0,
+    currentTaskId: null,
+    sessionEnded: false,
+    showAbandonedPrompt: false,
+    sessionStarted: false,
+    settings: DEFAULT_TIMER_SETTINGS,
+    sessionStartedAt: null,
+    sessionEndedAt: null,
+    accFocusSeconds: 0,
+    rawFocusPeriods: [],
+    lastActiveAt: null,
   };
 }
 
@@ -114,14 +141,13 @@ export const createTimerStore = () => {
         if (!startedAt) return;
         const now = Date.now();
         const elapsed = Math.floor((now - startedAt) / 1000);
+        const credited = phase === 'focus' ? creditableElapsed(elapsed) : 0;
         set({
           startedAt: null,
           remainingSeconds: Math.max(0, remainingSeconds - elapsed),
-          accFocusSeconds: phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds,
+          accFocusSeconds: phase === 'focus' ? accFocusSeconds + credited : accFocusSeconds,
           rawFocusPeriods:
-            phase === 'focus'
-              ? [...rawFocusPeriods, { start: startedAt, end: now }]
-              : rawFocusPeriods,
+            credited > 0 ? [...rawFocusPeriods, { start: startedAt, end: now }] : rawFocusPeriods,
           lastActiveAt: now,
         });
       },
@@ -179,11 +205,12 @@ export const createTimerStore = () => {
         const now = Date.now();
         const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
         // 탭 방치 등으로 실제 경과가 목표 시간을 넘어도, 목표 시간만큼만 집중 시간으로 인정
-        const elapsed = Math.min(rawElapsed, remainingSeconds);
+        const elapsed = creditableElapsed(Math.min(rawElapsed, remainingSeconds));
         const totalFocus = accFocusSeconds + elapsed;
-        const closedPeriods = startedAt
-          ? [...rawFocusPeriods, { start: startedAt, end: startedAt + elapsed * 1000 }]
-          : rawFocusPeriods;
+        const closedPeriods =
+          startedAt && elapsed > 0
+            ? [...rawFocusPeriods, { start: startedAt, end: startedAt + elapsed * 1000 }]
+            : rawFocusPeriods;
         const next = cycleCount + 1;
         if (next >= settings.totalCycles) {
           trackEvent(EVENTS.TIMER_COMPLETED, { cycles: next });
@@ -232,41 +259,29 @@ export const createTimerStore = () => {
         const now = Date.now();
         const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
         // 탭 방치 등으로 실제 경과가 목표 시간을 넘어도, 목표 시간만큼만 집중 시간으로 인정
-        const elapsed = Math.min(rawElapsed, remainingSeconds);
+        const elapsed = creditableElapsed(Math.min(rawElapsed, remainingSeconds));
+        const totalFocus = phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds;
+        if (totalFocus < FOCUS_PERIOD_LIMITS.MIN_FOCUS_SECONDS) {
+          toast('5초 미만 세션은 기록되지 않아요');
+          set(resetSessionState());
+          return;
+        }
         const closedPeriods =
-          startedAt && phase === 'focus'
+          startedAt && phase === 'focus' && elapsed > 0
             ? [...rawFocusPeriods, { start: startedAt, end: startedAt + elapsed * 1000 }]
             : rawFocusPeriods;
         set({
           startedAt: null,
           sessionEnded: true,
           isFocusMode: false,
-          accFocusSeconds: phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds,
+          accFocusSeconds: totalFocus,
           sessionEndedAt: now,
           rawFocusPeriods: closedPeriods,
           lastActiveAt: now,
         });
       },
 
-      dismissSessionRecord: () => {
-        const seconds = phaseSeconds(DEFAULT_TIMER_SETTINGS);
-        set({
-          phase: 'focus',
-          remainingSeconds: seconds.focus,
-          startedAt: null,
-          cycleCount: 0,
-          currentTaskId: null,
-          sessionEnded: false,
-          showAbandonedPrompt: false,
-          sessionStarted: false,
-          settings: DEFAULT_TIMER_SETTINGS,
-          sessionStartedAt: null,
-          sessionEndedAt: null,
-          accFocusSeconds: 0,
-          rawFocusPeriods: [],
-          lastActiveAt: null,
-        });
-      },
+      dismissSessionRecord: () => set(resetSessionState()),
 
       enterFocusMode: () => {
         trackEvent(EVENTS.FOCUS_MODE_ENTERED);
