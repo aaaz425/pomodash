@@ -25,13 +25,15 @@ export function MiniTimerWidget() {
   if (!hydrated || !sessionStarted || pathname === '/') return null;
 
   const phaseStyles = PHASE_BADGE_STYLES[phase];
+  const dotClass = isRunning ? phaseStyles.dot : 'bg-muted-foreground/50';
+  const iconClass = isRunning ? phaseStyles.text : 'text-muted-foreground';
 
   return (
     // 모바일: BottomNav 위 중앙 / 태블릿·데스크톱: 상단 중앙
     <div className="fixed bottom-18 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-4 z-40">
       <div className="flex items-center gap-2 rounded-full bg-card border border-border shadow-lg px-3 py-1.5 whitespace-nowrap">
         <Link href="/" className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full shrink-0 ${phaseStyles.dot}`} />
+          <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
           <span className="font-mono text-sm font-semibold tabular-nums">
             {fmt(displaySeconds)}
           </span>
@@ -45,9 +47,9 @@ export function MiniTimerWidget() {
           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
         >
           {isRunning ? (
-            <Pause className={`w-3 h-3 ${phaseStyles.text}`} />
+            <Pause className={`w-3 h-3 ${iconClass}`} />
           ) : (
-            <Play className={`w-3 h-3 ${phaseStyles.text}`} />
+            <Play className={`w-3 h-3 ${iconClass}`} />
           )}
         </button>
       </div>

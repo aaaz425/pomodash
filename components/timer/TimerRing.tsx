@@ -7,6 +7,8 @@ import {
   PHASE_LABELS,
   PHASE_BADGE_STYLES,
   PHASE_GLOW,
+  NEUTRAL_HEX_COLOR,
+  NEUTRAL_GLOW,
 } from '@/lib/constants/timerColors';
 import { Badge } from '@/components/shared/Badge';
 
@@ -30,13 +32,13 @@ export function TimerRing() {
 
   const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
-  const color = PHASE_HEX_COLORS[phase];
+  const color = isNeutral ? NEUTRAL_HEX_COLOR : PHASE_HEX_COLORS[phase];
   const badge = PHASE_BADGE_STYLES[phase];
 
   const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0');
   const ss = String(displaySeconds % 60).padStart(2, '0');
 
-  const glow = PHASE_GLOW[phase];
+  const glow = isNeutral ? NEUTRAL_GLOW : PHASE_GLOW[phase];
 
   return (
     <div className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]">
