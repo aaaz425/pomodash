@@ -19,3 +19,8 @@ export const PHASE_GLOW: Record<TimerPhase, string> = {
   focus: 'bg-[radial-gradient(circle,_#10d9a030_0%,_transparent_70%)]',
   'short-break': 'bg-[radial-gradient(circle,_#60a5fa30_0%,_transparent_70%)]',
 };
+
+// 대기/일시정지 상태 — CSS 변수라 다크/라이트 모드 자동 대응
+export const NEUTRAL_HEX_COLOR = 'var(--muted-foreground)';
+export const NEUTRAL_GLOW =
+  'bg-[radial-gradient(circle,_var(--muted-foreground)_0%,_transparent_70%)] opacity-30';
