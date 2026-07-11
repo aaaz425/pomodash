@@ -29,8 +29,11 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
 
       {hasData ? (
         <div className="flex items-center justify-center gap-4 flex-1">
-          {/* Donut chart */}
-          <div className="relative shrink-0 w-[120px] h-[120px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]">
+          {/* Donut chart — 옆 범례가 이미 텍스트로 동일 정보를 제공하므로 접근성 트리에서 제외 */}
+          <div
+            aria-hidden="true"
+            className="relative shrink-0 w-[120px] h-[120px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+          >
             <ResponsiveContainer width="100%" height="100%" minHeight={120}>
               <PieChart>
                 <Pie
