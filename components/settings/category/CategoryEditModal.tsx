@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/shared/TextInput';
 import type { Category } from '@/types';
 
-import { CATEGORY_COLOR_KEYS } from '@/lib/constants/categoryColors';
+import { CATEGORY_COLOR_KEYS, CATEGORY_COLOR_LABELS } from '@/lib/constants/categoryColors';
 
 interface Props {
   category: Category | null; // null = 새 카테고리
@@ -75,7 +75,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
             <button
               key={c}
               onClick={() => setColor(c)}
-              aria-label={c}
+              aria-label={CATEGORY_COLOR_LABELS[c]}
               aria-pressed={color === c}
               className={`w-7 h-7 rounded-full ${c} transition-all ${
                 color === c
