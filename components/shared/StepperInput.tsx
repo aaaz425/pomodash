@@ -56,7 +56,7 @@ export function StepperInput({
           onChange={(e) => setRaw(e.target.value.replace(/\D/g, ''))}
           onBlur={() => commit(raw)}
           onKeyDown={(e) => e.key === 'Enter' && commit(raw)}
-          className="w-10 text-center text-base font-semibold text-foreground bg-transparent focus:outline-none py-2 disabled:cursor-not-allowed"
+          className="w-10 text-center text-base font-semibold text-foreground bg-transparent outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-sm py-2 disabled:cursor-not-allowed"
         />
         <button
           type="button"
