@@ -115,7 +115,7 @@ export default function DashboardPage() {
   })();
 
   return (
-    <main className="flex-1 overflow-y-auto">
+    <main id="main-content" className="flex-1 overflow-y-auto">
       <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

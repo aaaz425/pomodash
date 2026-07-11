@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 
 import { Badge } from '@/components/shared/Badge';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { SrOnlyDataTable } from '@/components/dashboard/SrOnlyDataTable';
 import { getHourlyFocusSeconds } from '@/lib/dashboard';
 import type { Session } from '@/types';
 
@@ -27,10 +28,6 @@ export function HourlyChart({ sessions }: Props) {
   const peakHour = hourly.indexOf(Math.max(...hourly));
   const hasFocus = hourly.some((v) => v > 0);
 
-  const hourlySummary = hourly
-    .map((sec, hour) => `${formatHourLabel(hour)} ${Math.round(sec / 60)}분`)
-    .join(', ');
-
   return (
     <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[180px]">
       <div className="flex items-center justify-between">
@@ -43,7 +40,17 @@ export function HourlyChart({ sessions }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5 flex-1">
-        {hasFocus && <span className="sr-only">{hourlySummary}</span>}
+        {hasFocus && (
+          <SrOnlyDataTable
+            caption="시간대별 집중 분석"
+            rowHeaderLabel="시간대"
+            columns={['집중 시간']}
+            rows={hourly.map((sec, hour) => ({
+              label: formatHourLabel(hour),
+              values: [`${Math.round(sec / 60)}분`],
+            }))}
+          />
+        )}
         {/* Bars */}
         <div aria-hidden="true" className="flex items-end gap-0.5 flex-1">
           {hourly.map((val, i) => {

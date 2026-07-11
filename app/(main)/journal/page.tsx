@@ -2,7 +2,10 @@ import { JournalView } from '@/components/journal/JournalView';
 
 export default function JournalPage() {
   return (
-    <main className="flex-1 overflow-y-auto lg:overflow-hidden lg:flex lg:flex-col">
+    <main
+      id="main-content"
+      className="flex-1 overflow-y-auto lg:overflow-hidden lg:flex lg:flex-col"
+    >
       <div className="p-4 sm:p-6 md:p-8 lg:p-10 lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
         <div className="mb-6 lg:shrink-0">
           <h1 className="text-xl font-bold text-foreground">기록</h1>

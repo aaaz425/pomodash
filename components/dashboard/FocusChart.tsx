@@ -6,6 +6,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { getFocusTrendData } from '@/lib/dashboard';
 import type { TabType } from '@/types';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { SrOnlyDataTable } from '@/components/dashboard/SrOnlyDataTable';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -24,20 +25,13 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
 
   const hasData = usedCats.length > 0;
 
-  const chartSummary = data
-    .map((item) => {
-      const parts = usedCats.map((cat) => `${cat.name} ${item[cat.name] ?? 0}분`).join(', ');
-      return `${item.label}: ${parts}`;
-    })
-    .join(' / ');
-
   return (
     <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold text-foreground">{focusLabel}</p>
         {hasData && (
-          <div className="flex flex-wrap gap-3">
+          <div aria-hidden="true" className="flex flex-wrap gap-3">
             {usedCats.map((cat) => (
               <span
                 key={cat.name}
@@ -57,7 +51,15 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
       {/* Chart */}
       {hasData ? (
         <div className="flex-1 min-h-[140px]">
-          <span className="sr-only">{chartSummary}</span>
+          <SrOnlyDataTable
+            caption={focusLabel}
+            rowHeaderLabel="구간"
+            columns={usedCats.map((cat) => cat.name)}
+            rows={data.map((item) => ({
+              label: item.label,
+              values: usedCats.map((cat) => `${item[cat.name] ?? 0}분`),
+            }))}
+          />
           <div aria-hidden="true" className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%" minHeight={140}>
               <BarChart
