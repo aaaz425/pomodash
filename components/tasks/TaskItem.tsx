@@ -41,7 +41,20 @@ export function TaskItem({
     <div
       ref={setNodeRef}
       style={style}
+      role={mode === 'select' ? 'button' : undefined}
+      tabIndex={mode === 'select' ? 0 : undefined}
+      aria-pressed={mode === 'select' ? isSelected : undefined}
       onClick={mode === 'select' ? () => onSelect?.(task.id) : undefined}
+      onKeyDown={
+        mode === 'select'
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelect?.(task.id);
+              }
+            }
+          : undefined
+      }
       className={[
         'flex items-center gap-2.5 px-3 py-2.5 rounded-lg group transition-colors',
         mode === 'select' ? 'cursor-pointer' : '',
