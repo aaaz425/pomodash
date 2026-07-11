@@ -39,7 +39,7 @@ export default function SettingsPage() {
   const soundAlert = useSettingsStore((s) => s.soundAlert);
 
   return (
-    <main className="flex-1 overflow-y-auto">
+    <main id="main-content" className="flex-1 overflow-y-auto">
       <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6">
         <div>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
