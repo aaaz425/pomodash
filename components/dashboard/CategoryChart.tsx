@@ -6,6 +6,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { getCategoryFocusData } from '@/lib/dashboard';
 import { formatDuration } from '@/lib/sessionUtils';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { SrOnlyDataTable } from '@/components/dashboard/SrOnlyDataTable';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -77,8 +78,8 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="flex flex-col gap-2 flex-1 min-w-0">
+          {/* Legend — 시각용, 스크린리더에는 아래 sr-only 테이블을 대신 제공 */}
+          <div aria-hidden="true" className="flex flex-col gap-2 flex-1 min-w-0">
             {data.map((item) => (
               <div key={item.name} className="flex items-center justify-between gap-2 min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
@@ -99,6 +100,16 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
               </div>
             ))}
           </div>
+
+          <SrOnlyDataTable
+            caption="카테고리별 집중 시간"
+            rowHeaderLabel="카테고리"
+            columns={['집중 시간', '비율']}
+            rows={data.map((item) => ({
+              label: item.name,
+              values: [formatDuration(item.minutes * 60), `${item.percent}%`],
+            }))}
+          />
         </div>
       ) : (
         <EmptyState
