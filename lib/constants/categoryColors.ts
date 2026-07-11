@@ -95,6 +95,20 @@ export const CATEGORY_PILL_STYLES: Record<
   },
 };
 
+// 색상 선택 버튼 aria-label용 — Tailwind 클래스명을 그대로 노출하면 스크린리더가 읽을 수 없음
+export const CATEGORY_COLOR_LABELS: Record<CategoryColorKey, string> = {
+  'bg-blue-500': '파란색',
+  'bg-green-500': '초록색',
+  'bg-orange-500': '주황색',
+  'bg-purple-500': '보라색',
+  'bg-gray-500': '회색',
+  'bg-red-500': '빨간색',
+  'bg-pink-500': '분홍색',
+  'bg-yellow-500': '노란색',
+  'bg-teal-500': '청록색',
+  'bg-indigo-500': '남색',
+};
+
 export const CATEGORY_HEX_COLORS: Record<CategoryColorKey, string> = {
   'bg-blue-500': '#3b82f6',
   'bg-green-500': '#22c55e',

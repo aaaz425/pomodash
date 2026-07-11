@@ -69,6 +69,8 @@ export function ContributionCalendar({ data }: Props) {
               day ? (
                 <div
                   key={day.date}
+                  role="img"
+                  aria-label={formatTitle(day.date, day.focusMinutes)}
                   title={formatTitle(day.date, day.focusMinutes)}
                   className={`w-3.5 h-3.5 shrink-0 rounded-[3px] ${intensityClass(day.focusMinutes)}`}
                 />

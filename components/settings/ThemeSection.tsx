@@ -68,6 +68,7 @@ export function ThemeSection() {
           <button
             key={optMode}
             onClick={() => setTheme(optMode)}
+            aria-pressed={isSelected}
             className="flex-1 flex flex-col gap-2"
           >
             <div

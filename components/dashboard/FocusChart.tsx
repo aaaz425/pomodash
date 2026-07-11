@@ -24,6 +24,13 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
 
   const hasData = usedCats.length > 0;
 
+  const chartSummary = data
+    .map((item) => {
+      const parts = usedCats.map((cat) => `${cat.name} ${item[cat.name] ?? 0}분`).join(', ');
+      return `${item.label}: ${parts}`;
+    })
+    .join(' / ');
+
   return (
     <div className="flex flex-col gap-3 p-5 rounded-lg border border-border bg-card min-h-[200px]">
       {/* Header */}
@@ -50,47 +57,50 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
       {/* Chart */}
       {hasData ? (
         <div className="flex-1 min-h-[140px]">
-          <ResponsiveContainer width="100%" height="100%" minHeight={140}>
-            <BarChart
-              layout="vertical"
-              data={data}
-              margin={{ top: 6, right: 8, bottom: 0, left: 0 }}
-              barCategoryGap="30%"
-              barSize={22}
-            >
-              <XAxis
-                type="number"
-                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => (v === 0 ? '' : `${v}분`)}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-                width={44}
-              />
-              <Tooltip
-                cursor={{ fill: 'var(--muted)', opacity: 0.3 }}
-                contentStyle={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 8,
-                  fontSize: 12,
-                }}
-                formatter={(value, name) => [
-                  typeof value === 'number' ? `${value}분` : String(value),
-                  String(name ?? ''),
-                ]}
-              />
-              {usedCats.map((cat) => (
-                <Bar key={cat.name} dataKey={cat.name} stackId="a" fill={cat.color} />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
+          <span className="sr-only">{chartSummary}</span>
+          <div aria-hidden="true" className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%" minHeight={140}>
+              <BarChart
+                layout="vertical"
+                data={data}
+                margin={{ top: 6, right: 8, bottom: 0, left: 0 }}
+                barCategoryGap="30%"
+                barSize={22}
+              >
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => (v === 0 ? '' : `${v}분`)}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={44}
+                />
+                <Tooltip
+                  cursor={{ fill: 'var(--muted)', opacity: 0.3 }}
+                  contentStyle={{
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  formatter={(value, name) => [
+                    typeof value === 'number' ? `${value}분` : String(value),
+                    String(name ?? ''),
+                  ]}
+                />
+                {usedCats.map((cat) => (
+                  <Bar key={cat.name} dataKey={cat.name} stackId="a" fill={cat.color} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       ) : (
         <EmptyState
