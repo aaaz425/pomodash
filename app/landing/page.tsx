@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, BarChart2, Flame, CheckCircle, Timer, ListChecks } from 'lucide-react';
 import { LandingCTA } from '@/components/landing/LandingCTA';
+import { siteConfig } from '@/config/site';
+
+export const metadata: Metadata = {
+  title: siteConfig.title,
+  description: siteConfig.description,
+};
 
 export default function LandingPage() {
   return (
