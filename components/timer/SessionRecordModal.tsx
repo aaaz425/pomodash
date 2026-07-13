@@ -6,12 +6,13 @@ import { Check } from 'lucide-react';
 import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { SessionProgressBadge } from '@/components/timer/SessionProgressBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
 import { Button } from '@/components/ui/button';
 import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
+import { formatSessionProgressLabel } from '@/lib/sessionUtils';
 
 export function SessionRecordModal() {
   const hydrated = useHydrated();
@@ -19,6 +20,7 @@ export function SessionRecordModal() {
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+  const mode = useTimerStore((s) => s.mode);
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
   const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt);
   const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt);
@@ -52,10 +54,11 @@ export function SessionRecordModal() {
     );
     addSession({
       taskId,
+      mode,
       startedAt: new Date(sessionStartedAt ?? now).toISOString(),
       endedAt: new Date(now).toISOString(),
-      completedCycles: cycleCount,
-      totalCycles,
+      completedCycles: mode === 'free' ? 0 : cycleCount,
+      totalCycles: mode === 'free' ? 0 : totalCycles,
       focusSeconds: accFocusSeconds,
       pausedSeconds,
       focusPeriods,
@@ -127,21 +130,11 @@ export function SessionRecordModal() {
                       <CategoryBadge category={category} className="self-start" />
                     )}
                   </div>
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <span className="text-[11px] text-muted-foreground">
-                      완료된 사이클 {cycleCount} / {totalCycles}
-                    </span>
-                    <CycleIndicator />
-                  </div>
+                  <SessionProgressBadge />
                 </div>
               ) : (
                 /* Case B: 작업 없는 세션 — 작업 귀속 UI */
-                <SessionTaskSelector
-                  selectedTaskId={selectedTaskId}
-                  cycleCount={cycleCount}
-                  totalCycles={totalCycles}
-                  onSelect={setSelectedTaskId}
-                />
+                <SessionTaskSelector selectedTaskId={selectedTaskId} onSelect={setSelectedTaskId} />
               )}
 
               {/* Note Section */}
@@ -201,9 +194,11 @@ export function SessionRecordModal() {
         open={pendingAction === 'save'}
         title="이 기록으로 저장할까요?"
         description={
-          !isTaskSession && !selectedTaskId
-            ? `완료된 사이클 ${cycleCount} / ${totalCycles} · 미분류로 저장됩니다`
-            : `완료된 사이클 ${cycleCount} / ${totalCycles}`
+          formatSessionProgressLabel(mode, {
+            cycleCount,
+            totalCycles,
+            focusSeconds: accFocusSeconds,
+          }) + (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
         }
         confirmLabel="저장"
         onConfirm={handleSave}

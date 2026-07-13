@@ -1,5 +1,7 @@
 export type TimerPhase = 'focus' | 'short-break';
 
+export type TimerMode = 'pomodoro' | 'free';
+
 export interface Category {
   id: string;
   name: string;
@@ -25,6 +27,7 @@ export interface FocusPeriod {
 export interface Session {
   id: string;
   taskId: string | null;
+  mode: TimerMode; // 'free'는 completedCycles/totalCycles가 0 — 저널/모달에서 "N/M 사이클" 대신 별도 표시 필요
   startedAt: string; // ISO 8601, 시간대 분석용
   endedAt: string; // ISO 8601, 경과 시간 ≠ 집중 시간
   completedCycles: number;

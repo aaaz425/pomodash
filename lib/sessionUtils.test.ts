@@ -5,6 +5,8 @@ import {
   formatDuration,
   formatFocusPeriodRanges,
   formatFullDate,
+  formatSessionEndSummary,
+  formatSessionProgressLabel,
   formatSessionTimeSummary,
   formatTimeRange,
   getSessionOrdinalTitle,
@@ -16,6 +18,7 @@ function makeSession(startedAt: string, focusSeconds = 1500): Session {
   return {
     id: startedAt,
     taskId: null,
+    mode: 'pomodoro',
     startedAt,
     endedAt: new Date(new Date(startedAt).getTime() + focusSeconds * 1000).toISOString(),
     completedCycles: 1,
@@ -262,5 +265,31 @@ describe('hasAbnormalFocusGap', () => {
       { start: '2024-03-15T10:25:01', end: '2024-03-15T10:50:00' }, // 60분 1초 간격
     ];
     expect(hasAbnormalFocusGap(periods)).toBe(true);
+  });
+});
+
+describe('formatSessionProgressLabel', () => {
+  it('pomodoro 모드는 "완료된 사이클 X / Y" 형식', () => {
+    expect(
+      formatSessionProgressLabel('pomodoro', { cycleCount: 2, totalCycles: 4, focusSeconds: 3000 }),
+    ).toBe('완료된 사이클 2 / 4');
+  });
+
+  it('free 모드는 "자유 집중 Nm" 형식 (formatDuration 재사용)', () => {
+    expect(
+      formatSessionProgressLabel('free', { cycleCount: 0, totalCycles: 0, focusSeconds: 90 }),
+    ).toBe('자유 집중 1분');
+  });
+});
+
+describe('formatSessionEndSummary', () => {
+  it('pomodoro 모드는 사이클 정보를 포함', () => {
+    expect(formatSessionEndSummary('pomodoro', 25, 2, 4)).toBe(
+      '지금까지 25분 · 2 / 4사이클 진행했어요',
+    );
+  });
+
+  it('free 모드는 사이클 언급 없이 경과 시간만', () => {
+    expect(formatSessionEndSummary('free', 7, 0, 0)).toBe('지금까지 7분 집중했어요');
   });
 });

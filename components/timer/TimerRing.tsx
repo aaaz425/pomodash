@@ -11,6 +11,7 @@ import {
   NEUTRAL_GLOW,
 } from '@/lib/constants/timerColors';
 import { Badge } from '@/components/shared/Badge';
+import { formatClock } from '@/lib/utils';
 
 const BASE = 240;
 const SW = 18;
@@ -19,7 +20,7 @@ const CIRC = 2 * Math.PI * R;
 
 export function TimerRing() {
   const hydrated = useHydrated();
-  const { displaySeconds, phase } = useTimer();
+  const { displaySeconds, phase, mode } = useTimer();
   const totalSeconds = useTimerStore((s) =>
     s.phase === 'focus' ? s.settings.focusMinutes * 60 : s.settings.shortBreakMinutes * 60,
   );
@@ -30,13 +31,14 @@ export function TimerRing() {
   const isNeutral = isIdle || isPaused;
   const statusLabel = isIdle ? '대기 중' : isPaused ? '일시정지' : PHASE_LABELS[phase];
 
-  const elapsedFraction = totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
+  // free 모드는 목표치가 없으므로 링을 가득 채운 채 옅게 표시해 "진행 중"만 알림
+  const elapsedFraction =
+    mode === 'free' ? 1 : totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
   const color = isNeutral ? NEUTRAL_HEX_COLOR : PHASE_HEX_COLORS[phase];
   const badge = PHASE_BADGE_STYLES[phase];
 
-  const mm = String(Math.floor(displaySeconds / 60)).padStart(2, '0');
-  const ss = String(displaySeconds % 60).padStart(2, '0');
+  const timeLabel = formatClock(displaySeconds);
 
   const glow = isNeutral ? NEUTRAL_GLOW : PHASE_GLOW[phase];
 
@@ -61,6 +63,7 @@ export function TimerRing() {
           r={R}
           fill="none"
           stroke={color}
+          strokeOpacity={mode === 'free' ? 0.35 : undefined}
           strokeWidth={SW}
           strokeLinecap="round"
           strokeDasharray={CIRC}
@@ -76,7 +79,7 @@ export function TimerRing() {
           className="font-mono font-bold tabular-nums text-foreground leading-none tracking-[-2px] text-[1.75rem] sm:text-[2.5rem] lg:text-[3rem]"
           dateTime={`PT${Math.floor(displaySeconds / 60)}M${displaySeconds % 60}S`}
         >
-          {mm}:{ss}
+          {timeLabel}
         </time>
         {isNeutral ? (
           <Badge className="gap-1.5 px-2.5 bg-muted/60">

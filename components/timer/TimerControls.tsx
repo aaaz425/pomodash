@@ -8,11 +8,13 @@ import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { StartSessionModal } from '@/components/timer/StartSessionModal';
 import { Button } from '@/components/ui/button';
+import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
   const settings = useTimerStore((s) => s.settings);
+  const mode = useTimerStore((s) => s.mode);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
@@ -74,11 +76,12 @@ export function TimerControls() {
       <ConfirmDialog
         open={showEndConfirm}
         title="세션을 종료할까요?"
-        description={
-          <>
-            지금까지 {elapsedMinutes}분 · {cycleCount} / {settings.totalCycles}사이클 진행했어요
-          </>
-        }
+        description={formatSessionEndSummary(
+          mode,
+          elapsedMinutes,
+          cycleCount,
+          settings.totalCycles,
+        )}
         confirmLabel="세션 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}

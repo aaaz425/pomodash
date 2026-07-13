@@ -6,9 +6,11 @@ import { PHASE_BADGE_STYLES } from '@/lib/constants/timerColors';
 
 export function CycleIndicator() {
   const hydrated = useHydrated();
-  const { phase } = useTimer();
+  const { phase, mode } = useTimer();
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+
+  if (mode === 'free') return null; // 자유 모드는 고정 사이클이 없음
 
   return (
     <div

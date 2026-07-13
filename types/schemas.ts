@@ -35,6 +35,8 @@ export const FocusPeriodSchema = z.object({
 export const SessionSchema = z.object({
   id: z.string(),
   taskId: z.string().nullable(),
+  // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수
+  mode: z.enum(['pomodoro', 'free']).default('pomodoro'),
   startedAt: z.string(),
   endedAt: z.string(),
   completedCycles: z.number(),
@@ -73,6 +75,8 @@ export const RawFocusPeriodSchema = z.object({
 
 export const ActiveTimerStateSchema = z.object({
   phase: z.enum(['focus', 'short-break']),
+  // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수
+  mode: z.enum(['pomodoro', 'free']).default('pomodoro'),
   remainingSeconds: z.number(),
   startedAt: z.number().nullable(),
   cycleCount: z.number(),

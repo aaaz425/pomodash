@@ -1,4 +1,4 @@
-import type { FocusPeriod, Session, SessionGroup } from '@/types';
+import type { FocusPeriod, Session, SessionGroup, TimerMode } from '@/types';
 import { TIMER_LIMITS } from '@/lib/constants/limits';
 import { clampPeriodDuration } from '@/lib/focusPeriods';
 
@@ -112,4 +112,28 @@ export function formatSessionTimeSummary(
 ): string {
   const range = formatTimeRange(startedAt, endedAt);
   return hasAbnormalFocusGap(focusPeriods) ? `${range} · ${focusPeriods.length}구간` : range;
+}
+
+export function formatSessionProgressLabel(
+  mode: TimerMode,
+  {
+    cycleCount,
+    totalCycles,
+    focusSeconds,
+  }: { cycleCount: number; totalCycles: number; focusSeconds: number },
+): string {
+  return mode === 'free'
+    ? `자유 집중 ${formatDuration(focusSeconds)}`
+    : `완료된 사이클 ${cycleCount} / ${totalCycles}`;
+}
+
+export function formatSessionEndSummary(
+  mode: TimerMode,
+  elapsedMinutes: number,
+  cycleCount: number,
+  totalCycles: number,
+): string {
+  return mode === 'free'
+    ? `지금까지 ${elapsedMinutes}분 집중했어요`
+    : `지금까지 ${elapsedMinutes}분 · ${cycleCount} / ${totalCycles}사이클 진행했어요`;
 }

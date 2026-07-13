@@ -1,26 +1,19 @@
 'use client';
 
-import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { SessionProgressBadge } from '@/components/timer/SessionProgressBadge';
 import { TaskList } from '@/components/tasks/TaskList';
 
 interface Props {
   selectedTaskId: string | null;
-  cycleCount: number;
-  totalCycles: number;
   onSelect: (id: string) => void;
 }
 
-export function SessionTaskSelector({ selectedTaskId, cycleCount, totalCycles, onSelect }: Props) {
+export function SessionTaskSelector({ selectedTaskId, onSelect }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-foreground min-w-0">어떤 작업을 하셨나요?</span>
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <span className="text-[11px] text-muted-foreground">
-            완료된 사이클 {cycleCount} / {totalCycles}
-          </span>
-          <CycleIndicator />
-        </div>
+        <SessionProgressBadge />
       </div>
 
       <TaskList

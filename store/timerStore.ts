@@ -1,7 +1,7 @@
 'use client';
 
 import { createStore } from 'zustand';
-import type { TimerPhase, TimerSettings } from '@/types';
+import type { TimerMode, TimerPhase, TimerSettings } from '@/types';
 import {
   DEFAULT_TIMER_SETTINGS,
   ActiveTimerStateSchema,
@@ -19,6 +19,7 @@ type RawFocusPeriod = z.infer<typeof RawFocusPeriodSchema>;
 
 interface TimerStore {
   phase: TimerPhase;
+  mode: TimerMode; // 'free'는 고정 사이클 없는 카운트업 — phase는 항상 'focus'로 고정해 기존 로직 재사용
   remainingSeconds: number;
   startedAt: number | null; // 현재 실행 구간 시작 시각 (절대 시간 기반 계산용)
   cycleCount: number; // 현재 세션 내 완료된 focus 수
@@ -34,6 +35,7 @@ interface TimerStore {
   rawFocusPeriods: RawFocusPeriod[]; // 집중 구간 기록 (저장 전 normalizeFocusPeriods 통과 필요)
   lastActiveAt: number | null; // 방치 감지 기준 시각
 
+  setMode: (mode: TimerMode) => void;
   start: () => void;
   pause: () => void;
   complete: () => void; // 타이머 0 도달 시 훅이 호출
@@ -68,6 +70,7 @@ function resetSessionState() {
   const seconds = phaseSeconds(DEFAULT_TIMER_SETTINGS);
   return {
     phase: 'focus' as const,
+    mode: 'pomodoro' as const,
     remainingSeconds: seconds.focus,
     startedAt: null,
     cycleCount: 0,
@@ -88,6 +91,7 @@ function resetSessionState() {
 function toActiveTimerSnapshot(s: TimerStore) {
   return {
     phase: s.phase,
+    mode: s.mode,
     remainingSeconds: s.remainingSeconds,
     startedAt: s.startedAt,
     cycleCount: s.cycleCount,
@@ -109,6 +113,7 @@ export const createTimerStore = () => {
     const seconds = phaseSeconds(settings);
     return {
       phase: 'focus',
+      mode: 'pomodoro',
       remainingSeconds: seconds.focus,
       startedAt: null,
       cycleCount: 0,
@@ -123,6 +128,8 @@ export const createTimerStore = () => {
       accFocusSeconds: 0,
       rawFocusPeriods: [],
       lastActiveAt: null,
+
+      setMode: (mode) => set({ mode }),
 
       start: () =>
         set((state) => {
@@ -153,8 +160,8 @@ export const createTimerStore = () => {
       },
 
       complete: () => {
-        const { startedAt, phase, settings } = get();
-        if (!startedAt) return;
+        const { startedAt, phase, settings, mode } = get();
+        if (!startedAt || mode === 'free') return; // free 모드는 자동 완료 없음 — 사용자가 endSession()으로 직접 종료
         if (phase === 'focus') {
           get().completeCycle();
         } else {
@@ -255,11 +262,16 @@ export const createTimerStore = () => {
       },
 
       endSession: () => {
-        const { startedAt, phase, remainingSeconds, accFocusSeconds, rawFocusPeriods } = get();
+        const { startedAt, phase, mode, remainingSeconds, accFocusSeconds, rawFocusPeriods } =
+          get();
         const now = Date.now();
         const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
-        // 탭 방치 등으로 실제 경과가 목표 시간을 넘어도, 목표 시간만큼만 집중 시간으로 인정
-        const elapsed = creditableElapsed(Math.min(rawElapsed, remainingSeconds));
+        // free 모드는 목표 시간이 없으므로 clamp 없이 경과 전체를 인정. pomodoro는 탭 방치 등으로
+        // 실제 경과가 목표 시간을 넘어도 목표 시간만큼만 집중 시간으로 인정
+        const elapsed =
+          mode === 'free'
+            ? creditableElapsed(rawElapsed)
+            : creditableElapsed(Math.min(rawElapsed, remainingSeconds));
         const totalFocus = phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds;
         if (totalFocus < FOCUS_PERIOD_LIMITS.MIN_FOCUS_SECONDS) {
           toast('5초 미만 세션은 기록되지 않아요');

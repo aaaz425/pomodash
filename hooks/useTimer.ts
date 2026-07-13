@@ -8,9 +8,11 @@ export function useTimer() {
   const startedAt = useTimerStore((s) => s.startedAt);
   const remainingSeconds = useTimerStore((s) => s.remainingSeconds);
   const phase = useTimerStore((s) => s.phase);
+  const mode = useTimerStore((s) => s.mode);
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
+  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
   const complete = useTimerStore((s) => s.complete);
 
   const soundAlert = useSettingsStore((s) => s.soundAlert);
@@ -32,6 +34,13 @@ export function useTimer() {
 
     const tick = () => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+
+      // free 모드: 카운트업, 자동 완료/알림 없음 — 사용자가 직접 종료
+      if (mode === 'free') {
+        setRunningDisplay(accFocusSeconds + elapsed);
+        return;
+      }
+
       const remaining = Math.max(0, remainingSeconds - elapsed);
       setRunningDisplay(remaining);
 
@@ -80,6 +89,8 @@ export function useTimer() {
     remainingSeconds,
     complete,
     phase,
+    mode,
+    accFocusSeconds,
     cycleCount,
     totalCycles,
     soundAlert,
@@ -90,16 +101,28 @@ export function useTimer() {
   ]);
 
   // 정지 중엔 store 값 직접 사용 (렌더 중 Date.now() 금지)
-  const displaySeconds = startedAt !== null ? runningDisplay : remainingSeconds;
+  const displaySeconds =
+    mode === 'free'
+      ? startedAt !== null
+        ? runningDisplay
+        : accFocusSeconds
+      : startedAt !== null
+        ? runningDisplay
+        : remainingSeconds;
 
   const elapsedMinutes =
-    cycleCount * focusMinutes +
-    (phase === 'focus' ? Math.max(0, Math.floor((focusMinutes * 60 - displaySeconds) / 60)) : 0);
+    mode === 'free'
+      ? Math.floor(displaySeconds / 60)
+      : cycleCount * focusMinutes +
+        (phase === 'focus'
+          ? Math.max(0, Math.floor((focusMinutes * 60 - displaySeconds) / 60))
+          : 0);
 
   return {
     displaySeconds,
     isRunning: startedAt !== null,
     phase,
+    mode,
     cycleCount,
     elapsedMinutes,
   };
