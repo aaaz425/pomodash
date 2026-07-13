@@ -56,7 +56,7 @@
 
 경쟁 포모도로/스터디 타이머 앱 리서치 기반으로 확정한 차별화 방향. 로그인·백엔드 없이 localStorage만으로 구현 가능한 범위로 한정.
 
-- [>] `feat/free-stopwatch-mode` — 고정 사이클 없이 자유롭게 측정하는 스톱워치 모드
+- [x] `feat/free-stopwatch-mode` — 고정 사이클 없이 자유롭게 측정하는 스톱워치 모드
 - [ ] `feat/garden-growth` — 세션 기록 기반 정원 성장 시각화 (하이브리드형, 실패해도 손실 없음)
 - [ ] `feat/badge-collection` — 스트릭/누적시간/다양성/특별 이벤트 뱃지 수집
 - [ ] `feat/share-card` — 로그인 없는 집중 요약 공유 카드 (클라이언트 Canvas 생성)
