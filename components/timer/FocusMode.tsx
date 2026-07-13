@@ -14,6 +14,7 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
+import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
@@ -146,15 +147,7 @@ export function FocusMode() {
           <ConfirmDialog
             open={showEndConfirm}
             title="세션을 종료할까요?"
-            description={
-              mode === 'free' ? (
-                <>지금까지 {elapsedMinutes}분 집중했어요.</>
-              ) : (
-                <>
-                  지금까지 {elapsedMinutes}분 · {cycleCount}/{totalCycles}사이클 진행했어요.
-                </>
-              )
-            }
+            description={`${formatSessionEndSummary(mode, elapsedMinutes, cycleCount, totalCycles)}.`}
             confirmLabel="세션 종료"
             onConfirm={confirmEnd}
             onCancel={cancelEnd}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { TaskList } from '@/components/tasks/TaskList';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
+import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
 import type { TimerMode, TimerSettings } from '@/types';
@@ -91,22 +92,12 @@ export function StartSessionModal({ onClose }: Props) {
       {/* 타이머 방식 */}
       <div className="flex flex-col gap-3">
         <span className="text-sm font-semibold text-foreground">타이머 방식</span>
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-          {MODE_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setPendingMode(option.value)}
-              className={[
-                'flex-1 px-3 py-1.5 rounded-md text-sm transition-colors',
-                pendingMode === option.value
-                  ? 'bg-card text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground',
-              ].join(' ')}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={MODE_OPTIONS}
+          value={pendingMode}
+          onChange={setPendingMode}
+          fullWidth
+        />
       </div>
 
       <div className="h-px bg-border" />
