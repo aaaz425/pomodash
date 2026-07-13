@@ -100,7 +100,8 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 ### 전체 흐름 (Claude가 전담)
 
-1. 브랜치 내 중간 커밋 → **자동으로 진행** (커밋한 브랜치명 응답에 명시, 즉시 push)
+1. 브랜치 내 중간 커밋 → **매번 변경 내용을 요약해 보여주고 승인 받은 후** 커밋 + 즉시 push를 한 세트로 진행 (커밋한 브랜치명 응답에 명시)
+   - 브랜치 생성이나 계획을 승인받았어도 예외 없음 — 커밋 시점마다 별도로 승인 필요
 2. PR 생성 전 → **반드시** feature 브랜치에서 `git fetch origin && git rebase origin/main` 실행 후 push
 3. 작업 완료 → PR 제목/본문 초안 제시 → **승인 후** `gh pr create`
 4. **승인 후** `gh pr merge --squash`
@@ -109,7 +110,8 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 ### 핵심 규칙
 
-- 커밋 후 항상 **즉시 push**, 브랜치명 응답에 명시
+- **커밋 전 항상 사용자 승인**, 승인 후 커밋과 push를 한 세트로 즉시 진행하고 브랜치명을 응답에 명시
+- 커밋 메시지는 **제목 한 줄만** — 본문(WHY 등) 없이 작성. 사용자가 명시적으로 본문을 요청할 때만 예외
 - Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
 - PR 전 rebase 누락 시 GitHub에서 충돌 발생 → **PR 생성 전 반드시 실행**
 - 커밋 메시지: `docs/guides/commit-convention.md` 형식만 사용
