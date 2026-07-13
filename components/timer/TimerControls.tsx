@@ -13,6 +13,7 @@ export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
   const settings = useTimerStore((s) => s.settings);
+  const mode = useTimerStore((s) => s.mode);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
@@ -75,9 +76,13 @@ export function TimerControls() {
         open={showEndConfirm}
         title="세션을 종료할까요?"
         description={
-          <>
-            지금까지 {elapsedMinutes}분 · {cycleCount} / {settings.totalCycles}사이클 진행했어요
-          </>
+          mode === 'free' ? (
+            <>지금까지 {elapsedMinutes}분 집중했어요</>
+          ) : (
+            <>
+              지금까지 {elapsedMinutes}분 · {cycleCount} / {settings.totalCycles}사이클 진행했어요
+            </>
+          )
         }
         confirmLabel="세션 종료"
         onConfirm={confirmEnd}

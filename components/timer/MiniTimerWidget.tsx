@@ -6,16 +6,11 @@ import { Pause, Play } from 'lucide-react';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { PHASE_BADGE_STYLES } from '@/lib/constants/timerColors';
-
-function fmt(seconds: number): string {
-  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const ss = String(seconds % 60).padStart(2, '0');
-  return `${mm}:${ss}`;
-}
+import { formatClock } from '@/lib/utils';
 
 export function MiniTimerWidget() {
   const hydrated = useHydrated();
-  const { displaySeconds, isRunning, phase, cycleCount } = useTimer();
+  const { displaySeconds, isRunning, phase, mode, cycleCount } = useTimer();
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
   const pause = useTimerStore((s) => s.pause);
@@ -35,10 +30,12 @@ export function MiniTimerWidget() {
         <Link href="/" className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
           <span className="font-mono text-sm font-semibold tabular-nums">
-            {fmt(displaySeconds)}
+            {formatClock(displaySeconds)}
           </span>
           <span className="text-xs text-muted-foreground">
-            {phase === 'focus' ? '집중' : '휴식'} · {cycleCount}/{totalCycles}
+            {mode === 'free'
+              ? '자유 집중'
+              : `${phase === 'focus' ? '집중' : '휴식'} · ${cycleCount}/${totalCycles}`}
           </span>
         </Link>
         <button

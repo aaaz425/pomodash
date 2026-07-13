@@ -16,6 +16,7 @@ function makeSession(startedAt: string, focusSeconds = 1500): Session {
   return {
     id: startedAt,
     taskId: null,
+    mode: 'pomodoro',
     startedAt,
     endedAt: new Date(new Date(startedAt).getTime() + focusSeconds * 1000).toISOString(),
     completedCycles: 1,

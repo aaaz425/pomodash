@@ -17,6 +17,7 @@ function addNCategories(store: ReturnType<typeof createTaskStore>, n: number) {
 function makeSessionInput(overrides: Partial<Omit<Session, 'id'>> = {}): Omit<Session, 'id'> {
   return {
     taskId: null,
+    mode: 'pomodoro',
     startedAt: '2024-03-15T09:00:00.000Z',
     endedAt: '2024-03-15T09:30:00.000Z',
     completedCycles: 1,

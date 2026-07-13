@@ -22,7 +22,7 @@ export function FocusMode() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { cycleCount, elapsedMinutes } = useTimer();
+  const { cycleCount, elapsedMinutes, mode } = useTimer();
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
@@ -77,7 +77,9 @@ export function FocusMode() {
 
           {/* Task Section */}
           <div className="relative flex flex-col items-center gap-2">
-            <span className="text-sm text-muted-foreground/60">{cycleCount + 1}번째 집중 세션</span>
+            <span className="text-sm text-muted-foreground/60">
+              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중 세션`}
+            </span>
             {task ? (
               <div className="flex items-center gap-2">
                 <span className="text-xl font-semibold text-foreground">{task.title}</span>
@@ -145,9 +147,13 @@ export function FocusMode() {
             open={showEndConfirm}
             title="세션을 종료할까요?"
             description={
-              <>
-                지금까지 {elapsedMinutes}분 · {cycleCount}/{totalCycles}사이클 진행했어요.
-              </>
+              mode === 'free' ? (
+                <>지금까지 {elapsedMinutes}분 집중했어요.</>
+              ) : (
+                <>
+                  지금까지 {elapsedMinutes}분 · {cycleCount}/{totalCycles}사이클 진행했어요.
+                </>
+              )
             }
             confirmLabel="세션 종료"
             onConfirm={confirmEnd}

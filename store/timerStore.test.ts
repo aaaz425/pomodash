@@ -488,6 +488,66 @@ describe('timerStore', () => {
     });
   });
 
+  describe('자유 스톱워치 모드', () => {
+    it('setMode() — mode가 반영됨', () => {
+      const store = createTimerStore();
+      store.getState().setMode('free');
+      expect(store.getState().mode).toBe('free');
+    });
+
+    it('complete() — free 모드에서는 아무 동작도 하지 않음(자동 완료 없음)', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().setMode('free');
+      store.getState().start();
+
+      vi.setSystemTime(new Date('2024-01-01T01:00:00.000Z'));
+      store.getState().complete();
+
+      expect(store.getState().cycleCount).toBe(0);
+      expect(store.getState().sessionEnded).toBe(false);
+      expect(typeof store.getState().startedAt).toBe('number');
+    });
+
+    it('endSession() — free 모드는 remainingSeconds(목표 시간)와 무관하게 경과 전체를 인정', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().setMode('free');
+      store.getState().start();
+
+      // 기본 focusMinutes(25분)를 훌쩍 넘겨도 pomodoro처럼 25분으로 clamp되지 않아야 함
+      vi.setSystemTime(new Date('2024-01-01T01:10:00.000Z'));
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(70 * 60);
+      expect(store.getState().sessionEnded).toBe(true);
+    });
+
+    it('endSession() — free 모드도 5초 미만이면 기록되지 않고 초기화됨', () => {
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      const store = createTimerStore();
+      store.getState().setMode('free');
+      store.getState().start();
+
+      vi.setSystemTime(new Date('2024-01-01T00:00:03.000Z'));
+      store.getState().endSession();
+
+      expect(store.getState().accFocusSeconds).toBe(0);
+      expect(store.getState().sessionEnded).toBe(false);
+    });
+
+    it('dismissSessionRecord() — mode가 기본값(pomodoro)으로 복원됨', () => {
+      const store = createTimerStore();
+      store.getState().setMode('free');
+      store.getState().start();
+      store.getState().endSession();
+
+      store.getState().dismissSessionRecord();
+
+      expect(store.getState().mode).toBe('pomodoro');
+    });
+  });
+
   describe('초기값 및 설정 복원', () => {
     it('생성 시점에는 localStorage 값과 무관하게 항상 기본값으로 시작함', () => {
       localStorage.setItem(
