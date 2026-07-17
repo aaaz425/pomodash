@@ -160,6 +160,28 @@ select:not(:disabled) {
   transition: stroke-dashoffset 1s linear;
 }
 
+@keyframes timer-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(2);
+  }
+}
+
+.timer-glow-pulse {
+  animation: timer-glow-pulse 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-glow-pulse {
+    animation: none;
+  }
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;

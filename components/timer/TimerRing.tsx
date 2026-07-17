@@ -6,11 +6,10 @@ import {
   PHASE_HEX_COLORS,
   PHASE_LABELS,
   PHASE_BADGE_STYLES,
-  PHASE_GLOW,
   NEUTRAL_HEX_COLOR,
-  NEUTRAL_GLOW,
 } from '@/lib/constants/timerColors';
 import { Badge } from '@/components/shared/Badge';
+import { TimerGlow } from '@/components/timer/TimerGlow';
 import { formatClock } from '@/lib/utils';
 
 const BASE = 240;
@@ -40,13 +39,9 @@ export function TimerRing() {
 
   const timeLabel = formatClock(displaySeconds);
 
-  const glow = isNeutral ? NEUTRAL_GLOW : PHASE_GLOW[phase];
-
   return (
     <div className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]">
-      <div
-        className={`absolute pointer-events-none rounded-full w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] lg:w-[440px] lg:h-[440px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${glow}`}
-      />
+      <TimerGlow phase={phase} isNeutral={isNeutral} />
       <svg viewBox={`0 0 ${BASE} ${BASE}`} className="w-full h-full -rotate-90" aria-hidden="true">
         <circle
           cx={BASE / 2}
