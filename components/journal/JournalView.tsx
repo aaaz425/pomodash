@@ -5,6 +5,7 @@ import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { ListView } from '@/components/journal/ListView';
 import { TimelineView } from '@/components/journal/TimelineView';
 import { CalendarView } from '@/components/journal/CalendarView';
+import { InsightsSection } from '@/components/journal/InsightsSection';
 import { SessionDetailOverlay } from '@/components/journal/SessionDetailOverlay';
 import { JournalEmptyState } from '@/components/journal/JournalEmptyState';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
@@ -40,6 +41,8 @@ export function JournalView() {
 
   return (
     <div className="flex flex-col gap-4">
+      <InsightsSection sessions={sessions} tasks={tasks} categories={categories} />
+
       <SegmentedControl options={TAB_OPTIONS} value={activeTab} onChange={setActiveTab} fullWidth />
 
       {activeTab === 'list' && (
