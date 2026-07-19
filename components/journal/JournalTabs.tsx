@@ -15,5 +15,5 @@ interface Props {
 }
 
 export function JournalTabs({ value, onChange }: Props) {
-  return <SegmentedControl options={TABS} value={value} onChange={onChange} fullWidth />;
+  return <SegmentedControl options={TABS} value={value} onChange={onChange} />;
 }

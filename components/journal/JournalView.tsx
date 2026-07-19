@@ -22,8 +22,6 @@ export function JournalView() {
 
   if (!hydrated) return null;
 
-  if (sessions.length === 0) return <JournalEmptyState />;
-
   const selectedSession = sessions.find((s) => s.id === selectedId) ?? null;
   const selectedTask = selectedSession
     ? (tasks.find((t) => t.id === selectedSession.taskId) ?? null)
@@ -33,38 +31,53 @@ export function JournalView() {
     : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <InsightsSection sessions={sessions} tasks={tasks} categories={categories} />
+    <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">
+      {/* Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">기록</h1>
+          <p className="mt-1 text-sm text-muted-foreground">한 번의 집중도 기억합니다</p>
+        </div>
+        {sessions.length > 0 && <JournalTabs value={activeTab} onChange={setActiveTab} />}
+      </div>
 
-      <JournalTabs value={activeTab} onChange={setActiveTab} />
+      {sessions.length === 0 ? (
+        <JournalEmptyState />
+      ) : (
+        <>
+          <InsightsSection sessions={sessions} tasks={tasks} categories={categories} />
 
-      {activeTab === 'list' && (
-        <ListView
-          sessions={sessions}
-          tasks={tasks}
-          categories={categories}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-        />
+          {activeTab === 'list' && (
+            <ListView
+              sessions={sessions}
+              tasks={tasks}
+              categories={categories}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+          )}
+          {activeTab === 'timeline' && (
+            <TimelineView sessions={sessions} onSelect={setSelectedId} />
+          )}
+          {activeTab === 'calendar' && (
+            <CalendarView
+              sessions={sessions}
+              tasks={tasks}
+              categories={categories}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+          )}
+
+          <SessionDetailOverlay
+            session={selectedSession}
+            task={selectedTask}
+            category={selectedCategory}
+            onClose={() => setSelectedId(null)}
+            onDeleted={() => setSelectedId(null)}
+          />
+        </>
       )}
-      {activeTab === 'timeline' && <TimelineView sessions={sessions} onSelect={setSelectedId} />}
-      {activeTab === 'calendar' && (
-        <CalendarView
-          sessions={sessions}
-          tasks={tasks}
-          categories={categories}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-        />
-      )}
-
-      <SessionDetailOverlay
-        session={selectedSession}
-        task={selectedTask}
-        category={selectedCategory}
-        onClose={() => setSelectedId(null)}
-        onDeleted={() => setSelectedId(null)}
-      />
     </div>
   );
 }
