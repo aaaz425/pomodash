@@ -72,7 +72,11 @@ export interface Session {
   pausedSeconds: number // 총 일시정지 초
   focusPeriods: Array<{ start: string; end: string }> // 타임라인 블록용 실제 집중 구간
   note: string | null // 세션 회고 메모 (향후 모달에서 입력)
+  focusRating: FocusRating | null // 집중도 자가 평점 3단계, 옵션
+  distractionTags: string[] // 방해요소 태그 프리셋(id) 배열, 옵션
 }
+
+export type FocusRating = 1 | 2 | 3
 
 // TimerRecord — 향후 per-phase 세분화 집계용으로 예약, 현재 미사용
 export interface TimerRecord {

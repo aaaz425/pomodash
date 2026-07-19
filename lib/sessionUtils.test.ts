@@ -27,6 +27,8 @@ function makeSession(startedAt: string, focusSeconds = 1500): Session {
     pausedSeconds: 0,
     focusPeriods: [],
     note: null,
+    focusRating: null,
+    distractionTags: [],
   };
 }
 

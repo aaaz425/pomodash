@@ -26,6 +26,8 @@ function makeSessionInput(overrides: Partial<Omit<Session, 'id'>> = {}): Omit<Se
     pausedSeconds: 0,
     focusPeriods: [],
     note: null,
+    focusRating: null,
+    distractionTags: [],
     ...overrides,
   };
 }
@@ -165,7 +167,7 @@ describe('deleteTask', () => {
   });
 });
 
-describe('addSession / updateSessionNote / deleteSession', () => {
+describe('addSession / updateSessionNote / updateSessionRating / updateSessionTags / deleteSession', () => {
   it('addSession — 새 세션이 목록 맨 앞에 추가됨', () => {
     const store = createTaskStore();
     store.getState().addSession(makeSessionInput());
@@ -174,6 +176,13 @@ describe('addSession / updateSessionNote / deleteSession', () => {
       '2024-03-16T09:00:00.000Z',
       '2024-03-15T09:00:00.000Z',
     ]);
+  });
+
+  it('addSession — focusRating/distractionTags가 그대로 저장됨', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ focusRating: 3, distractionTags: ['phone'] }));
+    expect(store.getState().sessions[0].focusRating).toBe(3);
+    expect(store.getState().sessions[0].distractionTags).toEqual(['phone']);
   });
 
   it('updateSessionNote — note 양 끝 공백이 trim됨', () => {
@@ -205,6 +214,52 @@ describe('addSession / updateSessionNote / deleteSession', () => {
     store.getState().addSession(makeSessionInput({ note: '기존 메모' }));
     store.getState().updateSessionNote('no-such-id', '변경 시도');
     expect(store.getState().sessions[0].note).toBe('기존 메모');
+  });
+
+  it('updateSessionRating — 정상적으로 평점이 갱신됨', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput());
+    const id = store.getState().sessions[0].id;
+    store.getState().updateSessionRating(id, 2);
+    expect(store.getState().sessions[0].focusRating).toBe(2);
+  });
+
+  it('updateSessionRating — null로 재설정하면 선택 해제됨', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ focusRating: 3 }));
+    const id = store.getState().sessions[0].id;
+    store.getState().updateSessionRating(id, null);
+    expect(store.getState().sessions[0].focusRating).toBeNull();
+  });
+
+  it('updateSessionRating — 존재하지 않는 id면 아무 세션도 변경되지 않음', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ focusRating: 1 }));
+    store.getState().updateSessionRating('no-such-id', 3);
+    expect(store.getState().sessions[0].focusRating).toBe(1);
+  });
+
+  it('updateSessionTags — 정상적으로 태그 배열이 교체됨', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
+    const id = store.getState().sessions[0].id;
+    store.getState().updateSessionTags(id, ['noise', 'fatigue']);
+    expect(store.getState().sessions[0].distractionTags).toEqual(['noise', 'fatigue']);
+  });
+
+  it('updateSessionTags — 빈 배열로 설정 가능', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
+    const id = store.getState().sessions[0].id;
+    store.getState().updateSessionTags(id, []);
+    expect(store.getState().sessions[0].distractionTags).toEqual([]);
+  });
+
+  it('updateSessionTags — 존재하지 않는 id면 아무 세션도 변경되지 않음', () => {
+    const store = createTaskStore();
+    store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
+    store.getState().updateSessionTags('no-such-id', ['noise']);
+    expect(store.getState().sessions[0].distractionTags).toEqual(['phone']);
   });
 
   it('deleteSession — 해당 id의 세션이 목록에서 제거됨', () => {
@@ -361,5 +416,27 @@ describe('hydrate', () => {
     const store = createTaskStore();
     store.getState().hydrate();
     expect(store.getState().tasks).toEqual([]);
+  });
+
+  it('구버전 세션 데이터(focusRating/distractionTags 없음)도 default 값으로 채워져 복원됨', () => {
+    const legacySession = {
+      id: 's1',
+      taskId: null,
+      mode: 'pomodoro',
+      startedAt: '2024-03-15T09:00:00.000Z',
+      endedAt: '2024-03-15T09:30:00.000Z',
+      completedCycles: 1,
+      totalCycles: 4,
+      focusSeconds: 1500,
+      pausedSeconds: 0,
+      focusPeriods: [],
+      note: null,
+      // focusRating/distractionTags 필드 없음 — 구버전 데이터 시뮬레이션
+    };
+    localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify([legacySession]));
+    const store = createTaskStore();
+    store.getState().hydrate();
+    expect(store.getState().sessions[0].focusRating).toBeNull();
+    expect(store.getState().sessions[0].distractionTags).toEqual([]);
   });
 });

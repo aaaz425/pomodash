@@ -2,6 +2,8 @@ export type TimerPhase = 'focus' | 'short-break';
 
 export type TimerMode = 'pomodoro' | 'free';
 
+export type FocusRating = 1 | 2 | 3;
+
 export interface Category {
   id: string;
   name: string;
@@ -36,6 +38,8 @@ export interface Session {
   pausedSeconds: number;
   focusPeriods: FocusPeriod[]; // 타임라인용 실제 구간
   note: string | null;
+  focusRating: FocusRating | null; // 3단계 자가 평점, 옵션
+  distractionTags: string[]; // DISTRACTION_TAGS의 id 배열, 옵션
 }
 
 // per-phase 집계용 예약 타입, 미사용

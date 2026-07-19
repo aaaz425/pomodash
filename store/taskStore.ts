@@ -10,6 +10,7 @@ import {
   type Task,
   type Category,
   type Session,
+  type FocusRating,
   TasksSchema,
   CategoriesSchema,
   SessionsSchema,
@@ -42,6 +43,8 @@ interface TaskStore {
   deleteTask: (id: string) => void;
   addSession: (input: Omit<Session, 'id'>) => void;
   updateSessionNote: (id: string, note: string | null) => void;
+  updateSessionRating: (id: string, rating: FocusRating | null) => void;
+  updateSessionTags: (id: string, tags: string[]) => void;
   deleteSession: (id: string) => void;
   reorderTasks: (activeId: string, overId: string) => void;
   addCategory: (input: { name: string; color: string }) => void;
@@ -115,6 +118,20 @@ export const createTaskStore = () =>
       saveSessions(sessions);
       set({ sessions });
       if (note?.trim()) trackEvent(EVENTS.SESSION_NOTE_WRITTEN);
+    },
+
+    updateSessionRating: (id, rating) => {
+      const sessions = get().sessions.map((s) => (s.id === id ? { ...s, focusRating: rating } : s));
+      saveSessions(sessions);
+      set({ sessions });
+    },
+
+    updateSessionTags: (id, tags) => {
+      const sessions = get().sessions.map((s) =>
+        s.id === id ? { ...s, distractionTags: tags } : s,
+      );
+      saveSessions(sessions);
+      set({ sessions });
     },
 
     deleteSession: (id) => {
