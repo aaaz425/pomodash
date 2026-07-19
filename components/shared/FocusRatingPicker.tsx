@@ -1,12 +1,7 @@
 'use client';
 
+import { FOCUS_RATING_OPTIONS } from '@/lib/constants';
 import type { FocusRating } from '@/types';
-
-const OPTIONS: Array<{ value: FocusRating; label: string }> = [
-  { value: 1, label: '흐트러짐' },
-  { value: 2, label: '보통' },
-  { value: 3, label: '몰입' },
-];
 
 interface Props {
   value: FocusRating | null;
@@ -16,7 +11,7 @@ interface Props {
 export function FocusRatingPicker({ value, onChange }: Props) {
   return (
     <div className="flex items-center gap-1.5">
-      {OPTIONS.map((option) => {
+      {FOCUS_RATING_OPTIONS.map((option) => {
         const isSelected = value === option.value;
         return (
           <button
