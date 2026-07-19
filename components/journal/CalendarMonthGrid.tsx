@@ -58,12 +58,12 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
   const today = new Date();
 
   return (
-    <div className="flex flex-col rounded-lg border border-border overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-border bg-card">
+    <div className="flex flex-col rounded-xl border border-border overflow-hidden shadow-sm">
+      <div className="grid grid-cols-7 border-b border-border bg-muted/40">
         {DAY_LABELS.map((label, i) => (
           <span
             key={label}
-            className={`text-xs font-medium text-center py-2 ${headerTextClass(i)}`}
+            className={`text-xs font-semibold text-center py-2.5 ${headerTextClass(i)}`}
           >
             {label}
           </span>
@@ -75,7 +75,10 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
             {week.map((day, di) => {
               if (!day) {
                 return (
-                  <div key={`empty-${wi}-${di}`} className="min-h-[64px] sm:min-h-[80px] bg-card" />
+                  <div
+                    key={`empty-${wi}-${di}`}
+                    className="min-h-[92px] sm:min-h-[132px] bg-muted/20"
+                  />
                 );
               }
 
@@ -91,26 +94,27 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
                   onClick={() => onSelectDate(date)}
                   aria-label={`${date.getDate()}일${hasFocus ? `, ${formatMinutes(day.focusMinutes)} 집중` : ''}`}
                   className={[
-                    'flex flex-col items-center gap-1 min-h-[64px] sm:min-h-[80px] pt-2 pb-1.5 transition-colors',
-                    isSelected ? 'bg-primary/15' : 'bg-card hover:bg-muted',
+                    'flex flex-col items-start min-h-[92px] sm:min-h-[132px] p-2 sm:p-3 transition-colors',
+                    isSelected ? 'bg-primary/10' : 'bg-card hover:bg-muted/60',
                   ].join(' ')}
                 >
                   <span
                     className={[
-                      'flex items-center justify-center w-6 h-6 rounded-full text-xs',
+                      'flex items-center justify-center w-7 h-7 rounded-full text-sm transition-colors',
                       isSelected
-                        ? 'bg-primary text-primary-foreground font-semibold'
+                        ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
                         : isToday
-                          ? 'border border-primary font-semibold text-primary'
+                          ? 'bg-primary/15 font-semibold text-primary'
                           : `font-medium ${dayNumberTextClass(dayOfWeek)}`,
                     ].join(' ')}
                   >
                     {date.getDate()}
                   </span>
+
                   {hasFocus && (
                     <>
-                      <span className="sm:hidden w-1.5 h-1.5 rounded-full bg-primary" />
-                      <span className="hidden sm:inline text-[10px] text-muted-foreground">
+                      <span className="sm:hidden mt-auto w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span className="hidden sm:inline-flex mt-auto items-center self-start rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                         {formatMinutes(day.focusMinutes)}
                       </span>
                     </>
