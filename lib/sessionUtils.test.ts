@@ -10,6 +10,7 @@ import {
   formatSessionTimeSummary,
   formatTimeRange,
   getSessionOrdinalTitle,
+  getSessionsForDate,
   groupSessionsByDate,
   hasAbnormalFocusGap,
 } from './sessionUtils';
@@ -102,6 +103,28 @@ describe('groupSessionsByDate', () => {
     const groups = groupSessionsByDate([makeSession('2024-03-15T09:00:00')]);
     expect(groups[0].displayLabel).toBe('오늘');
     vi.useRealTimers();
+  });
+});
+
+describe('getSessionsForDate', () => {
+  it('해당 날짜의 세션만 반환', () => {
+    const sessions = [
+      makeSession('2024-03-15T09:00:00'),
+      makeSession('2024-03-16T09:00:00'),
+      makeSession('2024-03-15T20:00:00'),
+    ];
+    const result = getSessionsForDate(sessions, new Date('2024-03-15T00:00:00'));
+    expect(result.map((s) => s.startedAt)).toEqual(['2024-03-15T09:00:00', '2024-03-15T20:00:00']);
+  });
+
+  it('다른 날짜 경계값(자정 직전/직후)은 포함하지 않음', () => {
+    const sessions = [makeSession('2024-03-14T23:59:59'), makeSession('2024-03-16T00:00:00')];
+    const result = getSessionsForDate(sessions, new Date('2024-03-15T12:00:00'));
+    expect(result).toEqual([]);
+  });
+
+  it('해당 날짜 세션이 없으면 빈 배열 반환', () => {
+    expect(getSessionsForDate([], new Date('2024-03-15T12:00:00'))).toEqual([]);
   });
 });
 

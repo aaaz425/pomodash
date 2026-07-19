@@ -1,10 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { ListView } from '@/components/journal/ListView';
+import { TimelineView } from '@/components/journal/TimelineView';
 import { SessionDetailOverlay } from '@/components/journal/SessionDetailOverlay';
 import { JournalEmptyState } from '@/components/journal/JournalEmptyState';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+
+type JournalTab = 'list' | 'timeline';
+
+const TAB_OPTIONS: Array<{ value: JournalTab; label: string }> = [
+  { value: 'list', label: '리스트' },
+  { value: 'timeline', label: '타임라인' },
+];
 
 export function JournalView() {
   const hydrated = useHydrated();
@@ -13,6 +22,7 @@ export function JournalView() {
   const categories = useTaskStore((s) => s.categories);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<JournalTab>('list');
 
   if (!hydrated) return null;
 
@@ -27,14 +37,20 @@ export function JournalView() {
     : null;
 
   return (
-    <div className="flex flex-col">
-      <ListView
-        sessions={sessions}
-        tasks={tasks}
-        categories={categories}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-      />
+    <div className="flex flex-col gap-4">
+      <SegmentedControl options={TAB_OPTIONS} value={activeTab} onChange={setActiveTab} fullWidth />
+
+      {activeTab === 'list' ? (
+        <ListView
+          sessions={sessions}
+          tasks={tasks}
+          categories={categories}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+      ) : (
+        <TimelineView sessions={sessions} onSelect={setSelectedId} />
+      )}
 
       <SessionDetailOverlay
         session={selectedSession}

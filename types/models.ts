@@ -92,6 +92,15 @@ export interface SessionGroup {
   sessions: Session[];
 }
 
+export interface TimelineBlock {
+  sessionId: string;
+  taskId: string | null;
+  top: number; // 0-100, 하루 대비 시작 위치(%)
+  height: number; // 0-100, 하루 대비 길이(%) — 가독성을 위한 최소값 보장
+  startLabel: string; // "09:12"
+  endLabel: string;
+}
+
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;
