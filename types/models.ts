@@ -63,6 +63,8 @@ export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
 
+export type JournalTab = 'list' | 'timeline' | 'calendar';
+
 export interface DayActivity {
   date: string; // YYYY-MM-DD
   focusMinutes: number;

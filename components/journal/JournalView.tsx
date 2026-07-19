@@ -1,22 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { ListView } from '@/components/journal/ListView';
 import { TimelineView } from '@/components/journal/TimelineView';
 import { CalendarView } from '@/components/journal/CalendarView';
 import { InsightsSection } from '@/components/journal/InsightsSection';
+import { JournalTabs } from '@/components/journal/JournalTabs';
 import { SessionDetailOverlay } from '@/components/journal/SessionDetailOverlay';
 import { JournalEmptyState } from '@/components/journal/JournalEmptyState';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
-
-type JournalTab = 'list' | 'timeline' | 'calendar';
-
-const TAB_OPTIONS: Array<{ value: JournalTab; label: string }> = [
-  { value: 'list', label: '리스트' },
-  { value: 'timeline', label: '타임라인' },
-  { value: 'calendar', label: '캘린더' },
-];
+import type { JournalTab } from '@/types';
 
 export function JournalView() {
   const hydrated = useHydrated();
@@ -43,7 +36,7 @@ export function JournalView() {
     <div className="flex flex-col gap-4">
       <InsightsSection sessions={sessions} tasks={tasks} categories={categories} />
 
-      <SegmentedControl options={TAB_OPTIONS} value={activeTab} onChange={setActiveTab} fullWidth />
+      <JournalTabs value={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'list' && (
         <ListView
