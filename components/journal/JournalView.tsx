@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ListView } from '@/components/journal/ListView';
-import { TimelineView } from '@/components/journal/TimelineView';
 import { CalendarView } from '@/components/journal/CalendarView';
 import { InsightsSection } from '@/components/journal/InsightsSection';
 import { JournalTabs } from '@/components/journal/JournalTabs';
@@ -55,9 +54,6 @@ export function JournalView() {
               selectedId={selectedId}
               onSelect={setSelectedId}
             />
-          )}
-          {activeTab === 'timeline' && (
-            <TimelineView sessions={sessions} onSelect={setSelectedId} />
           )}
           {activeTab === 'calendar' && (
             <CalendarView

@@ -63,7 +63,7 @@ export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
 
-export type JournalTab = 'list' | 'timeline' | 'calendar';
+export type JournalTab = 'list' | 'calendar';
 
 export interface DayActivity {
   date: string; // YYYY-MM-DD
@@ -92,15 +92,6 @@ export interface SessionGroup {
   displayLabel: string;
   totalFocusSeconds: number;
   sessions: Session[];
-}
-
-export interface TimelineBlock {
-  sessionId: string;
-  taskId: string | null;
-  top: number; // 0-100, 하루 대비 시작 위치(%)
-  height: number; // 0-100, 하루 대비 길이(%) — 가독성을 위한 최소값 보장
-  startLabel: string; // "09:12"
-  endLabel: string;
 }
 
 export interface DistractionFrequency {

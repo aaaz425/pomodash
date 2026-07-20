@@ -5,7 +5,6 @@ import type { JournalTab } from '@/types';
 
 const TABS: { value: JournalTab; label: string }[] = [
   { value: 'list', label: '리스트' },
-  { value: 'timeline', label: '타임라인' },
   { value: 'calendar', label: '캘린더' },
 ];
 
