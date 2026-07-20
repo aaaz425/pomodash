@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { CalendarMonthNav } from '@/components/journal/CalendarMonthNav';
 import { CalendarMonthGrid } from '@/components/journal/CalendarMonthGrid';
-import { SessionListItem } from '@/components/journal/SessionListItem';
+import { CalendarDayModal } from '@/components/journal/CalendarDayModal';
 import { getMonthlyActivityData } from '@/lib/dashboard';
 import { getSessionsForDate } from '@/lib/sessionUtils';
 import type { Category, Session, Task } from '@/types';
@@ -55,42 +55,18 @@ export function CalendarView({ sessions, tasks, categories, selectedId, onSelect
         onSelectDate={setSelectedDate}
       />
 
-      {selectedDate && (
-        <div className="flex flex-col gap-2">
-          <span className="text-xs text-muted-foreground">
-            {selectedDate.toLocaleDateString('ko-KR', {
-              month: 'long',
-              day: 'numeric',
-              weekday: 'short',
-            })}
-          </span>
-          {daySessions.length === 0 ? (
-            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-              이 날은 기록이 없어요
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {daySessions.map((session, displayIdx) => {
-                const task = tasks.find((t) => t.id === session.taskId) ?? null;
-                const category = task
-                  ? (categories.find((c) => c.id === task.categoryId) ?? null)
-                  : null;
-                return (
-                  <SessionListItem
-                    key={session.id}
-                    session={session}
-                    task={task}
-                    category={category}
-                    sessionIndex={daySessions.length - 1 - displayIdx}
-                    isSelected={selectedId === session.id}
-                    onSelect={() => onSelect(session.id)}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
+      <CalendarDayModal
+        date={selectedDate}
+        sessions={daySessions}
+        tasks={tasks}
+        categories={categories}
+        selectedId={selectedId}
+        onSelectSession={(id) => {
+          setSelectedDate(null);
+          onSelect(id);
+        }}
+        onClose={() => setSelectedDate(null)}
+      />
     </div>
   );
 }

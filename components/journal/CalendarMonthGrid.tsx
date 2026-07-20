@@ -89,16 +89,17 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
               const isToday = isSameDate(date, today);
               const isFuture = date.getTime() > today.getTime();
               const hasFocus = day.focusMinutes > 0 && !isFuture;
+              const isDisabled = isFuture || !hasFocus;
 
               return (
                 <button
                   key={day.date}
                   onClick={() => onSelectDate(date)}
-                  disabled={isFuture}
+                  disabled={isDisabled}
                   aria-label={`${date.getDate()}일${hasFocus ? `, ${formatMinutes(day.focusMinutes)} 집중` : ''}`}
                   className={[
                     'flex flex-col items-start min-h-[92px] sm:min-h-[132px] p-2 sm:p-3 transition-colors',
-                    isFuture
+                    isDisabled
                       ? 'bg-card cursor-not-allowed'
                       : isSelected
                         ? 'bg-primary/10'
