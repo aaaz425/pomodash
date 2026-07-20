@@ -11,8 +11,11 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { SessionTaskSelector } from '@/components/timer/SessionTaskSelector';
 import { Button } from '@/components/ui/button';
 import { MemoTextarea } from '@/components/shared/MemoTextarea';
+import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
+import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 import { formatSessionProgressLabel } from '@/lib/sessionUtils';
+import type { FocusRating } from '@/types';
 
 export function SessionRecordModal() {
   const hydrated = useHydrated();
@@ -32,6 +35,8 @@ export function SessionRecordModal() {
   const addSession = useTaskStore((s) => s.addSession);
 
   const [note, setNote] = useState('');
+  const [focusRating, setFocusRating] = useState<FocusRating | null>(null);
+  const [distractionTags, setDistractionTags] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
@@ -63,9 +68,13 @@ export function SessionRecordModal() {
       pausedSeconds,
       focusPeriods,
       note: note.trim() || null,
+      focusRating,
+      distractionTags,
     });
     dismissSessionRecord();
     setNote('');
+    setFocusRating(null);
+    setDistractionTags([]);
     setSelectedTaskId(null);
     setPendingAction(null);
   }
@@ -73,6 +82,8 @@ export function SessionRecordModal() {
   function handleSkip() {
     dismissSessionRecord();
     setNote('');
+    setFocusRating(null);
+    setDistractionTags([]);
     setSelectedTaskId(null);
     setPendingAction(null);
   }
@@ -136,6 +147,22 @@ export function SessionRecordModal() {
                 /* Case B: 작업 없는 세션 — 작업 귀속 UI */
                 <SessionTaskSelector selectedTaskId={selectedTaskId} onSelect={setSelectedTaskId} />
               )}
+
+              {/* Focus Rating Section */}
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                  이번 세션 집중도는 어땠나요? (선택)
+                </span>
+                <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
+              </div>
+
+              {/* Distraction Tags Section */}
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                  집중을 방해한 게 있었다면 선택해주세요 (선택)
+                </span>
+                <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
+              </div>
 
               {/* Note Section */}
               <div className="flex flex-col gap-2.5">

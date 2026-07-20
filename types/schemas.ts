@@ -45,6 +45,12 @@ export const SessionSchema = z.object({
   pausedSeconds: z.number(),
   focusPeriods: z.array(FocusPeriodSchema),
   note: z.string().max(INPUT_LIMITS.NOTE_MAX_LENGTH).nullable(),
+  // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수
+  focusRating: z
+    .union([z.literal(1), z.literal(2), z.literal(3)])
+    .nullable()
+    .default(null),
+  distractionTags: z.array(z.string()).default([]),
 });
 
 // 향후 per-phase 집계용으로 예약, 현재 미사용

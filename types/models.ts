@@ -2,6 +2,8 @@ export type TimerPhase = 'focus' | 'short-break';
 
 export type TimerMode = 'pomodoro' | 'free';
 
+export type FocusRating = 1 | 2 | 3;
+
 export interface Category {
   id: string;
   name: string;
@@ -36,6 +38,8 @@ export interface Session {
   pausedSeconds: number;
   focusPeriods: FocusPeriod[]; // 타임라인용 실제 구간
   note: string | null;
+  focusRating: FocusRating | null; // 3단계 자가 평점, 옵션
+  distractionTags: string[]; // DISTRACTION_TAGS의 id 배열, 옵션
 }
 
 // per-phase 집계용 예약 타입, 미사용
@@ -58,6 +62,8 @@ export interface TimerSettings {
 export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
+
+export type JournalTab = 'list' | 'calendar';
 
 export interface DayActivity {
   date: string; // YYYY-MM-DD
@@ -86,6 +92,24 @@ export interface SessionGroup {
   displayLabel: string;
   totalFocusSeconds: number;
   sessions: Session[];
+}
+
+export interface DistractionFrequency {
+  tagId: string;
+  count: number;
+}
+
+export interface FocusRatingTrend {
+  recentAvg: number | null; // 평점 입력된 세션이 하나도 없으면 null
+  previousAvg: number | null;
+  sampleSize: number; // recentAvg 계산에 쓰인 세션 수 — 신뢰도 판단용
+}
+
+export interface CategoryRatingItem {
+  categoryId: string;
+  categoryName: string;
+  avgRating: number;
+  sampleSize: number;
 }
 
 export interface AppSettings {

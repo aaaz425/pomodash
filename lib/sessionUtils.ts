@@ -2,7 +2,7 @@ import type { FocusPeriod, Session, SessionGroup, TimerMode } from '@/types';
 import { TIMER_LIMITS } from '@/lib/constants/limits';
 import { clampPeriodDuration } from '@/lib/focusPeriods';
 
-function toLocalDateKey(isoString: string): string {
+export function toLocalDateKey(isoString: string): string {
   const d = new Date(isoString);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
@@ -47,6 +47,11 @@ export function groupSessionsByDate(sessions: Session[], ref?: Date): SessionGro
       totalFocusSeconds: groupSessions.reduce((sum, s) => sum + s.focusSeconds, 0),
       sessions: [...groupSessions].sort((a, b) => b.startedAt.localeCompare(a.startedAt)),
     }));
+}
+
+export function getSessionsForDate(sessions: Session[], date: Date): Session[] {
+  const key = toDateKey(date);
+  return sessions.filter((s) => toLocalDateKey(s.startedAt) === key);
 }
 
 export function getSessionOrdinalTitle(startedAt: string, chronologicalIndex: number): string {

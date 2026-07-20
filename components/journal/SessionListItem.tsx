@@ -7,6 +7,7 @@ import {
   formatSessionTimeSummary,
   getSessionOrdinalTitle,
 } from '@/lib/sessionUtils';
+import { FOCUS_RATING_LABELS } from '@/lib/constants';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -55,6 +56,11 @@ export function SessionListItem({
           <CategoryBadge category={category} />
         ) : (
           <Badge className="rounded-md font-medium bg-muted text-muted-foreground">기타</Badge>
+        )}
+        {session.focusRating && (
+          <Badge className="rounded-md font-medium bg-primary/10 text-primary">
+            {FOCUS_RATING_LABELS[session.focusRating]}
+          </Badge>
         )}
         <span className="text-[11px] text-muted-foreground">{duration}</span>
       </div>

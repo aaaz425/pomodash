@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
+import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { JournalNoteEditor } from '@/components/journal/JournalNoteEditor';
 import { useTaskStore } from '@/store/StoreProvider';
 import {
@@ -26,6 +28,8 @@ interface Props {
 
 export function JournalDetailPanel({ session, task, category, onBack, onDeleted }: Props) {
   const updateSessionNote = useTaskStore((s) => s.updateSessionNote);
+  const updateSessionRating = useTaskStore((s) => s.updateSessionRating);
+  const updateSessionTags = useTaskStore((s) => s.updateSessionTags);
   const deleteSession = useTaskStore((s) => s.deleteSession);
   const sessions = useTaskStore((s) => s.sessions);
 
@@ -45,7 +49,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   }
 
   return (
-    <div className="h-full flex flex-col gap-6 bg-card border border-border rounded-xl p-6 overflow-y-auto">
+    <div className="flex flex-col gap-6">
       {onBack && (
         <button
           onClick={onBack}
@@ -73,6 +77,30 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
               : formatTimeRange(session.startedAt, session.endedAt)}
           </span>
         </div>
+      </div>
+
+      <div className="border-t border-border" />
+
+      {/* Focus Rating Section */}
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          집중도
+        </span>
+        <FocusRatingPicker
+          value={session.focusRating}
+          onChange={(rating) => updateSessionRating(session.id, rating)}
+        />
+      </div>
+
+      {/* Distraction Tags Section */}
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          방해요소
+        </span>
+        <DistractionTagPicker
+          value={session.distractionTags}
+          onChange={(tags) => updateSessionTags(session.id, tags)}
+        />
       </div>
 
       <div className="border-t border-border" />
