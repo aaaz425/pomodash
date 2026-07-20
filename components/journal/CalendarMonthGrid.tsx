@@ -56,6 +56,7 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
   }
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden shadow-sm">
@@ -77,7 +78,7 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
                 return (
                   <div
                     key={`empty-${wi}-${di}`}
-                    className="min-h-[92px] sm:min-h-[132px] bg-muted/20"
+                    className="min-h-[92px] sm:min-h-[132px] bg-muted/10"
                   />
                 );
               }
@@ -86,26 +87,34 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
               const dayOfWeek = date.getDay();
               const isSelected = selectedDate ? isSameDate(date, selectedDate) : false;
               const isToday = isSameDate(date, today);
-              const hasFocus = day.focusMinutes > 0;
+              const isFuture = date.getTime() > today.getTime();
+              const hasFocus = day.focusMinutes > 0 && !isFuture;
 
               return (
                 <button
                   key={day.date}
                   onClick={() => onSelectDate(date)}
+                  disabled={isFuture}
                   aria-label={`${date.getDate()}일${hasFocus ? `, ${formatMinutes(day.focusMinutes)} 집중` : ''}`}
                   className={[
                     'flex flex-col items-start min-h-[92px] sm:min-h-[132px] p-2 sm:p-3 transition-colors',
-                    isSelected ? 'bg-primary/10' : 'bg-card hover:bg-muted/60',
+                    isFuture
+                      ? 'bg-card cursor-not-allowed'
+                      : isSelected
+                        ? 'bg-primary/10'
+                        : 'bg-card hover:bg-muted/60',
                   ].join(' ')}
                 >
                   <span
                     className={[
                       'flex items-center justify-center w-7 h-7 rounded-full text-sm transition-colors',
-                      isSelected
-                        ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
-                        : isToday
-                          ? 'bg-primary/15 font-semibold text-primary'
-                          : `font-medium ${dayNumberTextClass(dayOfWeek)}`,
+                      isFuture
+                        ? 'font-medium text-muted-foreground/30'
+                        : isSelected
+                          ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                          : isToday
+                            ? 'bg-primary/15 font-semibold text-primary'
+                            : `font-medium ${dayNumberTextClass(dayOfWeek)}`,
                     ].join(' ')}
                   >
                     {date.getDate()}

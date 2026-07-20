@@ -43,8 +43,11 @@ export function CalendarView({ sessions, tasks, categories, selectedId, onSelect
     <div className="flex flex-col gap-4">
       <CalendarMonthNav
         month={viewedMonth}
-        onPrev={() => setViewedMonth((m) => addMonths(m, -1))}
-        onNext={() => setViewedMonth((m) => addMonths(m, 1))}
+        onPrevYear={() => setViewedMonth((m) => addMonths(m, -12))}
+        onPrevMonth={() => setViewedMonth((m) => addMonths(m, -1))}
+        onNextMonth={() => setViewedMonth((m) => addMonths(m, 1))}
+        onNextYear={() => setViewedMonth((m) => addMonths(m, 12))}
+        onToday={() => setViewedMonth(new Date())}
       />
       <CalendarMonthGrid
         data={monthData}
