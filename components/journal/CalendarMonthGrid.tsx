@@ -78,7 +78,7 @@ export function CalendarMonthGrid({ data, selectedDate, onSelectDate }: Props) {
                 return (
                   <div
                     key={`empty-${wi}-${di}`}
-                    className="min-h-[92px] sm:min-h-[132px] bg-muted/10"
+                    className="min-h-[92px] sm:min-h-[132px] bg-card"
                   />
                 );
               }
