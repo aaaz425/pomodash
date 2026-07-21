@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import type { BadgeDefinition, BadgeIconKey, BadgeTier } from '@/lib/constants/badges';
+import { BADGE_TIER_STYLES, type BadgeDefinition, type BadgeIconKey } from '@/lib/constants/badges';
 
 const BADGE_ICONS: Record<BadgeIconKey, LucideIcon> = {
   flame: Flame,
@@ -24,31 +24,6 @@ const BADGE_ICONS: Record<BadgeIconKey, LucideIcon> = {
   rocket: Rocket,
 };
 
-// 등급별 메달 색상 — 실제 금속/보석 톤을 흉내낸 그라디언트 조합
-const TIER_MEDALLION: Record<BadgeTier, string> = {
-  bronze: 'from-amber-700 via-amber-500 to-amber-800',
-  silver: 'from-slate-300 via-slate-100 to-slate-400',
-  gold: 'from-yellow-300 via-amber-400 to-yellow-600',
-  platinum: 'from-cyan-200 via-sky-300 to-indigo-400',
-  special: 'from-fuchsia-400 via-purple-500 to-indigo-600',
-};
-
-const TIER_RING: Record<BadgeTier, string> = {
-  bronze: 'ring-amber-900/40',
-  silver: 'ring-slate-400/40',
-  gold: 'ring-yellow-600/40',
-  platinum: 'ring-indigo-500/40',
-  special: 'ring-purple-600/40',
-};
-
-const TIER_RIBBON: Record<BadgeTier, string> = {
-  bronze: 'bg-amber-700',
-  silver: 'bg-slate-400',
-  gold: 'bg-yellow-500',
-  platinum: 'bg-indigo-400',
-  special: 'bg-purple-500',
-};
-
 interface Props {
   badge: BadgeDefinition;
   earned: boolean;
@@ -56,6 +31,7 @@ interface Props {
 
 export function BadgeMedal({ badge, earned }: Props) {
   const Icon = BADGE_ICONS[badge.icon];
+  const tier = BADGE_TIER_STYLES[badge.tier];
 
   return (
     <div
@@ -75,8 +51,8 @@ export function BadgeMedal({ badge, earned }: Props) {
       <div
         className={cn(
           'relative flex h-14 w-14 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-background shadow-md bg-gradient-to-br',
-          earned ? TIER_MEDALLION[badge.tier] : 'from-muted to-muted grayscale',
-          earned ? TIER_RING[badge.tier] : 'ring-border',
+          earned ? tier.medallion : 'from-muted to-muted grayscale',
+          earned ? tier.ring : 'ring-border',
         )}
       >
         <div className="absolute inset-1 rounded-full ring-1 ring-inset ring-white/40" />
@@ -92,13 +68,13 @@ export function BadgeMedal({ badge, earned }: Props) {
         <div
           className={cn(
             'h-2.5 w-2.5 [clip-path:polygon(0_0,100%_0,50%_100%)]',
-            earned ? TIER_RIBBON[badge.tier] : 'bg-muted',
+            earned ? tier.ribbon : 'bg-muted',
           )}
         />
         <div
           className={cn(
             'h-2.5 w-2.5 [clip-path:polygon(0_0,100%_0,50%_100%)]',
-            earned ? TIER_RIBBON[badge.tier] : 'bg-muted',
+            earned ? tier.ribbon : 'bg-muted',
           )}
         />
       </div>
