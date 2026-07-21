@@ -5,3 +5,4 @@ export * from './categoryColors';
 export * from './timerColors';
 export * from './distractionTags';
 export * from './focusRating';
+export * from './badges';
