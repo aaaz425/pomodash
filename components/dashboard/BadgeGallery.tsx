@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import { getEarnedBadgeIds } from '@/lib/badges';
 import {
@@ -9,6 +10,7 @@ import {
   type BadgeCategory,
 } from '@/lib/constants/badges';
 import { BadgeMedal } from '@/components/dashboard/BadgeMedal';
+import { EmptyState } from '@/components/shared/EmptyState';
 import type { Session, Task } from '@/types';
 
 interface Props {
@@ -19,8 +21,14 @@ interface Props {
 const CATEGORY_ORDER: BadgeCategory[] = ['streak', 'total-time', 'diversity', 'special'];
 
 export function BadgeGallery({ sessions, tasks }: Props) {
+  const [expanded, setExpanded] = useState(false);
+
   const earnedIds = useMemo(() => getEarnedBadgeIds(sessions, tasks), [sessions, tasks]);
   const earnedCount = earnedIds.size;
+  const earnedBadges = useMemo(
+    () => BADGE_DEFINITIONS.filter((b) => earnedIds.has(b.id)),
+    [earnedIds],
+  );
 
   return (
     <div className="flex flex-col gap-4 p-5 rounded-lg border border-border bg-card">
@@ -31,20 +39,39 @@ export function BadgeGallery({ sessions, tasks }: Props) {
         </span>
       </div>
 
-      <div className="flex flex-col gap-4">
-        {CATEGORY_ORDER.map((category) => (
-          <div key={category} className="flex flex-col gap-2.5">
-            <p className="text-xs font-medium text-muted-foreground">
-              {BADGE_CATEGORY_LABELS[category]}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {BADGE_DEFINITIONS.filter((b) => b.category === category).map((badge) => (
-                <BadgeMedal key={badge.id} badge={badge} earned={earnedIds.has(badge.id)} />
-              ))}
+      {expanded ? (
+        <div className="flex flex-col gap-4">
+          {CATEGORY_ORDER.map((category) => (
+            <div key={category} className="flex flex-col gap-2.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                {BADGE_CATEGORY_LABELS[category]}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {BADGE_DEFINITIONS.filter((b) => b.category === category).map((badge) => (
+                  <BadgeMedal key={badge.id} badge={badge} earned={earnedIds.has(badge.id)} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : earnedBadges.length > 0 ? (
+        <div className="flex flex-wrap gap-3">
+          {earnedBadges.map((badge) => (
+            <BadgeMedal key={badge.id} badge={badge} earned />
+          ))}
+        </div>
+      ) : (
+        <EmptyState message="아직 획득한 뱃지가 없어요" messageClassName="text-xs" />
+      )}
+
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex items-center justify-center gap-1 self-center text-xs text-muted-foreground hover:text-foreground"
+      >
+        {expanded ? '접기' : '전체 뱃지 보기'}
+        {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+      </button>
     </div>
   );
 }

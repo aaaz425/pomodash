@@ -94,7 +94,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     category: 'streak',
     tier: 'bronze',
     days: 3,
-    name: '점화',
+    name: '작심삼일 탈출',
     description: '3일 연속 집중',
     icon: 'flame',
   },
