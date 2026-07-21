@@ -69,7 +69,7 @@ export function BadgeGallery({ sessions, tasks }: Props) {
         onClick={() => setExpanded((v) => !v)}
         className="flex items-center justify-center gap-1 self-center text-xs text-muted-foreground hover:text-foreground"
       >
-        {expanded ? '접기' : '전체 뱃지 보기'}
+        {expanded ? '접기' : '뱃지 모두 보기'}
         {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
       </button>
     </div>
