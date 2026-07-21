@@ -55,7 +55,7 @@
 ## Phase 6-b — 차별화 기능
 
 - [x] `feat/free-stopwatch-mode` — 고정 사이클 없이 자유롭게 측정하는 스톱워치 모드
-- [ ] `feat/badge-collection` — 스트릭/누적시간/다양성/특별 이벤트 뱃지 수집
+- [>] `feat/badge-collection` — 스트릭/누적시간/다양성/특별 이벤트 뱃지 수집
 - [ ] `feat/share-card` — 집중 요약 공유 카드 (클라이언트 Canvas 생성)
 
 ## Phase 7 — 백엔드 & 동기화
