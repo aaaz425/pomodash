@@ -4,6 +4,7 @@ import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { trackEvent, EVENTS } from '@/config/analytics';
 
+import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
 import { ContributionCalendar } from '@/components/dashboard/ContributionCalendar';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
@@ -193,6 +194,9 @@ export function DashboardView() {
         <CategoryChart sessions={filtered} tasks={tasks} categories={categories} />
         <HourlyChart sessions={filtered} />
       </div>
+
+      {/* Badge Gallery */}
+      <BadgeGallery sessions={sessions} tasks={tasks} />
     </div>
   );
 }
