@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react';
+import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { trackEvent, EVENTS } from '@/config/analytics';
 
@@ -10,7 +10,9 @@ import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
 import { MonthlyActivityCard } from '@/components/dashboard/MonthlyActivityCard';
+import { ShareCardModal } from '@/components/dashboard/ShareCardModal';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { Button } from '@/components/ui/button';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
@@ -28,6 +30,7 @@ import {
   getStreakDays,
   getTotalFocusSeconds,
 } from '@/lib/dashboard';
+import { buildShareCardData } from '@/lib/shareCard';
 import type { TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
@@ -46,6 +49,7 @@ function makeCountSub(diff: number, label: string): string | undefined {
 
 export function DashboardView() {
   const [tab, setTab] = useState<TabType>('week');
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     trackEvent(EVENTS.DASHBOARD_VIEWED);
@@ -57,6 +61,10 @@ export function DashboardView() {
 
   const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
   const monthSessions = useMemo(() => filterSessionsByTab(sessions, 'month'), [sessions]);
+  const shareCardData = useMemo(
+    () => buildShareCardData(filtered, sessions, tab),
+    [filtered, sessions, tab],
+  );
 
   const totalFocusSeconds = useMemo(() => getTotalFocusSeconds(filtered), [filtered]);
   const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
@@ -123,7 +131,20 @@ export function DashboardView() {
           <h1 className="text-xl font-bold text-foreground">통계</h1>
           <p className="mt-1 text-sm text-muted-foreground">집중의 흐름을 한눈에</p>
         </div>
-        <DashboardTabs value={tab} onChange={setTab} />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setShareOpen(true);
+              trackEvent(EVENTS.SHARE_CARD_OPENED);
+            }}
+            aria-label="공유 카드 만들기"
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <DashboardTabs value={tab} onChange={setTab} />
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -180,6 +201,8 @@ export function DashboardView() {
 
       {/* Badge Gallery */}
       <BadgeGallery sessions={sessions} tasks={tasks} />
+
+      {shareOpen && <ShareCardModal data={shareCardData} onClose={() => setShareOpen(false)} />}
     </div>
   );
 }

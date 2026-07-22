@@ -112,6 +112,15 @@ export interface CategoryRatingItem {
   sampleSize: number;
 }
 
+export interface ShareCardData {
+  periodLabel: string; // '오늘' | '이번 주' | '이번 달' | '전체'
+  headline: string; // 스트릭/집중시간 기반 한 줄 헤드라인
+  totalFocusLabel: string; // formatDuration() 결과, 0이면 '0분'
+  sessionCount: number;
+  streakDays: number; // 전체 세션 기준(탭 필터링과 무관)
+  generatedAtLabel: string; // 'yyyy.MM.dd'
+}
+
 export interface AppSettings {
   nickname: string;
   browserNotification: boolean;

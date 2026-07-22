@@ -24,4 +24,7 @@ export const EVENTS = {
   TASK_CREATED: 'task_created',
   SESSION_NOTE_WRITTEN: 'session_note_written',
   DASHBOARD_VIEWED: 'dashboard_viewed',
+  SHARE_CARD_OPENED: 'share_card_opened',
+  SHARE_CARD_DOWNLOADED: 'share_card_downloaded',
+  SHARE_CARD_SHARED: 'share_card_shared',
 } as const;
