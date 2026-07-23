@@ -1,6 +1,6 @@
 # 아키텍처 구조도
 
-> **버전:** 1.0 · **기준:** Next.js App Router + localStorage MVP
+> **버전:** 1.1 · **기준:** Next.js App Router + localStorage MVP
 
 ---
 
@@ -48,9 +48,16 @@ flowchart LR
     end
 
     subgraph components["components/ (UI)"]
-        Feature["feature/\n(timer, tasks, dashboard\njournal)"]
+        Feature["feature/\n(timer, tasks, dashboard\njournal, settings, landing)"]
         Shared["shared/\n(공유 컴포넌트)"]
         UI["ui/\n(shadcn/ui)"]
+    end
+
+    subgraph hooks["hooks/ (브라우저 API 추상화 + 재사용 로직)"]
+        UseTimer["useTimer"]
+        UseCurrentTask["useCurrentTask"]
+        UseSessionEndFlow["useSessionEndFlow"]
+        UseTheme["useTheme 등"]
     end
 
     subgraph store["store/ (전역 상태)"]
@@ -69,6 +76,10 @@ flowchart LR
         Storage["storage.ts"]
         Notifications["notifications.ts"]
         FocusPeriods["focusPeriods.ts"]
+        Dashboard["dashboard.ts / journalInsights.ts"]
+        Badges["badges.ts"]
+        ShareCard["shareCard.ts / shareCardCanvas.ts"]
+        SessionUtils["sessionUtils.ts / sessionStale.ts"]
     end
 
     subgraph types["types/"]
@@ -80,8 +91,12 @@ flowchart LR
     Pages --> Shared
     Feature --> UI
     Shared --> UI
+    Feature --> hooks
+    Shared --> hooks
     Feature --> store
     Shared --> store
+    hooks --> store
+    hooks --> lib
     store --> lib
     store --> types
     lib --> types
@@ -128,7 +143,7 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     actor User
-    participant Timer as TimerDisplay
+    participant Timer as TimerSection
     participant Store as timerStore
     participant Hook as useTimer
     participant Lib as lib/storage
@@ -159,13 +174,13 @@ sequenceDiagram
 
 ---
 
-## 6. 스토어 구성 및 역할
+## 5. 스토어 구성 및 역할
 
 | 스토어 | 파일 | 주요 상태 | 주요 액션 |
 |--------|------|-----------|-----------|
-| timerStore | `store/timerStore.ts` | phase, startedAt, remainingSeconds, currentCycle, focusPeriods | start, pause, reset, nextPhase, endSession |
-| taskStore | `store/taskStore.ts` | tasks[], selectedTaskId | addTask, updateTask, deleteTask, selectTask, reorder |
-| settingsStore | `store/settingsStore.ts` | AppSettings | updateSettings, resetToDefault |
+| timerStore | `store/timerStore.ts` | phase, mode, startedAt, remainingSeconds, cycleCount, currentTaskId, rawFocusPeriods | start, pause, complete, reset, completeCycle, endSession |
+| taskStore | `store/taskStore.ts` | tasks[], categories[], sessions[] | addTask, updateTask, deleteTask, addSession, updateSessionNote/Rating/Tags, addCategory, deleteCategory |
+| settingsStore | `store/settingsStore.ts` | AppSettings 필드를 평탄화해서 개별 상태로 보관(nickname, soundType 등) | setNickname, setTimerDefaults, setSoundType, addMessage 등 |
 
 모든 스토어는 `createStore()` 팩토리 패턴을 쓴다 (SSR 싱글톤 버그 방지). 참조: `docs/guides/conventions.md` — Zustand 스토어 패턴
 

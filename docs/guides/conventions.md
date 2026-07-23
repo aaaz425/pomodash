@@ -12,6 +12,7 @@ components/
   dashboard/          # 대시보드 feature
   journal/            # 기록 feature
   settings/           # 설정 feature
+  landing/            # 랜딩 페이지 feature
   shared/             # 여러 feature에서 공유하는 컴포넌트
     layout/           # 반응형 레이아웃 전용 (app 레이어에서만 사용)
 store/                # Zustand 스토어 (createStore 팩토리 패턴)

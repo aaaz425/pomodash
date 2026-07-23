@@ -139,8 +139,8 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 | 타이머 숫자     | **Geist Mono** | `ui-monospace, SF Mono, Menlo`                |
 | 코드 / 로그     | **Geist Mono** | `ui-monospace`                                |
 
-Next.js `next/font/local`로 Pretendard + Geist Mono를 로드한다.
-Pretendard는 `@fontsource/pretendard` 패키지 또는 CDN(`cdn.jsdelivr.net/gh/orioncactus/pretendard`)을 통해 제공한다.
+Geist Mono는 Next.js `next/font/google`(`app/layout.tsx`)로 로드한다.
+Pretendard는 `next/font`를 쓰지 않고 `@fontsource/pretendard` 패키지를 `app/globals.css`에서 `@import`로 직접 로드한다.
 Inter 대비 한글 글리프를 내장하므로 한글/영문이 동일 폰트로 렌더링된다.
 
 ### 타입 스케일
