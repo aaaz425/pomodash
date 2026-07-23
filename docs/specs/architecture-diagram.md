@@ -1,6 +1,6 @@
 # 아키텍처 구조도
 
-> **버전:** 1.0 · **기준:** Next.js App Router + localStorage MVP
+> **버전:** 1.1 · **기준:** Next.js App Router + localStorage MVP
 
 ---
 
@@ -143,7 +143,7 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     actor User
-    participant Timer as TimerDisplay
+    participant Timer as TimerSection
     participant Store as timerStore
     participant Hook as useTimer
     participant Lib as lib/storage
@@ -174,7 +174,7 @@ sequenceDiagram
 
 ---
 
-## 6. 스토어 구성 및 역할
+## 5. 스토어 구성 및 역할
 
 | 스토어 | 파일 | 주요 상태 | 주요 액션 |
 |--------|------|-----------|-----------|

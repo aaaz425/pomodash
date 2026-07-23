@@ -1,6 +1,6 @@
 # ERD — Entity Relationship Diagram
 
-> **버전:** 1.0 · **기준:** `types/index.ts` (localStorage MVP 기준, Supabase 마이그레이션 전)
+> **버전:** 1.1 · **기준:** `types/index.ts` (localStorage MVP 기준, Supabase 마이그레이션 전)
 > **저장소:** 브라우저 localStorage (서버 DB 없음)
 
 ---
