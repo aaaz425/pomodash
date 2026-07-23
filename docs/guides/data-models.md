@@ -20,7 +20,7 @@
 
 - 5초 미만 집중 구간 드롭 (노이즈)
 - 5초 이하 일시정지로 나뉜 인접 구간 병합
-- 최대 100개 구간 상한 (초과 시 뒤쪽을 하나로 합침)
+- 최대 100개 구간 상한 (초과 시 뒤쪽 구간을 드롭, 병합하지 않음)
 
 ### 사이클 (Cycle)
 
@@ -38,6 +38,7 @@
 
 ```typescript
 export type TimerPhase = 'focus' | 'short-break'
+export type TimerMode = 'pomodoro' | 'free'
 
 export interface Category {
   id: string
@@ -64,6 +65,7 @@ export interface FocusPeriod {
 export interface Session {
   id: string
   taskId: string | null // null = 미분류
+  mode: TimerMode // 'free'는 completedCycles/totalCycles가 0 — "N/M 사이클" 대신 별도 표시 필요
   startedAt: string // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
   endedAt: string // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
   completedCycles: number // 실제 완료 사이클 수
@@ -71,7 +73,7 @@ export interface Session {
   focusSeconds: number // 집계용 — 반드시 이 값만 사용 (endedAt - startedAt 금지)
   pausedSeconds: number // 총 일시정지 초
   focusPeriods: Array<{ start: string; end: string }> // 타임라인 블록용 실제 집중 구간
-  note: string | null // 세션 회고 메모 (향후 모달에서 입력)
+  note: string | null // 세션 회고 메모, 마지막 사이클 완료 시 1회 작성
   focusRating: FocusRating | null // 집중도 자가 평점 3단계, 옵션
   distractionTags: string[] // 방해요소 태그 프리셋(id) 배열, 옵션
 }
@@ -118,6 +120,7 @@ const STORAGE_KEYS = {
   settings: 'pomodash:settings',
   activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
+  theme: 'theme', // 예외적으로 'pomodash:' 접두사 없음
 } as const
 ```
 
