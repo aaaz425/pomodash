@@ -33,7 +33,7 @@ export function useInstallPrompt() {
       window.removeEventListener('beforeinstallprompt', handlePrompt);
       window.removeEventListener('appinstalled', handleInstalled);
     };
-  }, []);
+  }, [isInstalled]);
 
   async function triggerInstall() {
     if (!promptEvent) return;

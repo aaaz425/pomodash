@@ -60,9 +60,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AnalyticsProvider>{children}</AnalyticsProvider>
         <Analytics />
         <SpeedInsights />
-        <Script id="sw-register" strategy="afterInteractive">
-          {`if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');`}
-        </Script>
+        {process.env.NODE_ENV === 'production' && (
+          <Script id="sw-register" strategy="afterInteractive">
+            {`if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');`}
+          </Script>
+        )}
       </body>
     </html>
   );
