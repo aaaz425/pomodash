@@ -15,7 +15,7 @@ Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Rechar
 npm run dev      # 로컬 개발 서버
 npm run build    # 프로덕션 빌드 — 커밋 전 반드시 통과 확인
 npm run lint     # 린트
-npm run test     # 단위 테스트 (vitest 도입 후)
+npm run test     # 단위 테스트 (vitest)
 ```
 
 ---
