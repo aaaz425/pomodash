@@ -41,10 +41,10 @@ export function SettingsView() {
   return (
     <>
       <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6">
-        <div>
+        <header>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
           <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
-        </div>
+        </header>
 
         <SettingCard title="프로필">
           <ProfileSection />
