@@ -6,6 +6,7 @@ export default function HomePage() {
   return (
     <>
       <main id="main-content" className="flex-1 overflow-y-auto flex flex-col">
+        <h1 className="sr-only">타이머</h1>
         <TimerSection />
       </main>
       <SessionRecordModal />
