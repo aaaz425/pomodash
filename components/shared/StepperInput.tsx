@@ -10,6 +10,7 @@ interface Props {
   max: number;
   step?: number;
   unit: string;
+  label: string;
   disabled?: boolean;
 }
 
@@ -20,6 +21,7 @@ export function StepperInput({
   max,
   step = 1,
   unit,
+  label,
   disabled = false,
 }: Props) {
   const [raw, setRaw] = useState('');
@@ -47,6 +49,7 @@ export function StepperInput({
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
+          aria-label={`${label} (단위: ${unit})`}
           disabled={disabled}
           value={editing ? raw : String(value)}
           onFocus={() => {
