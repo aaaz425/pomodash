@@ -15,12 +15,14 @@ export function IconSidebar() {
       </div>
       <div className="w-8 h-px bg-border mb-1" />
       <nav className="flex flex-col gap-0.5">
-        {NAV_ITEMS.map(({ href, icon: Icon }) => {
+        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;
           return (
             <Link
               key={href}
               href={href}
+              aria-label={label}
+              aria-current={isActive ? 'page' : undefined}
               className={[
                 'w-10 h-10 flex items-center justify-center rounded-lg transition-colors',
                 isActive ? 'bg-primary/10' : 'hover:bg-muted',
