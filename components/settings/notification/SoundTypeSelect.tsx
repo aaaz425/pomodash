@@ -50,6 +50,9 @@ export function SoundTypeSelect({ value, onChange }: Props) {
         ref={triggerRef}
         type="button"
         id="sound-type"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls="sound-type-listbox"
         onClick={handleTriggerClick}
         className={[
           'flex items-center justify-between gap-1.5 w-24 text-sm bg-muted border rounded-lg px-2.5 py-1.5 text-foreground transition-colors disabled:cursor-not-allowed',
@@ -67,7 +70,9 @@ export function SoundTypeSelect({ value, onChange }: Props) {
         createPortal(
           <div
             ref={dropdownRef}
+            id="sound-type-listbox"
             role="listbox"
+            aria-labelledby="sound-type"
             style={{ top: coords.top, left: coords.left }}
             className="fixed z-70 w-32 bg-card border border-border rounded-xl shadow-2xl py-1"
           >
