@@ -57,8 +57,11 @@ export function CategoryEditModal({ category, onClose }: Props) {
       }
     >
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-muted-foreground">이름</label>
+        <label htmlFor="category-name" className="text-xs font-medium text-muted-foreground">
+          이름
+        </label>
         <TextInput
+          id="category-name"
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -69,8 +72,10 @@ export function CategoryEditModal({ category, onClose }: Props) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-xs font-medium text-muted-foreground">색상</label>
-        <div className="flex gap-2 flex-wrap">
+        <span id="category-color-label" className="text-xs font-medium text-muted-foreground">
+          색상
+        </span>
+        <div className="flex gap-2 flex-wrap" role="group" aria-labelledby="category-color-label">
           {CATEGORY_COLOR_KEYS.map((c) => (
             <button
               key={c}
