@@ -125,8 +125,7 @@ export function DashboardView() {
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground">통계</h1>
           <p className="mt-1 text-sm text-muted-foreground">집중의 흐름을 한눈에</p>
@@ -145,7 +144,7 @@ export function DashboardView() {
           </Button>
           <DashboardTabs value={tab} onChange={setTab} />
         </div>
-      </div>
+      </header>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">

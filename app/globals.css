@@ -128,6 +128,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* 컴포넌트가 자체 focus-visible 스타일을 지정하지 않았을 때의 기본 포커스 표시 (ring 유틸은 box-shadow라 겹치지 않음) */
+  :focus-visible {
+    outline-width: 2px;
+    outline-style: solid;
+    outline-offset: 2px;
+  }
   html,
   body {
     @apply font-sans text-foreground bg-card;

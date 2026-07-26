@@ -35,6 +35,7 @@ export function TimerSettingsGroup({
           max={TIMER_LIMITS.FOCUS_MINUTES_MAX}
           step={5}
           unit="분"
+          label="집중 시간"
           disabled={disabled}
         />
       </div>
@@ -46,6 +47,7 @@ export function TimerSettingsGroup({
           min={TIMER_LIMITS.CYCLES_MIN}
           max={TIMER_LIMITS.CYCLES_MAX}
           unit="회"
+          label={cyclesLabel}
           disabled={disabled}
         />
       </div>
@@ -58,6 +60,7 @@ export function TimerSettingsGroup({
           max={TIMER_LIMITS.BREAK_MINUTES_MAX}
           step={5}
           unit="분"
+          label="휴식 시간"
           disabled={disabled}
         />
       </div>

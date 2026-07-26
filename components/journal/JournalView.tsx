@@ -31,14 +31,13 @@ export function JournalView() {
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground">기록</h1>
           <p className="mt-1 text-sm text-muted-foreground">한 번의 집중도 기억합니다</p>
         </div>
         {sessions.length > 0 && <JournalTabs value={activeTab} onChange={setActiveTab} />}
-      </div>
+      </header>
 
       {sessions.length === 0 ? (
         <JournalEmptyState />

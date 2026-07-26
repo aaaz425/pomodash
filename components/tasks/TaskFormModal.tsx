@@ -100,8 +100,11 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
     >
       {/* 작업 제목 */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-muted-foreground">작업 제목</label>
+        <label htmlFor="task-title" className="text-xs font-medium text-muted-foreground">
+          작업 제목
+        </label>
         <TextInput
+          id="task-title"
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -112,8 +115,10 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
       </div>
 
       {/* 카테고리 */}
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-medium text-muted-foreground">카테고리</label>
+      <div className="flex flex-col gap-2" role="group" aria-labelledby="task-category-label">
+        <span id="task-category-label" className="text-xs font-medium text-muted-foreground">
+          카테고리
+        </span>
         <CategoryPills
           variant="rich"
           categories={categories}

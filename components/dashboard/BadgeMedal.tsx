@@ -36,9 +36,12 @@ export function BadgeMedal({ badge, earned }: Props) {
   return (
     <div
       tabIndex={0}
+      aria-label={badge.name}
+      aria-describedby={`badge-tooltip-${badge.id}`}
       className="group relative flex flex-col items-center gap-1 w-[76px] outline-none"
     >
       <div
+        id={`badge-tooltip-${badge.id}`}
         role="tooltip"
         className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-max max-w-[160px] -translate-x-1/2 flex-col items-center gap-0.5 rounded-md border border-border bg-popover px-2.5 py-1.5 text-center shadow-md group-hover:flex group-focus:flex"
       >

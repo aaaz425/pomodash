@@ -100,6 +100,7 @@ export function SoundAlertSettings() {
             min={SOUND_LIMITS.REPEAT_MIN}
             max={SOUND_LIMITS.REPEAT_MAX}
             unit="회"
+            label="반복 횟수"
           />
         </div>
       </fieldset>
