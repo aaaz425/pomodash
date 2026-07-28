@@ -7,7 +7,7 @@
 
 ## 기술 스택
 
-Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Posthog · Vercel
+Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Vercel
 
 ## 개발 명령어
 
@@ -146,5 +146,4 @@ git switch main && git pull && git branch -D <merged-branch>
 ## 주요 결정사항
 
 - AI API 없이도 완전히 작동 (Claude API는 MVP 이후 선택적 추가)
-- localStorage만 사용 (로그인 없음, 진입 장벽 최소화)
 - 다크 모드 우선 + 라이트 모드 지원 (시스템 설정 연동, 수동 전환 가능)

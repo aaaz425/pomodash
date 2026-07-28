@@ -43,7 +43,7 @@
 - [x] `feat/mini-timer-nav` — 타이머 실행 중 다른 페이지에 있을 때 nav 미니 타이머
 - [x] `chore/pwa` — PWA 아이콘 + 매니페스트 마무리
 - [x] `chore/vercel-deploy` — Vercel 프로젝트 연결
-- [x] `chore/analytics` — Vercel Analytics + Posthog 이벤트 연동
+- [x] `chore/analytics` — Vercel Analytics 연동
 
 ## Phase 6-a — 서비스 고도화
 
@@ -60,6 +60,7 @@
 
 ## Phase 7 — 백엔드 & 동기화
 
+- [x] `chore/cleanup-legacy-copy` — 로그인 없음 포지셔닝 문구 및 PostHog 트래킹 제거
 - [ ] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
 - [ ] `style/skeleton-ui` — 페이지별 스켈레톤 로딩 UI (supabase-migration 완료 후)
 

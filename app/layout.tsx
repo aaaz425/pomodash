@@ -3,7 +3,6 @@ import Script from 'next/script';
 import { Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { AnalyticsProvider } from '@/components/shared/AnalyticsProvider';
 import { ThemeInit } from '@/components/shared/ThemeInit';
 import { siteConfig, siteUrl } from '@/config/site';
 import './globals.css';
@@ -57,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko" className="dark" suppressHydrationWarning>
       <body className={`${geistMono.variable} antialiased`}>
         <ThemeInit />
-        <AnalyticsProvider>{children}</AnalyticsProvider>
+        {children}
         <Analytics />
         <SpeedInsights />
         {process.env.NODE_ENV === 'production' && (

@@ -7,7 +7,7 @@
 
 ## 개요
 
-Pomodash는 서버 DB 없이 localStorage만 사용한다. 엔티티 간 관계는 외래 키 ID로 참조하고 런타임에 Zod 스키마로 검증한다. FocusPeriod는 Session에 내장(embedded)되어 별도 키로 저장되지 않는다.
+엔티티 간 관계는 외래 키 ID로 참조하고 런타임에 Zod 스키마로 검증한다. FocusPeriod는 Session에 내장(embedded)되어 별도 키로 저장되지 않는다.
 
 ---
 

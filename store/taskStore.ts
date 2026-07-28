@@ -2,7 +2,6 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
-import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { generateId } from '@/lib/utils';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
@@ -80,7 +79,6 @@ export const createTaskStore = () =>
       const tasks = [newTask, ...get().tasks];
       saveTasks(tasks);
       set({ tasks });
-      trackEvent(EVENTS.TASK_CREATED);
       return newTask.id;
     },
 
@@ -117,7 +115,6 @@ export const createTaskStore = () =>
       );
       saveSessions(sessions);
       set({ sessions });
-      if (note?.trim()) trackEvent(EVENTS.SESSION_NOTE_WRITTEN);
     },
 
     updateSessionRating: (id, rating) => {

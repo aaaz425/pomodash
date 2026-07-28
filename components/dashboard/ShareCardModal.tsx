@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { trackEvent, EVENTS } from '@/config/analytics';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
@@ -41,7 +40,6 @@ export function ShareCardModal({ data, onClose }: Props) {
     setIsBusy(true);
     try {
       await downloadCanvasAsPng(canvasRef.current, filename);
-      trackEvent(EVENTS.SHARE_CARD_DOWNLOADED);
     } finally {
       setIsBusy(false);
     }
@@ -51,12 +49,7 @@ export function ShareCardModal({ data, onClose }: Props) {
     if (!canvasRef.current) return;
     setIsBusy(true);
     try {
-      const result = await shareCanvasAsPng(
-        canvasRef.current,
-        filename,
-        '오늘의 집중 기록 — Pomodash',
-      );
-      if (result === 'shared') trackEvent(EVENTS.SHARE_CARD_SHARED);
+      await shareCanvasAsPng(canvasRef.current, filename, '오늘의 집중 기록 — Pomodash');
     } finally {
       setIsBusy(false);
     }
