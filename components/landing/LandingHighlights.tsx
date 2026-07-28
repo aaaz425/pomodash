@@ -14,7 +14,7 @@ const HIGHLIGHTS = [
   {
     icon: Share2,
     title: '집중 기록을 공유하세요',
-    desc: '이번 주 집중 요약을 카드로 만들어 다운로드하거나 공유할 수 있어요.',
+    desc: '집중 요약을 카드로 만들어 다운로드하거나 공유할 수 있어요.',
     src: '/landing/share-card.png',
     alt: '공유 카드 화면',
     width: 960,
