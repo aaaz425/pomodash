@@ -10,6 +10,9 @@ export function LandingFooter() {
           <a href="#how" className="hover:text-foreground transition-colors">
             사용법
           </a>
+          <a href="#achievement" className="hover:text-foreground transition-colors">
+            성장 확인
+          </a>
         </div>
       </div>
     </footer>

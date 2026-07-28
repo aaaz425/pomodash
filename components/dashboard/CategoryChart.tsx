@@ -35,7 +35,12 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             aria-hidden="true"
             className="relative shrink-0 w-[120px] h-[120px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
           >
-            <ResponsiveContainer width="100%" height="100%" minHeight={120}>
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minHeight={120}
+              initialDimension={{ width: 1, height: 1 }}
+            >
               <PieChart>
                 <Pie
                   data={data}
