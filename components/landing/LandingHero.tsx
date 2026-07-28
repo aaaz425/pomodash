@@ -3,9 +3,6 @@ import { LandingCTA } from '@/components/landing/LandingCTA';
 export function LandingHero() {
   return (
     <section className="mx-auto max-w-6xl px-6 pt-20 pb-16 flex flex-col items-center text-center gap-6">
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-        로그인 없이 바로 시작
-      </span>
       <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground max-w-2xl leading-tight">
         집중하면
         <br />

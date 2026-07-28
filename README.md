@@ -4,7 +4,7 @@
 
 계획하고, 집중하고, 기록한다
 
-수험생과 취업 준비생을 위한 포모도로 기반 집중 도구. 로그인 없이 바로 쓸 수 있고 모든 데이터는 브라우저에 저장된다.
+수험생과 취업 준비생을 위한 포모도로 기반 집중 도구.
 
 ## 스크린샷
 
@@ -52,15 +52,6 @@ npm run dev
 | `npm run test` | 단위 테스트 (Vitest) |
 | `npm run test:e2e` | E2E 테스트 (Playwright) |
 
-### 환경 변수
-
-모두 선택 사항 — 없어도 로컬 개발에 영향 없음. `.env.local.example` 참고
-
-| 변수 | 설명 |
-|------|------|
-| `NEXT_PUBLIC_POSTHOG_KEY` | Posthog 이벤트 추적 API 키 |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Posthog 호스트 (기본값: `https://app.posthog.com`) |
-
 ### 프로젝트 구조
 
 ```
@@ -105,7 +96,7 @@ docs/          # 프로젝트 문서
 | Recharts | 대시보드 집중 시간 차트 |
 | date-fns | 날짜 그루핑 및 스트릭 계산 |
 | framer-motion | 집중 모드 전환 애니메이션 |
-| Vercel Analytics + Posthog | 사용 지표 모니터링 |
+| Vercel Analytics | 사용 지표 모니터링 |
 
 ## 라이선스
 

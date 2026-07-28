@@ -10,7 +10,6 @@ import {
 } from '@/types';
 import type { z } from 'zod';
 import { toast } from 'sonner';
-import { trackEvent, EVENTS } from '@/config/analytics';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { isSessionStale } from '@/lib/sessionStale';
 import { FOCUS_PERIOD_LIMITS } from '@/lib/constants/limits';
@@ -133,7 +132,6 @@ export const createTimerStore = () => {
 
       start: () =>
         set((state) => {
-          if (!state.sessionStarted) trackEvent(EVENTS.TIMER_STARTED);
           const now = Date.now();
           return {
             startedAt: now,
@@ -220,7 +218,6 @@ export const createTimerStore = () => {
             : rawFocusPeriods;
         const next = cycleCount + 1;
         if (next >= settings.totalCycles) {
-          trackEvent(EVENTS.TIMER_COMPLETED, { cycles: next });
           set({
             cycleCount: next,
             startedAt: null,
@@ -295,10 +292,7 @@ export const createTimerStore = () => {
 
       dismissSessionRecord: () => set(resetSessionState()),
 
-      enterFocusMode: () => {
-        trackEvent(EVENTS.FOCUS_MODE_ENTERED);
-        set({ isFocusMode: true });
-      },
+      enterFocusMode: () => set({ isFocusMode: true }),
       exitFocusMode: () => set({ isFocusMode: false }),
 
       // lastActiveAt도 함께 갱신 — 안 그러면 재생 버튼을 다시 눌렀을 때 start()의 방치 검사가 즉시 재발동함

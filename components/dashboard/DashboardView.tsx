@@ -1,8 +1,7 @@
 'use client';
 
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { trackEvent, EVENTS } from '@/config/analytics';
+import { useMemo, useState } from 'react';
 
 import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
@@ -50,10 +49,6 @@ function makeCountSub(diff: number, label: string): string | undefined {
 export function DashboardView() {
   const [tab, setTab] = useState<TabType>('week');
   const [shareOpen, setShareOpen] = useState(false);
-
-  useEffect(() => {
-    trackEvent(EVENTS.DASHBOARD_VIEWED);
-  }, []);
 
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
@@ -134,10 +129,7 @@ export function DashboardView() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => {
-              setShareOpen(true);
-              trackEvent(EVENTS.SHARE_CARD_OPENED);
-            }}
+            onClick={() => setShareOpen(true)}
             aria-label="공유 카드 만들기"
           >
             <Share2 className="w-4 h-4" />
