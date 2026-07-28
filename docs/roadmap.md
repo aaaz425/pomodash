@@ -61,7 +61,6 @@
 ## Phase 7 — 백엔드 & 동기화
 
 - [x] `chore/cleanup-legacy-copy` — 로그인 없음 포지셔닝 문구 및 PostHog 트래킹 제거
-- [>] `style/landing-revamp` — 랜딩 하이드레이션 버그 수정 + 스무스 스크롤 + 줄바꿈 + 콘텐츠/밀도 개선
 - [ ] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
 - [ ] `style/skeleton-ui` — 페이지별 스켈레톤 로딩 UI (supabase-migration 완료 후)
 
