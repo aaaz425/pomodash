@@ -4,13 +4,18 @@ export function LandingHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-        <span className="text-primary font-bold text-base">Pomodash</span>
+        <a href="#top" className="text-primary font-bold text-base">
+          Pomodash
+        </a>
         <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition-colors">
             기능
           </a>
           <a href="#how" className="hover:text-foreground transition-colors">
             사용법
+          </a>
+          <a href="#achievement" className="hover:text-foreground transition-colors">
+            성장 확인
           </a>
         </nav>
         <Link
