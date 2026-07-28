@@ -143,14 +143,9 @@
     overscroll-behavior: none;
   }
 
-  body {
-    overflow-y: scroll;
-  }
-
   @media (display-mode: standalone) {
     body {
       height: 100vh;
-      overflow-y: scroll;
     }
   }
 }
@@ -182,19 +177,9 @@ select:not(:disabled) {
   animation: timer-glow-pulse 5s ease-in-out infinite;
 }
 
-html,
-body {
-  scroll-behavior: smooth;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .timer-glow-pulse {
     animation: none;
-  }
-
-  html,
-  body {
-    scroll-behavior: auto;
   }
 }
 
