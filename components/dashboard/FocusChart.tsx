@@ -61,7 +61,12 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
             }))}
           />
           <div aria-hidden="true" className="w-full h-full">
-            <ResponsiveContainer width="100%" height="100%" minHeight={140}>
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minHeight={140}
+              initialDimension={{ width: 1, height: 1 }}
+            >
               <BarChart
                 layout="vertical"
                 data={data}
