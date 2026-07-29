@@ -143,6 +143,10 @@
     overscroll-behavior: none;
   }
 
+  body {
+    overflow: hidden;
+  }
+
   @media (display-mode: standalone) {
     body {
       height: 100vh;
