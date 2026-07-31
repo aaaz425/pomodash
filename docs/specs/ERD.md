@@ -203,10 +203,12 @@ Session의 `focusPeriods` 배열 원소. 별도 localStorage 키 없음.
 
 ---
 
-## Phase 7 이후 변경 예정
+## Phase 7 스키마 (`chore/supabase-setup`, `supabase/migrations/20260731124043_init_schema.sql`)
 
-Supabase 마이그레이션 시:
-- localStorage 키 → Supabase 테이블로 전환
-- `taskId` nullable FK → Supabase foreign key constraint
-- `focusPeriods` 내장 배열 → 별도 `focus_periods` 테이블로 정규화 가능
+- localStorage 키 → Supabase 테이블(`categories`/`tasks`/`sessions`/`settings`)로 전환, `uuid` PK(`gen_random_uuid()`), 전 테이블 `auth.uid() = user_id` RLS
+- `Task.categoryId`(nullable 아님) → `tasks.category_id`는 `on delete restrict` — 기존 앱은 카테고리 삭제 시 참조 task를 방치했지만 DB는 삭제를 막음. 실제 UX(차단 안내/재할당/nullable 전환)는 `refactor/store-supabase-sync`에서 결정
+- `Session.taskId`(nullable) → `sessions.task_id`는 `on delete set null`로 "미분류 세션" 유지
+- `focusPeriods` 내장 배열 → **정규화하지 않고 `jsonb`로 유지 확정**(항상 부모 세션과 함께만 조회되어 별도 테이블화 이득 없음), `jsonb_array_length <= 100` CHECK로 `FOCUS_PERIOD_LIMITS.MAX_PERIODS` 반영
+- 재정렬 가능한 `tasks`/`categories`에 신규 `position` 컬럼 추가 (localStorage 배열 순서를 대체)
+- 신규 계정 생성 시 `handle_new_user()` 트리거가 기본 카테고리 5개 + 기본 `settings` 1행을 원자적으로 시딩
 
