@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Bell, ListChecks, ListTodo, Sparkles, Timer } from 'lucide-react';
+import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { InstallSection } from '@/components/settings/InstallSection';
@@ -28,7 +29,11 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
   );
 }
 
-export function SettingsView() {
+interface Props {
+  userEmail: string | null;
+}
+
+export function SettingsView({ userEmail }: Props) {
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
 
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
@@ -45,6 +50,10 @@ export function SettingsView() {
           <h1 className="text-xl font-bold text-foreground">설정</h1>
           <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
         </header>
+
+        <SettingCard title="계정">
+          <AccountSection userEmail={userEmail} />
+        </SettingCard>
 
         <SettingCard title="프로필">
           <ProfileSection />

@@ -131,3 +131,8 @@ export interface AppSettings {
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
 }
+
+export interface AuthActionResult {
+  error?: string;
+  pendingConfirmation?: true;
+}
