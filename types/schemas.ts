@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Category, TimerSettings } from '@/types/models';
-import { TIMER_LIMITS, INPUT_LIMITS, SOUND_LIMITS } from '@/lib/constants/limits';
+import { TIMER_LIMITS, INPUT_LIMITS, SOUND_LIMITS, AUTH_LIMITS } from '@/lib/constants/limits';
 
 export const CategorySchema = z.object({
   id: z.string(),
@@ -112,6 +112,24 @@ export const AppSettingsSchema = z.object({
     .max(INPUT_LIMITS.MESSAGE_COUNT_MAX),
   defaultTimerSettings: TimerSettingsSchema,
 });
+
+export const LoginCredentialsSchema = z.object({
+  email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
+  password: z.string().min(1, { message: '비밀번호를 입력해주세요' }),
+});
+
+export const SignupCredentialsSchema = z
+  .object({
+    email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
+    password: z
+      .string()
+      .min(AUTH_LIMITS.PASSWORD_MIN_LENGTH, { message: '비밀번호는 8자 이상이어야 해요' }),
+    passwordConfirm: z.string(),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: '비밀번호가 일치하지 않아요',
+    path: ['passwordConfirm'],
+  });
 
 export const CategoriesSchema = z.array(CategorySchema).max(INPUT_LIMITS.CATEGORIES_MAX);
 export const TasksSchema = z.array(TaskSchema);
