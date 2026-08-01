@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/supabase/server';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { siteConfig } from '@/config/site';
@@ -10,10 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SignupPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) {
     redirect('/');
