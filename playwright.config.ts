@@ -12,6 +12,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'list',
+  // Supabase 왕복이 실제로 생겨서(로컬보다 느린 CI 러너 기준) 기본 5초보다 여유를 둠
+  expect: { timeout: 10_000 },
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
