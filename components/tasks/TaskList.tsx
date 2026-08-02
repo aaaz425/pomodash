@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
-import { useTaskStore } from '@/store/StoreProvider';
+import { useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TaskItem } from '@/components/tasks/TaskItem';
@@ -32,6 +32,7 @@ interface Props {
 }
 
 export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName }: Props) {
+  const hydrated = useHydrated();
   const tasks = useTaskStore((s) => s.tasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);
@@ -102,8 +103,9 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName 
 
       <button
         type="button"
+        disabled={!hydrated}
         onClick={() => setEditTarget('new')}
-        className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors self-start"
+        className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors self-start disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <Plus className="w-3.5 h-3.5" />새 작업 추가
       </button>

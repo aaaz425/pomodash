@@ -39,6 +39,7 @@ export function SessionRecordModal() {
   const [distractionTags, setDistractionTags] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!hydrated || !sessionEnded || sessionEndedAt === null) return null;
 
@@ -49,7 +50,9 @@ export function SessionRecordModal() {
     : accFocusSeconds;
   const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds);
 
-  function handleSave() {
+  async function handleSave() {
+    if (isSaving) return;
+    setIsSaving(true);
     const taskId = isTaskSession ? currentTaskId : selectedTaskId;
     const focusPeriods = normalizeFocusPeriods(
       rawFocusPeriods.map((p) => ({
@@ -57,7 +60,7 @@ export function SessionRecordModal() {
         end: new Date(p.end).toISOString(),
       })),
     );
-    addSession({
+    await addSession({
       taskId,
       mode,
       startedAt: new Date(sessionStartedAt ?? now).toISOString(),
@@ -77,6 +80,7 @@ export function SessionRecordModal() {
     setDistractionTags([]);
     setSelectedTaskId(null);
     setPendingAction(null);
+    setIsSaving(false);
   }
 
   function handleSkip() {
