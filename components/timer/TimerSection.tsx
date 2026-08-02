@@ -1,14 +1,16 @@
 'use client';
 
-import { useTimerStore, useHydrated } from '@/store/StoreProvider';
+import { useTimerStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { TimerControls } from '@/components/timer/TimerControls';
 
 export function TimerSection() {
-  const hydrated = useHydrated();
+  const { hydrated, showSkeleton } = useDelayedHydration();
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
   const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
@@ -18,7 +20,9 @@ export function TimerSection() {
     <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
       {/* 현재 작업 */}
       <div className="flex items-center gap-2 h-5 text-sm text-muted-foreground">
-        {task ? (
+        {!hydrated ? (
+          showSkeleton && <Skeleton className="h-4 w-24" />
+        ) : task ? (
           <>
             {category && <CategoryBadge category={category} />}
             <span>{task.title}</span>

@@ -7,11 +7,13 @@ import { InsightsSection } from '@/components/journal/InsightsSection';
 import { JournalTabs } from '@/components/journal/JournalTabs';
 import { SessionDetailOverlay } from '@/components/journal/SessionDetailOverlay';
 import { JournalEmptyState } from '@/components/journal/JournalEmptyState';
-import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { JournalSkeleton } from '@/components/journal/JournalSkeleton';
+import { useTaskStore } from '@/store/StoreProvider';
+import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import type { JournalTab } from '@/types';
 
 export function JournalView() {
-  const hydrated = useHydrated();
+  const { hydrated, showSkeleton } = useDelayedHydration();
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);
@@ -19,7 +21,7 @@ export function JournalView() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<JournalTab>('list');
 
-  if (!hydrated) return null;
+  if (!hydrated) return showSkeleton ? <JournalSkeleton /> : null;
 
   const selectedSession = sessions.find((s) => s.id === selectedId) ?? null;
   const selectedTask = selectedSession

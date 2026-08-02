@@ -14,7 +14,9 @@ import { TaskManageModal } from '@/components/settings/task/TaskManageModal';
 import { MotivationalModal } from '@/components/settings/motivational/MotivationalModal';
 import { NotificationModal } from '@/components/settings/notification/NotificationModal';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
+import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
+import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 
 type MenuKey = 'timer' | 'task' | 'category' | 'motivational' | 'notification';
 
@@ -34,6 +36,7 @@ interface Props {
 }
 
 export function SettingsView({ user }: Props) {
+  const { hydrated, showSkeleton } = useDelayedHydration();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
 
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
@@ -42,6 +45,8 @@ export function SettingsView({ user }: Props) {
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const soundAlert = useSettingsStore((s) => s.soundAlert);
+
+  if (!hydrated) return showSkeleton ? <SettingsSkeleton /> : null;
 
   return (
     <>
