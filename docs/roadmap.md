@@ -61,7 +61,7 @@
 ## Phase 7 — 백엔드 & 동기화
 
 - [x] `chore/cleanup-legacy-copy` — 로그인 없음 포지셔닝 문구 및 PostHog 트래킹 제거
-- [>] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
+- [x] `chore/supabase-migration` — localStorage → Supabase 마이그레이션 (로그인, 동기화)
 - [ ] `style/skeleton-ui` — 페이지별 스켈레톤 로딩 UI (supabase-migration 완료 후)
 
 ## Phase 8 — 네이티브 앱
