@@ -20,14 +20,17 @@ export function CategoryEditModal({ category, onClose }: Props) {
 
   const [name, setName] = useState(category?.name ?? '');
   const [color, setColor] = useState(category?.color ?? (CATEGORY_COLOR_KEYS[0] as string));
+  // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 생성될 수 있음
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSave() {
+  async function handleSave() {
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed || isSubmitting) return;
+    setIsSubmitting(true);
     if (category) {
-      updateCategory(category.id, { name: trimmed, color });
+      await updateCategory(category.id, { name: trimmed, color });
     } else {
-      addCategory({ name: trimmed, color });
+      await addCategory({ name: trimmed, color });
     }
     onClose();
   }
@@ -46,7 +49,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isSubmitting}
             variant="default"
             size="lg"
             className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"

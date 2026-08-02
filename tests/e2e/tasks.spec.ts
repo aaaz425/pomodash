@@ -21,6 +21,13 @@ test.describe('작업 관리', () => {
 
     await expect(addModal).not.toBeVisible();
     await expect(taskModal.getByText('E2E 테스트 작업')).toBeVisible();
+
+    // 정리 — 다음 테스트와 이름이 겹치지 않도록 생성한 작업을 삭제
+    const taskRow = taskModal.getByText('E2E 테스트 작업').locator('xpath=ancestor::div[1]');
+    await taskRow.getByRole('button', { name: '삭제' }).click();
+    const confirm = page.getByRole('alertdialog');
+    await confirm.getByRole('button', { name: '삭제' }).click();
+    await expect(taskModal.getByText('E2E 테스트 작업')).not.toBeVisible();
   });
 
   test('작업 선택 후 타이머 연결', async ({ page }) => {

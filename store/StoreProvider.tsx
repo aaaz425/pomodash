@@ -47,15 +47,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    taskStore.getState().hydrate();
     timerStore.getState().hydrate();
-    // settingsStore는 Supabase 조회라 네트워크 왕복이 있음 — 이게 끝난 뒤에 hydrated로 표시
-    settingsStore
-      .getState()
-      .hydrate()
-      .finally(() => {
+    // taskStore/settingsStore는 Supabase 조회라 네트워크 왕복이 있음 — 둘 다 끝난 뒤에 hydrated로 표시
+    Promise.all([taskStore.getState().hydrate(), settingsStore.getState().hydrate()]).finally(
+      () => {
         startTransition(() => setHydrated(true));
-      });
+      },
+    );
   }, [taskStore, settingsStore, timerStore]);
 
   return (
