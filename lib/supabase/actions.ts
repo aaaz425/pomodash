@@ -3,15 +3,9 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { isValidRedirectTarget } from '@/lib/supabase/redirect';
 import { LoginCredentialsSchema, SignupCredentialsSchema } from '@/types/schemas';
 import type { AuthActionResult } from '@/types';
-
-function isValidRedirectTarget(value: FormDataEntryValue | null): value is string {
-  // 오픈 리다이렉트 방지 — 같은 오리진의 경로만 허용.
-  // 두 번째 문자가 '/' 또는 '\'면 브라우저가 스킴 상대 경로(//evil.com, /\evil.com)로 해석할 수 있어 함께 차단.
-  if (typeof value !== 'string' || value[0] !== '/') return false;
-  return value[1] !== '/' && value[1] !== '\\';
-}
 
 export async function login(formData: FormData): Promise<AuthActionResult> {
   const parsed = LoginCredentialsSchema.safeParse({
@@ -73,6 +67,24 @@ export async function signup(formData: FormData): Promise<AuthActionResult> {
   }
 
   return { pendingConfirmation: true };
+}
+
+export async function loginWithKakao(formData: FormData): Promise<void> {
+  const origin = (await headers()).get('origin') ?? '';
+  const redirectTarget = formData.get('redirectTo');
+  const next = isValidRedirectTarget(redirectTarget) ? redirectTarget : '/';
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'kakao',
+    options: { redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}` },
+  });
+
+  if (error || !data.url) {
+    redirect('/login?error=auth_failed');
+  }
+
+  redirect(data.url);
 }
 
 export async function logout(): Promise<void> {

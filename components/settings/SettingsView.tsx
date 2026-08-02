@@ -30,10 +30,10 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
 }
 
 interface Props {
-  userEmail: string | null;
+  user: { email: string | null } | null;
 }
 
-export function SettingsView({ userEmail }: Props) {
+export function SettingsView({ user }: Props) {
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
 
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
@@ -52,7 +52,7 @@ export function SettingsView({ userEmail }: Props) {
         </header>
 
         <SettingCard title="계정">
-          <AccountSection userEmail={userEmail} />
+          <AccountSection user={user} />
         </SettingCard>
 
         <SettingCard title="프로필">

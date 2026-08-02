@@ -12,11 +12,11 @@ import type { AuthActionResult } from '@/types';
 export function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo');
-  const confirmFailed = searchParams.get('error') === 'confirm_failed';
+  const authFailed = searchParams.get('error') === 'auth_failed';
 
   const [state, formAction, pending] = useActionState<AuthActionResult, FormData>(
     (_prev, formData) => login(formData),
-    confirmFailed ? { error: '이메일 인증 확인에 실패했어요. 다시 시도해주세요' } : {},
+    authFailed ? { error: '인증에 실패했어요. 다시 시도해주세요' } : {},
   );
 
   return (
