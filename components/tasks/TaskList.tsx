@@ -17,9 +17,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
-import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { useTaskStore } from '@/store/StoreProvider';
+import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { TaskFormModal } from '@/components/tasks/TaskFormModal';
 import type { Task } from '@/types';
@@ -32,7 +34,7 @@ interface Props {
 }
 
 export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName }: Props) {
-  const hydrated = useHydrated();
+  const { hydrated, showSkeleton } = useDelayedHydration();
   const tasks = useTaskStore((s) => s.tasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);
@@ -66,7 +68,14 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName 
 
   return (
     <>
-      {visibleTasks.length === 0 ? (
+      {!hydrated ? (
+        showSkeleton && (
+          <div className={listClassName ?? 'flex flex-col gap-1'}>
+            <Skeleton className="h-11 w-full rounded-lg" />
+            <Skeleton className="h-11 w-full rounded-lg" />
+          </div>
+        )
+      ) : visibleTasks.length === 0 ? (
         <EmptyState
           message="아직 작업이 없어요"
           subMessage="아래에서 작업을 추가해보세요"

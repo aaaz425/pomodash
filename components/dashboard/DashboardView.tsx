@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
@@ -33,6 +34,7 @@ import { buildShareCardData } from '@/lib/shareCard';
 import type { TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
+import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 
 function makeFocusSub(diff: number, label: string): string | undefined {
   if (diff === 0) return undefined;
@@ -47,6 +49,7 @@ function makeCountSub(diff: number, label: string): string | undefined {
 }
 
 export function DashboardView() {
+  const { hydrated, showSkeleton } = useDelayedHydration();
   const [tab, setTab] = useState<TabType>('week');
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -117,6 +120,8 @@ export function DashboardView() {
       return makeCountSub(sessionCount - prevMonthCount, '전월 대비');
     return undefined;
   })();
+
+  if (!hydrated) return showSkeleton ? <DashboardSkeleton /> : null;
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">

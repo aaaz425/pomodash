@@ -1,5 +1,8 @@
 export const MESSAGE_ROTATE_INTERVAL_MS = 5000;
 
+// hydration이 이 시간 안에 끝나면 스켈레톤을 건너뛴다 — 빠른 연결에서 스켈레톤이 한 프레임 반짝이는 것 방지
+export const SKELETON_SHOW_DELAY_MS = 200;
+
 export const SOUND_SEQUENCE_INTERVAL = 1.9;
 
 import type { SoundType } from '@/types/models';
