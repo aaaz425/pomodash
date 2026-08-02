@@ -2,14 +2,13 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
-import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { toast } from 'sonner';
+import { fetchSettings, saveSettings } from '@/lib/supabase/settings';
 import {
   type TimerSettings,
   type AppSettings,
   type SoundType,
-  AppSettingsSchema,
   DEFAULT_TIMER_SETTINGS,
-  STORAGE_KEYS,
 } from '@/types';
 import { MOTIVATIONAL_MESSAGES } from '@/lib/constants/messages';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
@@ -35,18 +34,18 @@ interface SettingsStore {
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
 
-  setNickname: (nickname: string) => void;
-  setTimerDefaults: (settings: TimerSettings) => void;
-  setBrowserNotification: (enabled: boolean) => void;
-  setSoundAlert: (enabled: boolean) => void;
-  setSoundType: (type: SoundType) => void;
-  setSoundVolume: (volume: number) => void;
-  setSoundRepeatCount: (count: number) => void;
-  addMessage: (message: string) => void;
-  updateMessage: (index: number, message: string) => void;
-  deleteMessage: (index: number) => void;
-  reorderMessages: (fromId: string, toId: string) => void;
-  hydrate: () => void;
+  setNickname: (nickname: string) => Promise<void>;
+  setTimerDefaults: (settings: TimerSettings) => Promise<void>;
+  setBrowserNotification: (enabled: boolean) => Promise<void>;
+  setSoundAlert: (enabled: boolean) => Promise<void>;
+  setSoundType: (type: SoundType) => Promise<void>;
+  setSoundVolume: (volume: number) => Promise<void>;
+  setSoundRepeatCount: (count: number) => Promise<void>;
+  addMessage: (message: string) => Promise<void>;
+  updateMessage: (index: number, message: string) => Promise<void>;
+  deleteMessage: (index: number) => Promise<void>;
+  reorderMessages: (fromId: string, toId: string) => Promise<void>;
+  hydrate: () => Promise<void>;
 }
 
 function toAppSettings(s: SettingsStore): AppSettings {
@@ -62,92 +61,99 @@ function toAppSettings(s: SettingsStore): AppSettings {
   };
 }
 
-const saveSettings = (data: AppSettings): void => saveToStorage(STORAGE_KEYS.settings, data);
-
 export const createSettingsStore = () =>
-  createStore<SettingsStore>()((set, get) => ({
-    ...DEFAULT_SETTINGS,
+  createStore<SettingsStore>()((set, get) => {
+    // 낙관적으로 먼저 반영하고, 저장 실패하면 이전 값으로 되돌린다
+    async function persistChange(
+      previous: Partial<SettingsStore>,
+      patch: Partial<SettingsStore>,
+    ): Promise<void> {
+      set(patch);
+      const { error } = await saveSettings(toAppSettings(get()));
+      if (error) {
+        set(previous);
+        toast('설정 저장에 실패했어요. 다시 시도해주세요');
+      }
+    }
 
-    setNickname: (nickname) => {
-      set({ nickname });
-      saveSettings(toAppSettings(get()));
-    },
+    return {
+      ...DEFAULT_SETTINGS,
 
-    setTimerDefaults: (defaultTimerSettings) => {
-      set({ defaultTimerSettings });
-      saveSettings(toAppSettings(get()));
-    },
+      setNickname: (nickname) => persistChange({ nickname: get().nickname }, { nickname }),
 
-    setBrowserNotification: (browserNotification) => {
-      set({ browserNotification });
-      saveSettings(toAppSettings(get()));
-    },
+      setTimerDefaults: (defaultTimerSettings) =>
+        persistChange(
+          { defaultTimerSettings: get().defaultTimerSettings },
+          { defaultTimerSettings },
+        ),
 
-    setSoundAlert: (soundAlert) => {
-      set({ soundAlert });
-      saveSettings(toAppSettings(get()));
-    },
+      setBrowserNotification: (browserNotification) =>
+        persistChange({ browserNotification: get().browserNotification }, { browserNotification }),
 
-    setSoundType: (soundType) => {
-      set({ soundType });
-      saveSettings(toAppSettings(get()));
-    },
+      setSoundAlert: (soundAlert) =>
+        persistChange({ soundAlert: get().soundAlert }, { soundAlert }),
 
-    setSoundVolume: (soundVolume) => {
-      set({ soundVolume: Math.max(0, Math.min(100, Math.round(soundVolume))) });
-      saveSettings(toAppSettings(get()));
-    },
+      setSoundType: (soundType) => persistChange({ soundType: get().soundType }, { soundType }),
 
-    setSoundRepeatCount: (soundRepeatCount) => {
-      set({ soundRepeatCount: Math.max(1, Math.min(5, Math.round(soundRepeatCount))) });
-      saveSettings(toAppSettings(get()));
-    },
+      setSoundVolume: (soundVolume) =>
+        persistChange(
+          { soundVolume: get().soundVolume },
+          { soundVolume: Math.max(0, Math.min(100, Math.round(soundVolume))) },
+        ),
 
-    addMessage: (message) => {
-      const curr = get().motivationalMessages;
-      if (curr.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX) return;
-      const motivationalMessages = [...curr, message];
-      set({ motivationalMessages });
-      saveSettings(toAppSettings(get()));
-    },
+      setSoundRepeatCount: (soundRepeatCount) =>
+        persistChange(
+          { soundRepeatCount: get().soundRepeatCount },
+          { soundRepeatCount: Math.max(1, Math.min(5, Math.round(soundRepeatCount))) },
+        ),
 
-    updateMessage: (index, message) => {
-      const curr = get().motivationalMessages;
-      const trimmed = message.trim();
-      if (!trimmed || index < 0 || index >= curr.length) return;
-      const motivationalMessages = curr.map((m, i) => (i === index ? trimmed : m));
-      set({ motivationalMessages });
-      saveSettings(toAppSettings(get()));
-    },
+      addMessage: async (message) => {
+        const curr = get().motivationalMessages;
+        if (curr.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX) return;
+        await persistChange(
+          { motivationalMessages: curr },
+          { motivationalMessages: [...curr, message] },
+        );
+      },
 
-    deleteMessage: (index) => {
-      const curr = get().motivationalMessages;
-      if (curr.length <= INPUT_LIMITS.MESSAGE_COUNT_MIN) return;
-      const motivationalMessages = curr.filter((_, i) => i !== index);
-      set({ motivationalMessages });
-      saveSettings(toAppSettings(get()));
-    },
+      updateMessage: async (index, message) => {
+        const curr = get().motivationalMessages;
+        const trimmed = message.trim();
+        if (!trimmed || index < 0 || index >= curr.length) return;
+        const motivationalMessages = curr.map((m, i) => (i === index ? trimmed : m));
+        await persistChange({ motivationalMessages: curr }, { motivationalMessages });
+      },
 
-    reorderMessages: (fromId, toId) => {
-      const messages = get().motivationalMessages;
-      const from = parseInt(fromId);
-      const to = parseInt(toId);
-      if (
-        Number.isNaN(from) ||
-        Number.isNaN(to) ||
-        from < 0 ||
-        from >= messages.length ||
-        to < 0 ||
-        to >= messages.length
-      )
-        return;
-      const next = arrayMove(messages, from, to);
-      set({ motivationalMessages: next });
-      saveSettings(toAppSettings(get()));
-    },
+      deleteMessage: async (index) => {
+        const curr = get().motivationalMessages;
+        if (curr.length <= INPUT_LIMITS.MESSAGE_COUNT_MIN) return;
+        const motivationalMessages = curr.filter((_, i) => i !== index);
+        await persistChange({ motivationalMessages: curr }, { motivationalMessages });
+      },
 
-    hydrate: () => set(loadFromStorage(STORAGE_KEYS.settings, AppSettingsSchema, DEFAULT_SETTINGS)),
-  }));
+      reorderMessages: async (fromId, toId) => {
+        const messages = get().motivationalMessages;
+        const from = parseInt(fromId);
+        const to = parseInt(toId);
+        if (
+          Number.isNaN(from) ||
+          Number.isNaN(to) ||
+          from < 0 ||
+          from >= messages.length ||
+          to < 0 ||
+          to >= messages.length
+        )
+          return;
+        const next = arrayMove(messages, from, to);
+        await persistChange({ motivationalMessages: messages }, { motivationalMessages: next });
+      },
+
+      hydrate: async () => {
+        const settings = await fetchSettings();
+        if (settings) set(settings);
+      },
+    };
+  });
 
 export type SettingsStoreApi = ReturnType<typeof createSettingsStore>;
 export type { SettingsStore };
