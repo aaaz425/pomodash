@@ -2,20 +2,39 @@
 
 import { createStore } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
-import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { toast } from 'sonner';
 import { generateId } from '@/lib/utils';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
+import {
+  fetchTasks,
+  insertTask as insertTaskRow,
+  updateTask as updateTaskRow,
+  deleteTask as deleteTaskRow,
+  reorderTasks as reorderTasksRows,
+} from '@/lib/supabase/tasks';
+import {
+  fetchCategories,
+  insertCategory as insertCategoryRow,
+  updateCategory as updateCategoryRow,
+  deleteCategory as deleteCategoryRow,
+  reorderCategories as reorderCategoriesRows,
+} from '@/lib/supabase/categories';
+import {
+  fetchSessions,
+  insertSession as insertSessionRow,
+  updateSession as updateSessionRow,
+  deleteSession as deleteSessionRow,
+} from '@/lib/supabase/sessions';
 import {
   type Task,
   type Category,
   type Session,
   type FocusRating,
-  TasksSchema,
-  CategoriesSchema,
-  SessionsSchema,
   DEFAULT_CATEGORIES,
-  STORAGE_KEYS,
 } from '@/types';
+
+const CATEGORY_IN_USE_MESSAGE =
+  '이 카테고리를 쓰는 작업이 있어요. 작업을 먼저 옮기거나 삭제해주세요';
 
 interface TaskStore {
   tasks: Task[];
@@ -28,8 +47,8 @@ interface TaskStore {
     targetFocusMinutes?: number;
     targetCycles?: number;
     targetBreakMinutes?: number;
-  }) => string;
-  toggleTask: (id: string) => void;
+  }) => Promise<string | null>;
+  toggleTask: (id: string) => Promise<void>;
   updateTask: (
     id: string,
     patch: Partial<
@@ -38,152 +57,274 @@ interface TaskStore {
         'title' | 'categoryId' | 'targetFocusMinutes' | 'targetCycles' | 'targetBreakMinutes'
       >
     >,
-  ) => void;
-  deleteTask: (id: string) => void;
-  addSession: (input: Omit<Session, 'id'>) => void;
-  updateSessionNote: (id: string, note: string | null) => void;
-  updateSessionRating: (id: string, rating: FocusRating | null) => void;
-  updateSessionTags: (id: string, tags: string[]) => void;
-  deleteSession: (id: string) => void;
-  reorderTasks: (activeId: string, overId: string) => void;
-  addCategory: (input: { name: string; color: string }) => void;
-  updateCategory: (id: string, input: { name: string; color: string }) => void;
-  deleteCategory: (id: string) => void;
-  reorderCategories: (activeId: string, overId: string) => void;
-  hydrate: () => void;
+  ) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  addSession: (input: Omit<Session, 'id'>) => Promise<void>;
+  updateSessionNote: (id: string, note: string | null) => Promise<void>;
+  updateSessionRating: (id: string, rating: FocusRating | null) => Promise<void>;
+  updateSessionTags: (id: string, tags: string[]) => Promise<void>;
+  deleteSession: (id: string) => Promise<void>;
+  reorderTasks: (activeId: string, overId: string) => Promise<void>;
+  addCategory: (input: { name: string; color: string }) => Promise<void>;
+  updateCategory: (id: string, input: { name: string; color: string }) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
+  reorderCategories: (activeId: string, overId: string) => Promise<void>;
+  hydrate: () => Promise<void>;
 }
-
-const saveTasks = (tasks: Task[]) => saveToStorage(STORAGE_KEYS.tasks, tasks);
-const saveSessions = (sessions: Session[]) => saveToStorage(STORAGE_KEYS.sessions, sessions);
-const saveCategories = (categories: Category[]) =>
-  saveToStorage(STORAGE_KEYS.categories, categories);
 
 export const createTaskStore = () =>
   createStore<TaskStore>()((set, get) => ({
-    // SSR hydration mismatch 방지 — localStorage는 hydrate()로 반영
+    // SSR hydration mismatch 방지 — 실제 데이터는 hydrate()로 반영
     tasks: [],
     categories: DEFAULT_CATEGORIES,
     sessions: [],
 
-    addTask: ({ title, categoryId, targetFocusMinutes, targetCycles, targetBreakMinutes }) => {
-      const newTask: Task = {
-        id: generateId(),
-        title: title.trim(),
+    addTask: async ({
+      title,
+      categoryId,
+      targetFocusMinutes,
+      targetCycles,
+      targetBreakMinutes,
+    }) => {
+      const trimmed = title.trim();
+      const focus = targetFocusMinutes ?? 25;
+      const cycles = targetCycles ?? 4;
+      const breakMinutes = targetBreakMinutes ?? 5;
+      const tempId = generateId();
+      const optimisticTask: Task = {
+        id: tempId,
+        title: trimmed,
         categoryId,
-        targetFocusMinutes: targetFocusMinutes ?? 25,
-        targetCycles: targetCycles ?? 4,
-        targetBreakMinutes: targetBreakMinutes ?? 5,
+        targetFocusMinutes: focus,
+        targetCycles: cycles,
+        targetBreakMinutes: breakMinutes,
         completed: false,
         createdAt: new Date().toISOString(),
       };
-      const tasks = [newTask, ...get().tasks];
-      saveTasks(tasks);
-      set({ tasks });
-      return newTask.id;
+      const previousTasks = get().tasks;
+      const optimisticTasks = [optimisticTask, ...previousTasks];
+      set({ tasks: optimisticTasks });
+
+      const inserted = await insertTaskRow({
+        title: trimmed,
+        categoryId,
+        targetFocusMinutes: focus,
+        targetCycles: cycles,
+        targetBreakMinutes: breakMinutes,
+      });
+
+      if (!inserted) {
+        set({ tasks: previousTasks });
+        toast('작업 추가에 실패했어요. 다시 시도해주세요');
+        return null;
+      }
+
+      const finalTasks = optimisticTasks.map((t) => (t.id === tempId ? inserted : t));
+      set({ tasks: finalTasks });
+      // 새 작업이 맨 앞으로 온 순서를 position에 반영 — 실패해도 다음 재정렬 때 자연히 맞춰짐
+      void reorderTasksRows(finalTasks.map((t) => t.id));
+      return inserted.id;
     },
 
-    toggleTask: (id) => {
-      const tasks = get().tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
-      saveTasks(tasks);
-      set({ tasks });
+    toggleTask: async (id) => {
+      const previousTasks = get().tasks;
+      const task = previousTasks.find((t) => t.id === id);
+      if (!task) return;
+      const completed = !task.completed;
+      set({ tasks: previousTasks.map((t) => (t.id === id ? { ...t, completed } : t)) });
+      const { error } = await updateTaskRow(id, { completed });
+      if (error) {
+        set({ tasks: previousTasks });
+        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+      }
     },
 
-    updateTask: (id, patch) => {
-      const tasks = get().tasks.map((t) =>
-        t.id === id ? { ...t, ...patch, title: patch.title?.trim() ?? t.title } : t,
-      );
-      saveTasks(tasks);
-      set({ tasks });
-    },
-
-    deleteTask: (id) => {
-      const tasks = get().tasks.filter((t) => t.id !== id);
-      saveTasks(tasks);
-      set({ tasks });
-    },
-
-    addSession: (input) => {
-      const session: Session = { id: generateId(), ...input };
-      const sessions = [session, ...get().sessions];
-      saveSessions(sessions);
-      set({ sessions });
-    },
-
-    updateSessionNote: (id, note) => {
-      const sessions = get().sessions.map((s) =>
-        s.id === id ? { ...s, note: note?.trim() || null } : s,
-      );
-      saveSessions(sessions);
-      set({ sessions });
-    },
-
-    updateSessionRating: (id, rating) => {
-      const sessions = get().sessions.map((s) => (s.id === id ? { ...s, focusRating: rating } : s));
-      saveSessions(sessions);
-      set({ sessions });
-    },
-
-    updateSessionTags: (id, tags) => {
-      const sessions = get().sessions.map((s) =>
-        s.id === id ? { ...s, distractionTags: tags } : s,
-      );
-      saveSessions(sessions);
-      set({ sessions });
-    },
-
-    deleteSession: (id) => {
-      const sessions = get().sessions.filter((s) => s.id !== id);
-      saveSessions(sessions);
-      set({ sessions });
-    },
-
-    reorderTasks: (activeId, overId) => {
-      const { tasks } = get();
-      const from = tasks.findIndex((t) => t.id === activeId);
-      const to = tasks.findIndex((t) => t.id === overId);
-      if (from === -1 || to === -1) return;
-      const next = arrayMove(tasks, from, to);
-      saveTasks(next);
-      set({ tasks: next });
-    },
-
-    addCategory: ({ name, color }) => {
-      if (get().categories.length >= INPUT_LIMITS.CATEGORIES_MAX) return;
-      const categories = [...get().categories, { id: generateId(), name: name.trim(), color }];
-      saveCategories(categories);
-      set({ categories });
-    },
-
-    updateCategory: (id, { name, color }) => {
-      const categories = get().categories.map((c) =>
-        c.id === id ? { ...c, name: name.trim(), color } : c,
-      );
-      saveCategories(categories);
-      set({ categories });
-    },
-
-    deleteCategory: (id) => {
-      const categories = get().categories.filter((c) => c.id !== id);
-      saveCategories(categories);
-      set({ categories });
-    },
-
-    reorderCategories: (activeId, overId) => {
-      const { categories } = get();
-      const from = categories.findIndex((c) => c.id === activeId);
-      const to = categories.findIndex((c) => c.id === overId);
-      if (from === -1 || to === -1) return;
-      const next = arrayMove(categories, from, to);
-      saveCategories(next);
-      set({ categories: next });
-    },
-
-    hydrate: () =>
+    updateTask: async (id, patch) => {
+      const previousTasks = get().tasks;
+      if (!previousTasks.some((t) => t.id === id)) return;
+      const title = patch.title?.trim();
       set({
-        tasks: loadFromStorage(STORAGE_KEYS.tasks, TasksSchema, []),
-        categories: loadFromStorage(STORAGE_KEYS.categories, CategoriesSchema, DEFAULT_CATEGORIES),
-        sessions: loadFromStorage(STORAGE_KEYS.sessions, SessionsSchema, []),
-      }),
+        tasks: previousTasks.map((t) =>
+          t.id === id ? { ...t, ...patch, title: title ?? t.title } : t,
+        ),
+      });
+      const { error } = await updateTaskRow(id, { ...patch, title });
+      if (error) {
+        set({ tasks: previousTasks });
+        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+      }
+    },
+
+    deleteTask: async (id) => {
+      const previousTasks = get().tasks;
+      if (!previousTasks.some((t) => t.id === id)) return;
+      set({ tasks: previousTasks.filter((t) => t.id !== id) });
+      const { error } = await deleteTaskRow(id);
+      if (error) {
+        set({ tasks: previousTasks });
+        toast('작업 삭제에 실패했어요. 다시 시도해주세요');
+      }
+    },
+
+    addSession: async (input) => {
+      const tempId = generateId();
+      const previousSessions = get().sessions;
+      set({ sessions: [{ id: tempId, ...input }, ...previousSessions] });
+
+      const inserted = await insertSessionRow(input);
+      if (!inserted) {
+        set({ sessions: previousSessions });
+        toast('세션 저장에 실패했어요');
+        return;
+      }
+      set({ sessions: [inserted, ...previousSessions] });
+    },
+
+    updateSessionNote: async (id, note) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      const trimmedNote = note?.trim() || null;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, note: trimmedNote } : s)),
+      });
+      const { error } = await updateSessionRow(id, { note: trimmedNote });
+      if (error) {
+        set({ sessions: previousSessions });
+        toast('메모 저장에 실패했어요');
+      }
+    },
+
+    updateSessionRating: async (id, rating) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, focusRating: rating } : s)),
+      });
+      const { error } = await updateSessionRow(id, { focusRating: rating });
+      if (error) {
+        set({ sessions: previousSessions });
+        toast('평점 저장에 실패했어요');
+      }
+    },
+
+    updateSessionTags: async (id, tags) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, distractionTags: tags } : s)),
+      });
+      const { error } = await updateSessionRow(id, { distractionTags: tags });
+      if (error) {
+        set({ sessions: previousSessions });
+        toast('태그 저장에 실패했어요');
+      }
+    },
+
+    deleteSession: async (id) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({ sessions: previousSessions.filter((s) => s.id !== id) });
+      const { error } = await deleteSessionRow(id);
+      if (error) {
+        set({ sessions: previousSessions });
+        toast('세션 삭제에 실패했어요');
+      }
+    },
+
+    reorderTasks: async (activeId, overId) => {
+      const previousTasks = get().tasks;
+      const from = previousTasks.findIndex((t) => t.id === activeId);
+      const to = previousTasks.findIndex((t) => t.id === overId);
+      if (from === -1 || to === -1) return;
+      const next = arrayMove(previousTasks, from, to);
+      set({ tasks: next });
+      const { error } = await reorderTasksRows(next.map((t) => t.id));
+      if (error) {
+        set({ tasks: previousTasks });
+        toast('순서 저장에 실패했어요');
+      }
+    },
+
+    addCategory: async ({ name, color }) => {
+      const previousCategories = get().categories;
+      if (previousCategories.length >= INPUT_LIMITS.CATEGORIES_MAX) return;
+      const trimmed = name.trim();
+      const tempId = generateId();
+      const optimisticCategories = [...previousCategories, { id: tempId, name: trimmed, color }];
+      set({ categories: optimisticCategories });
+
+      const inserted = await insertCategoryRow({ name: trimmed, color });
+      if (!inserted) {
+        set({ categories: previousCategories });
+        toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
+        return;
+      }
+      const finalCategories = optimisticCategories.map((c) => (c.id === tempId ? inserted : c));
+      set({ categories: finalCategories });
+      void reorderCategoriesRows(finalCategories.map((c) => c.id));
+    },
+
+    updateCategory: async (id, { name, color }) => {
+      const previousCategories = get().categories;
+      if (!previousCategories.some((c) => c.id === id)) return;
+      const trimmed = name.trim();
+      set({
+        categories: previousCategories.map((c) =>
+          c.id === id ? { ...c, name: trimmed, color } : c,
+        ),
+      });
+      const { error } = await updateCategoryRow(id, { name: trimmed, color });
+      if (error) {
+        set({ categories: previousCategories });
+        toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
+      }
+    },
+
+    deleteCategory: async (id) => {
+      const previousCategories = get().categories;
+      if (!previousCategories.some((c) => c.id === id)) return;
+
+      // 참조하는 작업이 있으면 DB에서 어차피 막히는데, 먼저 지웠다가 롤백되면 화면이 깜빡여서
+      // 로컬에 이미 있는 tasks로 미리 걸러 낙관적 삭제 자체를 생략한다(DB 체크는 안전망으로 유지)
+      if (get().tasks.some((t) => t.categoryId === id)) {
+        toast(CATEGORY_IN_USE_MESSAGE);
+        return;
+      }
+
+      set({ categories: previousCategories.filter((c) => c.id !== id) });
+      const { error, blocked } = await deleteCategoryRow(id);
+      if (error) {
+        set({ categories: previousCategories });
+        toast(blocked ? CATEGORY_IN_USE_MESSAGE : '카테고리 삭제에 실패했어요. 다시 시도해주세요');
+      }
+    },
+
+    reorderCategories: async (activeId, overId) => {
+      const previousCategories = get().categories;
+      const from = previousCategories.findIndex((c) => c.id === activeId);
+      const to = previousCategories.findIndex((c) => c.id === overId);
+      if (from === -1 || to === -1) return;
+      const next = arrayMove(previousCategories, from, to);
+      set({ categories: next });
+      const { error } = await reorderCategoriesRows(next.map((c) => c.id));
+      if (error) {
+        set({ categories: previousCategories });
+        toast('순서 저장에 실패했어요');
+      }
+    },
+
+    hydrate: async () => {
+      const [tasks, categories, sessions] = await Promise.all([
+        fetchTasks(),
+        fetchCategories(),
+        fetchSessions(),
+      ]);
+      set({
+        tasks: tasks ?? [],
+        categories: categories ?? DEFAULT_CATEGORIES,
+        sessions: sessions ?? [],
+      });
+    },
   }));
 
 export type TaskStoreApi = ReturnType<typeof createTaskStore>;
