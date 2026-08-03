@@ -68,7 +68,7 @@
 
 - [x] `chore/rn-setup` — React Native (Expo) 프로젝트 초기 설정 + 공유 로직 분리
 - [x] `refactor/extract-shared-timer-store` — 웹 timerStore를 packages/shared로 추출 (동작 무변경)
-- [ ] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함, 웹과 픽셀 동일 UI)
+- [>] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함, 웹과 픽셀 동일 UI)
 - [ ] `feat/rn-tasks` — 작업 목록 네이티브 UI
 - [ ] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
 
