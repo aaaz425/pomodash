@@ -2,34 +2,40 @@
 
 ## 폴더 구조
 
+pnpm workspace 모노레포. 아래 구조는 `apps/web/` 기준이다. `apps/mobile/`은 Expo(Expo Router) 앱으로 별도 구조를 따른다.
+
 ```
-app/                  # 라우팅 세그먼트만 — 비즈니스 로직 금지
-config/               # 앱 설정 선언 (site.ts, analytics.ts)
-components/
-  ui/                 # shadcn/ui — 직접 수정 금지
-  timer/              # 타이머 feature
-  tasks/              # 작업 feature
-  dashboard/          # 대시보드 feature
-  journal/            # 기록 feature
-  settings/           # 설정 feature
-  landing/            # 랜딩 페이지 feature
-  shared/             # 여러 feature에서 공유하는 컴포넌트
-    layout/           # 반응형 레이아웃 전용 (app 레이어에서만 사용)
-store/                # Zustand 스토어 (createStore 팩토리 패턴)
-  StoreProvider.tsx   # SSR 안전 초기화용 Provider — app/layout.tsx에 마운트
-hooks/                # 브라우저 API 추상화 + 재사용 로직 훅
-lib/
-  constants/          # 검증·비즈니스·UX 상수 SSOT (limits, ux, categoryColors, timerColors …)
-  storage.ts          # localStorage 추상화 + Zod 파싱
-  notifications.ts    # Web Notifications API + 사운드 재생
-  dashboard.ts        # 대시보드 집계 순수 함수
-  sessionUtils.ts     # 세션 포맷팅·그룹핑
-  focusPeriods.ts     # 집중 구간 정규화 알고리즘
-  utils.ts            # cn(), generateId() 등 범용 유틸
-types/
-  models.ts           # TypeScript 인터페이스 + 타입 별칭
-  schemas.ts          # Zod 스키마 + 기본값 + STORAGE_KEYS
-  index.ts            # barrel (re-export — 기존 import 경로 유지)
+apps/web/
+  app/                  # 라우팅 세그먼트만 — 비즈니스 로직 금지
+  config/               # 앱 설정 선언 (site.ts, analytics.ts)
+  components/
+    ui/                 # shadcn/ui — 직접 수정 금지
+    timer/              # 타이머 feature
+    tasks/              # 작업 feature
+    dashboard/          # 대시보드 feature
+    journal/            # 기록 feature
+    settings/           # 설정 feature
+    landing/            # 랜딩 페이지 feature
+    shared/             # 여러 feature에서 공유하는 컴포넌트
+      layout/           # 반응형 레이아웃 전용 (app 레이어에서만 사용)
+  store/                # Zustand 스토어 (createStore 팩토리 패턴)
+    StoreProvider.tsx   # SSR 안전 초기화용 Provider — app/layout.tsx에 마운트
+  hooks/                # 브라우저 API 추상화 + 재사용 로직 훅
+  lib/
+    constants/          # 검증·비즈니스·UX 상수 SSOT (limits, ux, categoryColors, timerColors …)
+    storage.ts          # localStorage 추상화 + Zod 파싱
+    notifications.ts    # Web Notifications API + 사운드 재생
+    dashboard.ts        # 대시보드 집계 순수 함수
+    sessionUtils.ts     # 세션 포맷팅·그룹핑
+    focusPeriods.ts     # 집중 구간 정규화 알고리즘
+    utils.ts            # cn(), generateId() 등 범용 유틸
+  types/
+    models.ts           # TypeScript 인터페이스 + 타입 별칭
+    schemas.ts          # Zod 스키마 + 기본값 + STORAGE_KEYS
+    index.ts             # barrel (re-export — 기존 import 경로 유지)
+
+docs/                   # 루트 유지 — 웹/모바일 공통 프로젝트 문서
+supabase/                # 루트 유지 — 웹/모바일이 공유하는 백엔드 스키마
 ```
 
 ### 무엇이 어디에 들어가는가

@@ -176,7 +176,7 @@ Pomodash는 포모도로 기법 기반 학습 집중 도구다. 작업 계획 �
 | 질문 | 우선순위 |
 |------|----------|
 | Phase 7 Supabase 마이그레이션 시 기존 localStorage 데이터 이전 전략은? | Phase 7 시작 전 결정 필요 |
-| 네이티브 앱 전환 시 Expo Go vs EAS Build 선택? | Phase 8 시작 전 결정 필요 |
+| ~~네이티브 앱 전환 시 Expo Go vs EAS Build 선택?~~ | 결정됨 — Expo Go(관리형)로 시작, 네이티브 모듈(카카오 로그인 딥링크 등) 필요 시 EAS Build(dev client)로 전환 |
 | AI 연동(Claude API) 기능의 구체적인 UX는? | 유저 피드백 수집 후 결정 |
 | 커스텀 도메인 도입 시점은? | 유저 수 목표 달성 후 |
 
