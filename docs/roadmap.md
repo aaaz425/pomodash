@@ -66,7 +66,7 @@
 
 ## Phase 8 — 네이티브 앱
 
-- [>] `chore/rn-setup` — React Native (Expo) 프로젝트 초기 설정 + 공유 로직 분리
+- [x] `chore/rn-setup` — React Native (Expo) 프로젝트 초기 설정 + 공유 로직 분리
 - [ ] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함)
 - [ ] `feat/rn-tasks` — 작업 목록 네이티브 UI
 - [ ] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
