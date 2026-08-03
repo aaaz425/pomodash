@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Category, TimerSettings } from '@/types/models';
+import type { Category } from '@/types/models';
 import { TIMER_LIMITS, INPUT_LIMITS, SOUND_LIMITS, AUTH_LIMITS } from '@/lib/constants/limits';
 
 export const CategorySchema = z.object({
@@ -155,8 +155,4 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: '5', name: '기타', color: 'bg-gray-500' },
 ];
 
-export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
-  focusMinutes: 25,
-  shortBreakMinutes: 5,
-  totalCycles: 4,
-};
+export { DEFAULT_TIMER_SETTINGS } from '@pomodash/shared';

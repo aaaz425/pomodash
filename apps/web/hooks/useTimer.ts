@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { deriveTimerDisplay } from '@pomodash/shared';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import { playAlarm, sendNotification } from '@/lib/notifications';
 
@@ -33,18 +34,20 @@ export function useTimer() {
     notifiedRef.current = false;
 
     const tick = () => {
-      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const result = deriveTimerDisplay({
+        phase,
+        mode,
+        remainingSeconds,
+        startedAt,
+        accFocusSeconds,
+        cycleCount,
+        focusMinutes,
+        now: Date.now(),
+      });
 
-      // free 모드: 카운트업, 자동 완료/알림 없음 — 사용자가 직접 종료
-      if (mode === 'free') {
-        setRunningDisplay(accFocusSeconds + elapsed);
-        return;
-      }
+      setRunningDisplay(result.displaySeconds);
 
-      const remaining = Math.max(0, remainingSeconds - elapsed);
-      setRunningDisplay(remaining);
-
-      if (remaining === 0) {
+      if (result.justCompleted) {
         if (!notifiedRef.current) {
           notifiedRef.current = true;
           if (soundAlert)
@@ -92,6 +95,7 @@ export function useTimer() {
     mode,
     accFocusSeconds,
     cycleCount,
+    focusMinutes,
     totalCycles,
     soundAlert,
     soundType,
