@@ -5,11 +5,11 @@ pre-commit:
       run: npx prettier --write {staged_files}
       stage_fixed: true
     typecheck:
-      run: npx tsc --noEmit
+      run: pnpm --filter web exec tsc --noEmit
     lint:
-      run: npm run lint
+      run: pnpm --filter web lint
     # unit-test: vitest 도입 후 활성화
-    #   run: npm run test -- --run
+    #   run: pnpm --filter web test -- --run
 
 pre-push:
   commands:
@@ -21,4 +21,4 @@ pre-push:
           exit 1
         fi
     # e2e: PR 생성 시 GitHub Actions에서 실행
-    #   run: npm run test:e2e
+    #   run: pnpm --filter web test:e2e

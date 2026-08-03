@@ -8,14 +8,20 @@
 ## 기술 스택
 
 Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Vercel
+네이티브 앱: React Native (Expo, Expo Router)
+
+## 모노레포 구조
+
+pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 네이티브 앱) — 두 앱 간 공유 로직은 아직 없음(필요해지는 시점에 `packages/shared`로 추출 예정). `docs/`, `supabase/`는 두 앱이 공유하는 루트 레벨 리소스.
 
 ## 개발 명령어
 
 ```bash
-npm run dev      # 로컬 개발 서버
-npm run build    # 프로덕션 빌드 — 커밋 전 반드시 통과 확인
-npm run lint     # 린트
-npm run test     # 단위 테스트 (vitest)
+pnpm dev          # 웹 로컬 개발 서버 (apps/web)
+pnpm build        # 웹 프로덕션 빌드 — 커밋 전 반드시 통과 확인
+pnpm lint         # 전체 워크스페이스 린트
+pnpm test         # 웹 단위 테스트 (vitest)
+pnpm --filter mobile start   # Expo 개발 서버 (apps/mobile)
 ```
 
 ---
@@ -88,7 +94,7 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 
 ### Verification (커밋 전 필수)
 
-- `npm run build` 통과 확인 (pre-commit hook이 tsc + lint를 강제하지만 미리 확인)
+- `pnpm build` 통과 확인 (pre-commit hook이 tsc + lint를 강제하지만 미리 확인)
 - UI 변경 시 다크/라이트 모드 양쪽 확인
 - `lib/`, `store/` 변경 시 관련 단위 테스트 통과 확인
 

@@ -1,14 +1,7 @@
 export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'special';
 
 export type BadgeIconKey =
-  | 'flame'
-  | 'clock'
-  | 'layers'
-  | 'sparkles'
-  | 'moon'
-  | 'sun'
-  | 'trophy'
-  | 'rocket';
+  'flame' | 'clock' | 'layers' | 'sparkles' | 'moon' | 'sun' | 'trophy' | 'rocket';
 
 interface BaseBadge {
   id: string;
@@ -34,11 +27,7 @@ interface DiversityBadge extends BaseBadge {
 }
 
 export type SpecialEventId =
-  | 'first-session'
-  | 'night-owl'
-  | 'weekend-warrior'
-  | 'perfect-session'
-  | 'marathon';
+  'first-session' | 'night-owl' | 'weekend-warrior' | 'perfect-session' | 'marathon';
 
 interface SpecialBadge extends BaseBadge {
   category: 'special';
