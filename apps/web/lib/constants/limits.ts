@@ -1,11 +1,4 @@
-export const TIMER_LIMITS = {
-  FOCUS_MINUTES_MIN: 5,
-  FOCUS_MINUTES_MAX: 120,
-  BREAK_MINUTES_MIN: 0,
-  BREAK_MINUTES_MAX: 60,
-  CYCLES_MIN: 1,
-  CYCLES_MAX: 10,
-} as const;
+export { TIMER_LIMITS, FOCUS_PERIOD_LIMITS } from '@pomodash/shared';
 
 export const INPUT_LIMITS = {
   NOTE_MAX_LENGTH: 500,
@@ -22,12 +15,6 @@ export const SOUND_LIMITS = {
   VOLUME_MAX: 100,
   REPEAT_MIN: 1,
   REPEAT_MAX: 5,
-} as const;
-
-export const FOCUS_PERIOD_LIMITS = {
-  MIN_FOCUS_SECONDS: 5,
-  MAX_PAUSE_MERGE_SECONDS: 5,
-  MAX_PERIODS: 100,
 } as const;
 
 export const SESSION_LIMITS = {

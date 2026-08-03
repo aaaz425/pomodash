@@ -1,6 +1,6 @@
-export type TimerPhase = 'focus' | 'short-break';
+import type { TimerPhase, TimerMode, TimerSettings, FocusPeriod } from '@pomodash/shared';
 
-export type TimerMode = 'pomodoro' | 'free';
+export type { TimerPhase, TimerMode, TimerSettings, FocusPeriod };
 
 export type FocusRating = 1 | 2 | 3;
 
@@ -19,11 +19,6 @@ export interface Task {
   targetBreakMinutes: number; // 분
   completed: boolean;
   createdAt: string; // ISO 8601
-}
-
-export interface FocusPeriod {
-  start: string; // ISO 8601
-  end: string; // ISO 8601
 }
 
 export interface Session {
@@ -51,12 +46,6 @@ export interface TimerRecord {
   endedAt: string;
   focusSeconds: number;
   pausedSeconds: number;
-}
-
-export interface TimerSettings {
-  focusMinutes: number;
-  shortBreakMinutes: number;
-  totalCycles: number; // 이전 이름: cyclesBeforeLongBreak
 }
 
 export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
