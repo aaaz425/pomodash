@@ -1,9 +1,5 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
-
-// 병렬 워커/과거 실행 잔여 데이터와 이름이 절대 겹치지 않도록 매번 고유하게 생성
-function uniqueTaskName() {
-  return `E2E 테스트 작업 ${crypto.randomUUID().slice(0, 8)}`;
-}
+import { uniqueName } from './testUtils';
 
 // 작업 생성 후 목록에 반영될 때까지 대기 — Supabase 비동기 저장 완료 확인 (레이스 방지)
 async function createTask(page: Page, taskModal: Locator, name: string) {
@@ -32,7 +28,7 @@ test.describe('작업 관리', () => {
   });
 
   test('작업 생성', async ({ page }) => {
-    const taskName = uniqueTaskName();
+    const taskName = uniqueName('E2E 테스트 작업');
     await page.getByRole('button', { name: '작업 관리' }).click();
 
     const taskModal = page.getByRole('dialog', { name: '작업 관리' });
@@ -45,7 +41,7 @@ test.describe('작업 관리', () => {
   });
 
   test('작업 선택 후 타이머 연결', async ({ page }) => {
-    const taskName = uniqueTaskName();
+    const taskName = uniqueName('E2E 테스트 작업');
 
     // 설정 페이지에서 작업 생성
     await page.getByRole('button', { name: '작업 관리' }).click();

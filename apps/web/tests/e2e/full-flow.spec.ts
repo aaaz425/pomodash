@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { uniqueName } from './testUtils';
 
-const TASK_TITLE = 'E2E 풀플로우 작업';
+const TASK_TITLE = uniqueName('E2E 풀플로우 작업');
 const SESSION_NOTE = 'E2E 풀플로우 메모';
 
 test('작업 생성 → 타이머 완료 → 메모 작성 → journal/dashboard 반영', async ({ page }) => {
