@@ -1,0 +1,68 @@
+import { supabase } from '@/lib/supabase/client';
+import { CategorySchema, type Category } from '@/types/tasks';
+import { toMobileColorKey, toDbColor } from '@/constants/categoryColorMap';
+
+interface CategoryRow {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export function toCategory(row: CategoryRow): Category | null {
+  const parsed = CategorySchema.safeParse({
+    id: row.id,
+    name: row.name,
+    color: toMobileColorKey(row.color),
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+export async function fetchCategories(): Promise<Category[] | null> {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id, name, color')
+    .order('position', { ascending: true });
+  if (error || !data) return null;
+  return data.map(toCategory).filter((c): c is Category => c !== null);
+}
+
+export async function insertCategory(input: {
+  name: string;
+  color: Category['color'];
+}): Promise<Category | null> {
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({ name: input.name, color: toDbColor(input.color) })
+    .select('id, name, color')
+    .single();
+  if (error || !data) return null;
+  return toCategory(data);
+}
+
+export async function updateCategory(
+  id: string,
+  input: { name: string; color: Category['color'] },
+): Promise<{ error: boolean }> {
+  const { error } = await supabase
+    .from('categories')
+    .update({ name: input.name, color: toDbColor(input.color) })
+    .eq('id', id);
+  return { error: error !== null };
+}
+
+// on delete restrict — 참조하는 작업이 있으면 Postgres가 23503(foreign_key_violation)으로 막는다.
+export async function deleteCategory(id: string): Promise<{ error: boolean; blocked: boolean }> {
+  const { error } = await supabase.from('categories').delete().eq('id', id);
+  if (!error) return { error: false, blocked: false };
+  return { error: true, blocked: error.code === '23503' };
+}
+
+// 목록 순서(position)를 배열 순서대로 다시 씀 — add/reorder 후 호출
+export async function reorderCategories(orderedIds: string[]): Promise<{ error: boolean }> {
+  const results = await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase.from('categories').update({ position: index }).eq('id', id),
+    ),
+  );
+  return { error: results.some((r) => r.error !== null) };
+}

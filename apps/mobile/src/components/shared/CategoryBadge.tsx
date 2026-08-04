@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    alignSelf: 'flex-start',
   },
   text: {
     fontSize: 12,

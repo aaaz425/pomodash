@@ -80,7 +80,7 @@ export function CategorySection() {
 
   function handleDelete() {
     if (!deleteTargetId) return;
-    deleteCategory(deleteTargetId);
+    void deleteCategory(deleteTargetId);
     setDeleteTargetId(null);
   }
 
@@ -90,7 +90,7 @@ export function CategorySection() {
         data={categories}
         keyExtractor={(c) => c.id}
         scrollEnabled={false}
-        onDragEnd={({ from, to }) => reorderCategories(from, to)}
+        onDragEnd={({ from, to }) => void reorderCategories(from, to)}
         renderItem={({ item, drag, isActive }: RenderItemParams<Category>) => (
           <CategoryRow
             category={item}

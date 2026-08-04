@@ -3,7 +3,7 @@ import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
-export function TextInput(props: TextInputProps) {
+export function TextInput({ style, ...props }: TextInputProps) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
@@ -13,6 +13,7 @@ export function TextInput(props: TextInputProps) {
       style={[
         styles.input,
         { backgroundColor: theme.muted, color: theme.foreground, fontFamily: FONTS.sansRegular },
+        style,
       ]}
       {...props}
     />

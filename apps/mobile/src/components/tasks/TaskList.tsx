@@ -33,7 +33,7 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, maxHeight }: P
 
   function handleDelete() {
     if (!deleteTargetId) return;
-    deleteTask(deleteTargetId);
+    void deleteTask(deleteTargetId);
     setDeleteTargetId(null);
   }
 
@@ -66,7 +66,7 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, maxHeight }: P
           data={visibleTasks}
           keyExtractor={(t) => t.id}
           scrollEnabled={false}
-          onDragEnd={({ from, to }) => reorderTasks(from, to)}
+          onDragEnd={({ from, to }) => void reorderTasks(from, to)}
           renderItem={({ item, drag, isActive }: RenderItemParams<Task>) =>
             renderRow(item, { drag, isActive })
           }
