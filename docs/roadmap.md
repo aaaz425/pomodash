@@ -70,5 +70,5 @@
 - [x] `refactor/extract-shared-timer-store` — 웹 timerStore를 packages/shared로 추출 (동작 무변경)
 - [x] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함, 웹과 픽셀 동일 UI)
 - [x] `feat/rn-tasks` — 작업 목록 네이티브 UI
-- [ ] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
+- [>] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
 
