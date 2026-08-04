@@ -5,7 +5,7 @@ export type {
   FocusPeriod,
   RawFocusPeriod,
 } from './types/timer';
-export { TIMER_LIMITS, FOCUS_PERIOD_LIMITS } from './constants/limits';
+export { TIMER_LIMITS, FOCUS_PERIOD_LIMITS, CATEGORY_LIMITS } from './constants/limits';
 export { DEFAULT_TIMER_SETTINGS } from './constants/defaults';
 export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
 export { isSessionStale } from './lib/sessionStale';

@@ -3,7 +3,9 @@ import { Pause, Play, Square, X } from 'lucide-react-native';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { ThemeSchemeOverride } from '@/hooks/use-theme-scheme';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { MESSAGE_ROTATE_INTERVAL_MS, MOTIVATIONAL_MESSAGES } from '@/constants/messages';
@@ -21,6 +23,7 @@ export function FocusMode() {
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
   const endSession = useTimerStore((s) => s.endSession);
   const { cycleCount, mode } = useTimer();
+  const { task, category } = useCurrentTask();
 
   const message = useRotatingMessage(
     MOTIVATIONAL_MESSAGES,
@@ -53,14 +56,28 @@ export function FocusMode() {
             >
               {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중 세션`}
             </Text>
-            <Text
-              style={[
-                styles.taskTitle,
-                { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansSemiBold },
-              ]}
-            >
-              작업 없음
-            </Text>
+            {task ? (
+              <View style={styles.taskTitleRow}>
+                <Text
+                  style={[
+                    styles.taskTitle,
+                    { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                  ]}
+                >
+                  {task.title}
+                </Text>
+                {category && <CategoryBadge category={category} />}
+              </View>
+            ) : (
+              <Text
+                style={[
+                  styles.taskTitle,
+                  { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                작업 없음
+              </Text>
+            )}
           </View>
 
           <Text
@@ -147,6 +164,11 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontSize: 20,
+  },
+  taskTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   message: {
     fontSize: 14,
