@@ -32,6 +32,7 @@ export interface ThemeTokens {
   muted: string;
   mutedForeground: string;
   border: string;
+  destructive: string;
 }
 
 // 웹의 Tailwind 알파 표기(예: bg-muted/60)에 대응 — hex를 rgba 문자열로 변환
@@ -52,6 +53,7 @@ export const THEME: Record<'light' | 'dark', ThemeTokens> = {
     muted: '#EFEFEF',
     mutedForeground: '#374151',
     border: '#E5E7EB',
+    destructive: '#EF4444',
   },
   dark: {
     background: '#07090F',
@@ -62,5 +64,6 @@ export const THEME: Record<'light' | 'dark', ThemeTokens> = {
     muted: '#1A2332',
     mutedForeground: '#94A3B8',
     border: '#1E2D3D',
+    destructive: '#EF4444',
   },
 };

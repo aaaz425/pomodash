@@ -12,3 +12,7 @@ export const FOCUS_PERIOD_LIMITS = {
   MAX_PAUSE_MERGE_SECONDS: 5,
   MAX_PERIODS: 100,
 } as const;
+
+export const CATEGORY_LIMITS = {
+  COUNT_MAX: 10,
+} as const;

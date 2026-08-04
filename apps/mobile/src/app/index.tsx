@@ -6,13 +6,17 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { TimerControls } from '@/components/timer/TimerControls';
 import { FocusMode } from '@/components/timer/FocusMode';
 import { SessionCompleteSheet } from '@/components/timer/SessionCompleteSheet';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
 
 export default function TimerScreen() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+
+  const { task, category } = useCurrentTask();
 
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
   const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
@@ -27,15 +31,29 @@ export default function TimerScreen() {
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       <SafeAreaView style={styles.safeArea}>
-        {/* 현재 작업 — 이번 브랜치엔 작업 데이터가 없어 항상 미분류 상태로 표시 (rn-tasks에서 연결) */}
-        <Text
-          style={[
-            styles.taskRow,
-            { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
-          ]}
-        >
-          선택된 작업이 없습니다
-        </Text>
+        {/* 현재 작업 */}
+        {task ? (
+          <View style={styles.taskRowFilled}>
+            {category && <CategoryBadge category={category} />}
+            <Text
+              style={[
+                styles.taskTitle,
+                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+              ]}
+            >
+              {task.title}
+            </Text>
+          </View>
+        ) : (
+          <Text
+            style={[
+              styles.taskRow,
+              { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
+            ]}
+          >
+            선택된 작업이 없습니다
+          </Text>
+        )}
 
         <TimerRing />
 
@@ -96,6 +114,15 @@ const styles = StyleSheet.create({
   taskRow: {
     fontSize: 14,
     height: 20,
+  },
+  taskRowFilled: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 20,
+  },
+  taskTitle: {
+    fontSize: 14,
   },
   settingsPill: {
     flexDirection: 'row',
