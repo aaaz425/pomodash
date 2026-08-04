@@ -48,22 +48,25 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   );
   // 새 작업은 기본값만 빠르게 채우도록 접어두고, 기존 작업 수정은 이미 의미 있는 값이라 펼쳐서 보여줌
   const [showTimeSettings, setShowTimeSettings] = useState(task !== null);
+  // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 생성될 수 있음
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const trimmed = title.trim();
-    if (!trimmed) return;
+    if (!trimmed || isSubmitting) return;
+    setIsSubmitting(true);
 
     if (task === null) {
-      const newId = addTask({
+      const newId = await addTask({
         title: trimmed,
         categoryId,
         targetFocusMinutes,
         targetCycles,
         targetBreakMinutes,
       });
-      onCreated?.(newId);
+      if (newId) onCreated?.(newId);
     } else {
-      updateTask(task.id, {
+      await updateTask(task.id, {
         title: trimmed,
         categoryId,
         targetFocusMinutes,
@@ -103,11 +106,11 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
           </Pressable>
           <Pressable
             onPress={handleSubmit}
-            disabled={!title.trim()}
+            disabled={!title.trim() || isSubmitting}
             style={[
               styles.footerButton,
               { backgroundColor: theme.primary },
-              !title.trim() && styles.disabled,
+              (!title.trim() || isSubmitting) && styles.disabled,
             ]}
           >
             <Text

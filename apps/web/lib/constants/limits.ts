@@ -21,8 +21,6 @@ export const SESSION_LIMITS = {
   ABANDONED_CHECK_INTERVAL_MS: 30 * 1000,
 } as const;
 
-export const AUTH_LIMITS = {
-  PASSWORD_MIN_LENGTH: 8,
-} as const;
+export { AUTH_LIMITS } from '@pomodash/shared';
 
 export const STORAGE_VERSION = 1;

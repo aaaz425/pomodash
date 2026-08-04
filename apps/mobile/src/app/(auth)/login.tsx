@@ -1,0 +1,134 @@
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Link } from 'expo-router';
+import { useAuth } from '@/store/AuthProvider';
+import { AuthShell } from '@/components/auth/AuthShell';
+import { TextInput } from '@/components/shared/TextInput';
+import { PasswordField } from '@/components/auth/PasswordField';
+import { THEME } from '@/constants/timerColors';
+import { FONTS } from '@/constants/fonts';
+import { useThemeScheme } from '@/hooks/use-theme-scheme';
+
+export default function LoginScreen() {
+  const scheme = useThemeScheme();
+  const theme = THEME[scheme];
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit() {
+    if (pending) return;
+    setPending(true);
+    setError(null);
+    const result = await login(email, password);
+    setPending(false);
+    if (result.error) setError(result.error);
+    // 성공 시엔 AuthProvider의 onAuthStateChange가 세션을 갱신 → 루트 레이아웃이 자동으로 전환
+  }
+
+  return (
+    <AuthShell>
+      <View style={styles.form}>
+        <View style={styles.field}>
+          <Text
+            style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
+          >
+            이메일
+          </Text>
+          <TextInput
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            editable={!pending}
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        <PasswordField
+          label="비밀번호"
+          autoComplete="current-password"
+          editable={!pending}
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        {error && (
+          <Text style={[styles.error, { color: theme.destructive, fontFamily: FONTS.sansRegular }]}>
+            {error}
+          </Text>
+        )}
+
+        <Pressable
+          onPress={handleSubmit}
+          disabled={pending}
+          style={[styles.submit, { backgroundColor: theme.primary }, pending && styles.disabled]}
+        >
+          <Text
+            style={[
+              styles.submitText,
+              { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+            ]}
+          >
+            {pending ? '로그인 중...' : '로그인'}
+          </Text>
+        </Pressable>
+
+        <View style={styles.footerRow}>
+          <Text
+            style={[styles.footer, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
+          >
+            계정이 없으신가요?{' '}
+          </Text>
+          <Link href="/signup" asChild>
+            <Pressable>
+              <Text style={[styles.link, { color: theme.primary, fontFamily: FONTS.sansMedium }]}>
+                회원가입
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
+      </View>
+    </AuthShell>
+  );
+}
+
+const styles = StyleSheet.create({
+  form: {
+    gap: 16,
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 12,
+  },
+  error: {
+    fontSize: 14,
+  },
+  submit: {
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  disabled: {
+    opacity: 0.4,
+  },
+  submitText: {
+    fontSize: 14,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  footer: {
+    fontSize: 14,
+  },
+  link: {
+    fontSize: 14,
+  },
+});

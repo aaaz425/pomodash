@@ -1,0 +1,97 @@
+import { supabase } from '@/lib/supabase/client';
+import { TaskSchema, type Task } from '@/types/tasks';
+
+interface TaskRow {
+  id: string;
+  title: string;
+  category_id: string;
+  target_focus_minutes: number;
+  target_cycles: number;
+  target_break_minutes: number;
+  completed: boolean;
+  created_at: string;
+}
+
+const SELECT_COLUMNS =
+  'id, title, category_id, target_focus_minutes, target_cycles, target_break_minutes, completed, created_at';
+
+export function toTask(row: TaskRow): Task | null {
+  const parsed = TaskSchema.safeParse({
+    id: row.id,
+    title: row.title,
+    categoryId: row.category_id,
+    targetFocusMinutes: row.target_focus_minutes,
+    targetCycles: row.target_cycles,
+    targetBreakMinutes: row.target_break_minutes,
+    completed: row.completed,
+    createdAt: row.created_at,
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+export async function fetchTasks(): Promise<Task[] | null> {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(SELECT_COLUMNS)
+    .order('position', { ascending: true });
+  if (error || !data) return null;
+  return data.map(toTask).filter((t): t is Task => t !== null);
+}
+
+export async function insertTask(input: {
+  title: string;
+  categoryId: string;
+  targetFocusMinutes: number;
+  targetCycles: number;
+  targetBreakMinutes: number;
+}): Promise<Task | null> {
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert({
+      title: input.title,
+      category_id: input.categoryId,
+      target_focus_minutes: input.targetFocusMinutes,
+      target_cycles: input.targetCycles,
+      target_break_minutes: input.targetBreakMinutes,
+    })
+    .select(SELECT_COLUMNS)
+    .single();
+  if (error || !data) return null;
+  return toTask(data);
+}
+
+export async function updateTask(
+  id: string,
+  patch: Partial<{
+    title: string;
+    categoryId: string;
+    targetFocusMinutes: number;
+    targetCycles: number;
+    targetBreakMinutes: number;
+    completed: boolean;
+  }>,
+): Promise<{ error: boolean }> {
+  const row: Record<string, unknown> = {};
+  if (patch.title !== undefined) row.title = patch.title;
+  if (patch.categoryId !== undefined) row.category_id = patch.categoryId;
+  if (patch.targetFocusMinutes !== undefined) row.target_focus_minutes = patch.targetFocusMinutes;
+  if (patch.targetCycles !== undefined) row.target_cycles = patch.targetCycles;
+  if (patch.targetBreakMinutes !== undefined) row.target_break_minutes = patch.targetBreakMinutes;
+  if (patch.completed !== undefined) row.completed = patch.completed;
+
+  const { error } = await supabase.from('tasks').update(row).eq('id', id);
+  return { error: error !== null };
+}
+
+export async function deleteTask(id: string): Promise<{ error: boolean }> {
+  const { error } = await supabase.from('tasks').delete().eq('id', id);
+  return { error: error !== null };
+}
+
+// 목록 순서(position)를 배열 순서대로 다시 씀 — add/reorder 후 호출
+export async function reorderTasks(orderedIds: string[]): Promise<{ error: boolean }> {
+  const results = await Promise.all(
+    orderedIds.map((id, index) => supabase.from('tasks').update({ position: index }).eq('id', id)),
+  );
+  return { error: results.some((r) => r.error !== null) };
+}
