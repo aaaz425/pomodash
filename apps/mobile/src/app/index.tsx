@@ -1,98 +1,118 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTimerStore } from '@/store/StoreProvider';
+import { TimerRing } from '@/components/timer/TimerRing';
+import { CycleIndicator } from '@/components/timer/CycleIndicator';
+import { TimerControls } from '@/components/timer/TimerControls';
+import { FocusMode } from '@/components/timer/FocusMode';
+import { SessionCompleteSheet } from '@/components/timer/SessionCompleteSheet';
+import { THEME, withAlpha } from '@/constants/timerColors';
+import { FONTS } from '@/constants/fonts';
+import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function TimerScreen() {
+  const scheme = useThemeScheme();
+  const theme = THEME[scheme];
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
+  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
+  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+
+  const settingsPills = [
+    { value: `${focusMinutes}분`, label: '집중' },
+    { value: `${shortBreakMinutes}분`, label: '휴식' },
+    { value: `${totalCycles}회`, label: '사이클' },
+  ];
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
+    <View style={[styles.root, { backgroundColor: theme.background }]}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        {/* 현재 작업 — 이번 브랜치엔 작업 데이터가 없어 항상 미분류 상태로 표시 (rn-tasks에서 연결) */}
+        <Text
+          style={[
+            styles.taskRow,
+            { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
+          ]}
+        >
+          선택된 작업이 없습니다
+        </Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        <TimerRing />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        <CycleIndicator />
 
-        {Platform.OS === 'web' && <WebBadge />}
+        <View
+          style={[styles.settingsPill, { borderColor: theme.border, backgroundColor: theme.card }]}
+        >
+          {settingsPills.map(({ value, label }, i) => (
+            <View
+              key={label}
+              style={[
+                styles.settingsCell,
+                i > 0 && { borderLeftWidth: 1, borderLeftColor: theme.border },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.settingsValue,
+                  { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                {value}
+              </Text>
+              <Text
+                style={[
+                  styles.settingsLabel,
+                  { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                ]}
+              >
+                {label}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <TimerControls />
       </SafeAreaView>
-    </ThemedView>
+
+      <SessionCompleteSheet />
+      <FocusMode />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    gap: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 32,
   },
-  title: {
-    textAlign: 'center',
+  taskRow: {
+    fontSize: 14,
+    height: 20,
   },
-  code: {
-    textTransform: 'uppercase',
+  settingsPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  settingsCell: {
+    alignItems: 'center',
+    gap: 2,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  settingsValue: {
+    fontSize: 14,
+  },
+  settingsLabel: {
+    fontSize: 10,
   },
 });
