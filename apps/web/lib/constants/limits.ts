@@ -1,14 +1,4 @@
-export { TIMER_LIMITS, FOCUS_PERIOD_LIMITS } from '@pomodash/shared';
-
-export const INPUT_LIMITS = {
-  NOTE_MAX_LENGTH: 500,
-  NICKNAME_MAX_LENGTH: 20,
-  MESSAGE_LENGTH_MIN: 1,
-  MESSAGE_LENGTH_MAX: 200,
-  MESSAGE_COUNT_MIN: 1,
-  MESSAGE_COUNT_MAX: 20,
-  CATEGORIES_MAX: 10,
-} as const;
+export { TIMER_LIMITS, FOCUS_PERIOD_LIMITS, INPUT_LIMITS } from '@pomodash/shared';
 
 export const SOUND_LIMITS = {
   VOLUME_MIN: 0,

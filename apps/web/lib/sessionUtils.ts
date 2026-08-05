@@ -1,6 +1,9 @@
 import type { FocusPeriod, Session, SessionGroup, TimerMode } from '@/types';
 import { TIMER_LIMITS } from '@/lib/constants/limits';
 import { clampPeriodDuration } from '@/lib/focusPeriods';
+import { formatDuration, formatSessionProgressLabel } from '@pomodash/shared';
+
+export { formatDuration, formatSessionProgressLabel };
 
 export function toLocalDateKey(isoString: string): string {
   const d = new Date(isoString);
@@ -61,16 +64,6 @@ export function getSessionOrdinalTitle(startedAt: string, chronologicalIndex: nu
   return `${m}월 ${day}일 ${chronologicalIndex + 1}번째 세션`;
 }
 
-export function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}초`;
-  const mins = Math.floor(seconds / 60);
-  const hours = Math.floor(mins / 60);
-  const remMins = mins % 60;
-  if (hours === 0) return `${mins}분`;
-  if (remMins === 0) return `${hours}시간`;
-  return `${hours}시간 ${remMins}분`;
-}
-
 export function formatTimeRange(startedAt: string, endedAt: string): string {
   const fmt = (iso: string) =>
     new Date(iso).toLocaleTimeString('ko-KR', {
@@ -117,19 +110,6 @@ export function formatSessionTimeSummary(
 ): string {
   const range = formatTimeRange(startedAt, endedAt);
   return hasAbnormalFocusGap(focusPeriods) ? `${range} · ${focusPeriods.length}구간` : range;
-}
-
-export function formatSessionProgressLabel(
-  mode: TimerMode,
-  {
-    cycleCount,
-    totalCycles,
-    focusSeconds,
-  }: { cycleCount: number; totalCycles: number; focusSeconds: number },
-): string {
-  return mode === 'free'
-    ? `자유 집중 ${formatDuration(focusSeconds)}`
-    : `완료된 사이클 ${cycleCount} / ${totalCycles}`;
 }
 
 export function formatSessionEndSummary(

@@ -1,8 +1,12 @@
-import type { TimerPhase, TimerMode, TimerSettings, FocusPeriod } from '@pomodash/shared';
+import type {
+  TimerPhase,
+  TimerMode,
+  TimerSettings,
+  FocusPeriod,
+  FocusRating,
+} from '@pomodash/shared';
 
-export type { TimerPhase, TimerMode, TimerSettings, FocusPeriod };
-
-export type FocusRating = 1 | 2 | 3;
+export type { TimerPhase, TimerMode, TimerSettings, FocusPeriod, FocusRating };
 
 export interface Category {
   id: string;
