@@ -71,7 +71,7 @@
 - [x] `feat/rn-timer` — 네이티브 타이머 (백그라운드 알림 포함, 웹과 픽셀 동일 UI)
 - [x] `feat/rn-tasks` — 작업 목록 네이티브 UI
 - [x] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
-- [ ] `feat/rn-session-record` — 세션 종료 시 메모 작성 + Supabase `sessions` 저장
+- [>] `feat/rn-session-record` — 세션 종료 시 메모 작성 + Supabase `sessions` 저장
 - [ ] `feat/rn-journal-dashboard` — 기록(히스토리 조회) + 대시보드(집중 시간 집계·차트·스트릭)
 - [ ] `feat/rn-badges-share` — 뱃지 수집 + 공유 카드
 - [ ] `feat/rn-settings-sync` — 동기부여 메시지·알림음·기본 타이머값 Supabase `settings` 연동
