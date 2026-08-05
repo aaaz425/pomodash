@@ -39,6 +39,15 @@ export function toSession(row: SessionRow): Session | null {
   return parsed.success ? parsed.data : null;
 }
 
+export async function fetchSessions(): Promise<Session[] | null> {
+  const { data, error } = await supabase
+    .from('sessions')
+    .select(SELECT_COLUMNS)
+    .order('started_at', { ascending: false });
+  if (error || !data) return null;
+  return data.map(toSession).filter((s): s is Session => s !== null);
+}
+
 export async function insertSession(input: Omit<Session, 'id'>): Promise<Session | null> {
   const { data, error } = await supabase
     .from('sessions')
@@ -60,4 +69,22 @@ export async function insertSession(input: Omit<Session, 'id'>): Promise<Session
     .single();
   if (error || !data) return null;
   return toSession(data);
+}
+
+export async function updateSession(
+  id: string,
+  patch: Partial<Pick<Session, 'note' | 'focusRating' | 'distractionTags'>>,
+): Promise<{ error: boolean }> {
+  const row: Record<string, unknown> = {};
+  if (patch.note !== undefined) row.note = patch.note;
+  if (patch.focusRating !== undefined) row.focus_rating = patch.focusRating;
+  if (patch.distractionTags !== undefined) row.distraction_tags = patch.distractionTags;
+
+  const { error } = await supabase.from('sessions').update(row).eq('id', id);
+  return { error: error !== null };
+}
+
+export async function deleteSession(id: string): Promise<{ error: boolean }> {
+  const { error } = await supabase.from('sessions').delete().eq('id', id);
+  return { error: error !== null };
 }

@@ -1,5 +1,5 @@
 import { createStore } from 'zustand';
-import { CATEGORY_LIMITS } from '@pomodash/shared';
+import { CATEGORY_LIMITS, type FocusRating } from '@pomodash/shared';
 import { generateId } from '@/lib/generateId';
 import {
   fetchTasks,
@@ -15,7 +15,12 @@ import {
   deleteCategory as deleteCategoryRow,
   reorderCategories as reorderCategoriesRows,
 } from '@/lib/supabase/categories';
-import { insertSession as insertSessionRow } from '@/lib/supabase/sessions';
+import {
+  fetchSessions,
+  insertSession as insertSessionRow,
+  updateSession as updateSessionRow,
+  deleteSession as deleteSessionRow,
+} from '@/lib/supabase/sessions';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
 
@@ -32,6 +37,7 @@ const DEFAULT_CATEGORIES: Category[] = [
 interface TaskStore {
   tasks: Task[];
   categories: Category[];
+  sessions: Session[];
 
   addTask: (input: {
     title: string;
@@ -59,6 +65,10 @@ interface TaskStore {
   reorderCategories: (fromIndex: number, toIndex: number) => Promise<void>;
 
   addSession: (input: Omit<Session, 'id'>) => Promise<void>;
+  updateSessionNote: (id: string, note: string | null) => Promise<void>;
+  updateSessionRating: (id: string, rating: FocusRating | null) => Promise<void>;
+  updateSessionTags: (id: string, tags: string[]) => Promise<void>;
+  deleteSession: (id: string) => Promise<void>;
 
   hydrate: () => Promise<void>;
 }
@@ -74,6 +84,7 @@ export const createTaskStore = () =>
   createStore<TaskStore>()((set, get) => ({
     tasks: [],
     categories: [],
+    sessions: [],
 
     addTask: async ({
       title,
@@ -237,17 +248,80 @@ export const createTaskStore = () =>
     },
 
     addSession: async (input) => {
+      const tempId = generateId();
+      const previousSessions = get().sessions;
+      set({ sessions: [{ id: tempId, ...input }, ...previousSessions] });
+
       const inserted = await insertSessionRow(input);
       if (!inserted) {
+        set({ sessions: previousSessions });
         console.warn('[taskStore] addSession 실패');
+        return;
+      }
+      set({ sessions: [inserted, ...previousSessions] });
+    },
+
+    updateSessionNote: async (id, note) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      const trimmedNote = note?.trim() || null;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, note: trimmedNote } : s)),
+      });
+      const { error } = await updateSessionRow(id, { note: trimmedNote });
+      if (error) {
+        set({ sessions: previousSessions });
+        console.warn('[taskStore] updateSessionNote 실패');
+      }
+    },
+
+    updateSessionRating: async (id, rating) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, focusRating: rating } : s)),
+      });
+      const { error } = await updateSessionRow(id, { focusRating: rating });
+      if (error) {
+        set({ sessions: previousSessions });
+        console.warn('[taskStore] updateSessionRating 실패');
+      }
+    },
+
+    updateSessionTags: async (id, tags) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, distractionTags: tags } : s)),
+      });
+      const { error } = await updateSessionRow(id, { distractionTags: tags });
+      if (error) {
+        set({ sessions: previousSessions });
+        console.warn('[taskStore] updateSessionTags 실패');
+      }
+    },
+
+    deleteSession: async (id) => {
+      const previousSessions = get().sessions;
+      if (!previousSessions.some((s) => s.id === id)) return;
+      set({ sessions: previousSessions.filter((s) => s.id !== id) });
+      const { error } = await deleteSessionRow(id);
+      if (error) {
+        set({ sessions: previousSessions });
+        console.warn('[taskStore] deleteSession 실패');
       }
     },
 
     hydrate: async () => {
-      const [tasks, categories] = await Promise.all([fetchTasks(), fetchCategories()]);
+      const [tasks, categories, sessions] = await Promise.all([
+        fetchTasks(),
+        fetchCategories(),
+        fetchSessions(),
+      ]);
       set({
         tasks: tasks ?? [],
         categories: categories ?? DEFAULT_CATEGORIES,
+        sessions: sessions ?? [],
       });
     },
   }));

@@ -21,6 +21,21 @@ export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
 export { isSessionStale } from './lib/sessionStale';
 export { deriveTimerDisplay } from './lib/deriveTimerDisplay';
 export type { DeriveTimerDisplayInput, TimerDisplayState } from './lib/deriveTimerDisplay';
-export { formatDuration, formatSessionProgressLabel } from './lib/sessionFormat';
+export {
+  formatDuration,
+  formatSessionProgressLabel,
+  toLocalDateKey,
+  groupSessionsByDate,
+  getSessionsForDate,
+  getSessionOrdinalTitle,
+  formatTimeRange,
+  formatFullDate,
+  formatFocusPeriodRanges,
+  hasAbnormalFocusGap,
+  formatSessionTimeSummary,
+} from './lib/sessionFormat';
+export type { SessionGroup } from './lib/sessionFormat';
+export { getMonthlyActivityData } from './lib/dashboard';
+export type { DayActivity } from './lib/dashboard';
 export { createTimerStore } from './store/timerStore';
 export type { TimerStore, TimerStoreApi, TimerSnapshot, TimerStorePorts } from './store/timerStore';
