@@ -1,213 +1,55 @@
-import {
-  addHours,
-  endOfDay,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isWithinInterval,
-  min as minDate,
-  parseISO,
-  startOfDay,
-  startOfHour,
-  startOfMonth,
-  startOfWeek,
-  subDays,
-  subMonths,
-  subWeeks,
-} from 'date-fns';
+import { format, parseISO, startOfMonth, startOfWeek } from 'date-fns';
 
 import type {
   Category,
   Session,
   Task,
   TabType,
-  FocusPeriod,
   FocusTrendItem,
   FocusTrendMeta,
   CategoryFocusItem,
 } from '@/types';
 import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
-import { TIMER_LIMITS } from '@/lib/constants/limits';
-import { clampPeriodDuration } from '@/lib/focusPeriods';
-import { getMonthlyActivityData } from '@pomodash/shared';
+import {
+  getMonthlyActivityData,
+  filterSessionsByTab,
+  getTotalFocusSeconds,
+  getHourlyFocusSeconds,
+  getSessionCount,
+  getAvgSessionSeconds,
+  getStreakDays,
+  getPrevDayFocusSeconds,
+  getPrevDaySessionCount,
+  getPrevWeekFocusSeconds,
+  getPrevWeekSessionCount,
+  getPrevMonthFocusSeconds,
+  getPrevMonthSessionCount,
+  getMaxStreakDays,
+  getBusiestDayOfWeek,
+  getFirstSessionDate,
+} from '@pomodash/shared';
 
-export { getMonthlyActivityData };
+export {
+  getMonthlyActivityData,
+  filterSessionsByTab,
+  getTotalFocusSeconds,
+  getHourlyFocusSeconds,
+  getSessionCount,
+  getAvgSessionSeconds,
+  getStreakDays,
+  getPrevDayFocusSeconds,
+  getPrevDaySessionCount,
+  getPrevWeekFocusSeconds,
+  getPrevWeekSessionCount,
+  getPrevMonthFocusSeconds,
+  getPrevMonthSessionCount,
+  getMaxStreakDays,
+  getBusiestDayOfWeek,
+  getFirstSessionDate,
+};
 
 function tailwindToHex(colorClass: string): string {
   return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
-}
-
-function getTabInterval(tab: Exclude<TabType, 'all'>, today: Date) {
-  switch (tab) {
-    case 'today':
-      return { start: startOfDay(today), end: endOfDay(today) };
-    case 'week':
-      return {
-        start: startOfWeek(today, { weekStartsOn: 1 }),
-        end: endOfWeek(today, { weekStartsOn: 1 }),
-      };
-    case 'month':
-      return { start: startOfMonth(today), end: endOfMonth(today) };
-  }
-}
-
-export function filterSessionsByTab(
-  sessions: Session[],
-  tab: TabType,
-  today: Date = new Date(),
-): Session[] {
-  if (tab === 'all') return sessions;
-  const interval = getTabInterval(tab, today);
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval));
-}
-
-export function getTotalFocusSeconds(sessions: Session[]): number {
-  return sessions.reduce((sum, s) => sum + s.focusSeconds, 0);
-}
-
-function addPeriodToHourlyTotals(totals: number[], period: FocusPeriod): void {
-  const clamped = clampPeriodDuration(period, TIMER_LIMITS.FOCUS_MINUTES_MAX * 60);
-  const periodEnd = parseISO(clamped.end);
-  let cursor = parseISO(clamped.start);
-  while (cursor < periodEnd) {
-    const nextHour = addHours(startOfHour(cursor), 1);
-    const segmentEnd = minDate([nextHour, periodEnd]);
-    totals[cursor.getHours()] += (segmentEnd.getTime() - cursor.getTime()) / 1000;
-    cursor = segmentEnd;
-  }
-}
-
-export function getHourlyFocusSeconds(sessions: Session[]): number[] {
-  const totals = Array<number>(24).fill(0);
-  for (const s of sessions) {
-    if (s.focusPeriods.length === 0) {
-      totals[parseISO(s.startedAt).getHours()] += s.focusSeconds;
-      continue;
-    }
-    for (const period of s.focusPeriods) addPeriodToHourlyTotals(totals, period);
-  }
-  return totals;
-}
-
-export function getSessionCount(sessions: Session[]): number {
-  return sessions.length;
-}
-
-export function getAvgSessionSeconds(sessions: Session[]): number {
-  if (sessions.length === 0) return 0;
-  return Math.round(getTotalFocusSeconds(sessions) / sessions.length);
-}
-
-function toLocalDateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-export function getStreakDays(sessions: Session[], today: Date = new Date()): number {
-  if (sessions.length === 0) return 0;
-
-  const dateSet = new Set(sessions.map((s) => toLocalDateKey(parseISO(s.startedAt))));
-
-  let streak = 0;
-  const cursor = startOfDay(today);
-
-  while (dateSet.has(toLocalDateKey(cursor))) {
-    streak++;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
-}
-
-export function getPrevDayFocusSeconds(sessions: Session[], today: Date = new Date()): number {
-  const yesterday = subDays(today, 1);
-  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
-}
-
-export function getPrevDaySessionCount(sessions: Session[], today: Date = new Date()): number {
-  const yesterday = subDays(today, 1);
-  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
-}
-
-export function getPrevWeekFocusSeconds(sessions: Session[], today: Date = new Date()): number {
-  const prevWeek = subWeeks(today, 1);
-  const interval = {
-    start: startOfWeek(prevWeek, { weekStartsOn: 1 }),
-    end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
-  };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
-}
-
-export function getPrevWeekSessionCount(sessions: Session[], today: Date = new Date()): number {
-  const prevWeek = subWeeks(today, 1);
-  const interval = {
-    start: startOfWeek(prevWeek, { weekStartsOn: 1 }),
-    end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
-  };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
-}
-
-export function getPrevMonthFocusSeconds(sessions: Session[], today: Date = new Date()): number {
-  const prevMonth = subMonths(today, 1);
-  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
-}
-
-export function getPrevMonthSessionCount(sessions: Session[], today: Date = new Date()): number {
-  const prevMonth = subMonths(today, 1);
-  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
-}
-
-export function getMaxStreakDays(sessions: Session[]): number {
-  if (sessions.length === 0) return 0;
-
-  const dateSet = Array.from(
-    new Set(sessions.map((s) => toLocalDateKey(parseISO(s.startedAt)))),
-  ).sort();
-
-  let maxStreak = 0;
-  let currentStreak = 1;
-
-  for (let i = 1; i < dateSet.length; i++) {
-    const prev = new Date(dateSet[i - 1] + 'T00:00:00');
-    const curr = new Date(dateSet[i] + 'T00:00:00');
-    const diffDays = Math.round((curr.getTime() - prev.getTime()) / 86400000);
-
-    if (diffDays === 1) {
-      currentStreak++;
-    } else {
-      maxStreak = Math.max(maxStreak, currentStreak);
-      currentStreak = 1;
-    }
-  }
-
-  return Math.max(maxStreak, currentStreak);
-}
-
-export function getBusiestDayOfWeek(sessions: Session[], today: Date = new Date()): string | null {
-  const monthSessions = filterSessionsByTab(sessions, 'month', today);
-  if (monthSessions.length === 0) return null;
-
-  const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
-  const totals = new Array(7).fill(0);
-  for (const s of monthSessions) {
-    totals[parseISO(s.startedAt).getDay()] += s.focusSeconds;
-  }
-  return DAY_NAMES[totals.indexOf(Math.max(...totals))] + '요일';
-}
-
-export function getFirstSessionDate(sessions: Session[]): Date | null {
-  if (sessions.length === 0) return null;
-  const earliest = sessions.reduce((min, s) => (s.startedAt < min.startedAt ? s : min));
-  return parseISO(earliest.startedAt);
 }
 
 function resolveCategory(

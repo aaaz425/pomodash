@@ -35,7 +35,24 @@ export {
   formatSessionTimeSummary,
 } from './lib/sessionFormat';
 export type { SessionGroup } from './lib/sessionFormat';
-export { getMonthlyActivityData } from './lib/dashboard';
-export type { DayActivity } from './lib/dashboard';
+export {
+  getMonthlyActivityData,
+  filterSessionsByTab,
+  getTotalFocusSeconds,
+  getHourlyFocusSeconds,
+  getSessionCount,
+  getAvgSessionSeconds,
+  getStreakDays,
+  getPrevDayFocusSeconds,
+  getPrevDaySessionCount,
+  getPrevWeekFocusSeconds,
+  getPrevWeekSessionCount,
+  getPrevMonthFocusSeconds,
+  getPrevMonthSessionCount,
+  getMaxStreakDays,
+  getBusiestDayOfWeek,
+  getFirstSessionDate,
+} from './lib/dashboard';
+export type { DayActivity, TabType } from './lib/dashboard';
 export { createTimerStore } from './store/timerStore';
 export type { TimerStore, TimerStoreApi, TimerSnapshot, TimerStorePorts } from './store/timerStore';
