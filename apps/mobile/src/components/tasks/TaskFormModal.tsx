@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronDown, ChevronRight } from 'lucide-react-native';
-import { DEFAULT_TIMER_SETTINGS } from '@pomodash/shared';
-import { useTaskStore, useTimerStore } from '@/store/StoreProvider';
+import { useSettingsStore, useTaskStore, useTimerStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
 import { CategoryPills } from '@/components/shared/CategoryPills';
@@ -27,6 +26,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   const categories = useTaskStore((s) => s.categories);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
+  const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
 
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
@@ -38,13 +38,13 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   const [title, setTitle] = useState(task?.title ?? '');
   const [categoryId, setCategoryId] = useState(task?.categoryId ?? categories[0]?.id ?? '');
   const [targetFocusMinutes, setTargetFocusMinutes] = useState(
-    task?.targetFocusMinutes ?? DEFAULT_TIMER_SETTINGS.focusMinutes,
+    task?.targetFocusMinutes ?? defaultTimerSettings.focusMinutes,
   );
   const [targetCycles, setTargetCycles] = useState(
-    task?.targetCycles ?? DEFAULT_TIMER_SETTINGS.totalCycles,
+    task?.targetCycles ?? defaultTimerSettings.totalCycles,
   );
   const [targetBreakMinutes, setTargetBreakMinutes] = useState(
-    task?.targetBreakMinutes ?? DEFAULT_TIMER_SETTINGS.shortBreakMinutes,
+    task?.targetBreakMinutes ?? defaultTimerSettings.shortBreakMinutes,
   );
   // 새 작업은 기본값만 빠르게 채우도록 접어두고, 기존 작업 수정은 이미 의미 있는 값이라 펼쳐서 보여줌
   const [showTimeSettings, setShowTimeSettings] = useState(task !== null);

@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ListChecks, ListTodo, LogOut } from 'lucide-react-native';
-import { useTaskStore } from '@/store/StoreProvider';
+import { Bell, ListChecks, ListTodo, LogOut, Sparkles, Timer } from 'lucide-react-native';
+import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
+import { ProfileSection } from '@/components/settings/ProfileSection';
+import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
 import { TaskModal } from '@/components/tasks/TaskModal';
 import { CategoryModal } from '@/components/settings/CategoryModal';
+import { MotivationalModal } from '@/components/settings/MotivationalModal';
+import { NotificationModal } from '@/components/settings/NotificationModal';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
@@ -18,9 +22,16 @@ export default function SettingsScreen() {
 
   const taskCount = useTaskStore((s) => s.tasks.filter((t) => !t.completed).length);
   const categoryCount = useTaskStore((s) => s.categories.length);
+  const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
+  const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
+  const browserNotification = useSettingsStore((s) => s.browserNotification);
+  const soundAlert = useSettingsStore((s) => s.soundAlert);
 
+  const [showTimerDefaults, setShowTimerDefaults] = useState(false);
   const [showTasks, setShowTasks] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const [showMotivational, setShowMotivational] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
@@ -33,6 +44,16 @@ export default function SettingsScreen() {
           </Text>
         )}
 
+        <View style={styles.profileWrap}>
+          <ProfileSection />
+        </View>
+
+        <SettingsMenuRow
+          Icon={Timer}
+          label="타이머 기본값"
+          value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
+          onPress={() => setShowTimerDefaults(true)}
+        />
         <SettingsMenuRow
           Icon={ListChecks}
           label="작업 관리"
@@ -44,6 +65,18 @@ export default function SettingsScreen() {
           label="카테고리 관리"
           value={`${categoryCount}개`}
           onPress={() => setShowCategories(true)}
+        />
+        <SettingsMenuRow
+          Icon={Sparkles}
+          label="동기부여 메시지"
+          value={`${motivationalCount}개`}
+          onPress={() => setShowMotivational(true)}
+        />
+        <SettingsMenuRow
+          Icon={Bell}
+          label="알림"
+          value={browserNotification || soundAlert ? '켜짐' : '꺼짐'}
+          onPress={() => setShowNotification(true)}
         />
 
         <Pressable onPress={logout} style={styles.logoutRow}>
@@ -59,8 +92,11 @@ export default function SettingsScreen() {
         </Pressable>
       </SafeAreaView>
 
+      <TimerDefaultsModal visible={showTimerDefaults} onClose={() => setShowTimerDefaults(false)} />
       <TaskModal visible={showTasks} onClose={() => setShowTasks(false)} />
       <CategoryModal visible={showCategories} onClose={() => setShowCategories(false)} />
+      <MotivationalModal visible={showMotivational} onClose={() => setShowMotivational(false)} />
+      <NotificationModal visible={showNotification} onClose={() => setShowNotification(false)} />
     </View>
   );
 }
@@ -74,6 +110,10 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  profileWrap: {
     paddingHorizontal: 16,
     paddingBottom: 8,
   },
