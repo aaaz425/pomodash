@@ -55,17 +55,14 @@ export function BottomNav({ state, navigation, insets }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+    alignItems: 'stretch',
     borderTopWidth: 1,
   },
   item: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
   },
   label: {
     fontSize: 10,
