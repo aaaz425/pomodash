@@ -1,22 +1,15 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  formatDuration,
-  formatTimeRange,
-  formatFocusPeriodRanges,
-  formatFullDate,
-  getSessionOrdinalTitle,
-  hasAbnormalFocusGap,
-} from '@pomodash/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
-import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { SessionDetailHeader } from './SessionDetailHeader';
+import { SessionStatsRow } from './SessionStatsRow';
 import { JournalNoteEditor } from './JournalNoteEditor';
 
 interface Props {
@@ -60,32 +53,12 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 
   return (
     <Modal visible title="세션 기록" onClose={onClose}>
-      <View style={styles.taskSection}>
-        {category && <CategoryBadge category={category} style={styles.categoryBadge} />}
-        <Text
-          style={[
-            styles.taskTitle,
-            { color: task ? theme.foreground : theme.mutedForeground, fontFamily: FONTS.sansBold },
-          ]}
-        >
-          {task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex)}
-        </Text>
-        <View style={styles.metaRow}>
-          <Text
-            style={[styles.meta, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          >
-            {formatFullDate(session.startedAt)}
-          </Text>
-          <Text style={[styles.metaDot, { color: theme.mutedForeground }]}>·</Text>
-          <Text
-            style={[styles.meta, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          >
-            {hasAbnormalFocusGap(session.focusPeriods)
-              ? formatFocusPeriodRanges(session.focusPeriods)
-              : formatTimeRange(session.startedAt, session.endedAt)}
-          </Text>
-        </View>
-      </View>
+      <SessionDetailHeader
+        session={session}
+        task={task}
+        category={category}
+        sessionIndex={sessionIndex}
+      />
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
@@ -128,36 +101,7 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-      <View style={styles.stats}>
-        <View style={[styles.statCol, { borderRightColor: theme.border }]}>
-          <Text
-            style={[
-              styles.statLabel,
-              { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
-            ]}
-          >
-            집중 시간
-          </Text>
-          <Text style={[styles.statValue, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
-            {formatDuration(session.focusSeconds)}
-          </Text>
-        </View>
-        <View style={styles.statCol}>
-          <Text
-            style={[
-              styles.statLabel,
-              { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
-            ]}
-          >
-            {session.mode === 'free' ? '방식' : '사이클'}
-          </Text>
-          <Text style={[styles.statValue, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
-            {session.mode === 'free'
-              ? '자유 집중'
-              : `${session.completedCycles} / ${session.totalCycles}`}
-          </Text>
-        </View>
-      </View>
+      <SessionStatsRow session={session} />
 
       <Pressable onPress={() => setConfirmDelete(true)} style={styles.deleteRow}>
         <Text
@@ -181,27 +125,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  taskSection: {
-    gap: 8,
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-  },
-  taskTitle: {
-    fontSize: 20,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  meta: {
-    fontSize: 13,
-  },
-  metaDot: {
-    fontSize: 13,
-  },
   divider: {
     height: 1,
   },
@@ -212,23 +135,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
-  },
-  stats: {
-    flexDirection: 'row',
-  },
-  statCol: {
-    flex: 1,
-    gap: 4,
-    paddingHorizontal: 12,
-    borderRightWidth: StyleSheet.hairlineWidth,
-  },
-  statLabel: {
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  statValue: {
-    fontSize: 16,
   },
   deleteRow: {
     paddingTop: 8,
