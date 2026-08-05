@@ -1,6 +1,13 @@
 import { createTimerStore as createSharedTimerStore } from '@pomodash/shared';
+import type { TimerStorePorts } from '@pomodash/shared';
 
-// 이번 브랜치는 로컬 상태만 다룸 — 영속화 포트 없음(작업/세션 저장은 rn-tasks/rn-sync에서 추가)
-export const createTimerStore = () => createSharedTimerStore();
+// persistSnapshot/loadSnapshot은 아직 없음 — AsyncStorage가 비동기라 공유 스토어의
+// 동기 loadSnapshot 포트 시그니처에 그대로 못 꽂음(추후 별도 검토, feat/rn-session-record 계획 참고)
+export const createTimerStore = () => {
+  const ports: TimerStorePorts = {
+    onSessionTooShort: () => console.warn('[timerStore] 5초 미만 세션은 기록되지 않음'),
+  };
+  return createSharedTimerStore(ports);
+};
 
 export type { TimerStore, TimerStoreApi } from '@pomodash/shared';
