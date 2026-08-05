@@ -54,5 +54,15 @@ export {
   getFirstSessionDate,
 } from './lib/dashboard';
 export type { DayActivity, TabType } from './lib/dashboard';
+export { BADGE_CATEGORY_LABELS, BADGE_DEFINITIONS, getEarnedBadgeIds } from './lib/badges';
+export type {
+  BadgeTier,
+  BadgeIconKey,
+  BadgeCategory,
+  BadgeDefinition,
+  SpecialEventId,
+} from './lib/badges';
+export { buildHeadline, buildShareCardData } from './lib/shareCard';
+export type { ShareCardData } from './lib/shareCard';
 export { createTimerStore } from './store/timerStore';
 export type { TimerStore, TimerStoreApi, TimerSnapshot, TimerStorePorts } from './store/timerStore';

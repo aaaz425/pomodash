@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChartColumn, CircleCheck, Flame, Timer } from 'lucide-react-native';
+import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react-native';
 import {
+  buildShareCardData,
   formatDuration,
   filterSessionsByTab,
   getAvgSessionSeconds,
@@ -28,6 +29,8 @@ import { FocusChart } from '@/components/dashboard/FocusChart';
 import { MonthlyActivityCard } from '@/components/dashboard/MonthlyActivityCard';
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
+import { BadgeGallery } from '@/components/dashboard/badges/BadgeGallery';
+import { ShareCardModal } from '@/components/dashboard/ShareCardModal';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
@@ -63,6 +66,7 @@ export default function DashboardScreen() {
   const theme = THEME[scheme];
 
   const [tab, setTab] = useState<TabType>('week');
+  const [shareOpen, setShareOpen] = useState(false);
 
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
@@ -70,6 +74,7 @@ export default function DashboardScreen() {
 
   const filtered = filterSessionsByTab(sessions, tab);
   const monthSessions = filterSessionsByTab(sessions, 'month');
+  const shareCardData = buildShareCardData(filtered, sessions, tab);
 
   const totalFocusSeconds = getTotalFocusSeconds(filtered);
   const sessionCount = getSessionCount(filtered);
@@ -131,7 +136,18 @@ export default function DashboardScreen() {
                 집중의 흐름을 한눈에
               </Text>
             </View>
-            <DashboardTabs value={tab} onChange={setTab} />
+            <View style={styles.controlsRow}>
+              <Pressable
+                style={[styles.shareButton, { borderColor: theme.border }]}
+                onPress={() => setShareOpen(true)}
+                hitSlop={8}
+              >
+                <Share2 size={16} color={theme.foreground} />
+              </Pressable>
+              <View style={styles.tabsWrap}>
+                <DashboardTabs value={tab} onChange={setTab} />
+              </View>
+            </View>
           </View>
 
           <View style={styles.statGrid}>
@@ -179,8 +195,12 @@ export default function DashboardScreen() {
           <CategoryChart sessions={filtered} tasks={tasks} categories={categories} />
 
           <HourlyChart sessions={filtered} />
+
+          <BadgeGallery sessions={sessions} tasks={tasks} />
         </ScrollView>
       </SafeAreaView>
+
+      {shareOpen && <ShareCardModal data={shareCardData} onClose={() => setShareOpen(false)} />}
     </View>
   );
 }
@@ -208,5 +228,21 @@ const styles = StyleSheet.create({
   },
   statGrid: {
     gap: 10,
+  },
+  controlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  tabsWrap: {
+    flex: 1,
+  },
+  shareButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

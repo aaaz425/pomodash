@@ -74,7 +74,7 @@
 - [x] `feat/rn-session-record` — 세션 종료 시 메모 작성 + Supabase `sessions` 저장
 - [x] `feat/rn-journal` — 기록(세션 히스토리 리스트/캘린더/상세편집)
 - [x] `feat/rn-dashboard` — 대시보드(집중 시간 집계·차트·스트릭)
-- [ ] `feat/rn-badges-share` — 뱃지 수집 + 공유 카드
+- [x] `feat/rn-badges-share` — 뱃지 수집 + 공유 카드
 - [ ] `feat/rn-settings-sync` — 동기부여 메시지·알림음·기본 타이머값 Supabase `settings` 연동
 - [ ] `feat/rn-kakao-eas` — EAS 개발 빌드 전환 + 카카오 로그인
 
