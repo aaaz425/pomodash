@@ -62,6 +62,7 @@ export function NotificationSection() {
           value={browserNotification}
           onValueChange={(v) => void handlePushNotificationChange(v)}
           trackColor={{ true: theme.primary }}
+          style={styles.switch}
         />
       </View>
 
@@ -88,6 +89,7 @@ export function NotificationSection() {
           value={soundAlert}
           onValueChange={(v) => void setSoundAlert(v)}
           trackColor={{ true: theme.primary }}
+          style={styles.switch}
         />
       </View>
 
@@ -162,6 +164,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     flexShrink: 1,
+  },
+  switch: {
+    transform: [{ scale: 0.8 }],
   },
   title: {
     fontSize: 14,

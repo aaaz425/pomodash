@@ -1,6 +1,7 @@
 import { Redirect } from 'expo-router';
 import AppTabs from '@/components/app-tabs';
 import { StoreProvider } from '@/store/StoreProvider';
+import { PortalProvider } from '@/components/shared/Portal';
 import { useAuth } from '@/store/AuthProvider';
 
 export default function AppGroupLayout() {
@@ -11,7 +12,9 @@ export default function AppGroupLayout() {
 
   return (
     <StoreProvider>
-      <AppTabs />
+      <PortalProvider>
+        <AppTabs />
+      </PortalProvider>
     </StoreProvider>
   );
 }

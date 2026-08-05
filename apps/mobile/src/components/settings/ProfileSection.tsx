@@ -68,11 +68,14 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    height: 44,
   },
   button: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    height: 44,
+    paddingHorizontal: 16,
     borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   disabled: {
     opacity: 0.4,

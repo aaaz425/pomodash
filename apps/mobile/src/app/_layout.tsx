@@ -3,6 +3,7 @@ import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { AuthProvider, useAuth } from '@/store/AuthProvider';
@@ -40,11 +41,18 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AuthProvider>
-          <RootContent />
-        </AuthProvider>
-      </ThemeProvider>
+      {/* expo-router가 자동으로 감싸는 SafeAreaProvider는 네이티브에서 initialMetrics를
+          안 넘겨서 콜드 스타트 시 insets가 0으로 시작했다가 비동기로 갱신됨 — 그 갱신
+          타이밍이 앱 켜고 첫 모달을 열고 닫는 시점과 겹치면 시트 padding이 한 번 더 튀어
+          깜빡이는 문제가 있었음(실측 확인). initialWindowMetrics(네이티브 부트스트랩 시점
+          스냅샷)로 한 번 더 감싸서 첫 렌더부터 정확한 값이 잡히게 한다. */}
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <AuthProvider>
+            <RootContent />
+          </AuthProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

@@ -6,6 +6,7 @@ import type { FocusRating } from '@pomodash/shared';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { Portal } from '@/components/shared/Portal';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { THEME } from '@/constants/timerColors';
@@ -93,99 +94,115 @@ export function SessionCompleteSheet() {
   }
 
   return (
-    <Modal
-      visible={sessionEnded}
-      animationType="fade"
-      transparent
-      onRequestClose={() => setPendingAction('skip')}
-    >
-      <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')}>
-        <Pressable
-          style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
-          onPress={(e) => e.stopPropagation()}
-        >
-          <SafeAreaView edges={['bottom']}>
-            <ScrollView
-              contentContainerStyle={styles.scrollContent}
-              keyboardShouldPersistTaps="handled"
+    <Portal>
+      <Modal
+        visible={sessionEnded}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setPendingAction('skip')}
+      >
+        <View style={styles.root}>
+          <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')} />
+          <View style={styles.sheetWrap} pointerEvents="box-none">
+            <View
+              style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
             >
-              <SessionCompleteHeader />
-
-              <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
-              <SessionTaskSummary
-                isTaskSession={isTaskSession}
-                task={task}
-                category={category}
-                selectedTaskId={selectedTaskId}
-                onSelectTask={setSelectedTaskId}
-              />
-
-              <View style={styles.field}>
-                <Text
-                  style={[
-                    styles.sectionLabel,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                  ]}
+              <SafeAreaView edges={['bottom']}>
+                <ScrollView
+                  contentContainerStyle={styles.scrollContent}
+                  keyboardShouldPersistTaps="handled"
                 >
-                  이번 세션 집중도는 어땠나요? (선택)
-                </Text>
-                <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
-              </View>
+                  <SessionCompleteHeader />
 
-              <View style={styles.field}>
-                <Text
-                  style={[
-                    styles.sectionLabel,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                  ]}
-                >
-                  집중을 방해한 게 있었다면 선택해주세요 (선택)
-                </Text>
-                <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
-              </View>
+                  <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-              <SessionMemoField value={note} onChange={setNote} />
+                  <SessionTaskSummary
+                    isTaskSession={isTaskSession}
+                    task={task}
+                    category={category}
+                    selectedTaskId={selectedTaskId}
+                    onSelectTask={setSelectedTaskId}
+                  />
 
-              <SessionActionButtons
-                onSkip={() => setPendingAction('skip')}
-                onSave={() => setPendingAction('save')}
-              />
-            </ScrollView>
-          </SafeAreaView>
-        </Pressable>
+                  <View style={styles.field}>
+                    <Text
+                      style={[
+                        styles.sectionLabel,
+                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                      ]}
+                    >
+                      이번 세션 집중도는 어땠나요? (선택)
+                    </Text>
+                    <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
+                  </View>
 
-        <ConfirmModal
-          visible={pendingAction === 'skip'}
-          title="기록을 건너뛸까요?"
-          description="작성한 메모는 저장되지 않아요"
-          confirmLabel="건너뛰기"
-          destructive
-          onConfirm={handleSkip}
-          onCancel={() => setPendingAction(null)}
-        />
+                  <View style={styles.field}>
+                    <Text
+                      style={[
+                        styles.sectionLabel,
+                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                      ]}
+                    >
+                      집중을 방해한 게 있었다면 선택해주세요 (선택)
+                    </Text>
+                    <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
+                  </View>
 
-        <ConfirmModal
-          visible={pendingAction === 'save'}
-          title="이 기록으로 저장할까요?"
-          description={
-            (mode === 'free' ? '자유 집중 세션' : `완료된 사이클 ${cycleCount} / ${totalCycles}`) +
-            (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
-          }
-          confirmLabel="저장"
-          onConfirm={handleSave}
-          onCancel={() => setPendingAction(null)}
-        />
-      </Pressable>
-    </Modal>
+                  <SessionMemoField value={note} onChange={setNote} />
+
+                  <SessionActionButtons
+                    onSkip={() => setPendingAction('skip')}
+                    onSave={() => setPendingAction('save')}
+                  />
+                </ScrollView>
+              </SafeAreaView>
+            </View>
+          </View>
+
+          <ConfirmModal
+            visible={pendingAction === 'skip'}
+            title="기록을 건너뛸까요?"
+            description="작성한 메모는 저장되지 않아요"
+            confirmLabel="건너뛰기"
+            destructive
+            onConfirm={handleSkip}
+            onCancel={() => setPendingAction(null)}
+          />
+
+          <ConfirmModal
+            visible={pendingAction === 'save'}
+            title="이 기록으로 저장할까요?"
+            description={
+              (mode === 'free'
+                ? '자유 집중 세션'
+                : `완료된 사이클 ${cycleCount} / ${totalCycles}`) +
+              (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
+            }
+            confirmLabel="저장"
+            onConfirm={handleSave}
+            onCancel={() => setPendingAction(null)}
+          />
+        </View>
+      </Modal>
+    </Portal>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  sheetWrap: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   sheet: {
     borderTopLeftRadius: 24,

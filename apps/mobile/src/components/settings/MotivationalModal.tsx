@@ -8,7 +8,7 @@ interface Props {
 
 export function MotivationalModal({ visible, onClose }: Props) {
   return (
-    <Modal visible={visible} title="동기부여 메시지" onClose={onClose}>
+    <Modal visible={visible} title="동기부여 메시지" onClose={onClose} scrollable={false}>
       <MotivationalSection />
     </Modal>
   );
