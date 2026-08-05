@@ -21,6 +21,11 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="dashboard">
+        <NativeTabs.Trigger.Label>통계</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="chart.bar.fill" md="bar_chart" />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="journal">
         <NativeTabs.Trigger.Label>기록</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="book" md="book" />
