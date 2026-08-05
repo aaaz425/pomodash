@@ -22,5 +22,8 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
     "zustand": "^5.0.14"
+  },
+  "dependencies": {
+    "date-fns": "^4.4.0"
   }
 }

@@ -1,6 +1,5 @@
 import {
   addHours,
-  eachDayOfInterval,
   endOfDay,
   endOfMonth,
   endOfWeek,
@@ -22,7 +21,6 @@ import type {
   Session,
   Task,
   TabType,
-  DayActivity,
   FocusPeriod,
   FocusTrendItem,
   FocusTrendMeta,
@@ -31,6 +29,9 @@ import type {
 import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
 import { TIMER_LIMITS } from '@/lib/constants/limits';
 import { clampPeriodDuration } from '@/lib/focusPeriods';
+import { getMonthlyActivityData } from '@pomodash/shared';
+
+export { getMonthlyActivityData };
 
 function tailwindToHex(colorClass: string): string {
   return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
@@ -163,21 +164,6 @@ export function getPrevMonthSessionCount(sessions: Session[], today: Date = new 
   const prevMonth = subMonths(today, 1);
   const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
   return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
-}
-
-export function getMonthlyActivityData(
-  sessions: Session[],
-  today: Date = new Date(),
-): DayActivity[] {
-  const days = eachDayOfInterval({ start: startOfMonth(today), end: endOfMonth(today) });
-
-  return days.map((day) => {
-    const dateKey = toLocalDateKey(day);
-    const focusSeconds = sessions
-      .filter((s) => toLocalDateKey(parseISO(s.startedAt)) === dateKey)
-      .reduce((sum, s) => sum + s.focusSeconds, 0);
-    return { date: dateKey, focusMinutes: Math.round(focusSeconds / 60) };
-  });
 }
 
 export function getMaxStreakDays(sessions: Session[]): number {
