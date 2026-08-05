@@ -37,7 +37,7 @@ function CategoryRow({
       ]}
     >
       <View style={styles.left}>
-        <Pressable onLongPress={drag} hitSlop={8}>
+        <Pressable onLongPress={drag} delayLongPress={150} hitSlop={8}>
           <GripVertical size={14} color={withAlpha(theme.mutedForeground, 0.3)} />
         </Pressable>
         <View style={[styles.dot, { backgroundColor: CATEGORY_HEX[category.color] }]} />
@@ -89,7 +89,6 @@ export function CategorySection() {
       <DraggableFlatList
         data={categories}
         keyExtractor={(c) => c.id}
-        scrollEnabled={false}
         onDragEnd={({ from, to }) => void reorderCategories(from, to)}
         renderItem={({ item, drag, isActive }: RenderItemParams<Category>) => (
           <CategoryRow

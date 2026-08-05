@@ -67,7 +67,7 @@ function MessageRow({
         isActive && styles.dragging,
       ]}
     >
-      <Pressable onLongPress={drag} hitSlop={8}>
+      <Pressable onLongPress={drag} delayLongPress={150} hitSlop={8}>
         <GripVertical size={14} color={withAlpha(theme.mutedForeground, 0.3)} />
       </Pressable>
       <Text
@@ -114,8 +114,7 @@ export function MotivationalSection() {
     <View>
       <DraggableFlatList
         data={messages}
-        keyExtractor={(_, i) => String(i)}
-        scrollEnabled={false}
+        keyExtractor={(item) => item}
         onDragEnd={({ from, to }) => void reorderMessages(from, to)}
         renderItem={({ item, getIndex, drag, isActive }: RenderItemParams<string>) => {
           const index = getIndex() ?? 0;

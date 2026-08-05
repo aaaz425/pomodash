@@ -8,7 +8,7 @@ interface Props {
 
 export function CategoryModal({ visible, onClose }: Props) {
   return (
-    <Modal visible={visible} title="카테고리 관리" onClose={onClose}>
+    <Modal visible={visible} title="카테고리 관리" onClose={onClose} scrollable={false}>
       <CategorySection />
     </Modal>
   );
