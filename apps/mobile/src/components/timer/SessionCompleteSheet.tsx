@@ -1,61 +1,182 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Check } from 'lucide-react-native';
-import { useTimerStore } from '@/store/StoreProvider';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { normalizeFocusPeriods } from '@pomodash/shared';
+import type { FocusRating } from '@pomodash/shared';
+import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
+import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
+import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
+import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { SessionCompleteHeader } from './SessionCompleteHeader';
+import { SessionTaskSummary } from './SessionTaskSummary';
+import { SessionMemoField } from './SessionMemoField';
+import { SessionActionButtons } from './SessionActionButtons';
 
-// 웹의 SessionRecordModal에 대응 — 메모/집중도 평점/방해요소 태그/작업 선택은
-// 작업(Task) 데이터가 아직 모바일에 없어 이번 브랜치에서는 생략(추후 rn-tasks/rn-sync에서 구현)
 export function SessionCompleteSheet() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
   const sessionEnded = useTimerStore((s) => s.sessionEnded);
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
+  const cycleCount = useTimerStore((s) => s.cycleCount);
+  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+  const mode = useTimerStore((s) => s.mode);
+  const currentTaskId = useTimerStore((s) => s.currentTaskId);
+  const sessionStartedAt = useTimerStore((s) => s.sessionStartedAt);
+  const sessionEndedAt = useTimerStore((s) => s.sessionEndedAt);
+  const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
+  const rawFocusPeriods = useTimerStore((s) => s.rawFocusPeriods);
+
+  const { task, category } = useCurrentTask();
+  const addSession = useTaskStore((s) => s.addSession);
+
+  const [note, setNote] = useState('');
+  const [focusRating, setFocusRating] = useState<FocusRating | null>(null);
+  const [distractionTags, setDistractionTags] = useState<string[]>([]);
+  const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  if (!sessionEnded || sessionEndedAt === null) return null;
+
+  const isTaskSession = currentTaskId !== null;
+  const now = sessionEndedAt;
+  const totalElapsed = sessionStartedAt
+    ? Math.floor((now - sessionStartedAt) / 1000)
+    : accFocusSeconds;
+  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds);
+
+  function resetForm() {
+    setNote('');
+    setFocusRating(null);
+    setDistractionTags([]);
+    setSelectedTaskId(null);
+    setPendingAction(null);
+  }
+
+  async function handleSave() {
+    if (isSaving) return;
+    setIsSaving(true);
+    const taskId = isTaskSession ? currentTaskId : selectedTaskId;
+    const focusPeriods = normalizeFocusPeriods(
+      rawFocusPeriods.map((p) => ({
+        start: new Date(p.start).toISOString(),
+        end: new Date(p.end).toISOString(),
+      })),
+    );
+    await addSession({
+      taskId,
+      mode,
+      startedAt: new Date(sessionStartedAt ?? now).toISOString(),
+      endedAt: new Date(now).toISOString(),
+      completedCycles: mode === 'free' ? 0 : cycleCount,
+      totalCycles: mode === 'free' ? 0 : totalCycles,
+      focusSeconds: accFocusSeconds,
+      pausedSeconds,
+      focusPeriods,
+      note: note.trim() || null,
+      focusRating,
+      distractionTags,
+    });
+    dismissSessionRecord();
+    resetForm();
+    setIsSaving(false);
+  }
+
+  function handleSkip() {
+    dismissSessionRecord();
+    resetForm();
+  }
 
   return (
     <Modal
       visible={sessionEnded}
-      animationType="slide"
+      animationType="fade"
       transparent
-      onRequestClose={dismissSessionRecord}
+      onRequestClose={() => setPendingAction('skip')}
     >
-      <View style={styles.backdrop}>
-        <View style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <View style={[styles.iconOuter, { backgroundColor: withAlpha(theme.primary, 0.2) }]}>
-            <View style={[styles.iconInner, { backgroundColor: theme.primary }]}>
-              <Check size={20} color={theme.primaryForeground} strokeWidth={2.5} />
-            </View>
-          </View>
-
-          <Text style={[styles.headline, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
-            집중 완료!
-          </Text>
-          <Text
-            style={[
-              styles.subtext,
-              { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-            ]}
-          >
-            오늘도 집중 세션을 완료했어요
-          </Text>
-
-          <Pressable
-            onPress={dismissSessionRecord}
-            style={[styles.confirmButton, { backgroundColor: theme.primary }]}
-          >
-            <Text
-              style={[
-                styles.confirmText,
-                { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-              ]}
+      <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')}>
+        <Pressable
+          style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
+          onPress={(e) => e.stopPropagation()}
+        >
+          <SafeAreaView edges={['bottom']}>
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
             >
-              확인
-            </Text>
-          </Pressable>
-        </View>
-      </View>
+              <SessionCompleteHeader />
+
+              <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+              <SessionTaskSummary
+                isTaskSession={isTaskSession}
+                task={task}
+                category={category}
+                selectedTaskId={selectedTaskId}
+                onSelectTask={setSelectedTaskId}
+              />
+
+              <View style={styles.field}>
+                <Text
+                  style={[
+                    styles.sectionLabel,
+                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                  ]}
+                >
+                  이번 세션 집중도는 어땠나요? (선택)
+                </Text>
+                <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
+              </View>
+
+              <View style={styles.field}>
+                <Text
+                  style={[
+                    styles.sectionLabel,
+                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                  ]}
+                >
+                  집중을 방해한 게 있었다면 선택해주세요 (선택)
+                </Text>
+                <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
+              </View>
+
+              <SessionMemoField value={note} onChange={setNote} />
+
+              <SessionActionButtons
+                onSkip={() => setPendingAction('skip')}
+                onSave={() => setPendingAction('save')}
+              />
+            </ScrollView>
+          </SafeAreaView>
+        </Pressable>
+
+        <ConfirmModal
+          visible={pendingAction === 'skip'}
+          title="기록을 건너뛸까요?"
+          description="작성한 메모는 저장되지 않아요"
+          confirmLabel="건너뛰기"
+          destructive
+          onConfirm={handleSkip}
+          onCancel={() => setPendingAction(null)}
+        />
+
+        <ConfirmModal
+          visible={pendingAction === 'save'}
+          title="이 기록으로 저장할까요?"
+          description={
+            (mode === 'free' ? '자유 집중 세션' : `완료된 사이클 ${cycleCount} / ${totalCycles}`) +
+            (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
+          }
+          confirmLabel="저장"
+          onConfirm={handleSave}
+          onCancel={() => setPendingAction(null)}
+        />
+      </Pressable>
     </Modal>
   );
 }
@@ -70,39 +191,21 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderWidth: 1,
+    maxHeight: '85%',
+  },
+  scrollContent: {
     padding: 20,
-    alignItems: 'center',
-    gap: 16,
+    gap: 20,
   },
-  iconOuter: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+  divider: {
+    height: 1,
   },
-  iconInner: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  field: {
+    gap: 8,
   },
-  headline: {
-    fontSize: 26,
-  },
-  subtext: {
-    fontSize: 14,
-    marginTop: -8,
-  },
-  confirmButton: {
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  confirmText: {
-    fontSize: 14,
+  sectionLabel: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
 });

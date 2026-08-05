@@ -15,7 +15,9 @@ import {
   deleteCategory as deleteCategoryRow,
   reorderCategories as reorderCategoriesRows,
 } from '@/lib/supabase/categories';
+import { insertSession as insertSessionRow } from '@/lib/supabase/sessions';
 import type { Task, Category } from '@/types/tasks';
+import type { Session } from '@/types/sessions';
 
 // 회원가입 시 DB 트리거(handle_new_user)가 심어주는 기본값과 이름을 맞춘 폴백 —
 // fetchCategories 실패(네트워크 오류 등) 시에만 사용
@@ -55,6 +57,8 @@ interface TaskStore {
   updateCategory: (id: string, input: { name: string; color: Category['color'] }) => Promise<void>;
   deleteCategory: (id: string) => Promise<{ blocked: boolean }>;
   reorderCategories: (fromIndex: number, toIndex: number) => Promise<void>;
+
+  addSession: (input: Omit<Session, 'id'>) => Promise<void>;
 
   hydrate: () => Promise<void>;
 }
@@ -229,6 +233,13 @@ export const createTaskStore = () =>
       if (error) {
         set({ categories: previousCategories });
         console.warn('[taskStore] reorderCategories 실패');
+      }
+    },
+
+    addSession: async (input) => {
+      const inserted = await insertSessionRow(input);
+      if (!inserted) {
+        console.warn('[taskStore] addSession 실패');
       }
     },
 
