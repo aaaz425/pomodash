@@ -35,7 +35,15 @@
           "imageWidth": 76
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-sharing",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "집중 기록 공유 카드를 사진 앱에 저장하기 위해 접근 권한이 필요해요.",
+          "savePhotosPermission": "집중 기록 공유 카드를 사진 앱에 저장하기 위해 접근 권한이 필요해요."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
