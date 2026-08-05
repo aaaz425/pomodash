@@ -52,7 +52,7 @@ export interface TimerRecord {
   pausedSeconds: number;
 }
 
-export type SoundType = 'sine' | 'chime' | 'bell' | 'digital';
+export type { SoundType } from '@pomodash/shared';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
 
@@ -107,16 +107,7 @@ export interface CategoryRatingItem {
 
 export type { ShareCardData } from '@pomodash/shared';
 
-export interface AppSettings {
-  nickname: string;
-  browserNotification: boolean;
-  soundAlert: boolean;
-  soundType: SoundType;
-  soundVolume: number; // 0-100
-  soundRepeatCount: number; // 1-5
-  motivationalMessages: string[];
-  defaultTimerSettings: TimerSettings;
-}
+export type { AppSettings } from '@pomodash/shared';
 
 export interface AuthActionResult {
   error?: string;

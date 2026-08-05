@@ -30,3 +30,10 @@ export const INPUT_LIMITS = {
   MESSAGE_COUNT_MAX: 20,
   CATEGORIES_MAX: 10,
 } as const;
+
+export const SOUND_LIMITS = {
+  VOLUME_MIN: 0,
+  VOLUME_MAX: 100,
+  REPEAT_MIN: 1,
+  REPEAT_MAX: 5,
+} as const;

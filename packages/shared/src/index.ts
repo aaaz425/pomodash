@@ -12,8 +12,11 @@ export {
   CATEGORY_LIMITS,
   AUTH_LIMITS,
   INPUT_LIMITS,
+  SOUND_LIMITS,
 } from './constants/limits';
 export { DEFAULT_TIMER_SETTINGS } from './constants/defaults';
+export { MOTIVATIONAL_MESSAGES } from './constants/messages';
+export type { SoundType, AppSettings } from './types/settings';
 export { FOCUS_RATING_OPTIONS, FOCUS_RATING_LABELS } from './constants/focusRating';
 export { DISTRACTION_TAGS } from './constants/distractionTags';
 export type { DistractionTag } from './constants/distractionTags';
