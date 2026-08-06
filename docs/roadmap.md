@@ -77,5 +77,5 @@
 - [x] `feat/rn-badges-share` — 뱃지 수집 + 공유 카드
 - [x] `feat/rn-bottom-nav` — 하단 네비게이션 바를 웹과 동일한 커스텀 바로 교체
 - [x] `feat/rn-settings-sync` — 동기부여 메시지·알림음·기본 타이머값 Supabase `settings` 연동
-- [ ] `feat/rn-kakao-eas` — EAS 개발 빌드 전환 + 카카오 로그인
+- [>] `feat/rn-kakao-eas` — EAS 개발 빌드 전환 + 카카오 로그인
 
