@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
+import { login as kakaoLogin } from '@react-native-seoul/kakao-login';
 import { supabase } from '@/lib/supabase/client';
 import {
   LoginCredentialsSchema,
@@ -10,13 +11,14 @@ import {
 // 딥링크 없이(이번 브랜치 범위) 이메일 인증 링크는 웹으로 보낸다 —
 // 사용자가 메일 링크를 누르면 브라우저에서 웹의 /auth/confirm이 인증을 마무리하고,
 // 앱으로는 돌아오지 않으므로 비밀번호로 다시 로그인하면 된다.
-const WEB_APP_URL = 'https://pomodash-three.vercel.app';
+export const WEB_APP_URL = 'https://pomodash-three.vercel.app';
 
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthActionResult>;
+  loginWithKakao: () => Promise<AuthActionResult>;
   signup: (email: string, password: string, passwordConfirm: string) => Promise<AuthActionResult>;
   logout: () => Promise<void>;
 }
@@ -70,6 +72,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   }
 
+  async function loginWithKakao(): Promise<AuthActionResult> {
+    let accessToken: string;
+    try {
+      const token = await kakaoLogin();
+      accessToken = token.accessToken;
+    } catch (err) {
+      // 사용자가 로그인 취소 시(카카오톡 앱 전환 후 뒤로가기 등) 에러로 던져지므로 조용히 무시
+      if (err instanceof Error && err.message.includes('CANCEL')) {
+        return {};
+      }
+      return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
+    }
+
+    const { data, error: invokeError } = await supabase.functions.invoke<{
+      tokenHash?: string;
+      error?: string;
+    }>('kakao-login', { body: { accessToken } });
+
+    if (invokeError || !data?.tokenHash) {
+      return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
+    }
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: data.tokenHash,
+      type: 'magiclink',
+    });
+
+    if (verifyError) {
+      return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
+    }
+
+    return {};
+  }
+
   async function signup(
     email: string,
     password: string,
@@ -110,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: session?.user ?? null,
     loading,
     login,
+    loginWithKakao,
     signup,
     logout,
   };

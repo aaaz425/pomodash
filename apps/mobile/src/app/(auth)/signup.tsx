@@ -5,6 +5,9 @@ import { Mail } from 'lucide-react-native';
 import { AUTH_LIMITS } from '@pomodash/shared';
 import { useAuth } from '@/store/AuthProvider';
 import { AuthShell } from '@/components/auth/AuthShell';
+import { AuthDivider } from '@/components/auth/AuthDivider';
+import { KakaoButton } from '@/components/auth/KakaoButton';
+import { PrivacyLink } from '@/components/auth/PrivacyLink';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
 import { THEME, withAlpha } from '@/constants/timerColors';
@@ -144,6 +147,10 @@ export default function SignupScreen() {
           </Link>
         </View>
       </View>
+
+      <AuthDivider />
+      <KakaoButton onError={setError} />
+      <PrivacyLink />
     </AuthShell>
   );
 }

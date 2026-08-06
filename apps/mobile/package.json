@@ -6,6 +6,7 @@
     "@expo/ui": "~57.0.8",
     "@pomodash/shared": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-seoul/kakao-login": "^6.0.4",
     "@supabase/supabase-js": "^2.111.0",
     "date-fns": "^4.4.0",
     "expo": "~57.0.9",
