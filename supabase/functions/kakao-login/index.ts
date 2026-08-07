@@ -2,8 +2,6 @@
 // 카카오 accessToken을 카카오 API로 직접 검증한 뒤, magic link 방식으로 세션을 발급하는 우회 경로다.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const SYNTHETIC_EMAIL_DOMAIN = 'users.pomodash.app';
-
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'method not allowed' }), { status: 405 });
@@ -24,7 +22,8 @@ Deno.serve(async (req: Request) => {
   }
   const kakaoUser = await kakaoUserRes.json();
   const kakaoId = kakaoUser.id;
-  if (!kakaoId) {
+  const email = kakaoUser.kakao_account?.email;
+  if (!kakaoId || !email) {
     return new Response(JSON.stringify({ error: '카카오 사용자 정보를 가져오지 못했어요' }), {
       status: 401,
     });
@@ -34,8 +33,6 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
-
-  const email = `kakao_${kakaoId}@${SYNTHETIC_EMAIL_DOMAIN}`;
 
   // type: 'magiclink'는 계정이 없으면 새로 생성하고, 있으면 기존 계정으로 링크를 발급한다.
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({
