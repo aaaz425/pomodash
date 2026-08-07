@@ -23,6 +23,7 @@ Deno.serve(async (req: Request) => {
   const kakaoUser = await kakaoUserRes.json();
   const kakaoId = kakaoUser.id;
   const email = kakaoUser.kakao_account?.email;
+  const nickname = kakaoUser.kakao_account?.profile?.nickname;
   if (!kakaoId || !email) {
     return new Response(JSON.stringify({ error: '카카오 사용자 정보를 가져오지 못했어요' }), {
       status: 401,
@@ -38,7 +39,7 @@ Deno.serve(async (req: Request) => {
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({
     type: 'magiclink',
     email,
-    options: { data: { kakao_id: String(kakaoId), provider: 'kakao' } },
+    options: { data: { kakao_id: String(kakaoId), provider: 'kakao', nickname } },
   });
 
   if (error || !data.properties?.hashed_token) {
