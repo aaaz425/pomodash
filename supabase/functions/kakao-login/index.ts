@@ -48,8 +48,16 @@ Deno.serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: '세션 발급에 실패했어요' }), { status: 500 });
   }
 
-  return new Response(JSON.stringify({ tokenHash: data.properties.hashed_token }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  // 신규 사용자는 magiclink로 요청해도 실제 발급 타입이 signup으로 내려온다.
+  // verifyOtp는 실제 발급 타입과 일치해야 하므로 그대로 전달한다.
+  return new Response(
+    JSON.stringify({
+      tokenHash: data.properties.hashed_token,
+      verificationType: data.properties.verification_type,
+    }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
 });

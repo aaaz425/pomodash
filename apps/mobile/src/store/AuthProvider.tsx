@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { Session, User } from '@supabase/supabase-js';
+import type { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { login as kakaoLogin } from '@react-native-seoul/kakao-login';
 import { supabase } from '@/lib/supabase/client';
 import {
@@ -82,24 +82,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (err instanceof Error && err.message.includes('CANCEL')) {
         return {};
       }
+      console.error('[kakao] login() failed', err);
       return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
     }
 
     const { data, error: invokeError } = await supabase.functions.invoke<{
       tokenHash?: string;
+      verificationType?: EmailOtpType;
       error?: string;
     }>('kakao-login', { body: { accessToken } });
 
-    if (invokeError || !data?.tokenHash) {
+    if (invokeError || !data?.tokenHash || !data.verificationType) {
+      console.error('[kakao] edge function failed', invokeError, data);
       return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
     }
 
     const { error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: data.tokenHash,
-      type: 'magiclink',
+      type: data.verificationType,
     });
 
     if (verifyError) {
+      console.error('[kakao] verifyOtp failed', verifyError);
       return { error: '카카오 로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
     }
 
