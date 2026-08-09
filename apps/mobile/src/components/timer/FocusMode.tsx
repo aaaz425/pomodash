@@ -4,11 +4,14 @@ import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { ThemeSchemeOverride } from '@/hooks/use-theme-scheme';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { MESSAGE_ROTATE_INTERVAL_MS, MOTIVATIONAL_MESSAGES } from '@/constants/messages';
+import { formatSessionEndSummary } from '@/lib/sessionUtils';
 import { TimerRing } from './TimerRing';
 import { CycleIndicator } from './CycleIndicator';
 
@@ -21,9 +24,10 @@ export function FocusMode() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const endSession = useTimerStore((s) => s.endSession);
-  const { cycleCount, mode } = useTimer();
+  const settings = useTimerStore((s) => s.settings);
+  const { cycleCount, elapsedMinutes, mode } = useTimer();
   const { task, category } = useCurrentTask();
+  const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
 
   const message = useRotatingMessage(
     MOTIVATIONAL_MESSAGES,
@@ -113,7 +117,7 @@ export function FocusMode() {
             </Pressable>
 
             <Pressable
-              onPress={endSession}
+              onPress={requestEnd}
               style={[styles.outlineButton, { borderColor: theme.border }]}
             >
               <Square size={14} color={theme.mutedForeground} fill={theme.mutedForeground} />
@@ -129,6 +133,20 @@ export function FocusMode() {
           </View>
         </View>
       </ThemeSchemeOverride>
+
+      <ConfirmModal
+        visible={showEndConfirm}
+        title="세션을 종료할까요?"
+        description={formatSessionEndSummary(
+          mode,
+          elapsedMinutes,
+          cycleCount,
+          settings.totalCycles,
+        )}
+        confirmLabel="세션 종료"
+        onConfirm={confirmEnd}
+        onCancel={cancelEnd}
+      />
     </Modal>
   );
 }

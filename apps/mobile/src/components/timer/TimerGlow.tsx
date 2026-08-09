@@ -28,11 +28,13 @@ export function TimerGlow({ phase, isNeutral }: Props) {
       opacity.value = withTiming(0.3, { duration: 300 });
       return;
     }
-    // 웹의 timer-glow-pulse(5s ease-in-out infinite, 50%↔100%)에 대응 —
-    // filter: brightness()는 RN에 없어 opacity 애니메이션만으로 근사
+    // 웹의 timer-glow-pulse(5s ease-in-out infinite, 50%↔100% + brightness(2))에 대응 —
+    // RN은 filter: brightness()가 없어 opacity만으로 근사하는데, 그대로 1.0까지 올리면
+    // 글로우가 정확히 시간/뱃지 텍스트 뒤에서 밝아져 폰 화면에서 텍스트 가독성을 해친다.
+    // 웹보다 낮은 상한(0.65)으로 억제해 텍스트 대비를 확보한다.
     opacity.value = 0.5;
     opacity.value = withRepeat(
-      withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+      withTiming(0.65, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
       -1,
       true,
     );
