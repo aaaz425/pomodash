@@ -6,16 +6,18 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { TimerControls } from '@/components/timer/TimerControls';
 import { FocusMode } from '@/components/timer/FocusMode';
 import { SessionCompleteSheet } from '@/components/timer/SessionCompleteSheet';
+import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialog';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { ThemeSchemeOverride } from '@/hooks/use-theme-scheme';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 
-export default function TimerScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+// 웹처럼 시스템 설정과 무관하게 항상 dark 테마를 강제한다 (PHASE_BADGE 등
+// 타이머 관련 상수가 dark 배경 기준으로만 튜닝돼 있어 라이트 테마에서 가독성이 떨어짐)
+const theme = THEME.dark;
 
+export default function TimerScreen() {
   const { task, category } = useCurrentTask();
 
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
@@ -29,73 +31,79 @@ export default function TimerScreen() {
   ];
 
   return (
-    <View style={[styles.root, { backgroundColor: theme.background }]}>
-      <SafeAreaView style={styles.safeArea}>
-        {/* 현재 작업 */}
-        {task ? (
-          <View style={styles.taskRowFilled}>
-            {category && <CategoryBadge category={category} />}
-            <Text
-              style={[
-                styles.taskTitle,
-                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              {task.title}
-            </Text>
-          </View>
-        ) : (
-          <Text
-            style={[
-              styles.taskRow,
-              { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
-            ]}
-          >
-            선택된 작업이 없습니다
-          </Text>
-        )}
-
-        <TimerRing />
-
-        <CycleIndicator />
-
-        <View
-          style={[styles.settingsPill, { borderColor: theme.border, backgroundColor: theme.card }]}
-        >
-          {settingsPills.map(({ value, label }, i) => (
-            <View
-              key={label}
-              style={[
-                styles.settingsCell,
-                i > 0 && { borderLeftWidth: 1, borderLeftColor: theme.border },
-              ]}
-            >
+    <ThemeSchemeOverride scheme="dark">
+      <View style={[styles.root, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+          {/* 현재 작업 */}
+          {task ? (
+            <View style={styles.taskRowFilled}>
+              {category && <CategoryBadge category={category} />}
               <Text
                 style={[
-                  styles.settingsValue,
-                  { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-                ]}
-              >
-                {value}
-              </Text>
-              <Text
-                style={[
-                  styles.settingsLabel,
+                  styles.taskTitle,
                   { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
                 ]}
               >
-                {label}
+                {task.title}
               </Text>
             </View>
-          ))}
-        </View>
+          ) : (
+            <Text
+              style={[
+                styles.taskRow,
+                { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
+              ]}
+            >
+              선택된 작업이 없습니다
+            </Text>
+          )}
 
-        <TimerControls />
-      </SafeAreaView>
+          <TimerRing />
 
-      <SessionCompleteSheet />
-      <FocusMode />
-    </View>
+          <CycleIndicator />
+
+          <View
+            style={[
+              styles.settingsPill,
+              { borderColor: theme.border, backgroundColor: theme.card },
+            ]}
+          >
+            {settingsPills.map(({ value, label }, i) => (
+              <View
+                key={label}
+                style={[
+                  styles.settingsCell,
+                  i > 0 && { borderLeftWidth: 1, borderLeftColor: theme.border },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.settingsValue,
+                    { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                  ]}
+                >
+                  {value}
+                </Text>
+                <Text
+                  style={[
+                    styles.settingsLabel,
+                    { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <TimerControls />
+        </SafeAreaView>
+
+        <SessionCompleteSheet />
+        <FocusMode />
+        <AbandonedSessionDialog />
+      </View>
+    </ThemeSchemeOverride>
   );
 }
 

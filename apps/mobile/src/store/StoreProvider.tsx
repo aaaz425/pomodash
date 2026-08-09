@@ -31,22 +31,33 @@ export function useSettingsStore<T>(selector: (state: SettingsStore) => T): T {
   return useStore(store, selector);
 }
 
+// 웹 store/StoreProvider.tsx의 useHydrated 대응 — Supabase 조회가 끝나기 전엔
+// 화면별 스켈레톤을 보여주기 위한 플래그
+const HydrationContext = createContext(false);
+
+export function useHydrated(): boolean {
+  return useContext(HydrationContext);
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [timerStore] = useState<TimerStoreApi>(createTimerStore);
   const [taskStore] = useState<TaskStoreApi>(createTaskStore);
   const [settingsStore] = useState<SettingsStoreApi>(createSettingsStore);
+  const [hydrated, setHydrated] = useState(false);
 
   // StoreProvider는 인증된 상태에서만 마운트되므로(app 그룹 레이아웃의 게이트) 여기선 바로 조회해도 안전.
   // 로그아웃 시엔 이 컴포넌트 자체가 언마운트되며 스토어도 함께 버려지므로 별도 reset은 불필요.
   useEffect(() => {
-    Promise.all([taskStore.getState().hydrate(), settingsStore.getState().hydrate()]);
+    Promise.all([taskStore.getState().hydrate(), settingsStore.getState().hydrate()]).finally(() =>
+      setHydrated(true),
+    );
   }, [taskStore, settingsStore]);
 
   return (
     <TimerStoreContext.Provider value={timerStore}>
       <TaskStoreContext.Provider value={taskStore}>
         <SettingsStoreContext.Provider value={settingsStore}>
-          {children}
+          <HydrationContext.Provider value={hydrated}>{children}</HydrationContext.Provider>
         </SettingsStoreContext.Provider>
       </TaskStoreContext.Provider>
     </TimerStoreContext.Provider>

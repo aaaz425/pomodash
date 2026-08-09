@@ -66,6 +66,7 @@ const config: ExpoConfig = {
     'expo-notifications',
     'expo-sharing',
     'expo-secure-store',
+    'expo-audio',
     [
       'expo-media-library',
       {

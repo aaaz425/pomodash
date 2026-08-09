@@ -13,6 +13,9 @@ interface Props {
   /** 생략하면 확인 버튼 1개짜리 안내 모달이 된다(예: 카테고리 삭제 차단 안내) */
   onCancel?: () => void;
   destructive?: boolean;
+  /** 3번째 선택지(예: 방치된 세션 "폐기") — 생략하면 버튼 2개 */
+  tertiaryLabel?: string;
+  onTertiary?: () => void;
 }
 
 // 웹의 중앙 정렬 ConfirmDialog.tsx 대응 — Modal.tsx(바텀시트)와 별개의 프리미티브.
@@ -26,6 +29,8 @@ export function ConfirmModal({
   onConfirm,
   onCancel,
   destructive = false,
+  tertiaryLabel,
+  onTertiary,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
@@ -58,6 +63,21 @@ export function ConfirmModal({
           </View>
 
           <View style={styles.actions}>
+            {tertiaryLabel && onTertiary && (
+              <Pressable
+                onPress={onTertiary}
+                style={[styles.button, styles.tertiaryButton, { borderColor: theme.border }]}
+              >
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                  ]}
+                >
+                  {tertiaryLabel}
+                </Text>
+              </Pressable>
+            )}
             {onCancel && (
               <Pressable
                 onPress={onCancel}
@@ -131,6 +151,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
+  },
+  tertiaryButton: {
+    marginRight: 'auto',
+    borderWidth: 1,
+    backgroundColor: 'transparent',
   },
   buttonText: {
     fontSize: 14,

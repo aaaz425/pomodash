@@ -6,6 +6,7 @@ import {
   SOUND_LIMITS,
 } from '@pomodash/shared';
 import { fetchSettings, saveSettings } from '@/lib/supabase/settings';
+import { toast } from '@/lib/toast';
 import type { AppSettings, SoundType } from '@/types/settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -58,7 +59,7 @@ export const createSettingsStore = () =>
       const { error } = await saveSettings(toAppSettings(get()));
       if (error) {
         set(previous);
-        console.warn('[settingsStore] 설정 저장 실패');
+        toast('설정 저장에 실패했어요. 다시 시도해주세요');
       }
     }
 
@@ -139,6 +140,7 @@ export const createSettingsStore = () =>
       hydrate: async () => {
         const settings = await fetchSettings();
         if (settings) set(settings);
+        else toast('설정을 불러오지 못했어요. 다시 시도해주세요');
       },
     };
   });

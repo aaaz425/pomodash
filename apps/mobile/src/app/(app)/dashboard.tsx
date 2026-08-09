@@ -22,8 +22,9 @@ import {
   getTotalFocusSeconds,
   type TabType,
 } from '@pomodash/shared';
-import { useTaskStore } from '@/store/StoreProvider';
+import { useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { MonthlyActivityCard } from '@/components/dashboard/MonthlyActivityCard';
@@ -64,6 +65,7 @@ const SESSION_LABELS: Record<TabType, string> = {
 export default function DashboardScreen() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+  const hydrated = useHydrated();
 
   const [tab, setTab] = useState<TabType>('week');
   const [shareOpen, setShareOpen] = useState(false);
@@ -120,84 +122,90 @@ export default function DashboardScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <View>
-              <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
-                통계
-              </Text>
-              <Text
-                style={[
-                  styles.subtitle,
-                  { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                ]}
-              >
-                집중의 흐름을 한눈에
-              </Text>
-            </View>
-            <View style={styles.controlsRow}>
-              <Pressable
-                style={[styles.shareButton, { borderColor: theme.border }]}
-                onPress={() => setShareOpen(true)}
-                hitSlop={8}
-              >
-                <Share2 size={16} color={theme.foreground} />
-              </Pressable>
-              <View style={styles.tabsWrap}>
-                <DashboardTabs value={tab} onChange={setTab} />
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        {!hydrated ? (
+          <DashboardSkeleton />
+        ) : (
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.header}>
+              <View>
+                <Text
+                  style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansBold }]}
+                >
+                  통계
+                </Text>
+                <Text
+                  style={[
+                    styles.subtitle,
+                    { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                  ]}
+                >
+                  집중의 흐름을 한눈에
+                </Text>
+              </View>
+              <View style={styles.controlsRow}>
+                <Pressable
+                  style={[styles.shareButton, { borderColor: theme.border }]}
+                  onPress={() => setShareOpen(true)}
+                  hitSlop={8}
+                >
+                  <Share2 size={16} color={theme.foreground} />
+                </Pressable>
+                <View style={styles.tabsWrap}>
+                  <DashboardTabs value={tab} onChange={setTab} />
+                </View>
               </View>
             </View>
-          </View>
 
-          <View style={styles.statGrid}>
-            <StatCard
-              label={focusLabel}
-              Icon={Timer}
-              value={totalFocusSeconds === 0 ? '0분' : formatDuration(totalFocusSeconds)}
-              sub={focusSub}
+            <View style={styles.statGrid}>
+              <StatCard
+                label={focusLabel}
+                Icon={Timer}
+                value={totalFocusSeconds === 0 ? '0분' : formatDuration(totalFocusSeconds)}
+                sub={focusSub}
+              />
+              <StatCard
+                label={sessionLabel}
+                Icon={CircleCheck}
+                value={`${sessionCount}세션`}
+                sub={sessionCountSub}
+              />
+              <StatCard
+                label="연속 집중일"
+                Icon={Flame}
+                value={`${streakDays}일`}
+                sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
+              />
+              <StatCard
+                label="세션 평균"
+                Icon={ChartColumn}
+                value={avgSessionSeconds === 0 ? '-' : formatDuration(avgSessionSeconds)}
+                sub="세션당 평균 시간"
+              />
+            </View>
+
+            <FocusChart
+              sessions={filtered}
+              tasks={tasks}
+              categories={categories}
+              tab={tab}
+              focusLabel={focusLabel}
             />
-            <StatCard
-              label={sessionLabel}
-              Icon={CircleCheck}
-              value={`${sessionCount}세션`}
-              sub={sessionCountSub}
+
+            <MonthlyActivityCard
+              monthlyActivity={monthlyActivity}
+              monthFocusSeconds={monthFocusSeconds}
+              maxStreakDays={maxStreakDays}
+              busiestDay={busiestDay}
             />
-            <StatCard
-              label="연속 집중일"
-              Icon={Flame}
-              value={`${streakDays}일`}
-              sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
-            />
-            <StatCard
-              label="세션 평균"
-              Icon={ChartColumn}
-              value={avgSessionSeconds === 0 ? '-' : formatDuration(avgSessionSeconds)}
-              sub="세션당 평균 시간"
-            />
-          </View>
 
-          <FocusChart
-            sessions={filtered}
-            tasks={tasks}
-            categories={categories}
-            tab={tab}
-            focusLabel={focusLabel}
-          />
+            <CategoryChart sessions={filtered} tasks={tasks} categories={categories} />
 
-          <MonthlyActivityCard
-            monthlyActivity={monthlyActivity}
-            monthFocusSeconds={monthFocusSeconds}
-            maxStreakDays={maxStreakDays}
-            busiestDay={busiestDay}
-          />
+            <HourlyChart sessions={filtered} />
 
-          <CategoryChart sessions={filtered} tasks={tasks} categories={categories} />
-
-          <HourlyChart sessions={filtered} />
-
-          <BadgeGallery sessions={sessions} tasks={tasks} />
-        </ScrollView>
+            <BadgeGallery sessions={sessions} tasks={tasks} />
+          </ScrollView>
+        )}
       </SafeAreaView>
 
       {shareOpen && <ShareCardModal data={shareCardData} onClose={() => setShareOpen(false)} />}
