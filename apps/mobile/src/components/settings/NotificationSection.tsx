@@ -1,18 +1,14 @@
-import { StyleSheet, Switch, Text, View } from 'react-native';
-import { Bell, Volume2 } from 'lucide-react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Bell, Pause, Play, Volume2 } from 'lucide-react-native';
 import { SOUND_LIMITS, type SoundType } from '@pomodash/shared';
 import { useSettingsStore } from '@/store/StoreProvider';
-import { SegmentedControl } from '@/components/shared/SegmentedControl';
+import { SoundTypeSelect } from '@/components/settings/SoundTypeSelect';
 import { StepperInput } from '@/components/shared/StepperInput';
-import { SOUND_TYPE_LABELS } from '@/constants/soundTypes';
 import { requestNotificationPermissionAsync } from '@/lib/notifications';
+import { useSoundPreview } from '@/hooks/useSoundPreview';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-
-const SOUND_TYPE_OPTIONS: { value: SoundType; label: string }[] = (
-  Object.keys(SOUND_TYPE_LABELS) as SoundType[]
-).map((value) => ({ value, label: SOUND_TYPE_LABELS[value] }));
 
 export function NotificationSection() {
   const scheme = useThemeScheme();
@@ -29,12 +25,28 @@ export function NotificationSection() {
   const setSoundVolume = useSettingsStore((s) => s.setSoundVolume);
   const setSoundRepeatCount = useSettingsStore((s) => s.setSoundRepeatCount);
 
+  const {
+    isPlaying,
+    toggle: togglePreview,
+    stop: stopPreview,
+  } = useSoundPreview(soundType, soundVolume, soundRepeatCount);
+
   async function handlePushNotificationChange(enabled: boolean) {
     if (enabled) {
       const granted = await requestNotificationPermissionAsync();
       if (!granted) return;
     }
     void setBrowserNotification(enabled);
+  }
+
+  function handleSoundAlertToggle(enabled: boolean) {
+    if (!enabled && isPlaying) stopPreview();
+    void setSoundAlert(enabled);
+  }
+
+  function handleSoundTypeChange(type: SoundType) {
+    if (isPlaying && type !== soundType) stopPreview();
+    setSoundType(type);
   }
 
   return (
@@ -87,7 +99,7 @@ export function NotificationSection() {
         </View>
         <Switch
           value={soundAlert}
-          onValueChange={(v) => void setSoundAlert(v)}
+          onValueChange={handleSoundAlertToggle}
           trackColor={{ true: theme.primary }}
           style={styles.switch}
         />
@@ -103,12 +115,24 @@ export function NotificationSection() {
           >
             소리 종류
           </Text>
-          <View style={styles.segmentedWrap}>
-            <SegmentedControl
-              options={SOUND_TYPE_OPTIONS}
+          <View style={styles.soundTypeControls}>
+            <SoundTypeSelect
               value={soundType}
-              onChange={setSoundType}
+              onChange={handleSoundTypeChange}
+              disabled={!soundAlert}
             />
+            <Pressable
+              onPress={togglePreview}
+              disabled={!soundAlert}
+              hitSlop={8}
+              style={styles.previewButton}
+            >
+              {isPlaying ? (
+                <Pause size={14} color={theme.mutedForeground} fill={theme.mutedForeground} />
+              ) : (
+                <Play size={14} color={theme.mutedForeground} fill={theme.mutedForeground} />
+              )}
+            </Pressable>
           </View>
         </View>
 
@@ -192,7 +216,16 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 13,
   },
-  segmentedWrap: {
-    flex: 1,
+  soundTypeControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  previewButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

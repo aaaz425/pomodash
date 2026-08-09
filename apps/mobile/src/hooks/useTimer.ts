@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { deriveTimerDisplay } from '@pomodash/shared';
-import { useTimerStore } from '@/store/StoreProvider';
+import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import {
   scheduleTimerCompleteNotification,
   cancelScheduledNotification,
 } from '@/lib/notifications';
+import { playAlarm } from '@/lib/sound';
 
 export function useTimer() {
   const startedAt = useTimerStore((s) => s.startedAt);
@@ -17,6 +18,10 @@ export function useTimer() {
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
   const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
   const complete = useTimerStore((s) => s.complete);
+  const soundAlert = useSettingsStore((s) => s.soundAlert);
+  const soundType = useSettingsStore((s) => s.soundType);
+  const soundVolume = useSettingsStore((s) => s.soundVolume);
+  const soundRepeatCount = useSettingsStore((s) => s.soundRepeatCount);
 
   // 같은 완료 이벤트에서 complete()가 중복 호출되지 않도록 방지
   const notifiedRef = useRef(false);
@@ -44,11 +49,14 @@ export function useTimer() {
         : phase === 'focus'
           ? '잠깐 쉬어가세요.'
           : '다시 집중할 시간이에요.';
-      scheduleTimerCompleteNotification({ title, body, secondsFromNow: remainingSeconds }).then(
-        (id) => {
-          scheduledId = id;
-        },
-      );
+      scheduleTimerCompleteNotification({
+        title,
+        body,
+        secondsFromNow: remainingSeconds,
+        sound: soundAlert,
+      }).then((id) => {
+        scheduledId = id;
+      });
     }
 
     const tick = () => {
@@ -68,6 +76,13 @@ export function useTimer() {
       if (result.justCompleted && !notifiedRef.current) {
         notifiedRef.current = true;
         complete();
+        if (soundAlert) {
+          void playAlarm({
+            type: soundType,
+            volume: soundVolume,
+            repeatCount: soundRepeatCount,
+          });
+        }
       }
     };
 
@@ -96,6 +111,10 @@ export function useTimer() {
     cycleCount,
     focusMinutes,
     totalCycles,
+    soundAlert,
+    soundType,
+    soundVolume,
+    soundRepeatCount,
   ]);
 
   // 정지 중엔 store 값 직접 사용
