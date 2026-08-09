@@ -1,6 +1,7 @@
 import { createStore } from 'zustand';
 import { CATEGORY_LIMITS, type FocusRating } from '@pomodash/shared';
 import { generateId } from '@/lib/generateId';
+import { toast } from '@/lib/toast';
 import {
   fetchTasks,
   insertTask as insertTaskRow,
@@ -122,7 +123,7 @@ export const createTaskStore = () =>
 
       if (!inserted) {
         set({ tasks: previousTasks });
-        console.warn('[taskStore] addTask 실패');
+        toast('작업 추가에 실패했어요. 다시 시도해주세요');
         return null;
       }
 
@@ -141,7 +142,7 @@ export const createTaskStore = () =>
       const { error } = await updateTaskRow(id, { completed });
       if (error) {
         set({ tasks: previousTasks });
-        console.warn('[taskStore] toggleTask 실패');
+        toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
@@ -157,7 +158,7 @@ export const createTaskStore = () =>
       const { error } = await updateTaskRow(id, { ...patch, title });
       if (error) {
         set({ tasks: previousTasks });
-        console.warn('[taskStore] updateTask 실패');
+        toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
@@ -168,7 +169,7 @@ export const createTaskStore = () =>
       const { error } = await deleteTaskRow(id);
       if (error) {
         set({ tasks: previousTasks });
-        console.warn('[taskStore] deleteTask 실패');
+        toast('작업 삭제에 실패했어요. 다시 시도해주세요');
       }
     },
 
@@ -179,7 +180,7 @@ export const createTaskStore = () =>
       const { error } = await reorderTasksRows(next.map((t) => t.id));
       if (error) {
         set({ tasks: previousTasks });
-        console.warn('[taskStore] reorderTasks 실패');
+        toast('순서 저장에 실패했어요');
       }
     },
 
@@ -194,7 +195,7 @@ export const createTaskStore = () =>
       const inserted = await insertCategoryRow({ name: trimmed, color });
       if (!inserted) {
         set({ categories: previousCategories });
-        console.warn('[taskStore] addCategory 실패');
+        toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
         return;
       }
       const finalCategories = optimisticCategories.map((c) => (c.id === tempId ? inserted : c));
@@ -214,7 +215,7 @@ export const createTaskStore = () =>
       const { error } = await updateCategoryRow(id, { name: trimmed, color });
       if (error) {
         set({ categories: previousCategories });
-        console.warn('[taskStore] updateCategory 실패');
+        toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
@@ -231,7 +232,7 @@ export const createTaskStore = () =>
       const { error, blocked } = await deleteCategoryRow(id);
       if (error) {
         set({ categories: previousCategories });
-        console.warn('[taskStore] deleteCategory 실패');
+        toast('카테고리 삭제에 실패했어요. 다시 시도해주세요');
       }
       return { blocked };
     },
@@ -243,7 +244,7 @@ export const createTaskStore = () =>
       const { error } = await reorderCategoriesRows(next.map((c) => c.id));
       if (error) {
         set({ categories: previousCategories });
-        console.warn('[taskStore] reorderCategories 실패');
+        toast('순서 저장에 실패했어요');
       }
     },
 
@@ -255,7 +256,7 @@ export const createTaskStore = () =>
       const inserted = await insertSessionRow(input);
       if (!inserted) {
         set({ sessions: previousSessions });
-        console.warn('[taskStore] addSession 실패');
+        toast('세션 저장에 실패했어요');
         return;
       }
       set({ sessions: [inserted, ...previousSessions] });
@@ -271,7 +272,7 @@ export const createTaskStore = () =>
       const { error } = await updateSessionRow(id, { note: trimmedNote });
       if (error) {
         set({ sessions: previousSessions });
-        console.warn('[taskStore] updateSessionNote 실패');
+        toast('메모 저장에 실패했어요');
       }
     },
 
@@ -284,7 +285,7 @@ export const createTaskStore = () =>
       const { error } = await updateSessionRow(id, { focusRating: rating });
       if (error) {
         set({ sessions: previousSessions });
-        console.warn('[taskStore] updateSessionRating 실패');
+        toast('평점 저장에 실패했어요');
       }
     },
 
@@ -297,7 +298,7 @@ export const createTaskStore = () =>
       const { error } = await updateSessionRow(id, { distractionTags: tags });
       if (error) {
         set({ sessions: previousSessions });
-        console.warn('[taskStore] updateSessionTags 실패');
+        toast('태그 저장에 실패했어요');
       }
     },
 
@@ -308,7 +309,7 @@ export const createTaskStore = () =>
       const { error } = await deleteSessionRow(id);
       if (error) {
         set({ sessions: previousSessions });
-        console.warn('[taskStore] deleteSession 실패');
+        toast('세션 삭제에 실패했어요');
       }
     },
 
@@ -318,6 +319,9 @@ export const createTaskStore = () =>
         fetchCategories(),
         fetchSessions(),
       ]);
+      if (tasks === null || categories === null || sessions === null) {
+        toast('데이터를 불러오지 못했어요. 다시 시도해주세요');
+      }
       set({
         tasks: tasks ?? [],
         categories: categories ?? DEFAULT_CATEGORIES,
