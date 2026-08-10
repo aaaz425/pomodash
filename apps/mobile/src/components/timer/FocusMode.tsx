@@ -1,4 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play, Square, X } from 'lucide-react-native';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
@@ -28,6 +29,7 @@ export function FocusMode() {
   const { cycleCount, elapsedMinutes, mode } = useTimer();
   const { task, category } = useCurrentTask();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
+  const insets = useSafeAreaInsets();
 
   const message = useRotatingMessage(
     MOTIVATIONAL_MESSAGES,
@@ -39,7 +41,7 @@ export function FocusMode() {
     <Modal visible={isFocusMode} animationType="fade" onRequestClose={exitFocusMode}>
       <ThemeSchemeOverride scheme="dark">
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-          <Pressable onPress={exitFocusMode} style={styles.exitButton}>
+          <Pressable onPress={exitFocusMode} style={[styles.exitButton, { top: insets.top + 12 }]}>
             <X size={14} color={theme.mutedForeground} />
             <Text
               style={[
@@ -76,7 +78,10 @@ export function FocusMode() {
               <Text
                 style={[
                   styles.taskTitle,
-                  { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansSemiBold },
+                  {
+                    color: withAlpha(theme.mutedForeground, 0.5),
+                    fontFamily: FONTS.sansSemiBold,
+                  },
                 ]}
               >
                 작업 없음
@@ -132,21 +137,24 @@ export function FocusMode() {
             </Pressable>
           </View>
         </View>
-      </ThemeSchemeOverride>
 
-      <ConfirmModal
-        visible={showEndConfirm}
-        title="세션을 종료할까요?"
-        description={formatSessionEndSummary(
-          mode,
-          elapsedMinutes,
-          cycleCount,
-          settings.totalCycles,
-        )}
-        confirmLabel="세션 종료"
-        onConfirm={confirmEnd}
-        onCancel={cancelEnd}
-      />
+        {/* 바깥 자체가 이미 Modal이라 여기서 또 RN Modal을 중첩하면 세션 종료로 둘 다
+              동시에 닫힐 때 iOS에서 화면이 검게 남거나 안 뜨는 문제가 있어 inline으로 렌더링 */}
+        <ConfirmModal
+          inline
+          visible={showEndConfirm}
+          title="세션을 종료할까요?"
+          description={formatSessionEndSummary(
+            mode,
+            elapsedMinutes,
+            cycleCount,
+            settings.totalCycles,
+          )}
+          confirmLabel="세션 종료"
+          onConfirm={confirmEnd}
+          onCancel={cancelEnd}
+        />
+      </ThemeSchemeOverride>
     </Modal>
   );
 }

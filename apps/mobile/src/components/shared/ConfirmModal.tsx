@@ -16,6 +16,12 @@ interface Props {
   /** 3번째 선택지(예: 방치된 세션 "폐기") — 생략하면 버튼 2개 */
   tertiaryLabel?: string;
   onTertiary?: () => void;
+  /**
+   * true면 RN Modal로 감싸지 않고 절대 위치 오버레이로 렌더링한다 — 이미 다른 Modal
+   * 안에서 뜨는 경우(예: FocusMode) Modal을 중첩하면 iOS에서 두 Modal이 동시에
+   * 닫힐 때 화면이 검게 남거나 안 뜨는 문제가 있어서 그 경우에만 사용.
+   */
+  inline?: boolean;
 }
 
 // 웹의 중앙 정렬 ConfirmDialog.tsx 대응 — Modal.tsx(바텀시트)와 별개의 프리미티브.
@@ -31,9 +37,83 @@ export function ConfirmModal({
   destructive = false,
   tertiaryLabel,
   onTertiary,
+  inline = false,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+
+  const content = (
+    <View style={styles.backdrop}>
+      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View style={styles.textGroup}>
+          <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
+            {title}
+          </Text>
+          {description && (
+            <Text
+              style={[
+                styles.description,
+                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+              ]}
+            >
+              {description}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.actions}>
+          {tertiaryLabel && onTertiary && (
+            <Pressable
+              onPress={onTertiary}
+              style={[styles.button, styles.tertiaryButton, { borderColor: theme.border }]}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                {tertiaryLabel}
+              </Text>
+            </Pressable>
+          )}
+          {onCancel && (
+            <Pressable onPress={onCancel} style={[styles.button, { backgroundColor: theme.muted }]}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                {cancelLabel}
+              </Text>
+            </Pressable>
+          )}
+          <Pressable
+            onPress={onConfirm}
+            style={[
+              styles.button,
+              { backgroundColor: destructive ? theme.destructive : theme.primary },
+            ]}
+          >
+            <Text
+              style={[
+                styles.buttonText,
+                { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+              ]}
+            >
+              {confirmLabel}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+
+  if (inline) {
+    if (!visible) return null;
+    return <View style={StyleSheet.absoluteFill}>{content}</View>;
+  }
 
   return (
     <RNModal
@@ -42,76 +122,7 @@ export function ConfirmModal({
       transparent
       onRequestClose={onCancel ?? onConfirm}
     >
-      <View style={styles.backdrop}>
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <View style={styles.textGroup}>
-            <Text
-              style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}
-            >
-              {title}
-            </Text>
-            {description && (
-              <Text
-                style={[
-                  styles.description,
-                  { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                ]}
-              >
-                {description}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.actions}>
-            {tertiaryLabel && onTertiary && (
-              <Pressable
-                onPress={onTertiary}
-                style={[styles.button, styles.tertiaryButton, { borderColor: theme.border }]}
-              >
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                  ]}
-                >
-                  {tertiaryLabel}
-                </Text>
-              </Pressable>
-            )}
-            {onCancel && (
-              <Pressable
-                onPress={onCancel}
-                style={[styles.button, { backgroundColor: theme.muted }]}
-              >
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-                  ]}
-                >
-                  {cancelLabel}
-                </Text>
-              </Pressable>
-            )}
-            <Pressable
-              onPress={onConfirm}
-              style={[
-                styles.button,
-                { backgroundColor: destructive ? theme.destructive : theme.primary },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-                ]}
-              >
-                {confirmLabel}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
+      {content}
     </RNModal>
   );
 }
