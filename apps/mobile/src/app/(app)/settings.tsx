@@ -67,7 +67,7 @@ export default function SettingsScreen() {
   function goTo(next: CategoryKey | null) {
     if (next === activeCategory) return;
     setActiveCategory(next);
-    const exitDirection = next === null ? 1 : -1;
+    const exitDirection = next === null ? -1 : 1;
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 0,
