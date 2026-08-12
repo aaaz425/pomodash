@@ -133,7 +133,13 @@ export async function updatePassword(formData: FormData): Promise<AuthActionResu
     return { error: '비밀번호 변경에 실패했어요. 다시 시도해주세요' };
   }
 
-  redirect('/');
+  // /reset-password(이메일 링크로 진입하는 단독 페이지)는 성공 시 홈으로 리다이렉트하지만,
+  // 설정 다이얼로그에서 호출할 땐 리다이렉트 없이 다이얼로그만 닫아야 해서 hidden 필드로 분기한다.
+  if (formData.get('redirectOnSuccess') === '1') {
+    redirect('/');
+  }
+
+  return { success: true };
 }
 
 export async function loginWithKakao(formData: FormData): Promise<void> {

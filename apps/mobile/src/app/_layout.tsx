@@ -7,6 +7,7 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { AuthProvider, useAuth } from '@/store/AuthProvider';
+import { ThemeModeProvider } from '@/hooks/use-theme-scheme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -47,11 +48,13 @@ export default function RootLayout() {
           깜빡이는 문제가 있었음(실측 확인). initialWindowMetrics(네이티브 부트스트랩 시점
           스냅샷)로 한 번 더 감싸서 첫 렌더부터 정확한 값이 잡히게 한다. */}
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <AuthProvider>
-            <RootContent />
-          </AuthProvider>
-        </ThemeProvider>
+        <ThemeModeProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <AuthProvider>
+              <RootContent />
+            </AuthProvider>
+          </ThemeProvider>
+        </ThemeModeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

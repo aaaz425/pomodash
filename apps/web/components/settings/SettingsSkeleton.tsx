@@ -1,18 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-function SettingCardSkeleton({ contentClassName }: { contentClassName: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-card">
-      <div className="px-6 py-4 border-b border-border">
-        <Skeleton className="h-4 w-16" />
-      </div>
-      <div className={`p-6 ${contentClassName}`}>
-        <Skeleton className="h-4 w-full" />
-      </div>
-    </div>
-  );
-}
-
 function MenuRowSkeleton() {
   return (
     <div className="flex w-full items-center justify-between gap-3 px-4 py-3.5">
@@ -36,12 +23,7 @@ export function SettingsSkeleton() {
         <Skeleton className="h-4 w-48" />
       </header>
 
-      <SettingCardSkeleton contentClassName="h-10" />
-      <SettingCardSkeleton contentClassName="h-10" />
-      <SettingCardSkeleton contentClassName="h-20" />
-
       <div className="rounded-xl border border-border bg-card divide-y divide-border">
-        <MenuRowSkeleton />
         <MenuRowSkeleton />
         <MenuRowSkeleton />
         <MenuRowSkeleton />
