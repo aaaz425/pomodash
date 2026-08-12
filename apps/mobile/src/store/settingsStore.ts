@@ -7,6 +7,7 @@ import {
 } from '@pomodash/shared';
 import { fetchSettings, saveSettings } from '@/lib/supabase/settings';
 import { toast } from '@/lib/toast';
+import { withRetry } from '@/lib/retry';
 import type { AppSettings, SoundType } from '@/types/settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -138,7 +139,7 @@ export const createSettingsStore = () =>
       },
 
       hydrate: async () => {
-        const settings = await fetchSettings();
+        const settings = await withRetry(fetchSettings);
         if (settings) set(settings);
         else toast('설정을 불러오지 못했어요. 다시 시도해주세요');
       },
