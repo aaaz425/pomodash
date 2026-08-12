@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Bell, ListChecks, ListTodo, Sparkles, Timer } from 'lucide-react';
+import { deleteAccountConfirmed } from '@/lib/supabase/actions';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
@@ -32,12 +34,14 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
 }
 
 interface Props {
-  user: { email: string | null } | null;
+  user: { email: string | null; provider: string | null } | null;
 }
 
 export function SettingsView({ user }: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
+  const searchParams = useSearchParams();
+  const deletingRef = useRef(false);
 
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
   const taskCount = useTaskStore((s) => s.tasks.length);
@@ -45,6 +49,14 @@ export function SettingsView({ user }: Props) {
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const soundAlert = useSettingsStore((s) => s.soundAlert);
+
+  // 카카오 재인증(회원탈퇴 확인)을 마치고 돌아온 경우 — 재인증 라운드트립 자체가 본인 확인이므로
+  // 추가 확인 없이 탈퇴를 마무리한다. 성공 시 서버 액션이 /landing으로 리다이렉트한다.
+  useEffect(() => {
+    if (searchParams.get('confirmDelete') !== '1' || deletingRef.current) return;
+    deletingRef.current = true;
+    void deleteAccountConfirmed();
+  }, [searchParams]);
 
   if (!hydrated) return showSkeleton ? <SettingsSkeleton /> : null;
 

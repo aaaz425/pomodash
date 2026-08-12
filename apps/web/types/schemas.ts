@@ -131,6 +131,22 @@ export const SignupCredentialsSchema = z
     path: ['passwordConfirm'],
   });
 
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
+});
+
+export const NewPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(AUTH_LIMITS.PASSWORD_MIN_LENGTH, { message: '비밀번호는 8자 이상이어야 해요' }),
+    passwordConfirm: z.string(),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: '비밀번호가 일치하지 않아요',
+    path: ['passwordConfirm'],
+  });
+
 export const CategoriesSchema = z.array(CategorySchema).max(INPUT_LIMITS.CATEGORIES_MAX);
 export const TasksSchema = z.array(TaskSchema);
 export const SessionsSchema = z.array(SessionSchema);

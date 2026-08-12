@@ -58,6 +58,19 @@ export default function LoginScreen() {
           onChangeText={setPassword}
         />
 
+        <Link href="/forgot-password" asChild>
+          <Pressable style={styles.forgotPassword}>
+            <Text
+              style={[
+                styles.forgotPasswordText,
+                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+              ]}
+            >
+              비밀번호를 잊으셨나요?
+            </Text>
+          </Pressable>
+        </Link>
+
         {error && (
           <Text style={[styles.error, { color: theme.destructive, fontFamily: FONTS.sansRegular }]}>
             {error}
@@ -113,6 +126,13 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: -8,
+  },
+  forgotPasswordText: {
+    fontSize: 12,
   },
   submit: {
     alignItems: 'center',
