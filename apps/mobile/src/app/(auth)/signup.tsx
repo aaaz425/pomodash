@@ -6,8 +6,8 @@ import { AUTH_LIMITS } from '@pomodash/shared';
 import { useAuth } from '@/store/AuthProvider';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { AuthDivider } from '@/components/auth/AuthDivider';
+import { AuthConsentNotice } from '@/components/auth/AuthConsentNotice';
 import { KakaoButton } from '@/components/auth/KakaoButton';
-import { PrivacyLink } from '@/components/auth/PrivacyLink';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
 import { THEME, withAlpha } from '@/constants/timerColors';
@@ -61,7 +61,7 @@ export default function SignupScreen() {
                 { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
               ]}
             >
-              {email}로 인증 메일을 보냈어요.{'\n'}메일함(스팸함 포함)을 확인해주세요.
+              {email}로 인증 메일을 보냈어요.{'\n'}메일함(스팸함 포함)에서 링크를 눌러주세요.
             </Text>
           </View>
           <Link href="/login" asChild>
@@ -150,7 +150,7 @@ export default function SignupScreen() {
 
       <AuthDivider />
       <KakaoButton onError={setError} />
-      <PrivacyLink />
+      <AuthConsentNotice />
     </AuthShell>
   );
 }

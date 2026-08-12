@@ -10,8 +10,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: new LargeSecureStore(),
     autoRefreshToken: true,
     persistSession: true,
-    // RN엔 window.location이 없어 웹처럼 URL에서 세션을 읽을 수 없음 — 딥링크 콜백이 없는
-    // 이번 브랜치 범위(이메일/비밀번호만)에서는 애초에 불필요
+    // RN엔 window.location이 없어 SDK가 URL을 자동으로 못 읽는다 — 이메일 인증 딥링크는
+    // app/auth/confirm.tsx에서 code 파라미터를 직접 꺼내 exchangeCodeForSession()으로 처리한다
     detectSessionInUrl: false,
   },
 });
