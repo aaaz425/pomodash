@@ -31,9 +31,16 @@ interface Props {
   selectedTaskId?: string | null;
   onSelect?: (id: string) => void;
   listClassName?: string;
+  emptyStateClassName?: string;
 }
 
-export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName }: Props) {
+export function TaskList({
+  mode,
+  selectedTaskId = null,
+  onSelect,
+  listClassName,
+  emptyStateClassName = 'py-10',
+}: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
   const tasks = useTaskStore((s) => s.tasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
@@ -79,7 +86,7 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, listClassName 
         <EmptyState
           message="아직 작업이 없어요"
           subMessage="아래에서 작업을 추가해보세요"
-          className="py-10"
+          className={emptyStateClassName}
         />
       ) : (
         <DndContext

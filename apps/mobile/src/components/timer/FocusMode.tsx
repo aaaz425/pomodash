@@ -6,7 +6,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
-import { ThemeSchemeOverride } from '@/hooks/use-theme-scheme';
+import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { THEME, withAlpha } from '@/constants/timerColors';
@@ -16,10 +16,9 @@ import { formatSessionEndSummary } from '@/lib/sessionUtils';
 import { TimerRing } from './TimerRing';
 import { CycleIndicator } from './CycleIndicator';
 
-// 웹처럼 시스템 설정과 무관하게 항상 dark 테마를 강제한다
-const theme = THEME.dark;
-
 export function FocusMode() {
+  const scheme = useThemeScheme();
+  const theme = THEME[scheme];
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const start = useTimerStore((s) => s.start);
@@ -39,7 +38,7 @@ export function FocusMode() {
 
   return (
     <Modal visible={isFocusMode} animationType="fade" onRequestClose={exitFocusMode}>
-      <ThemeSchemeOverride scheme="dark">
+      <>
         <View style={[styles.container, { backgroundColor: theme.background }]}>
           <Pressable onPress={exitFocusMode} style={[styles.exitButton, { top: insets.top + 12 }]}>
             <X size={14} color={theme.mutedForeground} />
@@ -154,7 +153,7 @@ export function FocusMode() {
           onConfirm={confirmEnd}
           onCancel={cancelEnd}
         />
-      </ThemeSchemeOverride>
+      </>
     </Modal>
   );
 }

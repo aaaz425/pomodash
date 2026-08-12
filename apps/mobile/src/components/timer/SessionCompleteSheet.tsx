@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { normalizeFocusPeriods } from '@pomodash/shared';
 import type { FocusRating } from '@pomodash/shared';
@@ -109,51 +109,57 @@ export function SessionCompleteSheet() {
             >
               <SafeAreaView edges={['bottom']}>
                 <ScrollView
-                  contentContainerStyle={styles.scrollContent}
+                  contentContainerStyle={styles.scrollOuter}
                   keyboardShouldPersistTaps="handled"
                 >
-                  <SessionCompleteHeader />
+                  {/* 입력창 바깥(비어있는 영역)을 탭하면 키보드를 내려 blur를 유도한다 —
+                      RN ScrollView는 keyboardShouldPersistTaps="handled"만으로는 자식이
+                      처리하지 않은 빈 영역 탭에서도 blur가 안정적으로 발동하지 않는다. */}
+                  <Pressable style={styles.scrollContent} onPress={() => Keyboard.dismiss()}>
+                    <View style={styles.headerGroup}>
+                      <SessionCompleteHeader />
+                      <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                    </View>
 
-                  <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                    <SessionTaskSummary
+                      isTaskSession={isTaskSession}
+                      task={task}
+                      category={category}
+                      selectedTaskId={selectedTaskId}
+                      onSelectTask={setSelectedTaskId}
+                    />
 
-                  <SessionTaskSummary
-                    isTaskSession={isTaskSession}
-                    task={task}
-                    category={category}
-                    selectedTaskId={selectedTaskId}
-                    onSelectTask={setSelectedTaskId}
-                  />
+                    <View style={styles.field}>
+                      <Text
+                        style={[
+                          styles.sectionLabel,
+                          { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                        ]}
+                      >
+                        집중도 (선택)
+                      </Text>
+                      <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
+                    </View>
 
-                  <View style={styles.field}>
-                    <Text
-                      style={[
-                        styles.sectionLabel,
-                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                      ]}
-                    >
-                      이번 세션 집중도는 어땠나요? (선택)
-                    </Text>
-                    <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
-                  </View>
+                    <View style={styles.field}>
+                      <Text
+                        style={[
+                          styles.sectionLabel,
+                          { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                        ]}
+                      >
+                        방해요소 (선택)
+                      </Text>
+                      <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
+                    </View>
 
-                  <View style={styles.field}>
-                    <Text
-                      style={[
-                        styles.sectionLabel,
-                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                      ]}
-                    >
-                      집중을 방해한 게 있었다면 선택해주세요 (선택)
-                    </Text>
-                    <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
-                  </View>
+                    <SessionMemoField value={note} onChange={setNote} />
 
-                  <SessionMemoField value={note} onChange={setNote} />
-
-                  <SessionActionButtons
-                    onSkip={() => setPendingAction('skip')}
-                    onSave={() => setPendingAction('save')}
-                  />
+                    <SessionActionButtons
+                      onSkip={() => setPendingAction('skip')}
+                      onSave={() => setPendingAction('save')}
+                    />
+                  </Pressable>
                 </ScrollView>
               </SafeAreaView>
             </View>
@@ -210,9 +216,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     maxHeight: '85%',
   },
-  scrollContent: {
+  scrollOuter: {
     padding: 20,
+  },
+  scrollContent: {
     gap: 20,
+  },
+  headerGroup: {
+    gap: 10,
   },
   divider: {
     height: 1,

@@ -8,18 +8,6 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 // 웹 STORAGE_KEYS.theme와 이름만 맞춤(예외적으로 접두사 없음) — 스토리지 자체는 별개(AsyncStorage)
 const THEME_STORAGE_KEY = 'theme';
 
-// FocusMode는 웹처럼 시스템/사용자 설정과 무관하게 항상 dark를 강제해야 하므로,
-// 컴포넌트가 useColorScheme()을 직접 부르는 대신 이 override를 거치게 한다.
-const ThemeSchemeOverrideContext = createContext<Scheme | null>(null);
-
-export function ThemeSchemeOverride({ scheme, children }: { scheme: Scheme; children: ReactNode }) {
-  return (
-    <ThemeSchemeOverrideContext.Provider value={scheme}>
-      {children}
-    </ThemeSchemeOverrideContext.Provider>
-  );
-}
-
 interface ThemeModeContextValue {
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
@@ -55,10 +43,8 @@ export function useThemeMode(): ThemeModeContextValue {
 }
 
 export function useThemeScheme(): Scheme {
-  const override = useContext(ThemeSchemeOverrideContext);
   const system = useColorScheme();
   const modeCtx = useContext(ThemeModeContext);
   const mode = modeCtx?.mode ?? 'system';
-  const resolved = mode === 'system' ? (system === 'dark' ? 'dark' : 'light') : mode;
-  return override ?? resolved;
+  return mode === 'system' ? (system === 'dark' ? 'dark' : 'light') : mode;
 }

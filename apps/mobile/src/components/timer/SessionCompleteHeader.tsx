@@ -18,11 +18,6 @@ export function SessionCompleteHeader() {
       <Text style={[styles.headline, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
         집중 완료!
       </Text>
-      <Text
-        style={[styles.subtext, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-      >
-        오늘도 집중 세션을 완료했어요
-      </Text>
     </View>
   );
 }
@@ -48,9 +43,5 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 26,
-  },
-  subtext: {
-    fontSize: 14,
-    marginTop: -4,
   },
 });

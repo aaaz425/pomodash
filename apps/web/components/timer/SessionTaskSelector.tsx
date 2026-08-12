@@ -21,6 +21,7 @@ export function SessionTaskSelector({ selectedTaskId, onSelect }: Props) {
         selectedTaskId={selectedTaskId}
         onSelect={onSelect}
         listClassName="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto"
+        emptyStateClassName="py-3"
       />
 
       <p className="text-[11px] text-muted-foreground/60">선택하지 않으면 미분류로 저장됩니다</p>

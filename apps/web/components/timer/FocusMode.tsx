@@ -64,7 +64,7 @@ export function FocusMode() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="dark fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-background px-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-background px-4"
         >
           {/* Exit Button */}
           <button

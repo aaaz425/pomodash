@@ -10,14 +10,12 @@ import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialo
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { ThemeSchemeOverride } from '@/hooks/use-theme-scheme';
+import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 
-// 웹처럼 시스템 설정과 무관하게 항상 dark 테마를 강제한다 (PHASE_BADGE 등
-// 타이머 관련 상수가 dark 배경 기준으로만 튜닝돼 있어 라이트 테마에서 가독성이 떨어짐)
-const theme = THEME.dark;
-
 export default function TimerScreen() {
+  const scheme = useThemeScheme();
+  const theme = THEME[scheme];
   const { task, category } = useCurrentTask();
 
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
@@ -31,7 +29,7 @@ export default function TimerScreen() {
   ];
 
   return (
-    <ThemeSchemeOverride scheme="dark">
+    <>
       <View style={[styles.root, { backgroundColor: theme.background }]}>
         <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
           {/* 현재 작업 */}
@@ -103,7 +101,7 @@ export default function TimerScreen() {
         <FocusMode />
         <AbandonedSessionDialog />
       </View>
-    </ThemeSchemeOverride>
+    </>
   );
 }
 

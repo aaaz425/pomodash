@@ -23,7 +23,13 @@ export function SessionTaskSelector({ selectedTaskId, onSelect }: Props) {
         <SessionProgressBadge />
       </View>
 
-      <TaskList mode="select" selectedTaskId={selectedTaskId} onSelect={onSelect} maxHeight={180} />
+      <TaskList
+        mode="select"
+        selectedTaskId={selectedTaskId}
+        onSelect={onSelect}
+        maxHeight={180}
+        emptyStatePaddingVertical={12}
+      />
 
       <Text
         style={[
