@@ -15,6 +15,9 @@ export function LandingFooter() {
           <a href="#achievement" className="hover:text-foreground transition-colors">
             성장 확인
           </a>
+          <Link href="/terms" className="hover:text-foreground transition-colors">
+            이용약관
+          </Link>
           <Link href="/privacy" className="hover:text-foreground transition-colors">
             개인정보처리방침
           </Link>

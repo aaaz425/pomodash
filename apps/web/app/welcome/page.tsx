@@ -26,7 +26,7 @@ export default async function WelcomePage() {
           <CheckCircle2 className="w-7 h-7 text-primary" />
         </div>
         <div className="flex flex-col gap-1">
-          <h1 className="text-lg font-semibold text-foreground">이메일 인증이 완료됐어요</h1>
+          <h1 className="text-lg font-semibold text-foreground">가입이 완료됐어요</h1>
           <p className="text-sm text-muted-foreground">
             환영해요! 이제 Pomodash를 시작할 수 있어요.
           </p>

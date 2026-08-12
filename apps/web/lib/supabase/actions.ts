@@ -2,10 +2,25 @@
 
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { isValidRedirectTarget } from '@/lib/supabase/redirect';
 import { LoginCredentialsSchema, SignupCredentialsSchema } from '@/types/schemas';
 import type { AuthActionResult } from '@/types';
+
+// signUp()이 "이미 가입된 이메일" 응답을 줄 때 보안상 기존 계정의 메타데이터를 안 채워주기 때문에,
+// Edge Function(service_role)으로 직접 조회해야 카카오 가입 여부를 알 수 있다.
+async function getExistingProvider(
+  supabase: SupabaseClient,
+  email: string,
+): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke<{
+    exists: boolean;
+    provider: string | null;
+  }>('check-email-provider', { body: { email } });
+  if (error || !data?.exists) return null;
+  return data.provider;
+}
 
 export async function login(formData: FormData): Promise<AuthActionResult> {
   const parsed = LoginCredentialsSchema.safeParse({
@@ -27,6 +42,10 @@ export async function login(formData: FormData): Promise<AuthActionResult> {
       return { error: '잠시 후 다시 시도해주세요' };
     }
     if (error.message === 'Invalid login credentials') {
+      const provider = await getExistingProvider(supabase, parsed.data.email);
+      if (provider === 'kakao') {
+        return { error: '카카오로 가입됐어요. 카카오 로그인을 이용해주세요' };
+      }
       return { error: '이메일 또는 비밀번호가 올바르지 않습니다' };
     }
     return { error: '로그인에 실패했어요. 잠시 후 다시 시도해주세요' };
@@ -63,6 +82,10 @@ export async function signup(formData: FormData): Promise<AuthActionResult> {
 
   // 이미 가입+인증된 이메일이면 Supabase는 에러 없이 identities가 빈 배열인 응답을 준다
   if (data.user && data.user.identities?.length === 0) {
+    const provider = await getExistingProvider(supabase, parsed.data.email);
+    if (provider === 'kakao') {
+      return { error: '카카오로 가입됐어요. 카카오 로그인을 이용해주세요' };
+    }
     return { error: '이미 가입된 이메일이에요. 로그인해주세요' };
   }
 

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/supabase/server';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { AuthDivider } from '@/components/auth/AuthDivider';
+import { AuthConsentNotice } from '@/components/auth/AuthConsentNotice';
 import { KakaoButton } from '@/components/auth/KakaoButton';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { siteConfig } from '@/config/site';
@@ -23,6 +24,7 @@ export default async function SignupPage() {
       <SignupForm />
       <AuthDivider />
       <KakaoButton />
+      <AuthConsentNotice />
     </AuthShell>
   );
 }

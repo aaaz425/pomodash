@@ -2,6 +2,7 @@ import { createStore } from 'zustand';
 import { CATEGORY_LIMITS, type FocusRating } from '@pomodash/shared';
 import { generateId } from '@/lib/generateId';
 import { toast } from '@/lib/toast';
+import { withRetry } from '@/lib/retry';
 import {
   fetchTasks,
   insertTask as insertTaskRow,
@@ -315,9 +316,9 @@ export const createTaskStore = () =>
 
     hydrate: async () => {
       const [tasks, categories, sessions] = await Promise.all([
-        fetchTasks(),
-        fetchCategories(),
-        fetchSessions(),
+        withRetry(fetchTasks),
+        withRetry(fetchCategories),
+        withRetry(fetchSessions),
       ]);
       if (tasks === null || categories === null || sessions === null) {
         toast('데이터를 불러오지 못했어요. 다시 시도해주세요');

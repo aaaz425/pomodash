@@ -20,6 +20,21 @@ export function AboutSection() {
       >
         앱 소개 보기 →
       </Link>
+
+      <div className="flex gap-4">
+        <Link
+          href="/terms"
+          className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+        >
+          이용약관
+        </Link>
+        <Link
+          href="/privacy"
+          className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+        >
+          개인정보처리방침
+        </Link>
+      </div>
     </div>
   );
 }
