@@ -6,6 +6,7 @@ import { useSettingsStore, useTaskStore, useHydrated } from '@/store/StoreProvid
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { ProfileSection } from '@/components/settings/ProfileSection';
+import { PasswordChangeSection } from '@/components/settings/PasswordChangeSection';
 import { DeleteAccountModal } from '@/components/settings/DeleteAccountModal';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
 import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
@@ -101,6 +102,10 @@ export default function SettingsScreen() {
                 로그아웃
               </Text>
             </Pressable>
+
+            <View style={styles.profileWrap}>
+              <PasswordChangeSection />
+            </View>
 
             <Pressable onPress={() => setShowDeleteAccount(true)} style={styles.deleteAccountRow}>
               <Text

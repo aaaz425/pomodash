@@ -7,6 +7,7 @@ import { logout, deleteAccountWithPassword, loginWithKakao } from '@/lib/supabas
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordField } from '@/components/auth/PasswordField';
+import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
 import { cn } from '@/lib/utils';
 import { STORAGE_KEYS } from '@/types';
 import type { AuthActionResult } from '@/types';
@@ -18,6 +19,7 @@ interface Props {
 export function AccountSection({ user }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [state, formAction, pending] = useActionState<AuthActionResult, FormData>(
     (_prev, formData) => deleteAccountWithPassword(formData),
     {},
@@ -57,56 +59,76 @@ export function AccountSection({ user }: Props) {
         </form>
       </div>
 
-      {!verifying ? (
+      <div className="flex items-center gap-4">
         <button
           type="button"
-          onClick={() => setConfirmOpen(true)}
-          className="self-start text-xs text-destructive hover:underline"
+          onClick={() => setShowPasswordChange((v) => !v)}
+          className="text-xs text-muted-foreground hover:underline"
         >
-          회원탈퇴
+          {isKakao ? '비밀번호 설정' : '비밀번호 변경'}
         </button>
-      ) : isKakao ? (
-        <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
-          <p className="text-sm text-muted-foreground">
-            카카오 계정 확인이 필요해요. 카카오로 다시 인증하면 탈퇴가 진행돼요.
-          </p>
-          <div className="flex gap-2">
-            <form action={loginWithKakao}>
-              <input type="hidden" name="redirectTo" value="/settings?confirmDelete=1" />
-              <Button type="submit" variant="destructive" size="sm">
-                카카오로 확인하고 탈퇴
-              </Button>
-            </form>
-            <Button type="button" variant="outline" size="sm" onClick={() => setVerifying(false)}>
-              취소
-            </Button>
-          </div>
+        {!verifying && (
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            className="text-xs text-destructive hover:underline"
+          >
+            회원탈퇴
+          </button>
+        )}
+      </div>
+
+      {showPasswordChange && (
+        <div className="rounded-lg border border-border p-4">
+          <ResetPasswordForm />
         </div>
-      ) : (
-        <form
-          action={formAction}
-          className="flex flex-col gap-3 rounded-lg border border-border p-4"
-        >
-          <p className="text-sm text-muted-foreground">본인 확인을 위해 비밀번호를 입력해주세요.</p>
-          <PasswordField
-            id="delete-account-password"
-            name="password"
-            label="비밀번호"
-            autoComplete="current-password"
-            required
-            disabled={pending}
-          />
-          {state.error && <p className="text-sm text-destructive">{state.error}</p>}
-          <div className="flex gap-2">
-            <Button type="submit" variant="destructive" size="sm" disabled={pending}>
-              {pending ? '탈퇴 중...' : '탈퇴하기'}
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={() => setVerifying(false)}>
-              취소
-            </Button>
-          </div>
-        </form>
       )}
+
+      {verifying &&
+        (isKakao ? (
+          <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+            <p className="text-sm text-muted-foreground">
+              카카오 계정 확인이 필요해요. 카카오로 다시 인증하면 탈퇴가 진행돼요.
+            </p>
+            <div className="flex gap-2">
+              <form action={loginWithKakao}>
+                <input type="hidden" name="redirectTo" value="/settings?confirmDelete=1" />
+                <Button type="submit" variant="destructive" size="sm">
+                  카카오로 확인하고 탈퇴
+                </Button>
+              </form>
+              <Button type="button" variant="outline" size="sm" onClick={() => setVerifying(false)}>
+                취소
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <form
+            action={formAction}
+            className="flex flex-col gap-3 rounded-lg border border-border p-4"
+          >
+            <p className="text-sm text-muted-foreground">
+              본인 확인을 위해 비밀번호를 입력해주세요.
+            </p>
+            <PasswordField
+              id="delete-account-password"
+              name="password"
+              label="비밀번호"
+              autoComplete="current-password"
+              required
+              disabled={pending}
+            />
+            {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+            <div className="flex gap-2">
+              <Button type="submit" variant="destructive" size="sm" disabled={pending}>
+                {pending ? '탈퇴 중...' : '탈퇴하기'}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setVerifying(false)}>
+                취소
+              </Button>
+            </div>
+          </form>
+        ))}
 
       <ConfirmDialog
         open={confirmOpen}

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { login as kakaoLogin } from '@react-native-seoul/kakao-login';
+import { AUTH_LIMITS } from '@pomodash/shared';
 import { supabase } from '@/lib/supabase/client';
 import {
   LoginCredentialsSchema,
@@ -21,6 +22,7 @@ interface AuthContextValue {
   loginWithKakao: () => Promise<AuthActionResult>;
   signup: (email: string, password: string, passwordConfirm: string) => Promise<AuthActionResult>;
   requestPasswordReset: (email: string) => Promise<AuthActionResult>;
+  updatePassword: (password: string) => Promise<AuthActionResult>;
   deleteAccount: (password?: string) => Promise<AuthActionResult>;
   logout: () => Promise<void>;
 }
@@ -180,6 +182,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { pendingConfirmation: true };
   }
 
+  async function updatePassword(password: string): Promise<AuthActionResult> {
+    if (password.length < AUTH_LIMITS.PASSWORD_MIN_LENGTH) {
+      return { error: `비밀번호는 ${AUTH_LIMITS.PASSWORD_MIN_LENGTH}자 이상이어야 해요` };
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      return { error: '비밀번호 변경에 실패했어요. 다시 시도해주세요' };
+    }
+
+    return {};
+  }
+
   async function deleteAccount(password?: string): Promise<AuthActionResult> {
     const { data, error } = await supabase.functions.invoke<{ error?: string }>('delete-account', {
       body: password ? { password } : {},
@@ -205,6 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithKakao,
     signup,
     requestPasswordReset,
+    updatePassword,
     deleteAccount,
     logout,
   };
