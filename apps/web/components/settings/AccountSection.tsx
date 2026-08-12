@@ -7,7 +7,7 @@ import { logout, deleteAccountWithPassword, loginWithKakao } from '@/lib/supabas
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
+import { PasswordChangeDialog } from '@/components/settings/PasswordChangeDialog';
 import { cn } from '@/lib/utils';
 import { STORAGE_KEYS } from '@/types';
 import type { AuthActionResult } from '@/types';
@@ -19,7 +19,7 @@ interface Props {
 export function AccountSection({ user }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [state, formAction, pending] = useActionState<AuthActionResult, FormData>(
     (_prev, formData) => deleteAccountWithPassword(formData),
     {},
@@ -62,7 +62,7 @@ export function AccountSection({ user }: Props) {
       <div className="flex items-center gap-4">
         <button
           type="button"
-          onClick={() => setShowPasswordChange((v) => !v)}
+          onClick={() => setShowPasswordDialog(true)}
           className="text-xs text-muted-foreground hover:underline"
         >
           {isKakao ? '비밀번호 설정' : '비밀번호 변경'}
@@ -77,12 +77,6 @@ export function AccountSection({ user }: Props) {
           </button>
         )}
       </div>
-
-      {showPasswordChange && (
-        <div className="rounded-lg border border-border p-4">
-          <ResetPasswordForm />
-        </div>
-      )}
 
       {verifying &&
         (isKakao ? (
@@ -141,6 +135,13 @@ export function AccountSection({ user }: Props) {
         }}
         onCancel={() => setConfirmOpen(false)}
       />
+
+      {showPasswordDialog && (
+        <PasswordChangeDialog
+          title={isKakao ? '비밀번호 설정' : '비밀번호 변경'}
+          onClose={() => setShowPasswordDialog(false)}
+        />
+      )}
     </div>
   );
 }

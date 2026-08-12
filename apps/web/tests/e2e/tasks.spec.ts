@@ -25,6 +25,7 @@ async function deleteTask(page: Page, taskModal: Locator, name: string) {
 test.describe('작업 관리', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
+    await page.getByRole('button', { name: '환경설정' }).click();
   });
 
   test('작업 생성', async ({ page }) => {
@@ -60,6 +61,7 @@ test.describe('작업 관리', () => {
 
     // 정리 — 다음 테스트와 이름이 겹치지 않도록 생성한 작업을 삭제
     await page.goto('/settings');
+    await page.getByRole('button', { name: '환경설정' }).click();
     await page.getByRole('button', { name: '작업 관리' }).click();
     await deleteTask(page, taskModal, taskName);
   });

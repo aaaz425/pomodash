@@ -20,37 +20,31 @@ function MenuRowSkeleton() {
 export function SettingsSkeleton() {
   return (
     <View style={styles.container}>
-      <View style={styles.profileRow}>
-        <Skeleton width={48} height={48} borderRadius={24} />
-        <View style={styles.profileText}>
-          <Skeleton width={100} height={16} />
-          <Skeleton width={140} height={12} />
-        </View>
+      <View style={styles.header}>
+        <Skeleton width={60} height={20} />
+        <Skeleton width={160} height={13} />
       </View>
 
-      <MenuRowSkeleton />
-      <MenuRowSkeleton />
-      <MenuRowSkeleton />
-      <MenuRowSkeleton />
-      <MenuRowSkeleton />
+      <View style={styles.rowGroup}>
+        <MenuRowSkeleton />
+        <MenuRowSkeleton />
+        <MenuRowSkeleton />
+        <MenuRowSkeleton />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
+    padding: 16,
+    gap: 16,
+  },
+  header: {
     gap: 4,
   },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingBottom: 16,
-  },
-  profileText: {
-    gap: 6,
+  rowGroup: {
+    gap: 4,
   },
   row: {
     flexDirection: 'row',

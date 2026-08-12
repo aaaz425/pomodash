@@ -3,24 +3,44 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Bell, ListChecks, ListTodo, Sparkles, Timer } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Bell,
+  ChevronLeft,
+  Info,
+  ListChecks,
+  ListTodo,
+  Sparkles,
+  SlidersHorizontal,
+  Timer,
+  User,
+  type LucideIcon,
+} from 'lucide-react';
 import { deleteAccountConfirmed } from '@/lib/supabase/actions';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { InstallSection } from '@/components/settings/InstallSection';
 import { AboutSection } from '@/components/settings/AboutSection';
+import { NotificationSection } from '@/components/settings/notification/NotificationSection';
 import { TimerDefaultsModal } from '@/components/settings/timer-defaults/TimerDefaultsModal';
 import { CategoryModal } from '@/components/settings/category/CategoryModal';
 import { TaskManageModal } from '@/components/settings/task/TaskManageModal';
 import { MotivationalModal } from '@/components/settings/motivational/MotivationalModal';
-import { NotificationModal } from '@/components/settings/notification/NotificationModal';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 
-type MenuKey = 'timer' | 'task' | 'category' | 'motivational' | 'notification';
+type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
+type MenuKey = 'timer' | 'task' | 'category' | 'motivational';
+
+const CATEGORIES: { key: CategoryKey; label: string; Icon: LucideIcon }[] = [
+  { key: 'account', label: '계정', Icon: User },
+  { key: 'presets', label: '환경설정', Icon: SlidersHorizontal },
+  { key: 'notifications', label: '알림', Icon: Bell },
+  { key: 'about', label: '앱 정보', Icon: Info },
+];
 
 function SettingCard({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -39,6 +59,7 @@ interface Props {
 
 export function SettingsView({ user }: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
+  const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const searchParams = useSearchParams();
   const deletingRef = useRef(false);
@@ -60,73 +81,132 @@ export function SettingsView({ user }: Props) {
 
   if (!hydrated) return showSkeleton ? <SettingsSkeleton /> : null;
 
+  const activeLabel = CATEGORIES.find((c) => c.key === activeCategory)?.label;
+
   return (
     <>
-      <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6 overflow-hidden">
         <header>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
           <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
         </header>
 
-        <SettingCard title="계정">
-          <AccountSection user={user} />
-        </SettingCard>
+        <AnimatePresence mode="wait">
+          {activeCategory === null ? (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="rounded-xl border border-border bg-card divide-y divide-border"
+            >
+              {CATEGORIES.map(({ key, label, Icon }) => (
+                <SettingsMenuRow
+                  key={key}
+                  Icon={Icon}
+                  label={label}
+                  value={
+                    key === 'account'
+                      ? (user?.email ?? '카카오 계정')
+                      : key === 'notifications'
+                        ? browserNotification || soundAlert
+                          ? '켜짐'
+                          : '꺼짐'
+                        : ''
+                  }
+                  onClick={() => setActiveCategory(key)}
+                />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="detail"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 16 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="flex flex-col gap-6"
+            >
+              <button
+                type="button"
+                onClick={() => setActiveCategory(null)}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground w-fit"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {activeLabel}
+              </button>
 
-        <SettingCard title="프로필">
-          <ProfileSection />
-        </SettingCard>
+              {activeCategory === 'account' && (
+                <SettingCard title="계정">
+                  <div className="flex flex-col gap-4">
+                    <ProfileSection />
+                    <div className="border-t border-border pt-4">
+                      <AccountSection user={user} />
+                    </div>
+                  </div>
+                </SettingCard>
+              )}
 
-        <SettingCard title="테마">
-          <ThemeSection />
-        </SettingCard>
+              {activeCategory === 'presets' && (
+                <div className="flex flex-col gap-6">
+                  <SettingCard title="테마">
+                    <ThemeSection />
+                  </SettingCard>
+                  <div className="rounded-xl border border-border bg-card divide-y divide-border">
+                    <SettingsMenuRow
+                      Icon={Timer}
+                      label="타이머 기본값"
+                      value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
+                      onClick={() => setOpenMenu('timer')}
+                    />
+                    <SettingsMenuRow
+                      Icon={ListChecks}
+                      label="작업 관리"
+                      value={`${taskCount}개`}
+                      onClick={() => setOpenMenu('task')}
+                    />
+                    <SettingsMenuRow
+                      Icon={ListTodo}
+                      label="카테고리 관리"
+                      value={`${categoryCount}개`}
+                      onClick={() => setOpenMenu('category')}
+                    />
+                    <SettingsMenuRow
+                      Icon={Sparkles}
+                      label="동기부여 메시지"
+                      value={`${motivationalCount}개`}
+                      onClick={() => setOpenMenu('motivational')}
+                    />
+                  </div>
+                </div>
+              )}
 
-        <div className="rounded-xl border border-border bg-card divide-y divide-border">
-          <SettingsMenuRow
-            Icon={Timer}
-            label="타이머 기본값"
-            value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
-            onClick={() => setOpenMenu('timer')}
-          />
-          <SettingsMenuRow
-            Icon={ListChecks}
-            label="작업 관리"
-            value={`${taskCount}개`}
-            onClick={() => setOpenMenu('task')}
-          />
-          <SettingsMenuRow
-            Icon={ListTodo}
-            label="카테고리 관리"
-            value={`${categoryCount}개`}
-            onClick={() => setOpenMenu('category')}
-          />
-          <SettingsMenuRow
-            Icon={Sparkles}
-            label="동기부여 메시지"
-            value={`${motivationalCount}개`}
-            onClick={() => setOpenMenu('motivational')}
-          />
-          <SettingsMenuRow
-            Icon={Bell}
-            label="알림"
-            value={browserNotification || soundAlert ? '켜짐' : '꺼짐'}
-            onClick={() => setOpenMenu('notification')}
-          />
-        </div>
+              {activeCategory === 'notifications' && (
+                <SettingCard title="알림">
+                  <NotificationSection />
+                </SettingCard>
+              )}
 
-        <SettingCard title="앱 설치">
-          <InstallSection />
-        </SettingCard>
-
-        <SettingCard title="앱 정보">
-          <AboutSection />
-        </SettingCard>
+              {activeCategory === 'about' && (
+                <div className="flex flex-col gap-6">
+                  <SettingCard title="앱 설치">
+                    <InstallSection />
+                  </SettingCard>
+                  <SettingCard title="앱 정보">
+                    <AboutSection />
+                  </SettingCard>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {openMenu === 'timer' && <TimerDefaultsModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'task' && <TaskManageModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'category' && <CategoryModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'motivational' && <MotivationalModal onClose={() => setOpenMenu(null)} />}
-      {openMenu === 'notification' && <NotificationModal onClose={() => setOpenMenu(null)} />}
     </>
   );
 }

@@ -112,4 +112,5 @@ export type { AppSettings } from '@pomodash/shared';
 export interface AuthActionResult {
   error?: string;
   pendingConfirmation?: true;
+  success?: true;
 }
