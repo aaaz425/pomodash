@@ -4,6 +4,7 @@ import { uniqueName } from './testUtils';
 test.describe('설정', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
+    await page.getByRole('button', { name: '환경설정' }).click();
   });
 
   test('카테고리 추가 → 수정 → 삭제', async ({ page }) => {
