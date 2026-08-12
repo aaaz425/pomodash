@@ -41,5 +41,5 @@ export const SessionSchema = z.object({
   focusPeriods: z.array(FocusPeriodSchema),
   note: z.string().max(INPUT_LIMITS.NOTE_MAX_LENGTH).nullable(),
   focusRating: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullable(),
-  distractionTags: z.array(z.string()),
+  distractionTags: z.array(z.string().max(INPUT_LIMITS.DISTRACTION_TAG_MAX_LENGTH)),
 });

@@ -6,14 +6,15 @@ import { useThemeScheme } from '@/hooks/use-theme-scheme';
 interface Props {
   message: string;
   subMessage?: string;
+  paddingVertical?: number;
 }
 
-export function EmptyState({ message, subMessage }: Props) {
+export function EmptyState({ message, subMessage, paddingVertical = 40 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingVertical }]}>
       <Text
         style={[styles.message, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
       >
@@ -38,7 +39,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 40,
   },
   message: {
     fontSize: 14,

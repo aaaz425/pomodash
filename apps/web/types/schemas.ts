@@ -50,7 +50,7 @@ export const SessionSchema = z.object({
     .union([z.literal(1), z.literal(2), z.literal(3)])
     .nullable()
     .default(null),
-  distractionTags: z.array(z.string()).default([]),
+  distractionTags: z.array(z.string().max(INPUT_LIMITS.DISTRACTION_TAG_MAX_LENGTH)).default([]),
 });
 
 // 향후 per-phase 집계용으로 예약, 현재 미사용

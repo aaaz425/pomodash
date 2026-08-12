@@ -17,9 +17,16 @@ interface Props {
   selectedTaskId?: string | null;
   onSelect?: (id: string) => void;
   maxHeight?: number;
+  emptyStatePaddingVertical?: number;
 }
 
-export function TaskList({ mode, selectedTaskId = null, onSelect, maxHeight }: Props) {
+export function TaskList({
+  mode,
+  selectedTaskId = null,
+  onSelect,
+  maxHeight,
+  emptyStatePaddingVertical,
+}: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
   const tasks = useTaskStore((s) => s.tasks);
@@ -60,7 +67,11 @@ export function TaskList({ mode, selectedTaskId = null, onSelect, maxHeight }: P
   return (
     <View>
       {visibleTasks.length === 0 ? (
-        <EmptyState message="아직 작업이 없어요" subMessage="아래에서 작업을 추가해보세요" />
+        <EmptyState
+          message="아직 작업이 없어요"
+          subMessage="아래에서 작업을 추가해보세요"
+          paddingVertical={emptyStatePaddingVertical}
+        />
       ) : mode === 'manage' ? (
         <DraggableFlatList
           data={visibleTasks}

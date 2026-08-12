@@ -113,25 +113,24 @@ export function SessionRecordModal() {
           >
             <div className="flex flex-col gap-5 p-5 sm:gap-7 sm:p-10">
               {/* Header */}
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-full bg-primary/20">
-                  <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary">
-                    <Check
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground"
-                      strokeWidth={2.5}
-                    />
+              <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-full bg-primary/20">
+                    <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary">
+                      <Check
+                        className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground"
+                        strokeWidth={2.5}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-center gap-1.5 text-center">
-                  <h2 className="text-[26px] font-bold tracking-tight text-foreground">
+                  <h2 className="text-[26px] font-bold tracking-tight text-foreground text-center">
                     집중 완료!
                   </h2>
-                  <p className="text-sm text-muted-foreground">오늘도 집중 세션을 완료했어요</p>
                 </div>
-              </div>
 
-              {/* Divider */}
-              <div className="h-px bg-border" />
+                {/* Divider */}
+                <div className="h-px bg-border" />
+              </div>
 
               {/* Session Summary */}
               {isTaskSession ? (
@@ -155,7 +154,7 @@ export function SessionRecordModal() {
               {/* Focus Rating Section */}
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                  이번 세션 집중도는 어땠나요? (선택)
+                  집중도 (선택)
                 </span>
                 <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
               </div>
@@ -163,7 +162,7 @@ export function SessionRecordModal() {
               {/* Distraction Tags Section */}
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                  집중을 방해한 게 있었다면 선택해주세요 (선택)
+                  방해요소 (선택)
                 </span>
                 <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
               </div>
