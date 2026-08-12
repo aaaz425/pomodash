@@ -47,6 +47,13 @@ export function LoginForm() {
         disabled={pending}
       />
 
+      <Link
+        href="/forgot-password"
+        className="self-end text-xs text-muted-foreground hover:text-foreground -mt-2"
+      >
+        비밀번호를 잊으셨나요?
+      </Link>
+
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
 
       <Button

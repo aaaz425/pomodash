@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 // 화이트리스트 방식 — 여기 없는 경로는 전부 로그인 필요. 새 라우트를 깜빡하고
 // 게이팅 안 되는 사고를 막기 위해 "보호 경로 나열" 대신 "공개 경로만 나열"한다.
-const PUBLIC_PATHS = ['/landing', '/login', '/signup', '/privacy', '/terms'];
+const PUBLIC_PATHS = ['/landing', '/login', '/signup', '/privacy', '/terms', '/forgot-password'];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.includes(pathname) || pathname.startsWith('/auth/');

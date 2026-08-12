@@ -23,3 +23,7 @@ export const SignupCredentialsSchema = z
     message: '비밀번호가 일치하지 않아요',
     path: ['passwordConfirm'],
   });
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
+});

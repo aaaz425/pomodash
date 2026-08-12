@@ -6,6 +6,7 @@ import { useSettingsStore, useTaskStore, useHydrated } from '@/store/StoreProvid
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { ProfileSection } from '@/components/settings/ProfileSection';
+import { DeleteAccountModal } from '@/components/settings/DeleteAccountModal';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
 import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
 import { TaskModal } from '@/components/tasks/TaskModal';
@@ -34,6 +35,7 @@ export default function SettingsScreen() {
   const [showCategories, setShowCategories] = useState(false);
   const [showMotivational, setShowMotivational] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
@@ -99,6 +101,17 @@ export default function SettingsScreen() {
                 로그아웃
               </Text>
             </Pressable>
+
+            <Pressable onPress={() => setShowDeleteAccount(true)} style={styles.deleteAccountRow}>
+              <Text
+                style={[
+                  styles.deleteAccountLabel,
+                  { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                ]}
+              >
+                회원탈퇴
+              </Text>
+            </Pressable>
           </>
         )}
       </SafeAreaView>
@@ -108,6 +121,7 @@ export default function SettingsScreen() {
       <CategoryModal visible={showCategories} onClose={() => setShowCategories(false)} />
       <MotivationalModal visible={showMotivational} onClose={() => setShowMotivational(false)} />
       <NotificationModal visible={showNotification} onClose={() => setShowNotification(false)} />
+      <DeleteAccountModal visible={showDeleteAccount} onClose={() => setShowDeleteAccount(false)} />
     </View>
   );
 }
@@ -137,5 +151,12 @@ const styles = StyleSheet.create({
   },
   logoutLabel: {
     fontSize: 14,
+  },
+  deleteAccountRow: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  deleteAccountLabel: {
+    fontSize: 12,
   },
 });

@@ -5,7 +5,12 @@ import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { isValidRedirectTarget } from '@/lib/supabase/redirect';
-import { LoginCredentialsSchema, SignupCredentialsSchema } from '@/types/schemas';
+import {
+  LoginCredentialsSchema,
+  SignupCredentialsSchema,
+  ForgotPasswordSchema,
+  NewPasswordSchema,
+} from '@/types/schemas';
 import type { AuthActionResult } from '@/types';
 
 // signUp()이 "이미 가입된 이메일" 응답을 줄 때 보안상 기존 계정의 메타데이터를 안 채워주기 때문에,
@@ -92,6 +97,45 @@ export async function signup(formData: FormData): Promise<AuthActionResult> {
   return { pendingConfirmation: true };
 }
 
+export async function requestPasswordReset(formData: FormData): Promise<AuthActionResult> {
+  const parsed = ForgotPasswordSchema.safeParse({ email: formData.get('email') });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? '입력값을 확인해주세요' };
+  }
+
+  const origin = (await headers()).get('origin') ?? '';
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${origin}/auth/reset-confirm`,
+  });
+
+  if (error?.status === 429) {
+    return { error: '잠시 후 다시 시도해주세요' };
+  }
+
+  // 계정 존재 여부를 흘리지 않기 위해, 실패해도 성공과 동일하게 응답한다(Supabase 자체 동작과 동일)
+  return { pendingConfirmation: true };
+}
+
+export async function updatePassword(formData: FormData): Promise<AuthActionResult> {
+  const parsed = NewPasswordSchema.safeParse({
+    password: formData.get('password'),
+    passwordConfirm: formData.get('passwordConfirm'),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? '입력값을 확인해주세요' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+
+  if (error) {
+    return { error: '비밀번호 변경에 실패했어요. 다시 시도해주세요' };
+  }
+
+  redirect('/');
+}
+
 export async function loginWithKakao(formData: FormData): Promise<void> {
   const origin = (await headers()).get('origin') ?? '';
   const redirectTarget = formData.get('redirectTo');
@@ -114,4 +158,35 @@ export async function logout(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect('/login');
+}
+
+async function callDeleteAccount(
+  supabase: SupabaseClient,
+  body: { password?: string },
+): Promise<AuthActionResult> {
+  const { data, error } = await supabase.functions.invoke<{ error?: string }>('delete-account', {
+    body,
+  });
+
+  if (error || data?.error) {
+    return { error: data?.error ?? '탈퇴 처리에 실패했어요. 잠시 후 다시 시도해주세요' };
+  }
+
+  await supabase.auth.signOut();
+  redirect('/landing');
+}
+
+export async function deleteAccountWithPassword(formData: FormData): Promise<AuthActionResult> {
+  const password = formData.get('password');
+  if (typeof password !== 'string' || password.length === 0) {
+    return { error: '비밀번호를 입력해주세요' };
+  }
+
+  const supabase = await createClient();
+  return callDeleteAccount(supabase, { password });
+}
+
+export async function deleteAccountConfirmed(): Promise<AuthActionResult> {
+  const supabase = await createClient();
+  return callDeleteAccount(supabase, {});
 }

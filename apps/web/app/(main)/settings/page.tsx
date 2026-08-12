@@ -11,7 +11,16 @@ export default async function SettingsPage() {
 
   return (
     <main id="main-content" className="flex-1 overflow-y-auto">
-      <SettingsView user={user ? { email: user.email ?? null } : null} />
+      <SettingsView
+        user={
+          user
+            ? {
+                email: user.email ?? null,
+                provider: (user.user_metadata?.provider as string | undefined) ?? null,
+              }
+            : null
+        }
+      />
     </main>
   );
 }
