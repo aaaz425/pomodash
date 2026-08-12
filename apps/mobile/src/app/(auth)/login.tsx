@@ -5,7 +5,6 @@ import { useAuth } from '@/store/AuthProvider';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { AuthDivider } from '@/components/auth/AuthDivider';
 import { KakaoButton } from '@/components/auth/KakaoButton';
-import { PrivacyLink } from '@/components/auth/PrivacyLink';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
 import { THEME } from '@/constants/timerColors';
@@ -98,7 +97,6 @@ export default function LoginScreen() {
 
       <AuthDivider />
       <KakaoButton onError={setError} />
-      <PrivacyLink />
     </AuthShell>
   );
 }
