@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { deleteAccountConfirmed } from '@/lib/supabase/actions';
+import { createClient } from '@/lib/supabase/client';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeSection } from '@/components/settings/ThemeSection';
@@ -53,14 +54,14 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
   );
 }
 
-interface Props {
-  user: { email: string | null; provider: string | null } | null;
-}
+type SettingsUser = { email: string | null; provider: string | null } | null;
 
-export function SettingsView({ user }: Props) {
+export function SettingsView() {
   const { hydrated, showSkeleton } = useDelayedHydration();
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
+  const [user, setUser] = useState<SettingsUser>(null);
+  const [userLoaded, setUserLoaded] = useState(false);
   const searchParams = useSearchParams();
   const deletingRef = useRef(false);
 
@@ -71,6 +72,31 @@ export function SettingsView({ user }: Props) {
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const soundAlert = useSettingsStore((s) => s.soundAlert);
 
+  // 미들웨어가 이미 이 라우트 진입 시점에 세션을 검증하므로, 여기서는 서버 재검증(getUser) 없이
+  // 로컬 세션만 읽는다 — 페이지를 sync 서버 컴포넌트로 유지해 라우트 전환 애니메이션이
+  // settings/loading.tsx의 Suspense 스피너에 끊기지 않도록 하기 위함이기도 하다.
+  useEffect(() => {
+    let active = true;
+    createClient()
+      .auth.getSession()
+      .then(({ data }) => {
+        if (!active) return;
+        const sessionUser = data.session?.user;
+        setUser(
+          sessionUser
+            ? {
+                email: sessionUser.email ?? null,
+                provider: (sessionUser.user_metadata?.provider as string | undefined) ?? null,
+              }
+            : null,
+        );
+        setUserLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // 카카오 재인증(회원탈퇴 확인)을 마치고 돌아온 경우 — 재인증 라운드트립 자체가 본인 확인이므로
   // 추가 확인 없이 탈퇴를 마무리한다. 성공 시 서버 액션이 /landing으로 리다이렉트한다.
   useEffect(() => {
@@ -79,7 +105,7 @@ export function SettingsView({ user }: Props) {
     void deleteAccountConfirmed();
   }, [searchParams]);
 
-  if (!hydrated) return showSkeleton ? <SettingsSkeleton /> : null;
+  if (!hydrated || !userLoaded) return showSkeleton ? <SettingsSkeleton /> : null;
 
   const activeLabel = CATEGORIES.find((c) => c.key === activeCategory)?.label;
 
@@ -90,14 +116,14 @@ export function SettingsView({ user }: Props) {
           <h1 className="text-xl font-bold text-foreground">설정</h1>
         </header>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout" initial={false}>
           {activeCategory === null ? (
             <motion.div
               key="list"
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="rounded-xl border border-border bg-card divide-y divide-border"
             >
               {CATEGORIES.map(({ key, label, Icon }) => (
@@ -124,7 +150,7 @@ export function SettingsView({ user }: Props) {
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="flex flex-col gap-6"
             >
               <button
