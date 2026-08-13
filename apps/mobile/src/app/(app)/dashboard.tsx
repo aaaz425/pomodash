@@ -134,14 +134,6 @@ export default function DashboardScreen() {
                 >
                   통계
                 </Text>
-                <Text
-                  style={[
-                    styles.subtitle,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                  ]}
-                >
-                  집중의 흐름을 한눈에
-                </Text>
               </View>
               <View style={styles.controlsRow}>
                 <Pressable
@@ -229,10 +221,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-  },
-  subtitle: {
-    fontSize: 13,
-    marginTop: 2,
   },
   statGrid: {
     gap: 10,

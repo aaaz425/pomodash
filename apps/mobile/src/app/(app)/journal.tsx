@@ -38,14 +38,6 @@ export default function JournalScreen() {
                 >
                   기록
                 </Text>
-                <Text
-                  style={[
-                    styles.subtitle,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                  ]}
-                >
-                  한 번의 집중도 기억합니다
-                </Text>
               </View>
               {sessions.length > 0 && <JournalTabs value={activeTab} onChange={setActiveTab} />}
             </View>
@@ -94,9 +86,5 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-  },
-  subtitle: {
-    fontSize: 13,
-    marginTop: 2,
   },
 });

@@ -128,7 +128,6 @@ export function DashboardView() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground">통계</h1>
-          <p className="mt-1 text-sm text-muted-foreground">집중의 흐름을 한눈에</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
