@@ -9,9 +9,9 @@ import {
   ChevronLeft,
   Info,
   ListChecks,
-  ListTodo,
-  Sparkles,
+  MessageSquareQuote,
   SlidersHorizontal,
+  Tags,
   Timer,
   User,
   type LucideIcon,
@@ -166,13 +166,13 @@ export function SettingsView({ user }: Props) {
                       onClick={() => setOpenMenu('task')}
                     />
                     <SettingsMenuRow
-                      Icon={ListTodo}
+                      Icon={Tags}
                       label="카테고리 관리"
                       value={`${categoryCount}개`}
                       onClick={() => setOpenMenu('category')}
                     />
                     <SettingsMenuRow
-                      Icon={Sparkles}
+                      Icon={MessageSquareQuote}
                       label="동기부여 메시지"
                       value={`${motivationalCount}개`}
                       onClick={() => setOpenMenu('motivational')}

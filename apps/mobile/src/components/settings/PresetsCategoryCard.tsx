@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { ListChecks, ListTodo, Sparkles, Timer } from 'lucide-react-native';
+import { ListChecks, MessageSquareQuote, Tags, Timer } from 'lucide-react-native';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsCard } from '@/components/settings/SettingsCard';
@@ -43,13 +43,13 @@ export function PresetsCategoryCard({
           onPress={onOpenTask}
         />
         <SettingsMenuRow
-          Icon={ListTodo}
+          Icon={Tags}
           label="카테고리 관리"
           value={`${categoryCount}개`}
           onPress={onOpenCategory}
         />
         <SettingsMenuRow
-          Icon={Sparkles}
+          Icon={MessageSquareQuote}
           label="동기부여 메시지"
           value={`${motivationalCount}개`}
           onPress={onOpenMotivational}
