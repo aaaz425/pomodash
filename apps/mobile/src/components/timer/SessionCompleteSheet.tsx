@@ -71,6 +71,7 @@ export function SessionCompleteSheet() {
     );
     await addSession({
       taskId,
+      title: null,
       mode,
       startedAt: new Date(sessionStartedAt ?? now).toISOString(),
       endedAt: new Date(now).toISOString(),

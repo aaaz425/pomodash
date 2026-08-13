@@ -32,7 +32,9 @@ export function SessionListItem({
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
-  const title = task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
+  const displayTitle =
+    session.title ?? task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
+  const hasRealTitle = session.title !== null || task !== null;
 
   return (
     <Pressable
@@ -50,13 +52,13 @@ export function SessionListItem({
           style={[
             styles.title,
             {
-              color: task ? theme.foreground : theme.mutedForeground,
+              color: hasRealTitle ? theme.foreground : theme.mutedForeground,
               fontFamily: FONTS.sansMedium,
               flex: 1,
             },
           ]}
         >
-          {title}
+          {displayTitle}
         </Text>
         <Text
           style={[styles.meta, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}

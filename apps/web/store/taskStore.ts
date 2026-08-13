@@ -25,13 +25,7 @@ import {
   updateSession as updateSessionRow,
   deleteSession as deleteSessionRow,
 } from '@/lib/supabase/sessions';
-import {
-  type Task,
-  type Category,
-  type Session,
-  type FocusRating,
-  DEFAULT_CATEGORIES,
-} from '@/types';
+import { type Task, type Category, type Session, DEFAULT_CATEGORIES } from '@/types';
 
 const CATEGORY_IN_USE_MESSAGE =
   '이 카테고리를 쓰는 작업이 있어요. 작업을 먼저 옮기거나 삭제해주세요';
@@ -60,9 +54,10 @@ interface TaskStore {
   ) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   addSession: (input: Omit<Session, 'id'>) => Promise<void>;
-  updateSessionNote: (id: string, note: string | null) => Promise<void>;
-  updateSessionRating: (id: string, rating: FocusRating | null) => Promise<void>;
-  updateSessionTags: (id: string, tags: string[]) => Promise<void>;
+  updateSessionFields: (
+    id: string,
+    patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
+  ) => Promise<void>;
   deleteSession: (id: string) => Promise<void>;
   reorderTasks: (activeId: string, overId: string) => Promise<void>;
   addCategory: (input: { name: string; color: string }) => Promise<void>;
@@ -180,43 +175,16 @@ export const createTaskStore = () =>
       set({ sessions: [inserted, ...previousSessions] });
     },
 
-    updateSessionNote: async (id, note) => {
-      const previousSessions = get().sessions;
-      if (!previousSessions.some((s) => s.id === id)) return;
-      const trimmedNote = note?.trim() || null;
-      set({
-        sessions: previousSessions.map((s) => (s.id === id ? { ...s, note: trimmedNote } : s)),
-      });
-      const { error } = await updateSessionRow(id, { note: trimmedNote });
-      if (error) {
-        set({ sessions: previousSessions });
-        toast('메모 저장에 실패했어요');
-      }
-    },
-
-    updateSessionRating: async (id, rating) => {
+    updateSessionFields: async (id, patch) => {
       const previousSessions = get().sessions;
       if (!previousSessions.some((s) => s.id === id)) return;
       set({
-        sessions: previousSessions.map((s) => (s.id === id ? { ...s, focusRating: rating } : s)),
+        sessions: previousSessions.map((s) => (s.id === id ? { ...s, ...patch } : s)),
       });
-      const { error } = await updateSessionRow(id, { focusRating: rating });
+      const { error } = await updateSessionRow(id, patch);
       if (error) {
         set({ sessions: previousSessions });
-        toast('평점 저장에 실패했어요');
-      }
-    },
-
-    updateSessionTags: async (id, tags) => {
-      const previousSessions = get().sessions;
-      if (!previousSessions.some((s) => s.id === id)) return;
-      set({
-        sessions: previousSessions.map((s) => (s.id === id ? { ...s, distractionTags: tags } : s)),
-      });
-      const { error } = await updateSessionRow(id, { distractionTags: tags });
-      if (error) {
-        set({ sessions: previousSessions });
-        toast('태그 저장에 실패했어요');
+        toast('세션 저장에 실패했어요');
       }
     },
 

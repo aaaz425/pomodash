@@ -41,6 +41,10 @@ interface Props {
   // 이동은 안 되는 문제가 있음(실측 확인됨) — 이런 콘텐츠를 담는 모달은 false로 넘겨서
   // 바깥 ScrollView를 빼고 콘텐츠 자신의 스크롤에 맡긴다.
   scrollable?: boolean;
+  // 기본값 'never'는 포커스된 입력이 있을 때 빈 영역 첫 탭이 키보드를 내리는 데만
+  // 쓰이고 그 아래 터치는 버림 — 입력창과 버튼(자동완성 항목 등)이 같이 있는 콘텐츠는
+  // 'handled'로 넘겨야 첫 탭에 바로 반응한다.
+  keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
 }
 
 // 웹의 바텀시트 Modal.tsx(모바일 뷰포트 기준) 대응 — SessionCompleteSheet.tsx의 시트 패턴을 일반화
@@ -51,7 +55,15 @@ interface Props {
 // 자연히 백드롭으로 전달되고 시트 안쪽은 stopPropagation 없이도 자기 터치를 그대로 받는다.
 // <Portal>로 감싸는 이유는 별개 — 탭 스크린 트리 바깥(app/(app)/_layout.tsx의
 // PortalProvider)에서 렌더링되게 해서 하단 탭바에 가려지지 않고 화면 진짜 끝까지 닿게 함.
-export function Modal({ visible, title, onClose, children, footer, scrollable = true }: Props) {
+export function Modal({
+  visible,
+  title,
+  onClose,
+  children,
+  footer,
+  scrollable = true,
+  keyboardShouldPersistTaps = 'never',
+}: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
   const insets = useSafeAreaInsets();
@@ -157,7 +169,11 @@ export function Modal({ visible, title, onClose, children, footer, scrollable = 
               </View>
 
               {scrollable ? (
-                <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+                <ScrollView
+                  style={styles.body}
+                  contentContainerStyle={styles.bodyContent}
+                  keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+                >
                   {children}
                 </ScrollView>
               ) : (

@@ -9,6 +9,7 @@ export interface FocusPeriod {
 export interface Session {
   id: string;
   taskId: string | null;
+  title: string | null; // taskId와 독립된 세션별 라벨, 저널 상세 편집에서만 설정
   mode: TimerMode;
   startedAt: string; // ISO 8601
   endedAt: string; // ISO 8601
@@ -31,6 +32,7 @@ export const FocusPeriodSchema = z.object({
 export const SessionSchema = z.object({
   id: z.string(),
   taskId: z.string().nullable(),
+  title: z.string().max(INPUT_LIMITS.TITLE_MAX_LENGTH).nullable(),
   mode: z.enum(['pomodoro', 'free']),
   startedAt: z.string(),
   endedAt: z.string(),

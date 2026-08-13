@@ -8,6 +8,7 @@ function makeSession(overrides: Partial<Session> & { startedAt: string }): Sessi
   return {
     id: overrides.startedAt,
     taskId: null,
+    title: null,
     mode: 'pomodoro',
     endedAt: new Date(new Date(overrides.startedAt).getTime() + focusSeconds * 1000).toISOString(),
     completedCycles: 1,

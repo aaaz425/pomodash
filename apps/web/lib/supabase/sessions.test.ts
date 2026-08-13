@@ -4,6 +4,7 @@ import { toSession } from '@/lib/supabase/sessions';
 const validRow = {
   id: 's1',
   task_id: 't1',
+  title: null,
   mode: 'pomodoro',
   started_at: '2026-01-01T09:00:00.000Z',
   ended_at: '2026-01-01T09:30:00.000Z',
@@ -22,6 +23,7 @@ describe('toSession', () => {
     expect(toSession(validRow)).toEqual({
       id: 's1',
       taskId: 't1',
+      title: null,
       mode: 'pomodoro',
       startedAt: '2026-01-01T09:00:00.000Z',
       endedAt: '2026-01-01T09:30:00.000Z',
@@ -46,5 +48,9 @@ describe('toSession', () => {
 
   it('mode가 pomodoro/free가 아니면 검증 실패로 null 반환', () => {
     expect(toSession({ ...validRow, mode: 'invalid' })).toBeNull();
+  });
+
+  it('title이 설정돼 있으면 그대로 왕복됨', () => {
+    expect(toSession({ ...validRow, title: '알고리즘 스터디' })?.title).toBe('알고리즘 스터디');
   });
 });

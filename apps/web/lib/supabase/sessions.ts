@@ -4,6 +4,7 @@ import { SessionSchema, type Session } from '@/types';
 interface SessionRow {
   id: string;
   task_id: string | null;
+  title: string | null;
   mode: string;
   started_at: string;
   ended_at: string;
@@ -18,12 +19,13 @@ interface SessionRow {
 }
 
 const SELECT_COLUMNS =
-  'id, task_id, mode, started_at, ended_at, completed_cycles, total_cycles, focus_seconds, paused_seconds, focus_periods, note, focus_rating, distraction_tags';
+  'id, task_id, title, mode, started_at, ended_at, completed_cycles, total_cycles, focus_seconds, paused_seconds, focus_periods, note, focus_rating, distraction_tags';
 
 export function toSession(row: SessionRow): Session | null {
   const parsed = SessionSchema.safeParse({
     id: row.id,
     taskId: row.task_id,
+    title: row.title,
     mode: row.mode,
     startedAt: row.started_at,
     endedAt: row.ended_at,
@@ -55,6 +57,7 @@ export async function insertSession(input: Omit<Session, 'id'>): Promise<Session
     .from('sessions')
     .insert({
       task_id: input.taskId,
+      title: input.title,
       mode: input.mode,
       started_at: input.startedAt,
       ended_at: input.endedAt,
@@ -75,10 +78,11 @@ export async function insertSession(input: Omit<Session, 'id'>): Promise<Session
 
 export async function updateSession(
   id: string,
-  patch: Partial<Pick<Session, 'note' | 'focusRating' | 'distractionTags'>>,
+  patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
 ): Promise<{ error: boolean }> {
   const supabase = createClient();
   const row: Record<string, unknown> = {};
+  if (patch.title !== undefined) row.title = patch.title;
   if (patch.note !== undefined) row.note = patch.note;
   if (patch.focusRating !== undefined) row.focus_rating = patch.focusRating;
   if (patch.distractionTags !== undefined) row.distraction_tags = patch.distractionTags;
