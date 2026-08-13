@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Bell,
@@ -38,10 +39,29 @@ const CATEGORIES: { key: CategoryKey; label: string; Icon: LucideIcon }[] = [
   { key: 'about', label: '앱 정보', Icon: Info },
 ];
 
-// 목록 ↔ 디테일 전환은 진짜 라우트가 아니라 같은 화면 안 콘텐츠 교체 — 웹 SettingsView의
-// AnimatePresence(fade+x슬라이드, 0.25s easeOut)에 대응해 Animated.Value(opacity+translateX)로
-// 구현. Modal.tsx처럼 useNativeDriver: false가 필요한 layout 속성이 없어 여기선 true 사용 가능.
-const TRANSITION_DURATION = 250;
+// 웹 SettingsView의 AnimatePresence(mode="popLayout")에 대응
+const TRANSITION_MS = 200;
+const EASING = Easing.out(Easing.cubic);
+
+const listEnter = new Keyframe({
+  0: { opacity: 0, transform: [{ translateX: -16 }] },
+  100: { opacity: 1, transform: [{ translateX: 0 }], easing: EASING },
+}).duration(TRANSITION_MS);
+
+const listExit = new Keyframe({
+  0: { opacity: 1, transform: [{ translateX: 0 }] },
+  100: { opacity: 0, transform: [{ translateX: -16 }], easing: EASING },
+}).duration(TRANSITION_MS);
+
+const detailEnter = new Keyframe({
+  0: { opacity: 0, transform: [{ translateX: 16 }] },
+  100: { opacity: 1, transform: [{ translateX: 0 }], easing: EASING },
+}).duration(TRANSITION_MS);
+
+const detailExit = new Keyframe({
+  0: { opacity: 1, transform: [{ translateX: 0 }] },
+  100: { opacity: 0, transform: [{ translateX: 16 }], easing: EASING },
+}).duration(TRANSITION_MS);
 
 export default function SettingsScreen() {
   const scheme = useThemeScheme();
@@ -53,9 +73,6 @@ export default function SettingsScreen() {
   const soundAlert = useSettingsStore((s) => s.soundAlert);
 
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
-  const [renderCategory, setRenderCategory] = useState<CategoryKey | null>(null);
-  const [opacity] = useState(() => new Animated.Value(1));
-  const [translateX] = useState(() => new Animated.Value(0));
 
   const [openMenu, setOpenMenu] = useState<'timer' | 'task' | 'category' | 'motivational' | null>(
     null,
@@ -65,40 +82,7 @@ export default function SettingsScreen() {
   const isKakao = user?.user_metadata?.provider === 'kakao';
 
   function goTo(next: CategoryKey | null) {
-    if (next === activeCategory) return;
     setActiveCategory(next);
-    const exitDirection = next === null ? -1 : 1;
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: TRANSITION_DURATION,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateX, {
-        toValue: exitDirection * -16,
-        duration: TRANSITION_DURATION,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setRenderCategory(next);
-      translateX.setValue(exitDirection * 16);
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: TRANSITION_DURATION,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateX, {
-          toValue: 0,
-          duration: TRANSITION_DURATION,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]).start();
-    });
   }
 
   if (!hydrated) {
@@ -111,7 +95,7 @@ export default function SettingsScreen() {
     );
   }
 
-  const activeLabel = CATEGORIES.find((c) => c.key === renderCategory)?.label;
+  const activeLabel = CATEGORIES.find((c) => c.key === activeCategory)?.label;
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
@@ -123,8 +107,8 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          <Animated.View style={{ opacity, transform: [{ translateX }] }}>
-            {renderCategory === null ? (
+          {activeCategory === null ? (
+            <Animated.View key="list" entering={listEnter} exiting={listExit}>
               <SettingsRowGroup>
                 {CATEGORIES.map(({ key, label, Icon }) => (
                   <SettingsMenuRow
@@ -144,7 +128,9 @@ export default function SettingsScreen() {
                   />
                 ))}
               </SettingsRowGroup>
-            ) : (
+            </Animated.View>
+          ) : (
+            <Animated.View key="detail" entering={detailEnter} exiting={detailExit}>
               <View style={styles.detail}>
                 <Pressable onPress={() => goTo(null)} style={styles.backRow} hitSlop={8}>
                   <ChevronLeft size={16} color={theme.mutedForeground} />
@@ -158,14 +144,14 @@ export default function SettingsScreen() {
                   </Text>
                 </Pressable>
 
-                {renderCategory === 'account' && (
+                {activeCategory === 'account' && (
                   <AccountCategoryCard
                     onPasswordChangePress={() => setShowPasswordChange(true)}
                     onDeleteAccountPress={() => setShowDeleteAccount(true)}
                   />
                 )}
 
-                {renderCategory === 'presets' && (
+                {activeCategory === 'presets' && (
                   <PresetsCategoryCard
                     onOpenTimer={() => setOpenMenu('timer')}
                     onOpenTask={() => setOpenMenu('task')}
@@ -174,20 +160,20 @@ export default function SettingsScreen() {
                   />
                 )}
 
-                {renderCategory === 'notifications' && (
+                {activeCategory === 'notifications' && (
                   <SettingsCard title="알림">
                     <NotificationSection />
                   </SettingsCard>
                 )}
 
-                {renderCategory === 'about' && (
+                {activeCategory === 'about' && (
                   <SettingsCard title="앱 정보">
                     <AboutSection />
                   </SettingsCard>
                 )}
               </View>
-            )}
-          </Animated.View>
+            </Animated.View>
+          )}
         </ScrollView>
       </SafeAreaView>
 

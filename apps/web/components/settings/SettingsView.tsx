@@ -90,14 +90,14 @@ export function SettingsView({ user }: Props) {
           <h1 className="text-xl font-bold text-foreground">설정</h1>
         </header>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout" initial={false}>
           {activeCategory === null ? (
             <motion.div
               key="list"
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="rounded-xl border border-border bg-card divide-y divide-border"
             >
               {CATEGORIES.map(({ key, label, Icon }) => (
@@ -124,7 +124,7 @@ export function SettingsView({ user }: Props) {
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 16 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="flex flex-col gap-6"
             >
               <button
