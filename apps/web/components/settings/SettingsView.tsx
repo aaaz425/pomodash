@@ -9,9 +9,9 @@ import {
   ChevronLeft,
   Info,
   ListChecks,
-  ListTodo,
-  Sparkles,
+  MessageSquareQuote,
   SlidersHorizontal,
+  Tags,
   Timer,
   User,
   type LucideIcon,
@@ -88,7 +88,6 @@ export function SettingsView({ user }: Props) {
       <div className="max-w-2xl mx-auto p-4 sm:p-6 md:p-8 lg:p-10 lg:px-0 flex flex-col gap-6 overflow-hidden">
         <header>
           <h1 className="text-xl font-bold text-foreground">설정</h1>
-          <p className="mt-1 text-sm text-muted-foreground">프로필과 앱 설정을 관리합니다.</p>
         </header>
 
         <AnimatePresence mode="wait">
@@ -167,13 +166,13 @@ export function SettingsView({ user }: Props) {
                       onClick={() => setOpenMenu('task')}
                     />
                     <SettingsMenuRow
-                      Icon={ListTodo}
+                      Icon={Tags}
                       label="카테고리 관리"
                       value={`${categoryCount}개`}
                       onClick={() => setOpenMenu('category')}
                     />
                     <SettingsMenuRow
-                      Icon={Sparkles}
+                      Icon={MessageSquareQuote}
                       label="동기부여 메시지"
                       value={`${motivationalCount}개`}
                       onClick={() => setOpenMenu('motivational')}

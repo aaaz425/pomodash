@@ -121,14 +121,6 @@ export default function SettingsScreen() {
             <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansBold }]}>
               설정
             </Text>
-            <Text
-              style={[
-                styles.subtitle,
-                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              프로필과 앱 설정을 관리합니다.
-            </Text>
           </View>
 
           <Animated.View style={{ opacity, transform: [{ translateX }] }}>
@@ -229,9 +221,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-  },
-  subtitle: {
-    fontSize: 13,
   },
   detail: {
     gap: 16,

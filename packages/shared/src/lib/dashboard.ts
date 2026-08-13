@@ -47,7 +47,9 @@ export function getMonthlyActivityData<T extends { startedAt: string; focusSecon
     const focusSeconds = sessions
       .filter((s) => toLocalDateKey(parseISO(s.startedAt)) === dateKey)
       .reduce((sum, s) => sum + s.focusSeconds, 0);
-    return { date: dateKey, focusMinutes: Math.round(focusSeconds / 60) };
+    // 1분 미만 집중도 캘린더에서 사라지지 않도록 반올림 대신 최소 1분 보장
+    const focusMinutes = focusSeconds > 0 ? Math.max(1, Math.round(focusSeconds / 60)) : 0;
+    return { date: dateKey, focusMinutes };
   });
 }
 
