@@ -183,6 +183,13 @@ describe('getMonthlyActivityData', () => {
     const result = getMonthlyActivityData(sessions, TODAY);
     expect(result.every((d) => d.focusMinutes === 0)).toBe(true);
   });
+
+  it('1분 미만 집중이어도 반올림으로 사라지지 않고 최소 1분', () => {
+    const sessions = [makeSession('2024-03-15T09:00:00', 20)]; // 20초
+    const result = getMonthlyActivityData(sessions, TODAY);
+    const march15 = result.find((d) => d.date === '2024-03-15');
+    expect(march15?.focusMinutes).toBe(1);
+  });
 });
 
 describe('getMaxStreakDays', () => {
