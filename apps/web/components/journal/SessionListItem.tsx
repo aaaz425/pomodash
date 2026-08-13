@@ -27,7 +27,9 @@ export function SessionListItem({
   isSelected,
   onSelect,
 }: Props) {
-  const taskTitle = task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
+  const displayTitle =
+    session.title ?? task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
+  const hasRealTitle = session.title !== null || task !== null;
   const timeRange = formatSessionTimeSummary(
     session.startedAt,
     session.endedAt,
@@ -45,9 +47,9 @@ export function SessionListItem({
     >
       <div className="flex items-center justify-between gap-2">
         <span
-          className={`text-sm font-medium truncate ${task ? 'text-foreground' : 'text-muted-foreground'}`}
+          className={`text-sm font-medium truncate ${hasRealTitle ? 'text-foreground' : 'text-muted-foreground'}`}
         >
-          {taskTitle}
+          {displayTitle}
         </span>
         <span className="shrink-0 text-[11px] text-muted-foreground">{timeRange}</span>
       </div>

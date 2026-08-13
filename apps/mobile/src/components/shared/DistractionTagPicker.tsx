@@ -10,9 +10,10 @@ import { useThemeScheme } from '@/hooks/use-theme-scheme';
 interface Props {
   value: string[];
   onChange: (value: string[]) => void;
+  disabled?: boolean;
 }
 
-export function DistractionTagPicker({ value, onChange }: Props) {
+export function DistractionTagPicker({ value, onChange, disabled = false }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
   const [adding, setAdding] = useState(false);
@@ -70,12 +71,14 @@ export function DistractionTagPicker({ value, onChange }: Props) {
         return (
           <Pressable
             key={tag.id}
+            disabled={disabled}
             onPress={() => toggle(tag.id)}
             style={[
               styles.chip,
               isSelected
                 ? { backgroundColor: withAlpha(theme.primary, 0.1), borderColor: theme.primary }
                 : { backgroundColor: theme.card, borderColor: theme.border },
+              disabled && styles.disabled,
             ]}
           >
             <Text
@@ -96,10 +99,12 @@ export function DistractionTagPicker({ value, onChange }: Props) {
       {customTags.map((text) => (
         <Pressable
           key={text}
+          disabled={disabled}
           onPress={() => removeCustom(text)}
           style={[
             styles.chip,
             { backgroundColor: withAlpha(theme.primary, 0.1), borderColor: theme.primary },
+            disabled && styles.disabled,
           ]}
         >
           <Text style={[styles.label, { color: theme.primary, fontFamily: FONTS.sansMedium }]}>
@@ -108,7 +113,7 @@ export function DistractionTagPicker({ value, onChange }: Props) {
         </Pressable>
       ))}
 
-      {adding ? (
+      {disabled ? null : adding ? (
         <View style={styles.addRow}>
           <TextInput
             autoFocus
@@ -166,6 +171,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
     borderStyle: 'dashed',
+  },
+  disabled: {
+    opacity: 0.6,
   },
   label: {
     fontSize: 12,

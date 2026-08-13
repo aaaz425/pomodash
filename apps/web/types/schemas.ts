@@ -35,6 +35,7 @@ export const FocusPeriodSchema = z.object({
 export const SessionSchema = z.object({
   id: z.string(),
   taskId: z.string().nullable(),
+  title: z.string().max(INPUT_LIMITS.TITLE_MAX_LENGTH).nullable(),
   // 기존 localStorage 데이터에는 없는 필드이므로 .default() 필수
   mode: z.enum(['pomodoro', 'free']).default('pomodoro'),
   startedAt: z.string(),

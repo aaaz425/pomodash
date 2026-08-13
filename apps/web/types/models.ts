@@ -28,6 +28,7 @@ export interface Task {
 export interface Session {
   id: string;
   taskId: string | null;
+  title: string | null; // taskId와 독립된 세션별 라벨, 저널 상세 편집에서만 설정
   mode: TimerMode; // 'free'는 completedCycles/totalCycles가 0 — 저널/모달에서 "N/M 사이클" 대신 별도 표시 필요
   startedAt: string; // ISO 8601, 시간대 분석용
   endedAt: string; // ISO 8601, 경과 시간 ≠ 집중 시간

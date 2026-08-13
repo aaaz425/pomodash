@@ -9,11 +9,12 @@ import { TextInput } from '@/components/shared/TextInput';
 interface Props {
   value: string[];
   onChange: (value: string[]) => void;
+  disabled?: boolean;
 }
 
 const chipClassName = 'px-2.5 py-1 rounded-full text-xs font-medium transition-colors border';
 
-export function DistractionTagPicker({ value, onChange }: Props) {
+export function DistractionTagPicker({ value, onChange, disabled = false }: Props) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -59,12 +60,14 @@ export function DistractionTagPicker({ value, onChange }: Props) {
           <button
             key={tag.id}
             type="button"
+            disabled={disabled}
             onClick={() => toggle(tag.id)}
             className={[
               chipClassName,
               isSelected
                 ? 'bg-primary/10 border-primary text-primary'
                 : 'bg-card border-border text-muted-foreground hover:bg-border/50',
+              disabled ? 'opacity-60 cursor-not-allowed hover:bg-card' : '',
             ].join(' ')}
           >
             {tag.label}
@@ -76,14 +79,19 @@ export function DistractionTagPicker({ value, onChange }: Props) {
         <button
           key={text}
           type="button"
+          disabled={disabled}
           onClick={() => removeCustom(text)}
-          className={[chipClassName, 'bg-primary/10 border-primary text-primary'].join(' ')}
+          className={[
+            chipClassName,
+            'bg-primary/10 border-primary text-primary',
+            disabled ? 'opacity-60 cursor-not-allowed' : '',
+          ].join(' ')}
         >
           {text}
         </button>
       ))}
 
-      {adding ? (
+      {disabled ? null : adding ? (
         <div className="flex items-center gap-1">
           <TextInput
             autoFocus

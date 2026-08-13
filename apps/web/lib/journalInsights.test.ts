@@ -15,6 +15,7 @@ function makeSession(overrides: Partial<Session> = {}): Session {
   return {
     id: `s${idCounter}`,
     taskId: null,
+    title: null,
     mode: 'pomodoro',
     startedAt: '2024-03-15T09:00:00',
     endedAt: '2024-03-15T09:30:00',

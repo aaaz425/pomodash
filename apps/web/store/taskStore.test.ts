@@ -101,6 +101,7 @@ async function addNCategories(store: ReturnType<typeof createTaskStore>, n: numb
 function makeSessionInput(overrides: Partial<Omit<Session, 'id'>> = {}): Omit<Session, 'id'> {
   return {
     taskId: null,
+    title: null,
     mode: 'pomodoro',
     startedAt: '2024-03-15T09:00:00.000Z',
     endedAt: '2024-03-15T09:30:00.000Z',
@@ -284,81 +285,93 @@ describe('addSession / updateSessionNote / updateSessionRating / updateSessionTa
     expect(store.getState().sessions).toHaveLength(0);
   });
 
-  it('updateSessionNote — note 양 끝 공백이 trim됨', async () => {
+  it('updateSessionFields — note가 그대로 갱신됨', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput());
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionNote(id, '  잘했다  ');
+    await store.getState().updateSessionFields(id, { note: '잘했다' });
     expect(store.getState().sessions[0].note).toBe('잘했다');
   });
 
-  it('updateSessionNote — 빈 문자열로 설정하면 note가 null로 변경됨', async () => {
+  it('updateSessionFields — note를 null로 설정 가능', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput({ note: '기존 메모' }));
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionNote(id, '');
+    await store.getState().updateSessionFields(id, { note: null });
     expect(store.getState().sessions[0].note).toBeNull();
   });
 
-  it('updateSessionNote — 공백만 있는 문자열도 trim 후 null로 변경됨', async () => {
+  it('updateSessionFields — 존재하지 않는 id면 아무 세션도 변경되지 않음', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput({ note: '기존 메모' }));
-    const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionNote(id, '    ');
-    expect(store.getState().sessions[0].note).toBeNull();
-  });
-
-  it('updateSessionNote — 존재하지 않는 id면 아무 세션도 변경되지 않음', async () => {
-    const store = createTaskStore();
-    await store.getState().addSession(makeSessionInput({ note: '기존 메모' }));
-    await store.getState().updateSessionNote('no-such-id', '변경 시도');
+    await store.getState().updateSessionFields('no-such-id', { note: '변경 시도' });
     expect(store.getState().sessions[0].note).toBe('기존 메모');
   });
 
-  it('updateSessionRating — 정상적으로 평점이 갱신됨', async () => {
+  it('updateSessionFields — focusRating이 갱신됨', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput());
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionRating(id, 2);
+    await store.getState().updateSessionFields(id, { focusRating: 2 });
     expect(store.getState().sessions[0].focusRating).toBe(2);
   });
 
-  it('updateSessionRating — null로 재설정하면 선택 해제됨', async () => {
+  it('updateSessionFields — focusRating을 null로 재설정하면 선택 해제됨', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput({ focusRating: 3 }));
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionRating(id, null);
+    await store.getState().updateSessionFields(id, { focusRating: null });
     expect(store.getState().sessions[0].focusRating).toBeNull();
   });
 
-  it('updateSessionRating — 존재하지 않는 id면 아무 세션도 변경되지 않음', async () => {
-    const store = createTaskStore();
-    await store.getState().addSession(makeSessionInput({ focusRating: 1 }));
-    await store.getState().updateSessionRating('no-such-id', 3);
-    expect(store.getState().sessions[0].focusRating).toBe(1);
-  });
-
-  it('updateSessionTags — 정상적으로 태그 배열이 교체됨', async () => {
+  it('updateSessionFields — distractionTags 배열이 교체됨', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionTags(id, ['noise', 'fatigue']);
+    await store.getState().updateSessionFields(id, { distractionTags: ['noise', 'fatigue'] });
     expect(store.getState().sessions[0].distractionTags).toEqual(['noise', 'fatigue']);
   });
 
-  it('updateSessionTags — 빈 배열로 설정 가능', async () => {
+  it('updateSessionFields — distractionTags를 빈 배열로 설정 가능', async () => {
     const store = createTaskStore();
     await store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
     const id = store.getState().sessions[0].id;
-    await store.getState().updateSessionTags(id, []);
+    await store.getState().updateSessionFields(id, { distractionTags: [] });
     expect(store.getState().sessions[0].distractionTags).toEqual([]);
   });
 
-  it('updateSessionTags — 존재하지 않는 id면 아무 세션도 변경되지 않음', async () => {
+  it('updateSessionFields — title이 갱신됨', async () => {
     const store = createTaskStore();
-    await store.getState().addSession(makeSessionInput({ distractionTags: ['phone'] }));
-    await store.getState().updateSessionTags('no-such-id', ['noise']);
-    expect(store.getState().sessions[0].distractionTags).toEqual(['phone']);
+    await store.getState().addSession(makeSessionInput());
+    const id = store.getState().sessions[0].id;
+    await store.getState().updateSessionFields(id, { title: '알고리즘 스터디' });
+    expect(store.getState().sessions[0].title).toBe('알고리즘 스터디');
+  });
+
+  it('updateSessionFields — 여러 필드를 한 번에 갱신 가능', async () => {
+    const store = createTaskStore();
+    await store.getState().addSession(makeSessionInput());
+    const id = store.getState().sessions[0].id;
+    await store.getState().updateSessionFields(id, {
+      title: '집중 세션',
+      focusRating: 3,
+      distractionTags: ['phone'],
+      note: '메모',
+    });
+    const session = store.getState().sessions[0];
+    expect(session.title).toBe('집중 세션');
+    expect(session.focusRating).toBe(3);
+    expect(session.distractionTags).toEqual(['phone']);
+    expect(session.note).toBe('메모');
+  });
+
+  it('updateSessionFields — 저장 실패 시 롤백됨', async () => {
+    mockUpdateSession.mockResolvedValueOnce({ error: true });
+    const store = createTaskStore();
+    await store.getState().addSession(makeSessionInput({ note: '기존 메모' }));
+    const id = store.getState().sessions[0].id;
+    await store.getState().updateSessionFields(id, { note: '변경 시도' });
+    expect(store.getState().sessions[0].note).toBe('기존 메모');
   });
 
   it('deleteSession — 해당 id의 세션이 목록에서 제거됨', async () => {

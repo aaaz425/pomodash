@@ -7,9 +7,10 @@ import { useThemeScheme } from '@/hooks/use-theme-scheme';
 interface Props {
   value: FocusRating | null;
   onChange: (value: FocusRating | null) => void;
+  disabled?: boolean;
 }
 
-export function FocusRatingPicker({ value, onChange }: Props) {
+export function FocusRatingPicker({ value, onChange, disabled = false }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
@@ -20,8 +21,13 @@ export function FocusRatingPicker({ value, onChange }: Props) {
         return (
           <Pressable
             key={option.value}
+            disabled={disabled}
             onPress={() => onChange(isSelected ? null : option.value)}
-            style={[styles.button, { backgroundColor: isSelected ? theme.primary : theme.muted }]}
+            style={[
+              styles.button,
+              { backgroundColor: isSelected ? theme.primary : theme.muted },
+              disabled && styles.disabled,
+            ]}
           >
             <Text
               style={[
@@ -56,5 +62,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+  },
+  disabled: {
+    opacity: 0.6,
   },
 });
