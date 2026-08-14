@@ -48,6 +48,8 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
+  // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 저장될 수 있음
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const session = sessions.find((s) => s.id === sessionId) ?? null;
 
@@ -83,7 +85,8 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   }
 
   async function handleSaveEdit() {
-    if (!draft || !session) return;
+    if (!draft || !session || isSubmitting) return;
+    setIsSubmitting(true);
     await updateSessionFields(session.id, {
       title: draft.title.trim() || null,
       focusRating: draft.focusRating,
@@ -109,7 +112,12 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
           <View style={styles.editControls}>
             {isEditing ? (
               <>
-                <Pressable onPress={handleCancelEdit} hitSlop={4}>
+                <Pressable
+                  onPress={handleCancelEdit}
+                  disabled={isSubmitting}
+                  hitSlop={4}
+                  style={[isSubmitting && styles.disabled]}
+                >
                   <Text
                     style={[
                       styles.editText,
@@ -121,7 +129,12 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
                 </Pressable>
                 <Pressable
                   onPress={handleSaveEdit}
-                  style={[styles.saveButton, { backgroundColor: theme.primary }]}
+                  disabled={isSubmitting}
+                  style={[
+                    styles.saveButton,
+                    { backgroundColor: theme.primary },
+                    isSubmitting && styles.disabled,
+                  ]}
                 >
                   <Text
                     style={[
@@ -289,6 +302,9 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 const styles = StyleSheet.create({
   header: {
     gap: 8,
+  },
+  disabled: {
+    opacity: 0.4,
   },
   headerTopRow: {
     flexDirection: 'row',
