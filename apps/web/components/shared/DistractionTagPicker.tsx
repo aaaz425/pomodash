@@ -81,6 +81,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
           type="button"
           disabled={disabled}
           onClick={() => removeCustom(text)}
+          aria-label={`${text} 삭제`}
           className={[
             chipClassName,
             'bg-primary/10 border-primary text-primary',

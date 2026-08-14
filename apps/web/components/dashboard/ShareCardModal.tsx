@@ -80,6 +80,8 @@ export function ShareCardModal({ data, onClose }: Props) {
         ref={setCanvasRef}
         width={SHARE_CARD_SIZE}
         height={SHARE_CARD_SIZE}
+        role="img"
+        aria-label="오늘의 집중 기록 공유 카드"
         className="w-full h-auto rounded-lg"
       />
     </Modal>
