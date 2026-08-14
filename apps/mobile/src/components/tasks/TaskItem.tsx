@@ -43,7 +43,12 @@ export function TaskItem({
       ]}
     >
       {mode === 'manage' && (
-        <Pressable onLongPress={onDrag} hitSlop={8} style={styles.gripButton}>
+        <Pressable
+          onLongPress={onDrag}
+          hitSlop={8}
+          style={styles.gripButton}
+          accessibilityLabel="순서 조정"
+        >
           <GripVertical size={14} color={withAlpha(theme.mutedForeground, 0.3)} />
         </Pressable>
       )}
@@ -91,13 +96,19 @@ export function TaskItem({
 
       {mode === 'manage' && (
         <View style={styles.actions}>
-          <Pressable onPress={() => onEdit?.(task)} hitSlop={4} style={styles.iconButton}>
+          <Pressable
+            onPress={() => onEdit?.(task)}
+            hitSlop={4}
+            style={styles.iconButton}
+            accessibilityLabel="수정"
+          >
             <Pencil size={14} color={theme.mutedForeground} />
           </Pressable>
           <Pressable
             onPress={() => onDeleteRequest?.(task.id)}
             hitSlop={4}
             style={styles.iconButton}
+            accessibilityLabel="삭제"
           >
             <Trash2 size={14} color={theme.mutedForeground} />
           </Pressable>

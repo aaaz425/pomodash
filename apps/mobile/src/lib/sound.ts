@@ -66,6 +66,17 @@ export async function playAlarm({
       player.volume = Math.max(0, Math.min(100, volume)) / 100;
       activePlayers.push(player);
       player.play();
+
+      // 자연 재생 종료 후에도 activePlayers에 남아 누적되는 걸 막기 위해 재생 길이만큼 뒤에 정리
+      const cleanup = setTimeout(() => {
+        activePlayers = activePlayers.filter((p) => p !== player);
+        try {
+          player.remove();
+        } catch {
+          // ignore
+        }
+      }, TONE_DURATION_MS);
+      scheduledTimeouts.push(cleanup);
     };
 
     for (let i = 0; i < repeatCount; i++) {

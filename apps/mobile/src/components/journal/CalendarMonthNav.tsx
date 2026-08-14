@@ -27,19 +27,39 @@ export function CalendarMonthNav({
 
   return (
     <View style={styles.row}>
-      <Pressable onPress={onPrevYear} hitSlop={4} style={styles.navButton}>
+      <Pressable
+        onPress={onPrevYear}
+        hitSlop={4}
+        style={styles.navButton}
+        accessibilityLabel="이전 해"
+      >
         <ChevronsLeft size={16} color={theme.mutedForeground} />
       </Pressable>
-      <Pressable onPress={onPrevMonth} hitSlop={4} style={styles.navButton}>
+      <Pressable
+        onPress={onPrevMonth}
+        hitSlop={4}
+        style={styles.navButton}
+        accessibilityLabel="이전 달"
+      >
         <ChevronLeft size={16} color={theme.mutedForeground} />
       </Pressable>
       <Text style={[styles.label, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
         {label}
       </Text>
-      <Pressable onPress={onNextMonth} hitSlop={4} style={styles.navButton}>
+      <Pressable
+        onPress={onNextMonth}
+        hitSlop={4}
+        style={styles.navButton}
+        accessibilityLabel="다음 달"
+      >
         <ChevronRight size={16} color={theme.mutedForeground} />
       </Pressable>
-      <Pressable onPress={onNextYear} hitSlop={4} style={styles.navButton}>
+      <Pressable
+        onPress={onNextYear}
+        hitSlop={4}
+        style={styles.navButton}
+        accessibilityLabel="다음 해"
+      >
         <ChevronsRight size={16} color={theme.mutedForeground} />
       </Pressable>
       <Pressable onPress={onToday} style={[styles.todayButton, { borderColor: theme.border }]}>
