@@ -85,7 +85,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
               onClick={() => setColor(c)}
               aria-label={CATEGORY_COLOR_LABELS[c]}
               aria-pressed={color === c}
-              className={`w-7 h-7 rounded-full ${c} transition-all ${
+              className={`w-8 h-8 rounded-full ${c} transition-all ${
                 color === c
                   ? 'ring-2 ring-offset-2 ring-offset-card ring-foreground/30 scale-110'
                   : 'hover:scale-110'
