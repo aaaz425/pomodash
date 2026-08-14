@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -40,13 +40,13 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
 
-  const sessionIndex = (() => {
+  const sessionIndex = useMemo(() => {
     const dateKey = session.startedAt.slice(0, 10);
     const sorted = sessions
       .filter((s) => s.startedAt.slice(0, 10) === dateKey)
       .sort((a, b) => a.startedAt.localeCompare(b.startedAt));
     return sorted.findIndex((s) => s.id === session.id);
-  })();
+  }, [sessions, session.startedAt, session.id]);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
