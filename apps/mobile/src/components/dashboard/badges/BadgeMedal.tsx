@@ -44,7 +44,11 @@ export function BadgeMedal({ badge, earned }: Props) {
   };
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
+    <Pressable
+      style={styles.container}
+      onPress={handlePress}
+      accessibilityLabel={`${badge.name}${earned ? '' : ' (미획득)'}`}
+    >
       <View
         style={[
           styles.ring,

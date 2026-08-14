@@ -27,6 +27,14 @@ function dayOfWeekIndex(dateStr: string): number {
   return (d.getDay() + 6) % 7; // 0=월 ... 6=일
 }
 
+function formatCellLabel(dateStr: string, minutes: number): string {
+  const date = new Date(dateStr + 'T00:00:00');
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  if (minutes === 0) return `${month}월 ${day}일`;
+  return `${month}월 ${day}일 · ${minutes}분`;
+}
+
 export function ContributionCalendar({ data }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
@@ -69,6 +77,8 @@ export function ContributionCalendar({ data }: Props) {
               return (
                 <View
                   key={day.date}
+                  accessible
+                  accessibilityLabel={formatCellLabel(day.date, day.focusMinutes)}
                   style={[styles.cell, { backgroundColor: color ?? theme.muted }]}
                 />
               );

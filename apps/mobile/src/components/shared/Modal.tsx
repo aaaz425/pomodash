@@ -163,7 +163,7 @@ export function Modal({
                 >
                   {title}
                 </Text>
-                <Pressable onPress={onClose} hitSlop={8}>
+                <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
                   <X size={18} color={theme.mutedForeground} />
                 </Pressable>
               </View>
