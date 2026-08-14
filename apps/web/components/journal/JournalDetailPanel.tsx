@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -40,17 +40,19 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
 
-  const sessionIndex = (() => {
+  const sessionIndex = useMemo(() => {
     const dateKey = session.startedAt.slice(0, 10);
     const sorted = sessions
       .filter((s) => s.startedAt.slice(0, 10) === dateKey)
       .sort((a, b) => a.startedAt.localeCompare(b.startedAt));
     return sorted.findIndex((s) => s.id === session.id);
-  })();
+  }, [sessions, session.startedAt, session.id]);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
+  // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 저장될 수 있음
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const displayTitle =
     session.title ?? task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
@@ -73,7 +75,8 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   }
 
   async function handleSaveEdit() {
-    if (!draft) return;
+    if (!draft || isSubmitting) return;
+    setIsSubmitting(true);
     await updateSessionFields(session.id, {
       title: draft.title.trim() || null,
       focusRating: draft.focusRating,
@@ -110,13 +113,15 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
               <div className="flex gap-2">
                 <button
                   onClick={handleCancelEdit}
-                  className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   취소
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   저장
                 </button>
