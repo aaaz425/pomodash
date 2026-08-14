@@ -151,7 +151,7 @@ export function MotivationalSection() {
   const reorderMessages = useSettingsStore((s) => s.reorderMessages);
 
   const [input, setInput] = useState('');
-  const [editingMessage, setEditingMessage] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const isAtLimit = messages.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX;
 
   const sensors = useSensors(
@@ -189,17 +189,17 @@ export function MotivationalSection() {
           <div className="flex flex-col">
             {messages.map((msg, i) => (
               <MessageRow
-                key={msg}
+                key={i}
                 id={String(i)}
                 message={msg}
-                isEditing={editingMessage === msg}
-                dragDisabled={editingMessage !== null}
-                onStartEdit={() => setEditingMessage(msg)}
+                isEditing={editingIndex === i}
+                dragDisabled={editingIndex !== null}
+                onStartEdit={() => setEditingIndex(i)}
                 onSaveEdit={(text) => {
                   updateMessage(i, text);
-                  setEditingMessage(null);
+                  setEditingIndex(null);
                 }}
-                onCancelEdit={() => setEditingMessage(null)}
+                onCancelEdit={() => setEditingIndex(null)}
                 onDelete={() => deleteMessage(i)}
                 canDelete={messages.length > 1}
               />
