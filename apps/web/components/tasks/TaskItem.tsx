@@ -57,7 +57,6 @@ export function TaskItem({
       }
       className={[
         'flex items-center gap-2.5 px-3 py-2.5 rounded-lg group transition-colors',
-        mode === 'select' ? 'cursor-pointer' : '',
         isSelected ? 'bg-primary/10' : 'hover:bg-muted/50',
         isDragging ? 'opacity-50 scale-[0.98]' : '',
       ].join(' ')}

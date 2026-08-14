@@ -1,7 +1,9 @@
 'use client';
 
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { X } from 'lucide-react';
 import { SessionListItem } from '@/components/journal/SessionListItem';
+import { Button } from '@/components/ui/button';
 import type { Category, Session, Task } from '@/types';
 
 interface Props {
@@ -50,7 +52,15 @@ export function CalendarDayModal({
           ].join(' ')}
         >
           <div className="flex flex-col gap-3 p-5 sm:p-6">
-            <h2 className="text-base font-semibold text-foreground">{label}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold text-foreground">{label}</h2>
+              <DialogPrimitive.Close
+                aria-label="닫기"
+                render={<Button variant="ghost" size="icon" />}
+              >
+                <X className="w-4 h-4" />
+              </DialogPrimitive.Close>
+            </div>
 
             {sessions.length === 0 ? (
               <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">

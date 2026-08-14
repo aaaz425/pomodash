@@ -41,7 +41,7 @@ export function MiniTimerWidget() {
         <button
           onClick={isRunning ? pause : start}
           aria-label={isRunning ? '타이머 일시정지' : '타이머 재생'}
-          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
         >
           {isRunning ? (
             <Pause className={`w-3 h-3 ${iconClass}`} />

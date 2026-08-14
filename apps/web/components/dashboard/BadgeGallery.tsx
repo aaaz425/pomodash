@@ -67,6 +67,7 @@ export function BadgeGallery({ sessions, tasks }: Props) {
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
         className="flex items-center justify-center gap-1 self-center text-xs text-muted-foreground hover:text-foreground"
       >
         {expanded ? '접기' : '뱃지 모두 보기'}

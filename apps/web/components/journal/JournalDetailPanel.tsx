@@ -127,18 +127,18 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={handleEdit}
                   aria-label="편집"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setConfirmDelete(true)}
                   aria-label="기록 삭제"
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
