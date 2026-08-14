@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { BookOpen } from 'lucide-react';
 
 export function JournalEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-      <span className="text-5xl">📋</span>
+      <BookOpen className="w-10 h-10 text-muted-foreground/40" aria-hidden="true" />
       <div className="flex flex-col gap-1">
         <p className="text-base font-medium text-foreground">아직 기록된 세션이 없어요</p>
         <p className="text-sm text-muted-foreground">

@@ -88,6 +88,7 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
             {data.map((item) => (
               <div key={item.name} className="flex items-center justify-between gap-2 min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
+                  {/* 카테고리별 동적 hex 색상 — Tailwind 클래스로 표현 불가, 위 Cell fill과 동일한 예외 */}
                   <span
                     className="shrink-0 w-2 h-2 rounded-sm"
                     style={{ backgroundColor: item.color }}
