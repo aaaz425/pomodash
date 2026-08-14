@@ -48,9 +48,10 @@ export function TimerControls() {
         집중
       </Button>
 
-      <button
+      <Button
         onClick={handleStartClick}
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold whitespace-nowrap transition-colors hover:bg-primary/90 active:bg-primary/80"
+        size="lg"
+        className="gap-1.5 px-4 py-2.5 font-semibold whitespace-nowrap"
       >
         {isRunning ? (
           <Pause className="w-3.5 h-3.5" fill="currentColor" />
@@ -58,7 +59,7 @@ export function TimerControls() {
           <Play className="w-3.5 h-3.5" fill="currentColor" />
         )}
         {isRunning ? '일시정지' : '시작'}
-      </button>
+      </Button>
 
       <Button
         disabled={!sessionStarted}
