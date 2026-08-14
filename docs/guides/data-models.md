@@ -111,13 +111,10 @@ export interface AppSettings {
 
 ## localStorage Keys
 
+Task/Category/Session/AppSettings는 Supabase로 이전되어 더 이상 localStorage에 저장하지 않는다(`lib/supabase/*.ts`에서 Zod로 검증). localStorage에는 새로고침 복구용 활성 타이머 스냅샷과 테마만 남아있다.
+
 ```typescript
 const STORAGE_KEYS = {
-  tasks: 'pomodash:tasks',
-  categories: 'pomodash:categories',
-  sessions: 'pomodash:sessions',
-  timerSettings: 'pomodash:timer-settings',
-  settings: 'pomodash:settings',
   activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
   theme: 'theme', // 예외적으로 'pomodash:' 접두사 없음
@@ -132,16 +129,13 @@ Zod 스키마로 파싱 + 타입 추론을 일원화하고, SSR 환경을 방어
 ```typescript
 import { z } from 'zod'
 
-// 스키마 정의 (types/models.ts의 interface와 1:1 대응)
-const TaskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  categoryId: z.string(),
-  targetFocusMinutes: z.number(),
-  completed: z.boolean(),
-  createdAt: z.string(),
+// 스키마 정의 (types/models.ts의 interface와 1:1 대응) — 활성 타이머 예시
+const ActiveTimerStateSchema = z.object({
+  phase: z.enum(['focus', 'short-break']),
+  remainingSeconds: z.number(),
+  startedAt: z.number().nullable(),
+  // ...
 })
-const TasksSchema = z.array(TaskSchema)
 
 // lib/storage.ts — 제네릭 유틸
 function loadFromStorage<T>(key: string, schema: z.ZodType<T>, fallback: T): T {

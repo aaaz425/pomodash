@@ -54,17 +54,6 @@ export const SessionSchema = z.object({
   distractionTags: z.array(z.string().max(INPUT_LIMITS.DISTRACTION_TAG_MAX_LENGTH)).default([]),
 });
 
-// 향후 per-phase 집계용으로 예약, 현재 미사용
-export const TimerRecordSchema = z.object({
-  id: z.string(),
-  taskId: z.string().nullable(),
-  phase: z.enum(['focus', 'short-break']),
-  startedAt: z.string(),
-  endedAt: z.string(),
-  focusSeconds: z.number(),
-  pausedSeconds: z.number(),
-});
-
 export const TimerSettingsSchema = z.object({
   focusMinutes: z.number().min(TIMER_LIMITS.FOCUS_MINUTES_MIN).max(TIMER_LIMITS.FOCUS_MINUTES_MAX),
   shortBreakMinutes: z
@@ -148,17 +137,7 @@ export const NewPasswordSchema = z
     path: ['passwordConfirm'],
   });
 
-export const CategoriesSchema = z.array(CategorySchema).max(INPUT_LIMITS.CATEGORIES_MAX);
-export const TasksSchema = z.array(TaskSchema);
-export const SessionsSchema = z.array(SessionSchema);
-export const TimerRecordsSchema = z.array(TimerRecordSchema);
-
 export const STORAGE_KEYS = {
-  tasks: 'pomodash:tasks',
-  categories: 'pomodash:categories',
-  sessions: 'pomodash:sessions',
-  timerSettings: 'pomodash:timer-settings',
-  settings: 'pomodash:settings',
   activeTimer: 'pomodash:active-timer',
   version: 'pomodash:version',
   theme: 'theme',

@@ -12,7 +12,7 @@ Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Rechar
 
 ## 모노레포 구조
 
-pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 네이티브 앱) — 두 앱 간 공유 로직은 아직 없음(필요해지는 시점에 `packages/shared`로 추출 예정). `docs/`, `supabase/`는 두 앱이 공유하는 루트 레벨 리소스.
+pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 네이티브 앱) — 두 앱이 공유하는 순수 로직(타이머 계산, 대시보드 집계, 뱃지, focusPeriods, 세션 유틸 등)은 `packages/shared`(`@pomodash/shared`)로 추출되어 있다. `docs/`, `supabase/`는 두 앱이 공유하는 루트 레벨 리소스.
 
 ## 개발 명령어
 
