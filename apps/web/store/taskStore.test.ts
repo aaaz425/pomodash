@@ -540,14 +540,25 @@ describe('hydrate', () => {
       completed: false,
       createdAt: '2026-01-01T00:00:00.000Z',
     };
-    mockFetchTasks.mockResolvedValueOnce([task]);
-    mockFetchCategories.mockResolvedValueOnce(DEFAULT_CATEGORIES);
-    mockFetchSessions.mockResolvedValueOnce([]);
+    mockFetchTasks.mockResolvedValueOnce({ tasks: [task], invalidCount: 0 });
+    mockFetchCategories.mockResolvedValueOnce({ categories: DEFAULT_CATEGORIES, invalidCount: 0 });
+    mockFetchSessions.mockResolvedValueOnce({ sessions: [], invalidCount: 0 });
 
     const store = createTaskStore();
     await store.getState().hydrate();
     expect(store.getState().tasks).toEqual([task]);
     expect(store.getState().categories).toEqual(DEFAULT_CATEGORIES);
+  });
+
+  it('형식이 안 맞는 항목이 있으면 조용히 빼고 나머지만 복원됨', async () => {
+    mockFetchTasks.mockResolvedValueOnce({ tasks: [], invalidCount: 2 });
+    mockFetchCategories.mockResolvedValueOnce({ categories: DEFAULT_CATEGORIES, invalidCount: 0 });
+    mockFetchSessions.mockResolvedValueOnce({ sessions: [], invalidCount: 1 });
+
+    const store = createTaskStore();
+    await expect(store.getState().hydrate()).resolves.not.toThrow();
+    expect(store.getState().tasks).toEqual([]);
+    expect(store.getState().sessions).toEqual([]);
   });
 
   it('조회가 전부 실패(null)하면 tasks/sessions는 빈 배열, categories는 DEFAULT_CATEGORIES로 복원됨', async () => {

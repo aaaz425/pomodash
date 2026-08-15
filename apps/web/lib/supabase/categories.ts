@@ -12,14 +12,18 @@ export function toCategory(row: CategoryRow): Category | null {
   return parsed.success ? parsed.data : null;
 }
 
-export async function fetchCategories(): Promise<Category[] | null> {
+export async function fetchCategories(): Promise<{
+  categories: Category[];
+  invalidCount: number;
+} | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('categories')
     .select('id, name, color')
     .order('position', { ascending: true });
   if (error || !data) return null;
-  return data.map(toCategory).filter((c): c is Category => c !== null);
+  const categories = data.map(toCategory).filter((c): c is Category => c !== null);
+  return { categories, invalidCount: data.length - categories.length };
 }
 
 export async function insertCategory(input: {

@@ -41,14 +41,18 @@ export function toSession(row: SessionRow): Session | null {
   return parsed.success ? parsed.data : null;
 }
 
-export async function fetchSessions(): Promise<Session[] | null> {
+export async function fetchSessions(): Promise<{
+  sessions: Session[];
+  invalidCount: number;
+} | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('sessions')
     .select(SELECT_COLUMNS)
     .order('started_at', { ascending: false });
   if (error || !data) return null;
-  return data.map(toSession).filter((s): s is Session => s !== null);
+  const sessions = data.map(toSession).filter((s): s is Session => s !== null);
+  return { sessions, invalidCount: data.length - sessions.length };
 }
 
 export async function insertSession(input: Omit<Session, 'id'>): Promise<Session | null> {

@@ -66,7 +66,8 @@ interface TaskStore {
   deleteCategory: (id: string) => Promise<{ blocked: boolean }>;
   reorderCategories: (fromIndex: number, toIndex: number) => Promise<void>;
 
-  addSession: (input: Omit<Session, 'id'>) => Promise<void>;
+  /** 성공 여부를 반환 — 실패 시 호출부가 폼을 유지하고 재시도할 수 있도록 함 */
+  addSession: (input: Omit<Session, 'id'>) => Promise<boolean>;
   updateSessionFields: (
     id: string,
     patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
@@ -259,9 +260,10 @@ export const createTaskStore = () =>
       if (!inserted) {
         set({ sessions: previousSessions });
         toast('세션 저장에 실패했어요');
-        return;
+        return false;
       }
       set({ sessions: [inserted, ...previousSessions] });
+      return true;
     },
 
     updateSessionFields: async (id, patch) => {
@@ -289,19 +291,28 @@ export const createTaskStore = () =>
     },
 
     hydrate: async () => {
-      const [tasks, categories, sessions] = await Promise.all([
+      const [tasksResult, categoriesResult, sessionsResult] = await Promise.all([
         withRetry(fetchTasks),
         withRetry(fetchCategories),
         withRetry(fetchSessions),
       ]);
-      if (tasks === null || categories === null || sessions === null) {
+      if (tasksResult === null || categoriesResult === null || sessionsResult === null) {
         toast('데이터를 불러오지 못했어요. 다시 시도해주세요');
       }
       set({
-        tasks: tasks ?? [],
-        categories: categories ?? DEFAULT_CATEGORIES,
-        sessions: sessions ?? [],
+        tasks: tasksResult?.tasks ?? [],
+        categories: categoriesResult?.categories ?? DEFAULT_CATEGORIES,
+        sessions: sessionsResult?.sessions ?? [],
       });
+
+      // 형식이 안 맞는 데이터가 있어 일부 항목이 조용히 빠졌을 때 사용자에게 알림
+      const invalidCount =
+        (tasksResult?.invalidCount ?? 0) +
+        (categoriesResult?.invalidCount ?? 0) +
+        (sessionsResult?.invalidCount ?? 0);
+      if (invalidCount > 0) {
+        toast(`형식이 맞지 않아 불러오지 못한 기록이 ${invalidCount}건 있어요`);
+      }
     },
   }));
 

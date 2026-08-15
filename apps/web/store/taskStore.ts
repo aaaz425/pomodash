@@ -53,7 +53,8 @@ interface TaskStore {
     >,
   ) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
-  addSession: (input: Omit<Session, 'id'>) => Promise<void>;
+  /** 성공 여부를 반환 — 실패 시 호출부가 폼을 유지하고 재시도할 수 있도록 함 */
+  addSession: (input: Omit<Session, 'id'>) => Promise<boolean>;
   updateSessionFields: (
     id: string,
     patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
@@ -170,9 +171,10 @@ export const createTaskStore = () =>
       if (!inserted) {
         set({ sessions: previousSessions });
         toast('세션 저장에 실패했어요');
-        return;
+        return false;
       }
       set({ sessions: [inserted, ...previousSessions] });
+      return true;
     },
 
     updateSessionFields: async (id, patch) => {
@@ -282,16 +284,25 @@ export const createTaskStore = () =>
     },
 
     hydrate: async () => {
-      const [tasks, categories, sessions] = await Promise.all([
+      const [tasksResult, categoriesResult, sessionsResult] = await Promise.all([
         fetchTasks(),
         fetchCategories(),
         fetchSessions(),
       ]);
       set({
-        tasks: tasks ?? [],
-        categories: categories ?? DEFAULT_CATEGORIES,
-        sessions: sessions ?? [],
+        tasks: tasksResult?.tasks ?? [],
+        categories: categoriesResult?.categories ?? DEFAULT_CATEGORIES,
+        sessions: sessionsResult?.sessions ?? [],
       });
+
+      // 형식이 안 맞는 데이터가 있어 일부 항목이 조용히 빠졌을 때 사용자에게 알림
+      const invalidCount =
+        (tasksResult?.invalidCount ?? 0) +
+        (categoriesResult?.invalidCount ?? 0) +
+        (sessionsResult?.invalidCount ?? 0);
+      if (invalidCount > 0) {
+        toast(`형식이 맞지 않아 불러오지 못한 기록이 ${invalidCount}건 있어요`);
+      }
     },
   }));
 
