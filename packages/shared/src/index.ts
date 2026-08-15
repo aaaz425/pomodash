@@ -24,6 +24,8 @@ export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
 export { isSessionStale } from './lib/sessionStale';
 export { deriveTimerDisplay } from './lib/deriveTimerDisplay';
 export type { DeriveTimerDisplayInput, TimerDisplayState } from './lib/deriveTimerDisplay';
+export { deriveElapsedMinutes } from './lib/deriveElapsedMinutes';
+export type { DeriveElapsedMinutesInput } from './lib/deriveElapsedMinutes';
 export {
   formatDuration,
   formatSessionProgressLabel,

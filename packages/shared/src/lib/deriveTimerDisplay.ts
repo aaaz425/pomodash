@@ -1,4 +1,5 @@
 import type { TimerMode, TimerPhase } from '../types/timer';
+import { deriveElapsedMinutes } from './deriveElapsedMinutes';
 
 export interface DeriveTimerDisplayInput {
   phase: TimerPhase;
@@ -44,13 +45,13 @@ export function deriveTimerDisplay(input: DeriveTimerDisplayInput): TimerDisplay
     justCompleted = isRunning && runningRemaining === 0;
   }
 
-  const elapsedMinutes =
-    mode === 'free'
-      ? Math.floor(displaySeconds / 60)
-      : cycleCount * focusMinutes +
-        (phase === 'focus'
-          ? Math.max(0, Math.floor((focusMinutes * 60 - displaySeconds) / 60))
-          : 0);
+  const elapsedMinutes = deriveElapsedMinutes({
+    mode,
+    displaySeconds,
+    cycleCount,
+    focusMinutes,
+    phase,
+  });
 
   return { displaySeconds, isRunning, justCompleted, elapsedMinutes };
 }
