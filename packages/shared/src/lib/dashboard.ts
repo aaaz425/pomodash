@@ -42,11 +42,16 @@ export function getMonthlyActivityData<T extends { startedAt: string; focusSecon
 ): DayActivity[] {
   const days = eachDayOfInterval({ start: startOfMonth(today), end: endOfMonth(today) });
 
+  // 날짜별로 한 번만 순회해 집계 — 매 날짜마다 전체 세션을 다시 필터링하면 O(days*n)이 됨
+  const secondsByDate = new Map<string, number>();
+  for (const s of sessions) {
+    const dateKey = toLocalDateKey(parseISO(s.startedAt));
+    secondsByDate.set(dateKey, (secondsByDate.get(dateKey) ?? 0) + s.focusSeconds);
+  }
+
   return days.map((day) => {
     const dateKey = toLocalDateKey(day);
-    const focusSeconds = sessions
-      .filter((s) => toLocalDateKey(parseISO(s.startedAt)) === dateKey)
-      .reduce((sum, s) => sum + s.focusSeconds, 0);
+    const focusSeconds = secondsByDate.get(dateKey) ?? 0;
     // 1분 미만 집중도 캘린더에서 사라지지 않도록 반올림 대신 최소 1분 보장
     const focusMinutes = focusSeconds > 0 ? Math.max(1, Math.round(focusSeconds / 60)) : 0;
     return { date: dateKey, focusMinutes };
