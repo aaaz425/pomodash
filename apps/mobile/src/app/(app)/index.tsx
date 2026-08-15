@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTimerStore } from '@/store/StoreProvider';
+import { useHydrated, useTimerStore } from '@/store/StoreProvider';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { TimerControls } from '@/components/timer/TimerControls';
@@ -16,6 +16,7 @@ import { useCurrentTask } from '@/hooks/useCurrentTask';
 export default function TimerScreen() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+  const hydrated = useHydrated();
   const { task, category } = useCurrentTask();
 
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
@@ -27,6 +28,16 @@ export default function TimerScreen() {
     { value: `${shortBreakMinutes}분`, label: '휴식' },
     { value: `${totalCycles}회`, label: '사이클' },
   ];
+
+  // AsyncStorage에서 진행 중이던 타이머 스냅샷을 불러오기 전엔 기본값(25:00 대기중)이
+  // 잠깐 보였다가 실제 상태로 바뀌는 깜빡임이 생길 수 있어 hydrate 전까지는 렌더링을 미룬다.
+  if (!hydrated) {
+    return (
+      <View style={[styles.root, styles.centered, { backgroundColor: theme.background }]}>
+        <ActivityIndicator color={theme.mutedForeground} />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -108,6 +119,10 @@ export default function TimerScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+  },
+  centered: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   safeArea: {
     flex: 1,
