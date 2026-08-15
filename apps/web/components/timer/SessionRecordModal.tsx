@@ -234,6 +234,7 @@ export function SessionRecordModal() {
         confirmLabel="저장"
         onConfirm={handleSave}
         onCancel={() => setPendingAction(null)}
+        loading={isSaving}
       />
     </>
   );

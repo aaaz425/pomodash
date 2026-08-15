@@ -90,6 +90,7 @@ export function CategorySection() {
 
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -103,9 +104,11 @@ export function CategorySection() {
     }
   }
 
-  function handleDelete() {
-    if (!deleteTargetId) return;
-    deleteCategory(deleteTargetId);
+  async function handleDelete() {
+    if (!deleteTargetId || isDeleting) return;
+    setIsDeleting(true);
+    await deleteCategory(deleteTargetId);
+    setIsDeleting(false);
     setDeleteTargetId(null);
   }
 
@@ -162,6 +165,7 @@ export function CategorySection() {
         confirmLabel="삭제"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTargetId(null)}
+        loading={isDeleting}
       />
     </>
   );

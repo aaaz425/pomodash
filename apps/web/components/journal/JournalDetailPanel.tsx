@@ -53,6 +53,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
   const [draft, setDraft] = useState<EditDraft | null>(null);
   // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 저장될 수 있음
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const displayTitle =
     session.title ?? task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
@@ -87,8 +88,10 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
     setDraft(null);
   }
 
-  function handleDelete() {
-    deleteSession(session.id);
+  async function handleDelete() {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    await deleteSession(session.id);
     onDeleted();
   }
 
@@ -261,6 +264,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
         confirmLabel="삭제"
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
+        loading={isDeleting}
       />
     </div>
   );

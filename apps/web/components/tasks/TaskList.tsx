@@ -48,6 +48,7 @@ export function TaskList({
 
   const [editTarget, setEditTarget] = useState<Task | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const visibleTasks = tasks.filter((t) => !t.completed);
 
@@ -63,9 +64,11 @@ export function TaskList({
     }
   }
 
-  function handleDelete() {
-    if (!deleteTargetId) return;
-    deleteTask(deleteTargetId);
+  async function handleDelete() {
+    if (!deleteTargetId || isDeleting) return;
+    setIsDeleting(true);
+    await deleteTask(deleteTargetId);
+    setIsDeleting(false);
     setDeleteTargetId(null);
   }
 
@@ -141,6 +144,7 @@ export function TaskList({
         confirmLabel="삭제"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTargetId(null)}
+        loading={isDeleting}
       />
     </>
   );
