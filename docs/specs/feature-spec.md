@@ -1,11 +1,13 @@
 # 기능명세서 — Feature Specification
 
-> **버전:** 1.1 · **기준:** Phase 6-b 완료
+> **버전:** 1.2 · **기준:** Phase 8 완료 (웹 + 네이티브 앱, Supabase 백엔드)
+> 웹/모바일 기능은 동일하다. 데이터 저장은 전부 Supabase(RLS로 계정별 격리)이며, `focusSeconds`/`focusPeriods` 등 집계 규칙은 `packages/shared`에서 두 플랫폼이 공유한다.
 
 ---
 
 ## 목차
 
+0. [로그인](#0-로그인)
 1. [포모도로 타이머](#1-포모도로-타이머)
 2. [집중 모드](#2-집중-모드)
 3. [작업 관리](#3-작업-관리)
@@ -17,6 +19,22 @@
 9. [뱃지 수집](#9-뱃지-수집)
 10. [집중 요약 공유 카드](#10-집중-요약-공유-카드)
 11. [집중도/방해요소 기록 & 저널 인사이트](#11-집중도방해요소-기록--저널-인사이트)
+
+---
+
+## 0. 로그인
+
+### 설명
+
+이메일/비밀번호 또는 카카오 소셜 로그인으로 인증한다. 로그인 없이는 앱을 쓸 수 없다(전 데이터가 Supabase RLS로 계정에 귀속).
+
+### Acceptance Criteria
+
+- [ ] 이메일 회원가입: 이메일+비밀번호 입력 → 확인 메일 발송 → 링크 클릭으로 인증 완료
+- [ ] 이메일 로그인, 비밀번호 재설정(이메일 링크)
+- [ ] 카카오 로그인: OAuth 완료 시 최초 1회 기본 카테고리 5개 + 기본 설정이 자동 시딩(`handle_new_user` 트리거)
+- [ ] 미로그인 상태 접근 시 로그인 화면으로 리다이렉트
+- [ ] 로그아웃 시 기기 로컬의 활성 타이머 스냅샷도 함께 삭제(다음 계정에 이전 계정 타이머가 노출되지 않도록)
 
 ---
 
@@ -57,7 +75,7 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 
 | 상황 | 처리 |
 |------|------|
-| 타이머 실행 중 새로고침 | startedAt을 sessionStorage 또는 store에 유지 |
+| 타이머 실행 중 새로고침/앱 재시작 | 활성 타이머 스냅샷(localStorage/AsyncStorage)에서 startedAt 복원 |
 | focusMinutes = 0 | 설정 범위 제한으로 방지 (최소 5분) |
 | 사이클 도중 작업 전환 | 타이머 유지, 새 작업 ID로 세션 계속 |
 
@@ -110,26 +128,20 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 - [ ] 작업 삭제: 확인 다이얼로그 후 삭제
 - [ ] 작업 완료 표시: 완료 토글, 목록에서 시각적 구분
 - [ ] 카테고리 선택: 기본 5개(공부, 업무, 운동, 독서, 기타) + 사용자 정의
-- [ ] 드래그앤드롭으로 순서 변경, 변경 즉시 localStorage 저장
+- [ ] 드래그앤드롭으로 순서 변경, 변경 즉시 저장(`position` 컬럼)
 - [ ] 작업 선택 시 해당 작업의 타이머 설정값 자동 적용
 - [ ] 작업이 없을 때 빈 상태 안내 표시
 
 ### 데이터 흐름
 
-```
-생성: TaskForm 제출 → taskStore.addTask() → localStorage 저장
-수정: TaskForm 제출 → taskStore.updateTask() → localStorage 저장
-삭제: ConfirmDialog 확인 → taskStore.deleteTask() → localStorage 저장
-순서: DnD 완료 → taskStore.reorder() → localStorage 저장
-```
+CRUD/순서 변경 모두 동일 패턴: taskStore 액션 → optimistic update(즉시 UI 반영) → Supabase 요청 → 실패 시 롤백 + toast.
 
 ### 에지케이스
 
 | 상황 | 처리 |
 |------|------|
 | 작업 제목 공백만 입력 | 폼 검증으로 방지 |
-| 카테고리 삭제 시 해당 작업 | 작업의 categoryId 유지, 카테고리 없음 처리 |
-| 50개 이상 작업 | 현재 제한 없음 (성능 이슈 발생 시 페이지네이션 검토) |
+| 카테고리 삭제 시도 & 참조 작업 존재 | 삭제 차단 + 안내 토스트(클라이언트에서 선차단, DB `on delete restrict`는 안전망) |
 
 ---
 
@@ -148,22 +160,13 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 
 - [ ] 세션 종료 시 모달 자동 표시: 완료 사이클 수, 집중 시간, 작업명 표시
 - [ ] 모달에서 회고 메모 작성 (최대 500자, 선택 사항)
-- [ ] 저장 버튼 클릭 → Session 객체 localStorage에 저장
-- [ ] `/journal` 페이지에서 전체 세션 히스토리 조회
-- [ ] 날짜별 그룹핑, 최신순 정렬
-- [ ] 세션 카드에서 메모 수정 가능
-- [ ] 세션 삭제 가능 (확인 다이얼로그 후)
+- [ ] `/journal` 페이지에서 전체 세션 히스토리 조회, 날짜별 그룹핑·최신순 정렬
+- [ ] 저널 상세에서 제목/메모/집중도/방해요소 수정, 세션 삭제(확인 다이얼로그) 가능
 - [ ] 빈 히스토리 상태 표시
 
 ### 데이터 흐름
 
-```
-세션 종료 → timerStore.endSession()
-    → focusPeriods 정규화 (normalizeFocusPeriods)
-    → Session 객체 생성 (focusSeconds, pausedSeconds, completedCycles, ...)
-    → 모달 표시 → 사용자 메모 입력
-    → 저장 → sessionStore.addSession() → localStorage pomodash:sessions 업데이트
-```
+세션 종료 → `endSession()`이 `focusPeriods` 정규화 → 기록 모달에서 메모 입력 → 저장 시 `addSession()`이 optimistic update 후 Supabase insert, 실패하면 폼을 유지한 채 재시도 가능(토스트 안내).
 
 ### 에지케이스
 
@@ -171,7 +174,7 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 |------|------|
 | 0초 집중 세션 (바로 종료) | 저장하되 focusSeconds = 0으로 기록 |
 | 메모 저장 없이 모달 닫기 | 메모 없이 세션 저장 (note = null) |
-| 500자 초과 입력 | 입력 필드에서 maxLength로 방지 |
+| 세션 저장 실패(네트워크 등) | 토스트 안내 + 입력한 메모/평점/태그 유지, 재시도 가능 |
 
 ---
 
@@ -198,13 +201,7 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 
 ### 데이터 흐름
 
-```
-대시보드 마운트 → localStorage pomodash:sessions 읽기
-    → date-fns로 기간 필터링
-    → focusSeconds 집계 (endedAt - startedAt 아님)
-    → categoryId 기준 그룹핑 → Recharts 데이터 변환
-    → 스트릭: 오늘부터 역순 연속 날짜 계산
-```
+스토어에 로드된 세션에서 date-fns로 기간 필터링 → `focusSeconds` 집계(`endedAt - startedAt` 아님) → `categoryId` 기준 그룹핑 → Recharts 데이터 변환. 스트릭은 오늘부터 역순으로 연속 집중 날짜를 센다. 집계 로직은 `packages/shared/src/lib/dashboard.ts`에서 웹/앱이 공유한다.
 
 ### 에지케이스
 
@@ -233,7 +230,7 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 - [ ] 집중 시간: 5–120분 범위, StepperInput으로 변경
 - [ ] 휴식 시간: 0–60분 범위
 - [ ] 사이클 수: 1–10회 범위
-- [ ] 변경 즉시 localStorage에 저장
+- [ ] 변경 즉시 Supabase에 저장
 
 **알림**
 - [ ] 브라우저 알림 on/off 토글 (권한 요청 포함)
@@ -317,7 +314,7 @@ Tick: useTimer 훅 → remainingSeconds = targetSeconds - elapsed 재계산
 
 ### 설명
 
-세션 기록으로부터 매번 파생 계산되는 성취 뱃지. localStorage에 별도 저장하지 않고 스트릭/누적 시간/카테고리 다양성/특별 이벤트 4개 카테고리로 나눠 대시보드에 표시한다.
+세션 기록으로부터 매번 파생 계산되는 성취 뱃지. 별도 저장하지 않고 스트릭/누적 시간/카테고리 다양성/특별 이벤트 4개 카테고리로 나눠 대시보드에 표시한다.
 
 ### 사용자 스토리
 
