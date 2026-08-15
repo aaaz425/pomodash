@@ -29,14 +29,15 @@ export function toTask(row: TaskRow): Task | null {
   return parsed.success ? parsed.data : null;
 }
 
-export async function fetchTasks(): Promise<Task[] | null> {
+export async function fetchTasks(): Promise<{ tasks: Task[]; invalidCount: number } | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('tasks')
     .select(SELECT_COLUMNS)
     .order('position', { ascending: true });
   if (error || !data) return null;
-  return data.map(toTask).filter((t): t is Task => t !== null);
+  const tasks = data.map(toTask).filter((t): t is Task => t !== null);
+  return { tasks, invalidCount: data.length - tasks.length };
 }
 
 export async function insertTask(input: {

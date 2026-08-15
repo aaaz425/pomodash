@@ -60,7 +60,7 @@ export function SessionRecordModal() {
         end: new Date(p.end).toISOString(),
       })),
     );
-    await addSession({
+    const success = await addSession({
       taskId,
       title: null,
       mode,
@@ -75,13 +75,15 @@ export function SessionRecordModal() {
       focusRating,
       distractionTags,
     });
+    setPendingAction(null);
+    setIsSaving(false);
+    // 실패 시 폼을 그대로 유지해 재시도할 수 있게 함(토스트는 addSession 내부에서 이미 표시됨)
+    if (!success) return;
     dismissSessionRecord();
     setNote('');
     setFocusRating(null);
     setDistractionTags([]);
     setSelectedTaskId(null);
-    setPendingAction(null);
-    setIsSaving(false);
   }
 
   function handleSkip() {
