@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useStore } from 'zustand';
-import { createTimerStore } from '@/store/timerStore';
+import { createTimerStore, preloadTimerSnapshot } from '@/store/timerStore';
 import { createTaskStore } from '@/store/taskStore';
 import { createSettingsStore } from '@/store/settingsStore';
 import type { TimerStoreApi, TimerStore } from '@/store/timerStore';
@@ -48,10 +48,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // StoreProvider는 인증된 상태에서만 마운트되므로(app 그룹 레이아웃의 게이트) 여기선 바로 조회해도 안전.
   // 로그아웃 시엔 이 컴포넌트 자체가 언마운트되며 스토어도 함께 버려지므로 별도 reset은 불필요.
   useEffect(() => {
-    Promise.all([taskStore.getState().hydrate(), settingsStore.getState().hydrate()]).finally(() =>
-      setHydrated(true),
-    );
-  }, [taskStore, settingsStore]);
+    Promise.all([
+      preloadTimerSnapshot().then(() => timerStore.getState().hydrate()),
+      taskStore.getState().hydrate(),
+      settingsStore.getState().hydrate(),
+    ]).finally(() => setHydrated(true));
+  }, [timerStore, taskStore, settingsStore]);
 
   return (
     <TimerStoreContext.Provider value={timerStore}>

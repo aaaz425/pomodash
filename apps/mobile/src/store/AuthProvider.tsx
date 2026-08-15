@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { login as kakaoLogin } from '@react-native-seoul/kakao-login';
 import { AUTH_LIMITS } from '@pomodash/shared';
 import { supabase } from '@/lib/supabase/client';
+import { ACTIVE_TIMER_STORAGE_KEY } from '@/store/timerStore';
 import {
   LoginCredentialsSchema,
   SignupCredentialsSchema,
@@ -205,11 +207,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     await supabase.auth.signOut();
+    void AsyncStorage.removeItem(ACTIVE_TIMER_STORAGE_KEY);
     return {};
   }
 
+  // 같은 기기에서 다음 사용자가 로그인/가입했을 때 이전 사용자의 진행 중 타이머가
+  // 뜨는 걸 막기 위해, 계정과 무관하게 저장되는 activeTimer를 로그아웃 시 정리한다
   async function logout(): Promise<void> {
     await supabase.auth.signOut();
+    void AsyncStorage.removeItem(ACTIVE_TIMER_STORAGE_KEY);
   }
 
   const value: AuthContextValue = {
