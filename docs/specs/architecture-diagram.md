@@ -1,6 +1,6 @@
 # 아키텍처 구조도
 
-> **버전:** 1.1 · **기준:** Next.js App Router + localStorage MVP
+> **버전:** 2.0 · **기준:** pnpm 모노레포 + Supabase 백엔드 (Phase 7·8 완료)
 
 ---
 
@@ -8,98 +8,53 @@
 
 ```mermaid
 flowchart TB
-    subgraph Browser["브라우저 (Client)"]
-        direction TB
-        subgraph Next["Next.js App (Vercel Edge)"]
-            AppRouter["App Router\n(app/)"]
-            Components["Components\n(components/)"]
-            Stores["Zustand Stores\n(store/)"]
-            Lib["Utilities\n(lib/)"]
-        end
-        LS["localStorage\n(데이터 영속성)"]
-        SW["Service Worker\n(PWA 캐싱)"]
+    subgraph Web["apps/web (Next.js, Vercel)"]
+        WebApp["App Router / Components / Zustand Stores"]
+    end
+    subgraph Mobile["apps/mobile (Expo / React Native)"]
+        MobileApp["Expo Router / Components / Zustand Stores"]
+    end
+    subgraph Shared["packages/shared (@pomodash/shared)"]
+        SharedLib["순수 로직: 타이머 계산, 대시보드 집계,\n뱃지, focusPeriods, 세션 유틸"]
     end
 
-    subgraph External["외부 서비스"]
-        Vercel["Vercel\n(호스팅 / CDN)"]
-        Analytics["Vercel Analytics\n(페이지뷰 / Vitals)"]
-        Posthog["Posthog\n(제품 지표)"]
+    subgraph Supabase["Supabase"]
+        Auth["Auth (이메일 + 카카오)"]
+        DB["Postgres (categories/tasks/sessions/settings, RLS)"]
     end
 
-    AppRouter --> Components
-    Components --> Stores
-    Stores --> Lib
-    Lib --> LS
-    Next --> Analytics
-    Next --> Posthog
-    Vercel --> Next
+    WebApp --> SharedLib
+    MobileApp --> SharedLib
+    WebApp --> Supabase
+    MobileApp --> Supabase
+
+    LS["localStorage — 활성 타이머 스냅샷 + 테마만"]
+    AS["AsyncStorage — 활성 타이머 스냅샷 + 세션 캐시"]
+    WebApp --> LS
+    MobileApp --> AS
 ```
+
+Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소(localStorage/AsyncStorage)에는 새로고침 복구용 활성 타이머 스냅샷과 테마만 남는다.
 
 ---
 
-## 2. 컴포넌트 의존성 계층
+## 2. 컴포넌트 의존성 계층 (apps/web 기준)
 
-단방향 의존만 허용한다. `lib/`에서 `components/`나 `app/`을 import하는 역방향 의존은 금지한다.
+단방향 의존만 허용한다. `lib/`에서 `components/`나 `app/`을 import하는 역방향 의존은 금지한다. apps/mobile도 동일한 계층 규칙을 따르며, 플랫폼 무관 순수 로직은 `packages/shared`로 뽑는다.
 
 ```mermaid
 flowchart LR
-    subgraph app["app/ (라우팅)"]
-        Pages["page.tsx\nlayout.tsx"]
-    end
-
-    subgraph components["components/ (UI)"]
-        Feature["feature/\n(timer, tasks, dashboard\njournal, settings, landing)"]
-        Shared["shared/\n(공유 컴포넌트)"]
-        UI["ui/\n(shadcn/ui)"]
-    end
-
-    subgraph hooks["hooks/ (브라우저 API 추상화 + 재사용 로직)"]
-        UseTimer["useTimer"]
-        UseCurrentTask["useCurrentTask"]
-        UseSessionEndFlow["useSessionEndFlow"]
-        UseTheme["useTheme 등"]
-    end
-
-    subgraph store["store/ (전역 상태)"]
-        TimerStore["timerStore"]
-        TaskStore["taskStore"]
-        SettingsStore["settingsStore"]
-    end
-
-    subgraph config["config/ (앱 설정)"]
-        Site["site.ts"]
-        Analytics["analytics.ts"]
-    end
-
-    subgraph lib["lib/ (도메인 로직·유틸)"]
-        Constants["constants/\n(상수 SSOT)"]
-        Storage["storage.ts"]
-        Notifications["notifications.ts"]
-        FocusPeriods["focusPeriods.ts"]
-        Dashboard["dashboard.ts / journalInsights.ts"]
-        Badges["badges.ts"]
-        ShareCard["shareCard.ts / shareCardCanvas.ts"]
-        SessionUtils["sessionUtils.ts / sessionStale.ts"]
-    end
-
-    subgraph types["types/"]
-        Models["models.ts\n(인터페이스)"]
-        Schemas["schemas.ts\n(Zod 스키마)"]
-    end
-
-    Pages --> Feature
-    Pages --> Shared
-    Feature --> UI
-    Shared --> UI
-    Feature --> hooks
-    Shared --> hooks
-    Feature --> store
-    Shared --> store
+    Pages["app/ (라우팅)"] --> Feature["components/&lt;feature&gt;/"]
+    Pages --> Shared["components/shared/"]
+    Feature --> UI["components/ui/ (shadcn)"]
+    Feature --> hooks["hooks/"]
+    Feature --> store["store/"]
     hooks --> store
-    hooks --> lib
+    hooks --> lib["lib/ (플랫폼 특화 유틸)"]
     store --> lib
-    store --> types
-    lib --> types
+    store --> SharedPkg["@pomodash/shared"]
+    lib --> SharedPkg
+    store --> types["types/ (models.ts, schemas.ts)"]
 ```
 
 ---
@@ -128,12 +83,6 @@ stateDiagram-v2
         remainingSeconds =
         targetSeconds - elapsed
     end note
-
-    note right of SessionComplete
-        세션 기록 모달 표시
-        focusPeriods 정규화 후
-        localStorage 저장
-    end note
 ```
 
 ---
@@ -145,49 +94,41 @@ sequenceDiagram
     actor User
     participant Timer as TimerSection
     participant Store as timerStore
-    participant Hook as useTimer
-    participant Lib as lib/storage
-    participant LS as localStorage
+    participant Task as taskStore
+    participant Supa as Supabase
 
     User->>Timer: 시작 버튼 클릭
     Timer->>Store: start()
-    Store->>Store: startedAt = Date.now()
-    Store->>Store: focusPeriods에 구간 시작 추가
+    Store->>Store: startedAt = Date.now(), rawFocusPeriods 구간 시작
 
-    loop 매 tick (1초)
-        Hook->>Store: Date.now() - startedAt 재계산
-        Store->>Timer: remainingSeconds 업데이트
+    loop 매 tick (1초, 절대시간 재계산)
+        Store->>Timer: displaySeconds 갱신
     end
-
-    User->>Timer: 일시정지
-    Timer->>Store: pause()
-    Store->>Store: focusPeriods 현재 구간 종료
 
     User->>Timer: 세션 종료
     Timer->>Store: endSession()
-    Store->>Store: focusPeriods 정규화\n(normalizeFocusPeriods)
-    Store->>Lib: saveSession(session)
-    Lib->>Lib: Zod 검증
-    Lib->>LS: pomodash:sessions 업데이트
-    Store->>Timer: 세션 기록 모달 트리거
+    Store->>Store: normalizeFocusPeriods()
+    Store->>Task: addSession(session)
+    Task->>Task: optimistic update (즉시 UI 반영)
+    Task->>Supa: insert (Zod 검증 후)
+    Supa-->>Task: 실패 시 롤백 + toast
 ```
 
 ---
 
-## 5. 스토어 구성 및 역할
+## 5. 스토어 구성
 
-| 스토어 | 파일 | 주요 상태 | 주요 액션 |
-|--------|------|-----------|-----------|
-| timerStore | `store/timerStore.ts` | phase, mode, startedAt, remainingSeconds, cycleCount, currentTaskId, rawFocusPeriods | start, pause, complete, reset, completeCycle, endSession |
-| taskStore | `store/taskStore.ts` | tasks[], categories[], sessions[] | addTask, updateTask, deleteTask, addSession, updateSessionNote/Rating/Tags, addCategory, deleteCategory |
-| settingsStore | `store/settingsStore.ts` | AppSettings 필드를 평탄화해서 개별 상태로 보관(nickname, soundType 등) | setNickname, setTimerDefaults, setSoundType, addMessage 등 |
+| 스토어 | 주요 상태 | 주요 액션 |
+|--------|-----------|-----------|
+| timerStore | phase, mode, startedAt, remainingSeconds, cycleCount, rawFocusPeriods | start, pause, complete, reset, endSession |
+| taskStore | tasks[], categories[], sessions[] | addTask, updateTask, deleteTask, addSession, updateSessionFields, addCategory, deleteCategory |
+| settingsStore | AppSettings 필드 (nickname, soundType 등) | setNickname, setTimerDefaults, setSoundType, addMessage 등 |
 
-모든 스토어는 `createStore()` 팩토리 패턴을 쓴다 (SSR 싱글톤 버그 방지). 참조: `docs/guides/conventions.md` — Zustand 스토어 패턴
+세 스토어 모두 `createStore()` 팩토리 패턴을 쓴다(SSR/RN 양쪽에서 싱글톤 버그 방지). 그중 `timerStore`만 `packages/shared`의 `createTimerStore(ports)`를 웹/모바일 각자 감싸 localStorage/AsyncStorage 포트를 주입하고, `taskStore`/`settingsStore`는 플랫폼별로 각자 구현한다(Supabase 클라이언트 호출 방식 차이). 참조: [conventions.md](../guides/conventions.md)
 
 ---
 
-## 참조
+## 6. 참조
 
 - 폴더 구조 규칙: [docs/guides/conventions.md](../guides/conventions.md)
-- 데이터 모델: [docs/specs/ERD.md](ERD.md)
-
+- 데이터 모델 / Supabase 스키마: [docs/specs/ERD.md](ERD.md)

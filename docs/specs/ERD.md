@@ -1,13 +1,6 @@
 # ERD — Entity Relationship Diagram
 
-> **버전:** 1.1 · **기준:** `types/index.ts` (localStorage MVP 기준, Supabase 마이그레이션 전)
-> **저장소:** 브라우저 localStorage (서버 DB 없음)
-
----
-
-## 개요
-
-엔티티 간 관계는 외래 키 ID로 참조하고 런타임에 Zod 스키마로 검증한다. FocusPeriod는 Session에 내장(embedded)되어 별도 키로 저장되지 않는다.
+> **버전:** 2.0 · **기준:** Supabase Postgres (`supabase/migrations/`), RLS로 `auth.uid() = user_id` 전 테이블 적용
 
 ---
 
@@ -15,200 +8,88 @@
 
 ```mermaid
 erDiagram
-    CATEGORY {
-        string id PK
-        string name
-        string color "Tailwind class (e.g. bg-blue-500)"
+    CATEGORIES {
+        uuid id PK
+        uuid user_id FK "auth.users"
+        text name
+        text color "Tailwind class, 'bg-' 접두사 CHECK"
+        int position
+        timestamptz created_at
     }
 
-    TASK {
-        string id PK
-        string title
-        string categoryId FK
-        number targetFocusMinutes "기본 25, 범위 5-120"
-        number targetCycles "기본 4, 범위 1-10"
-        number targetBreakMinutes "기본 5, 범위 0-60"
+    TASKS {
+        uuid id PK
+        uuid user_id FK "auth.users"
+        uuid category_id FK "on delete restrict"
+        text title
+        int target_focus_minutes "5-120, 기본 25"
+        int target_cycles "1-10, 기본 4"
+        int target_break_minutes "0-60, 기본 5"
         boolean completed
-        string createdAt "ISO 8601"
+        int position
+        timestamptz created_at
     }
 
-    SESSION {
-        string id PK
-        string taskId FK "nullable — 미분류 세션"
-        string mode "'pomodoro' | 'free', free는 completedCycles/totalCycles 0"
-        string startedAt "ISO 8601"
-        string endedAt "ISO 8601"
-        number completedCycles
-        number totalCycles "당시 설정값 스냅샷"
-        number focusSeconds "집계 전용 — endedAt-startedAt 사용 금지"
-        number pausedSeconds
-        string note "nullable, 최대 500자"
-        number focusRating "nullable, 1-3단계 집중도 자가 평점"
-        string distractionTags "방해요소 태그 id 배열"
+    SESSIONS {
+        uuid id PK
+        uuid user_id FK "auth.users"
+        uuid task_id FK "nullable, on delete set null"
+        text title "nullable, 최대 100자, taskId와 독립된 자유 라벨"
+        text mode "'pomodoro' | 'free'"
+        timestamptz started_at
+        timestamptz ended_at
+        int completed_cycles
+        int total_cycles "당시 설정값 스냅샷"
+        int focus_seconds "집계 전용 — ended_at-started_at 사용 금지"
+        int paused_seconds
+        jsonb focus_periods "내장 배열, 최대 100개 CHECK"
+        text note "nullable, 최대 500자"
+        smallint focus_rating "nullable, 1-3"
+        text[] distraction_tags
+        timestamptz created_at
     }
 
-    FOCUS_PERIOD {
-        string start "ISO 8601 (Session에 내장)"
-        string end "ISO 8601 (Session에 내장)"
+    SETTINGS {
+        uuid user_id PK "auth.users, 유저당 1행"
+        text nickname "최대 20자"
+        boolean browser_notification
+        boolean sound_alert
+        text sound_type "'sine'|'chime'|'bell'|'digital'"
+        smallint sound_volume "0-100"
+        smallint sound_repeat_count "1-5"
+        text[] motivational_messages
+        int default_focus_minutes
+        int default_short_break_minutes
+        int default_total_cycles
+        timestamptz updated_at
     }
 
-    TIMER_SETTINGS {
-        number focusMinutes "5-120"
-        number shortBreakMinutes "0-60"
-        number totalCycles "1-10"
-    }
-
-    APP_SETTINGS {
-        string nickname
-        boolean browserNotification
-        boolean soundAlert
-        string soundType "'sine' | 'chime' | 'bell' | 'digital'"
-        number soundVolume "0-100"
-        number soundRepeatCount "1-5"
-        string motivationalMessages "배열, 1-20개"
-    }
-
-    CATEGORY ||--o{ TASK : "분류"
-    TASK ||--o{ SESSION : "집중 기록"
-    SESSION ||--|{ FOCUS_PERIOD : "포함 (내장)"
-    APP_SETTINGS ||--|| TIMER_SETTINGS : "defaultTimerSettings (내장)"
+    CATEGORIES ||--o{ TASKS : "분류"
+    TASKS |o--o{ SESSIONS : "집중 기록 (nullable)"
 ```
 
----
+`focus_periods`는 정규화하지 않고 `jsonb`로 내장한다 — 항상 부모 세션과 함께만 조회/집계되어 별도 테이블화 이득이 없다(`packages/shared/src/lib/focusPeriods.ts`, `dashboard.ts`). 정규화 규칙: 5초 미만 구간 드롭, 5초 이하 일시정지로 나뉜 인접 구간 병합, 최대 100개 상한.
 
-## 엔티티 상세
-
-### Category
-
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| `id` | string | PK | UUID 또는 고정 ID |
-| `name` | string | - | 표시 이름 |
-| `color` | string | - | Tailwind 클래스 (예: `bg-blue-500`) |
-
-**기본값:** 공부(blue), 업무(green), 운동(orange), 독서(purple), 기타(gray)
+TypeScript 인터페이스는 `types/models.ts`(웹)/`types/*.ts`(모바일), Zod 스키마는 `types/schemas.ts`에 대응한다. 필드 상세 제약: [docs/guides/data-models.md](../guides/data-models.md)
 
 ---
 
-### Task
+## RLS 및 트리거
 
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| `id` | string | PK | UUID |
-| `title` | string | - | 작업 이름 |
-| `categoryId` | string | FK → Category | 카테고리 참조 |
-| `targetFocusMinutes` | number | 5–120 | 사이클당 집중 시간 |
-| `targetCycles` | number | 1–10 | 목표 사이클 수 |
-| `targetBreakMinutes` | number | 0–60 | 사이클 간 휴식 시간 |
-| `completed` | boolean | - | 완료 여부 |
-| `createdAt` | string | ISO 8601 | 생성 시각 |
+- 전 테이블 `select`/`insert`/`update`/`delete`를 `auth.uid() = user_id`로 제한, `authenticated` 롤에만 권한 부여(로그인 필수, `anon` 권한 없음)
+- `tasks.category_id`는 `on delete restrict` — 참조하는 task가 있으면 카테고리 삭제가 막힌다(웹/앱 UX에서 안내)
+- `sessions.task_id`는 `on delete set null` — 작업 삭제 시 세션은 "미분류"로 남는다
+- `handle_new_user()` 트리거: 신규 계정 생성 시 기본 카테고리 5개 + 기본 `settings` 1행을 원자적으로 시딩(닉네임은 카카오 프로필 닉네임 또는 이메일 로컬 파트)
 
 ---
 
-### Session
+## 기기 로컬 저장소 (Supabase 미러링 아님)
 
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| `id` | string | PK | UUID |
-| `taskId` | string \| null | FK → Task | null = 미분류 세션 |
-| `mode` | `'pomodoro' \| 'free'` | - | free 모드는 완료 사이클 개념이 없어 completedCycles/totalCycles가 항상 0 |
-| `startedAt` | string | ISO 8601 | 세션 최초 시작 시각 |
-| `endedAt` | string | ISO 8601 | 세션 종료 시각 |
-| `completedCycles` | number | - | 실제 완료 사이클 수 |
-| `totalCycles` | number | - | 당시 설정값 스냅샷 |
-| `focusSeconds` | number | - | **집계 전용** (pausedSeconds 제외) |
-| `pausedSeconds` | number | - | 총 일시정지 시간 |
-| `focusPeriods` | FocusPeriod[] | - | 타임라인 블록용 실제 집중 구간 |
-| `note` | string \| null | 최대 500자 | 세션 회고 메모 |
-| `focusRating` | 1 \| 2 \| 3 \| null | 옵션 | 집중도 자가 평점 3단계 |
-| `distractionTags` | string[] | 옵션 | 방해요소 태그 프리셋 id 배열 |
-
-> **주의:** `focusSeconds`만 집계에 사용. `endedAt - startedAt`은 일시정지를 포함한 경과 시간이므로 통계에 쓰면 안 된다.
+Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소에는 새로고침/재시작 복구용 활성 타이머 스냅샷과 테마만 남는다 — 키 목록과 검증 패턴은 [docs/guides/data-models.md](../guides/data-models.md) 참조.
 
 ---
 
-### FocusPeriod (Session 내장)
+## 참조
 
-Session의 `focusPeriods` 배열 원소. 별도 localStorage 키 없음.
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `start` | string (ISO 8601) | 집중 구간 시작 |
-| `end` | string (ISO 8601) | 집중 구간 종료 |
-
-**정규화 규칙 (`lib/focusPeriods.ts`):**
-- 5초 미만 구간 드롭 (노이즈 제거)
-- 5초 이하 일시정지로 나뉜 인접 구간 병합
-- 최대 100개 구간 상한
-
----
-
-### TimerSettings (AppSettings 내장)
-
-| 필드 | 타입 | 범위 | 기본값 |
-|------|------|------|--------|
-| `focusMinutes` | number | 5–120 | 25 |
-| `shortBreakMinutes` | number | 0–60 | 5 |
-| `totalCycles` | number | 1–10 | 4 |
-
----
-
-### AppSettings
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `nickname` | string | 사용자 닉네임 |
-| `browserNotification` | boolean | 브라우저 알림 on/off |
-| `soundAlert` | boolean | 소리 알람 on/off |
-| `soundType` | SoundType | `'sine' \| 'chime' \| 'bell' \| 'digital'` |
-| `soundVolume` | number | 0–100 |
-| `soundRepeatCount` | number | 1–5 |
-| `motivationalMessages` | string[] | 동기부여 메시지 목록 (1–20개) |
-| `defaultTimerSettings` | TimerSettings | 세션 시작 시 기본 적용값 |
-
----
-
-## localStorage 키 매핑
-
-| 엔티티 | localStorage 키 | 형태 |
-|--------|-----------------|------|
-| Category[] | `pomodash:categories` | JSON 배열 |
-| Task[] | `pomodash:tasks` | JSON 배열 |
-| Session[] | `pomodash:sessions` | JSON 배열 (FocusPeriod 내장) |
-| AppSettings | `pomodash:settings` | JSON 객체 |
-| TimerSettings (런타임) | `pomodash:timer-settings` | JSON 객체 |
-| 진행 중 타이머 상태 | `pomodash:active-timer` | JSON 객체 (새로고침 복원용) |
-| 스키마 버전 | `pomodash:version` | 숫자 문자열 |
-| 테마 | `theme` | 문자열 (`pomodash:` 접두사 예외) |
-
----
-
-## 스키마 버전 관리
-
-- `pomodash:version` 값이 현재 버전과 다르면 localStorage 전체 초기화 또는 마이그레이션 실행
-- 현재 버전: **1**
-- 버전 업그레이드 시 기존 사용자 데이터 유실 가능 → 마이그레이션 로직 필수
-
----
-
-## 파생 데이터 (localStorage 미저장)
-
-아래는 Task/Session/Category로부터 매번 다시 계산되는 값으로, 별도 localStorage 키를 갖지 않는다. `types/models.ts`에 인터페이스로 정의되어 있다.
-
-| 타입 | 계산 위치 | 용도 |
-|------|-----------|------|
-| Badge 획득 여부 | `lib/badges.ts` | 스트릭/누적시간/다양성/특별이벤트 뱃지 수집 상태 (정의는 `lib/constants/badges.ts`) |
-| `ShareCardData` | `lib/shareCard.ts` | 집중 요약 공유 카드에 표시할 데이터 — 클라이언트 Canvas로 이미지 생성(`lib/shareCardCanvas.ts`) 후 `navigator.share`로 공유 |
-| `FocusRatingTrend`, `CategoryRatingItem`, `DistractionFrequency` | `lib/journalInsights.ts` | 기록 페이지 인사이트(최근/과거 집중도 비교, 카테고리별 평점, 방해요소 빈도) |
-
----
-
-## Phase 7 스키마 (`chore/supabase-setup`, `supabase/migrations/20260731124043_init_schema.sql`)
-
-- localStorage 키 → Supabase 테이블(`categories`/`tasks`/`sessions`/`settings`)로 전환, `uuid` PK(`gen_random_uuid()`), 전 테이블 `auth.uid() = user_id` RLS
-- `Task.categoryId`(nullable 아님) → `tasks.category_id`는 `on delete restrict` — 기존 앱은 카테고리 삭제 시 참조 task를 방치했지만 DB는 삭제를 막음. 실제 UX(차단 안내/재할당/nullable 전환)는 `refactor/store-supabase-sync`에서 결정
-- `Session.taskId`(nullable) → `sessions.task_id`는 `on delete set null`로 "미분류 세션" 유지
-- `focusPeriods` 내장 배열 → **정규화하지 않고 `jsonb`로 유지 확정**(항상 부모 세션과 함께만 조회되어 별도 테이블화 이득 없음), `jsonb_array_length <= 100` CHECK로 `FOCUS_PERIOD_LIMITS.MAX_PERIODS` 반영
-- 재정렬 가능한 `tasks`/`categories`에 신규 `position` 컬럼 추가 (localStorage 배열 순서를 대체)
-- 신규 계정 생성 시 `handle_new_user()` 트리거가 기본 카테고리 5개 + 기본 `settings` 1행을 원자적으로 시딩
-
+- 마이그레이션 원본: `supabase/migrations/`
+- 데이터 모델 상세(타입/기본값/localStorage 키): [docs/guides/data-models.md](../guides/data-models.md)

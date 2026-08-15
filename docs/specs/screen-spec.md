@@ -1,6 +1,6 @@
 # 화면정의서 — Screen Specification
 
-> **버전:** 1.1 · **기준:** Phase 6-b 완료
+> **버전:** 1.2 · **기준:** apps/web (Next.js). 모바일 앱(apps/mobile)은 화면 구성·라우팅·상호작용이 픽셀 단위로 동일하다 — 별도 문서 없이 이 문서를 공용으로 참조한다. 파일 경로만 `apps/mobile/src/`로 대응해서 읽는다.
 
 ---
 
@@ -67,7 +67,7 @@ MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 �
 
 ### 에지케이스
 
-- 기존 사용자(localStorage에 세션/작업 데이터 있음)도 랜딩으로 진입 가능 — 별도 리다이렉트 없음
+- 로그인 상태여도 랜딩으로 진입 가능 — 별도 리다이렉트 없음
 
 ---
 
@@ -258,15 +258,15 @@ JournalView
 │   └─ CalendarDayModal (날짜 선택 시 해당일 SessionListItem 목록)
 └─ SessionDetailOverlay (세션 선택 시, 모바일 하단시트/데스크톱 중앙팝업)
     └─ JournalDetailPanel
-        ├─ 작업명+CategoryBadge, 날짜/시간범위
+        ├─ SessionDetailHeader (CategoryBadge, 제목, 날짜/시간범위, 편집/삭제 아이콘)
         ├─ FocusRatingPicker (집중도 3단계)
         ├─ DistractionTagPicker (방해요소 태그, 다중 선택)
-        ├─ JournalNoteEditor (클릭 시 인라인 편집모드, 별도 모달 아님)
-        ├─ 통계(집중시간 / 사이클 또는 자유 집중 시간)
+        ├─ 메모 (뷰 모드: 텍스트 표시 / 편집 모드: MemoTextarea)
+        ├─ SessionStatsRow (집중시간 / 사이클 또는 자유 집중 시간)
         └─ "세션 삭제" → ConfirmDialog
 ```
 
-`JournalDetailPanel`은 리스트뷰/캘린더뷰 어느 쪽에서 세션을 클릭해도 공통으로 열리는 상세 콘텐츠다. `SessionDetailOverlay`는 그 콘텐츠를 담는 반응형 Dialog 셸이다.
+`JournalDetailPanel`은 리스트뷰/캘린더뷰 어느 쪽에서 세션을 클릭해도 공통으로 열리는 상세 콘텐츠다. `SessionDetailOverlay`는 그 콘텐츠를 담는 반응형 Dialog 셸이다. 편집은 필드별 인라인이 아니라 **패널 전체 단위의 통합 모드**다 — 편집 아이콘 클릭 시 제목/집중도/방해요소/메모가 한 번에 편집 가능 상태로 전환되고, "저장"으로 한 번에 커밋하거나 "취소"로 되돌린다.
 
 ### 컴포넌트 표
 
@@ -282,8 +282,8 @@ JournalView
 | CalendarMonthGrid | `components/journal/CalendarMonthGrid.tsx` | 월간 히트맵 그리드 |
 | CalendarDayModal | `components/journal/CalendarDayModal.tsx` | 선택 날짜의 세션 목록 모달 |
 | SessionDetailOverlay | `components/journal/SessionDetailOverlay.tsx` | 반응형 Dialog 셸 |
-| JournalDetailPanel | `components/journal/JournalDetailPanel.tsx` | 세션 상세(집중도/방해요소/메모/통계/삭제) |
-| JournalNoteEditor | `components/journal/JournalNoteEditor.tsx` | 메모 인라인 편집(500자 제한) |
+| JournalDetailPanel | `components/journal/JournalDetailPanel.tsx` | 세션 상세 조립(편집 상태 관리) |
+| SessionDetailHeader / SessionStatsRow | `components/journal/SessionDetailHeader.tsx`, `SessionStatsRow.tsx` | 제목/메타/편집 컨트롤, 집중시간·사이클 통계 |
 | JournalEmptyState | `components/journal/JournalEmptyState.tsx` | 세션 0개일 때 안내 |
 | CategoryBadge   | `components/shared/CategoryBadge.tsx`   | 카테고리 색상 뱃지      |
 | ConfirmDialog   | `components/shared/ConfirmDialog.tsx`   | 삭제 확인           |
@@ -297,8 +297,8 @@ JournalView
 | 필터 적용 | `useJournalFilters` 훅이 세션 필터링 후 날짜별 재그룹핑 |
 | 세션 항목 클릭(리스트/캘린더 공통) | SessionDetailOverlay + JournalDetailPanel 오픈 |
 | 캘린더 날짜 클릭(집중기록 있는 날만 활성) | CalendarDayModal 오픈, 해당일 세션 목록 표시 |
-| 상세 패널에서 메모 클릭 | 인라인 편집모드(저장/취소) |
-| 상세 패널에서 집중도/방해요소 선택 | 즉시 세션에 반영 |
+| 상세 패널 편집 아이콘 클릭 | 제목/집중도/방해요소/메모 통합 편집 모드 진입 |
+| 편집 모드에서 "저장"/"취소" | 전체 필드 일괄 커밋 / 원래 값으로 되돌림 |
 | "세션 삭제"    | ConfirmDialog → 확인 시 세션 제거, 오버레이 자동 닫힘 |
 
 ### 에지케이스
@@ -353,7 +353,27 @@ JournalView
 
 - 동기부여 메시지 전체 삭제 시: 최소 1개 유지 규칙 (마지막 메시지 삭제 버튼 비활성)
 - 브라우저 알림 권한 영구 거부 시: 토글 비활성 + "브라우저 설정에서 변경하세요" 안내
-- 기본 카테고리(공부, 업무, 운동, 독서, 기타) 삭제 가능 여부: 허용 (사용자 자율, 참조하던 작업의 categoryId는 유지되어 이후 "카테고리 없음"으로 표시됨)
+- 기본 카테고리(공부, 업무, 운동, 독서, 기타)도 삭제 가능하나, 참조하는 작업이 하나라도 있으면 삭제가 차단되고 안내 토스트가 뜬다(DB `on delete restrict`가 안전망)
+
+---
+
+## 화면 7 — 로그인 / 회원가입
+
+**경로:** `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/confirm`
+**목적:** 이메일 또는 카카오로 인증한다. 미로그인 상태에서 `/(main)` 하위 접근 시 `/login`으로 리다이렉트된다.
+
+### 인터랙션
+
+| 액션 | 동작 |
+| --- | --- |
+| 이메일+비밀번호 회원가입 | 확인 메일 발송 → `/auth/confirm` 링크 클릭 시 인증 완료 |
+| 카카오 로그인 버튼 | OAuth 진행, 최초 로그인 시 기본 카테고리/설정 자동 시딩 |
+| "비밀번호를 잊으셨나요" | `/forgot-password`에서 이메일 입력 → 재설정 링크 발송 → `/reset-password`에서 새 비밀번호 설정 |
+
+### 에지케이스
+
+- 이메일 인증 전 로그인 시도: Supabase 정책에 따른 안내
+- 카카오 로그인 실패/취소: 에러 없이 로그인 화면으로 복귀
 
 ---
 
