@@ -14,6 +14,8 @@ interface Props {
   onCancel: () => void;
   tertiaryLabel?: string;
   onTertiary?: () => void;
+  /** true면 확인/취소/3번째 버튼을 전부 비활성화 — 비동기(Supabase 왕복) onConfirm 진행 중 연타 방지 */
+  loading?: boolean;
 }
 
 // AlertDialog는 바깥 클릭으로 안 닫히는 게 기본 동작(의도적 — 실수로 안 닫히게).
@@ -28,13 +30,14 @@ export function ConfirmDialog({
   onCancel,
   tertiaryLabel,
   onTertiary,
+  loading = false,
 }: Props) {
   const hasTertiary = Boolean(tertiaryLabel && onTertiary);
   return (
     <AlertDialogPrimitive.Root
       open={open}
       onOpenChange={(next) => {
-        if (!next) onCancel();
+        if (!next && !loading) onCancel();
       }}
     >
       <AlertDialogPrimitive.Portal>
@@ -62,16 +65,29 @@ export function ConfirmDialog({
             className={`flex items-center gap-2 ${hasTertiary ? 'justify-between' : 'justify-end'}`}
           >
             {hasTertiary && (
-              <Button onClick={onTertiary} variant="destructive" size="lg" className="px-4">
+              <Button
+                onClick={onTertiary}
+                disabled={loading}
+                variant="destructive"
+                size="lg"
+                className="px-4"
+              >
                 {tertiaryLabel}
               </Button>
             )}
             <div className="flex items-center gap-2">
-              <Button onClick={onCancel} variant="secondary" size="lg" className="px-4">
+              <Button
+                onClick={onCancel}
+                disabled={loading}
+                variant="secondary"
+                size="lg"
+                className="px-4"
+              >
                 {cancelLabel}
               </Button>
               <Button
                 onClick={onConfirm}
+                disabled={loading}
                 variant="default"
                 size="lg"
                 className="px-4 font-semibold"

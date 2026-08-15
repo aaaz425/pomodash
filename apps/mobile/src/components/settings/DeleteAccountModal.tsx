@@ -82,6 +82,7 @@ export function DeleteAccountModal({ visible, onClose }: Props) {
         destructive
         onConfirm={handleKakaoReauthAndDelete}
         onCancel={handleClose}
+        loading={pending}
       />
     );
   }

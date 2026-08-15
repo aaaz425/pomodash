@@ -50,6 +50,7 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   const [draft, setDraft] = useState<EditDraft | null>(null);
   // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 저장될 수 있음
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const session = sessions.find((s) => s.id === sessionId) ?? null;
 
@@ -97,10 +98,10 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
     setDraft(null);
   }
 
-  function handleDelete() {
-    if (!session) return;
-    void deleteSession(session.id);
-    setConfirmDelete(false);
+  async function handleDelete() {
+    if (!session || isDeleting) return;
+    setIsDeleting(true);
+    await deleteSession(session.id);
     onClose();
   }
 
@@ -294,6 +295,7 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
         destructive
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
+        loading={isDeleting}
       />
     </Modal>
   );

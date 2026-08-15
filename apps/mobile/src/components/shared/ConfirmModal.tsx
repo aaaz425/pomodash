@@ -22,6 +22,8 @@ interface Props {
    * 닫힐 때 화면이 검게 남거나 안 뜨는 문제가 있어서 그 경우에만 사용.
    */
   inline?: boolean;
+  /** true면 확인/취소/3번째 버튼을 전부 비활성화 — 비동기(Supabase 왕복) onConfirm 진행 중 연타 방지 */
+  loading?: boolean;
 }
 
 // 웹의 중앙 정렬 ConfirmDialog.tsx 대응 — Modal.tsx(바텀시트)와 별개의 프리미티브.
@@ -38,6 +40,7 @@ export function ConfirmModal({
   tertiaryLabel,
   onTertiary,
   inline = false,
+  loading = false,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
@@ -65,7 +68,13 @@ export function ConfirmModal({
           {tertiaryLabel && onTertiary && (
             <Pressable
               onPress={onTertiary}
-              style={[styles.button, styles.tertiaryButton, { borderColor: theme.border }]}
+              disabled={loading}
+              style={[
+                styles.button,
+                styles.tertiaryButton,
+                { borderColor: theme.border },
+                loading && styles.disabled,
+              ]}
             >
               <Text
                 style={[
@@ -78,7 +87,11 @@ export function ConfirmModal({
             </Pressable>
           )}
           {onCancel && (
-            <Pressable onPress={onCancel} style={[styles.button, { backgroundColor: theme.muted }]}>
+            <Pressable
+              onPress={onCancel}
+              disabled={loading}
+              style={[styles.button, { backgroundColor: theme.muted }, loading && styles.disabled]}
+            >
               <Text
                 style={[
                   styles.buttonText,
@@ -91,9 +104,11 @@ export function ConfirmModal({
           )}
           <Pressable
             onPress={onConfirm}
+            disabled={loading}
             style={[
               styles.button,
               { backgroundColor: destructive ? theme.destructive : theme.primary },
+              loading && styles.disabled,
             ]}
           >
             <Text
@@ -170,5 +185,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 14,
+  },
+  disabled: {
+    opacity: 0.4,
   },
 });
