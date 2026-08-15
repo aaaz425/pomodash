@@ -1,26 +1,16 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Pencil, Trash2 } from 'lucide-react-native';
-import {
-  formatFocusPeriodRanges,
-  formatFullDate,
-  formatTimeRange,
-  getSessionOrdinalTitle,
-  hasAbnormalFocusGap,
-  INPUT_LIMITS,
-  type FocusRating,
-} from '@pomodash/shared';
+import { StyleSheet, Text, View } from 'react-native';
+import { getSessionOrdinalTitle, type FocusRating } from '@pomodash/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { TextInput } from '@/components/shared/TextInput';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
-import { SessionTitleInput } from '@/components/journal/SessionTitleInput';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { SessionDetailHeader } from './SessionDetailHeader';
+import { SessionNoteField } from './SessionNoteField';
 import { SessionStatsRow } from './SessionStatsRow';
 
 interface Props {
@@ -107,99 +97,21 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 
   return (
     <Modal visible title="세션 기록" onClose={onClose} keyboardShouldPersistTaps="handled">
-      <View style={styles.header}>
-        <View style={styles.headerTopRow}>
-          {category && <CategoryBadge category={category} style={styles.categoryBadge} />}
-          <View style={styles.editControls}>
-            {isEditing ? (
-              <>
-                <Pressable
-                  onPress={handleCancelEdit}
-                  disabled={isSubmitting}
-                  hitSlop={4}
-                  style={[isSubmitting && styles.disabled]}
-                >
-                  <Text
-                    style={[
-                      styles.editText,
-                      { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                    ]}
-                  >
-                    취소
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={handleSaveEdit}
-                  disabled={isSubmitting}
-                  style={[
-                    styles.saveButton,
-                    { backgroundColor: theme.primary },
-                    isSubmitting && styles.disabled,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.saveButtonText,
-                      { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-                    ]}
-                  >
-                    저장
-                  </Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Pressable onPress={handleEdit} hitSlop={4} accessibilityLabel="편집">
-                  <Pencil size={14} color={theme.mutedForeground} />
-                </Pressable>
-                <Pressable
-                  onPress={() => setConfirmDelete(true)}
-                  hitSlop={4}
-                  accessibilityLabel="기록 삭제"
-                >
-                  <Trash2 size={14} color={theme.mutedForeground} />
-                </Pressable>
-              </>
-            )}
-          </View>
-        </View>
-
-        {isEditing ? (
-          <SessionTitleInput
-            value={draft?.title ?? ''}
-            onChange={(v) => setDraft((d) => (d ? { ...d, title: v } : d))}
-            taskTitles={taskTitles}
-          />
-        ) : (
-          <Text
-            style={[
-              styles.title,
-              {
-                color: hasRealTitle ? theme.foreground : theme.mutedForeground,
-                fontFamily: FONTS.sansBold,
-              },
-            ]}
-          >
-            {displayTitle}
-          </Text>
-        )}
-
-        <View style={styles.metaRow}>
-          <Text
-            style={[styles.meta, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          >
-            {formatFullDate(session.startedAt)}
-          </Text>
-          <Text style={[styles.metaDot, { color: theme.mutedForeground }]}>·</Text>
-          <Text
-            style={[styles.meta, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          >
-            {hasAbnormalFocusGap(session.focusPeriods)
-              ? formatFocusPeriodRanges(session.focusPeriods)
-              : formatTimeRange(session.startedAt, session.endedAt)}
-          </Text>
-        </View>
-      </View>
+      <SessionDetailHeader
+        session={session}
+        category={category}
+        displayTitle={displayTitle}
+        hasRealTitle={hasRealTitle}
+        taskTitles={taskTitles}
+        isEditing={isEditing}
+        isSubmitting={isSubmitting}
+        draftTitle={draft?.title ?? ''}
+        onDraftTitleChange={(v) => setDraft((d) => (d ? { ...d, title: v } : d))}
+        onEdit={handleEdit}
+        onDelete={() => setConfirmDelete(true)}
+        onSaveEdit={handleSaveEdit}
+        onCancelEdit={handleCancelEdit}
+      />
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
@@ -237,51 +149,12 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-      <View style={styles.field}>
-        <Text
-          style={[
-            styles.sectionLabel,
-            { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-          ]}
-        >
-          메모
-        </Text>
-        {isEditing ? (
-          <View style={styles.noteEditing}>
-            <TextInput
-              multiline
-              numberOfLines={4}
-              maxLength={INPUT_LIMITS.NOTE_MAX_LENGTH}
-              value={draft?.note ?? ''}
-              onChangeText={(text) => setDraft((d) => (d ? { ...d, note: text } : d))}
-              placeholder="세션에 대한 메모를 남겨보세요..."
-              style={styles.noteInput}
-            />
-            <Text
-              style={[
-                styles.counter,
-                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              {draft?.note.length ?? 0} / {INPUT_LIMITS.NOTE_MAX_LENGTH}
-            </Text>
-          </View>
-        ) : (
-          <View style={[styles.noteDisplay, { backgroundColor: withAlpha(theme.muted, 0.4) }]}>
-            <Text
-              style={[
-                styles.noteText,
-                {
-                  color: session.note ? theme.foreground : theme.mutedForeground,
-                  fontFamily: FONTS.sansRegular,
-                },
-              ]}
-            >
-              {session.note || '메모가 없어요'}
-            </Text>
-          </View>
-        )}
-      </View>
+      <SessionNoteField
+        note={session.note}
+        isEditing={isEditing}
+        draftNote={draft?.note ?? ''}
+        onDraftNoteChange={(text) => setDraft((d) => (d ? { ...d, note: text } : d))}
+      />
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
@@ -302,52 +175,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    gap: 8,
-  },
-  disabled: {
-    opacity: 0.4,
-  },
-  headerTopRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-  },
-  editControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  editText: {
-    fontSize: 12,
-  },
-  saveButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  saveButtonText: {
-    fontSize: 12,
-  },
-  title: {
-    fontSize: 20,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  meta: {
-    fontSize: 13,
-  },
-  metaDot: {
-    fontSize: 13,
-  },
   divider: {
     height: 1,
   },
@@ -358,26 +185,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
-  },
-  noteEditing: {
-    gap: 8,
-  },
-  noteInput: {
-    height: 90,
-    textAlignVertical: 'top',
-  },
-  counter: {
-    fontSize: 11,
-    textAlign: 'right',
-  },
-  noteDisplay: {
-    minHeight: 72,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  noteText: {
-    fontSize: 14,
-    lineHeight: 20,
   },
 });

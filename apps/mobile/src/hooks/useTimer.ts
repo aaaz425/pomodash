@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
-import { deriveTimerDisplay } from '@pomodash/shared';
+import { deriveElapsedMinutes, deriveTimerDisplay } from '@pomodash/shared';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import {
   scheduleTimerCompleteNotification,
@@ -127,13 +127,13 @@ export function useTimer() {
         ? runningDisplay
         : remainingSeconds;
 
-  const elapsedMinutes =
-    mode === 'free'
-      ? Math.floor(displaySeconds / 60)
-      : cycleCount * focusMinutes +
-        (phase === 'focus'
-          ? Math.max(0, Math.floor((focusMinutes * 60 - displaySeconds) / 60))
-          : 0);
+  const elapsedMinutes = deriveElapsedMinutes({
+    mode,
+    displaySeconds,
+    cycleCount,
+    focusMinutes,
+    phase,
+  });
 
   return {
     displaySeconds,
