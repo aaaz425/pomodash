@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import {
   Bell,
   ChevronLeft,
@@ -80,6 +81,13 @@ export default function SettingsScreen() {
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const isKakao = user?.user_metadata?.provider === 'kakao';
+
+  // 탭 화면은 언마운트 안 되고 계속 살아있어서, 벗어날 때 상세 화면 상태를 직접 초기화해야 함
+  useFocusEffect(
+    useCallback(() => {
+      return () => setActiveCategory(null);
+    }, []),
+  );
 
   function goTo(next: CategoryKey | null) {
     setActiveCategory(next);

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { useColorScheme } from 'react-native';
+import { Appearance, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Scheme = 'light' | 'dark';
@@ -25,6 +25,11 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
       }
     });
   }, []);
+
+  // 네이티브 화면 배경은 JS mode가 아니라 OS 트레이트(userInterfaceStyle)를 따르므로 강제 동기화
+  useEffect(() => {
+    Appearance.setColorScheme(mode === 'system' ? 'unspecified' : mode);
+  }, [mode]);
 
   function setMode(next: ThemeMode) {
     setModeState(next);
