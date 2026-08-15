@@ -189,6 +189,7 @@ export function SessionCompleteSheet() {
             confirmLabel="저장"
             onConfirm={handleSave}
             onCancel={() => setPendingAction(null)}
+            loading={isSaving}
           />
         </View>
       </Modal>
