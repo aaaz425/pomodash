@@ -1,15 +1,35 @@
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Slot, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { AuthProvider, useAuth } from '@/store/AuthProvider';
-import { ThemeModeProvider } from '@/hooks/use-theme-scheme';
+import { ThemeModeProvider, useThemeScheme } from '@/hooks/use-theme-scheme';
+import { THEME } from '@/constants/timerColors';
 
 SplashScreen.preventAutoHideAsync();
+
+// React Navigation 기본 테마의 background가 우리 THEME 토큰과 미묘하게 달라 앱 배경색으로 맞춤
+const NAV_LIGHT_THEME = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: THEME.light.background },
+};
+const NAV_DARK_THEME = {
+  ...DarkTheme,
+  colors: { ...DarkTheme.colors, background: THEME.dark.background },
+};
+
+// 시스템 설정이 아니라 앱에서 고른 테마(useThemeScheme)를 따라야 화면 전환 중 배경이 안 깜빡임
+function NavigationThemeProvider({ children }: { children: React.ReactNode }) {
+  const scheme = useThemeScheme();
+  return (
+    <ThemeProvider value={scheme === 'dark' ? NAV_DARK_THEME : NAV_LIGHT_THEME}>
+      {children}
+    </ThemeProvider>
+  );
+}
 
 // 인증 상태 확인이 끝나기 전엔 스플래시를 계속 띄워둔다 — AnimatedSplashOverlay가
 // 자기 onLayout에서 SplashScreen.hideAsync()를 호출하므로, 로그인 화면인지 앱 화면인지
@@ -27,7 +47,6 @@ function RootContent() {
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
     'Pretendard-Regular': require('@/assets/fonts/Pretendard-Regular.ttf'),
     'Pretendard-Medium': require('@/assets/fonts/Pretendard-Medium.ttf'),
@@ -49,11 +68,11 @@ export default function RootLayout() {
           스냅샷)로 한 번 더 감싸서 첫 렌더부터 정확한 값이 잡히게 한다. */}
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <ThemeModeProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <NavigationThemeProvider>
             <AuthProvider>
               <RootContent />
             </AuthProvider>
-          </ThemeProvider>
+          </NavigationThemeProvider>
         </ThemeModeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
