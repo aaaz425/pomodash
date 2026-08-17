@@ -733,6 +733,16 @@ describe('timerStore', () => {
       expect(persistSnapshot).toHaveBeenCalled();
     });
 
+    it('persistSnapshot() — runningDisplaySeconds만 바뀌면 호출 안 됨(스냅샷에 미포함)', () => {
+      const persistSnapshot = vi.fn();
+      const store = createTimerStore({ persistSnapshot });
+      persistSnapshot.mockClear();
+
+      store.getState().setRunningDisplaySeconds(123);
+
+      expect(persistSnapshot).not.toHaveBeenCalled();
+    });
+
     it('onSessionTooShort() — 5초 미만 세션 폐기 시 호출됨', () => {
       const onSessionTooShort = vi.fn();
       vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));

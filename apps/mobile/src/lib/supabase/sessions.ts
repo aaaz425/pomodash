@@ -21,6 +21,10 @@ interface SessionRow {
 const SELECT_COLUMNS =
   'id, task_id, title, mode, started_at, ended_at, completed_cycles, total_cycles, focus_seconds, paused_seconds, focus_periods, note, focus_rating, distraction_tags';
 
+// 웹 apps/web/lib/constants/limits.ts의 SESSION_LIMITS.FETCH_LIMIT와 동일 —
+// 명시적 상한 없이 조회하면 Supabase 기본 행 상한(~1000)에서 조용히 잘릴 수 있어 안전장치로 설정
+const FETCH_LIMIT = 5000;
+
 export function toSession(row: SessionRow): Session | null {
   const parsed = SessionSchema.safeParse({
     id: row.id,
@@ -48,7 +52,8 @@ export async function fetchSessions(): Promise<{
   const { data, error } = await supabase
     .from('sessions')
     .select(SELECT_COLUMNS)
-    .order('started_at', { ascending: false });
+    .order('started_at', { ascending: false })
+    .limit(FETCH_LIMIT);
   if (error || !data) return null;
   const sessions = data.map(toSession).filter((s): s is Session => s !== null);
   return { sessions, invalidCount: data.length - sessions.length };

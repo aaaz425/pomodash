@@ -34,6 +34,8 @@ export interface TimerStorePorts {
 export interface TimerStore extends TimerSnapshot {
   isFocusMode: boolean; // true일 때 집중 모드 오버레이 표시
   showAbandonedPrompt: boolean;
+  // TimerEngine(싱글턴)이 매초 갱신하는 tick 캐시 — 영속화 대상 아님, 다른 컴포넌트는 읽기만 함
+  runningDisplaySeconds: number | null;
 
   setMode: (mode: TimerMode) => void;
   start: () => void;
@@ -52,6 +54,7 @@ export interface TimerStore extends TimerSnapshot {
   dismissAbandonedPrompt: () => void;
   checkAbandoned: () => void;
   hydrate: () => void;
+  setRunningDisplaySeconds: (seconds: number | null) => void;
 }
 
 function phaseSeconds(settings: TimerSettings): Record<TimerPhase, number> {
@@ -85,6 +88,11 @@ function resetSessionState() {
     rawFocusPeriods: [],
     lastActiveAt: null,
   };
+}
+
+// 스토어의 모든 액션이 불변 업데이트(spread/새 배열)만 쓰므로 키별 참조 비교로 충분
+function snapshotsEqual(a: TimerSnapshot, b: TimerSnapshot): boolean {
+  return (Object.keys(a) as (keyof TimerSnapshot)[]).every((key) => a[key] === b[key]);
 }
 
 // 새로고침 복구용 스냅샷 — isFocusMode(순수 UI 토글)는 제외
@@ -124,6 +132,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
       sessionEnded: false,
       isFocusMode: false,
       showAbandonedPrompt: false,
+      runningDisplaySeconds: null,
       sessionStarted: false,
       sessionStartedAt: null,
       sessionEndedAt: null,
@@ -298,6 +307,8 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
       enterFocusMode: () => set({ isFocusMode: true }),
       exitFocusMode: () => set({ isFocusMode: false }),
 
+      setRunningDisplaySeconds: (seconds) => set({ runningDisplaySeconds: seconds }),
+
       // lastActiveAt도 함께 갱신 — 안 그러면 재생 버튼을 다시 눌렀을 때 start()의 방치 검사가 즉시 재발동함
       dismissAbandonedPrompt: () => set({ showAbandonedPrompt: false, lastActiveAt: Date.now() }),
 
@@ -321,9 +332,12 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
   });
 
   // 상태 변경마다 자동 저장 — complete→completeCycle 위임 구조상 subscribe가 더 안전
+  // runningDisplaySeconds는 초당 갱신되므로 스냅샷 값이 실제로 바뀔 때만 저장 호출
   if (persistSnapshot) {
-    store.subscribe((state) => {
-      persistSnapshot(toTimerSnapshot(state));
+    store.subscribe((state, prevState) => {
+      const snapshot = toTimerSnapshot(state);
+      if (snapshotsEqual(snapshot, toTimerSnapshot(prevState))) return;
+      persistSnapshot(snapshot);
     });
   }
 

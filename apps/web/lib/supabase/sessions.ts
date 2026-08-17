@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { SessionSchema, type Session } from '@/types';
+import { SESSION_LIMITS } from '@/lib/constants/limits';
 
 interface SessionRow {
   id: string;
@@ -49,7 +50,8 @@ export async function fetchSessions(): Promise<{
   const { data, error } = await supabase
     .from('sessions')
     .select(SELECT_COLUMNS)
-    .order('started_at', { ascending: false });
+    .order('started_at', { ascending: false })
+    .limit(SESSION_LIMITS.FETCH_LIMIT);
   if (error || !data) return null;
   const sessions = data.map(toSession).filter((s): s is Session => s !== null);
   return { sessions, invalidCount: data.length - sessions.length };
