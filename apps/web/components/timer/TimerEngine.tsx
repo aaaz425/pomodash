@@ -60,7 +60,7 @@ export function TimerEngine() {
             let title: string;
             let body: string;
             if (isLastCycle) {
-              title = '세션 완료!';
+              title = '타이머 완료!';
               body = '모든 사이클을 마쳤어요. 수고했어요!';
             } else if (phase === 'focus') {
               title = '집중 시간 종료!';

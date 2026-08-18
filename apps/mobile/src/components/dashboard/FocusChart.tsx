@@ -54,7 +54,7 @@ export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Pro
       </View>
 
       {!hasData ? (
-        <EmptyState message="아직 기록된 세션이 없어요" />
+        <EmptyState message="아직 기록이 없어요" />
       ) : (
         <View style={styles.rows}>
           {data.map((item, i) => {

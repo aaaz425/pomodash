@@ -93,7 +93,7 @@ export function getSessionOrdinalTitle(startedAt: string, chronologicalIndex: nu
   const d = new Date(startedAt);
   const m = d.getMonth() + 1;
   const day = d.getDate();
-  return `${m}월 ${day}일 ${chronologicalIndex + 1}번째 세션`;
+  return `${m}월 ${day}일 ${chronologicalIndex + 1}번째 기록`;
 }
 
 export function formatTimeRange(startedAt: string, endedAt: string): string {

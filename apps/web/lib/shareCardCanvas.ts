@@ -130,7 +130,7 @@ function drawSecondaryStats(
 
   ctx.fillStyle = SHARE_CARD_COLORS.textMuted;
   ctx.font = '400 26px Pretendard';
-  ctx.fillText('세션 수', leftX, y);
+  ctx.fillText('기록 수', leftX, y);
   ctx.fillText('연속 집중일', rightX, y);
 
   ctx.fillStyle = SHARE_CARD_COLORS.textPrimary;

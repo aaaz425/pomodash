@@ -96,11 +96,7 @@ export function HourlyChart({ sessions }: Props) {
       </div>
 
       {!hasFocus && (
-        <EmptyState
-          message="아직 기록된 세션이 없어요"
-          className="pb-1"
-          messageClassName="text-xs"
-        />
+        <EmptyState message="아직 기록이 없어요" className="pb-1" messageClassName="text-xs" />
       )}
     </div>
   );

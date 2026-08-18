@@ -11,7 +11,7 @@ export const createTimerStore = () => {
     persistSnapshot: (snapshot) => saveToStorage(STORAGE_KEYS.activeTimer, snapshot),
     loadSnapshot: (fallback: TimerSnapshot) =>
       loadFromStorage(STORAGE_KEYS.activeTimer, ActiveTimerStateSchema, fallback),
-    onSessionTooShort: () => toast('5초 미만 세션은 기록되지 않아요'),
+    onSessionTooShort: () => toast('5초 미만은 기록되지 않아요'),
   };
   return createSharedTimerStore(ports);
 };

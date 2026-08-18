@@ -59,7 +59,7 @@ export function FocusMode() {
                 { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
               ]}
             >
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중 세션`}
+              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
             </Text>
             {task ? (
               <View style={styles.taskTitleRow}>
@@ -131,25 +131,25 @@ export function FocusMode() {
                   { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
                 ]}
               >
-                세션종료
+                타이머 종료
               </Text>
             </Pressable>
           </View>
         </View>
 
-        {/* 바깥 자체가 이미 Modal이라 여기서 또 RN Modal을 중첩하면 세션 종료로 둘 다
+        {/* 바깥 자체가 이미 Modal이라 여기서 또 RN Modal을 중첩하면 타이머 종료로 둘 다
               동시에 닫힐 때 iOS에서 화면이 검게 남거나 안 뜨는 문제가 있어 inline으로 렌더링 */}
         <ConfirmModal
           inline
           visible={showEndConfirm}
-          title="세션을 종료할까요?"
+          title="타이머를 종료할까요?"
           description={formatSessionEndSummary(
             mode,
             elapsedMinutes,
             cycleCount,
             settings.totalCycles,
           )}
-          confirmLabel="세션 종료"
+          confirmLabel="타이머 종료"
           onConfirm={confirmEnd}
           onCancel={cancelEnd}
         />

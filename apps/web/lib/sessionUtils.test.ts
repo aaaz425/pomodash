@@ -130,12 +130,12 @@ describe('getSessionsForDate', () => {
 });
 
 describe('getSessionOrdinalTitle', () => {
-  it('"M월 D일 N번째 세션" 형식으로 반환', () => {
-    expect(getSessionOrdinalTitle('2024-03-15T09:00:00', 2)).toBe('3월 15일 3번째 세션');
+  it('"M월 D일 N번째 기록" 형식으로 반환', () => {
+    expect(getSessionOrdinalTitle('2024-03-15T09:00:00', 2)).toBe('3월 15일 3번째 기록');
   });
 
   it('chronologicalIndex는 0-based이므로 +1되어 표시됨', () => {
-    expect(getSessionOrdinalTitle('2024-03-15T09:00:00', 0)).toBe('3월 15일 1번째 세션');
+    expect(getSessionOrdinalTitle('2024-03-15T09:00:00', 0)).toBe('3월 15일 1번째 기록');
   });
 });
 

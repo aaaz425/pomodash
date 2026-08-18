@@ -56,7 +56,7 @@ export function ListView({ sessions, tasks, categories, selectedId, onSelect }: 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">{filteredSessions.length}개의 세션</span>
+        <span className="text-xs text-muted-foreground">{filteredSessions.length}개의 기록</span>
         {filterButton}
       </div>
       {groups.length === 0 ? (

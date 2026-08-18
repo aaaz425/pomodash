@@ -55,7 +55,7 @@ export function StartSessionModal({ onClose }: Props) {
 
   return (
     <Modal
-      title="세션 시작"
+      title="타이머 시작"
       onClose={onClose}
       widthClassName="sm:w-[480px]"
       maxHeightClassName="max-h-[90vh]"
@@ -102,10 +102,10 @@ export function StartSessionModal({ onClose }: Props) {
 
       <div className="h-px bg-border" />
 
-      {/* 이번 세션 설정 */}
+      {/* 이번 타이머 설정 */}
       {pendingMode === 'pomodoro' ? (
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-semibold text-foreground">이번 세션 설정</span>
+          <span className="text-sm font-semibold text-foreground">이번 타이머 설정</span>
           <TimerSettingsGroup
             focusMinutes={pendingSettings.focusMinutes}
             onFocusMinutesChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
@@ -118,14 +118,14 @@ export function StartSessionModal({ onClose }: Props) {
             cyclesLabel="사이클"
           />
           <p className="text-[11px] text-muted-foreground/60">
-            이번 세션에서만 적용됩니다 · 작업 기본값은 변경되지 않아요
+            이번에만 적용됩니다 · 작업 기본값은 변경되지 않아요
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-foreground">자유 집중</span>
           <p className="text-[11px] text-muted-foreground/60">
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 세션 종료 버튼으로
+            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 타이머 종료 버튼으로
             마무리하세요.
           </p>
         </div>

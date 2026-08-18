@@ -96,7 +96,7 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   }
 
   return (
-    <Modal visible title="세션 기록" onClose={onClose} keyboardShouldPersistTaps="handled">
+    <Modal visible title="기록 상세" onClose={onClose} keyboardShouldPersistTaps="handled">
       <SessionDetailHeader
         session={session}
         category={category}

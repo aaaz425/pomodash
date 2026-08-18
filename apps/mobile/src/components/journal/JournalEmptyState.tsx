@@ -12,12 +12,12 @@ export function JournalEmptyState() {
     <View style={styles.container}>
       <Text style={styles.emoji}>📋</Text>
       <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansMedium }]}>
-        아직 기록된 세션이 없어요
+        아직 기록이 없어요
       </Text>
       <Text
         style={[styles.subtitle, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
       >
-        타이머를 시작해 첫 번째 집중 세션을 만들어보세요
+        타이머를 시작해 첫 기록을 만들어보세요
       </Text>
       <Pressable
         onPress={() => router.push('/')}

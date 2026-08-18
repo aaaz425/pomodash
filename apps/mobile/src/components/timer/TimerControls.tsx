@@ -98,21 +98,21 @@ export function TimerControls() {
               { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
             ]}
           >
-            세션 종료
+            타이머 종료
           </Text>
         </Pressable>
       </View>
       <StartSessionSheet visible={showStartSheet} onClose={() => setShowStartSheet(false)} />
       <ConfirmModal
         visible={showEndConfirm}
-        title="세션을 종료할까요?"
+        title="타이머를 종료할까요?"
         description={formatSessionEndSummary(
           mode,
           elapsedMinutes,
           cycleCount,
           settings.totalCycles,
         )}
-        confirmLabel="세션 종료"
+        confirmLabel="타이머 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
       />

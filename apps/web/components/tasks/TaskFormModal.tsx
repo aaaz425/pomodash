@@ -165,7 +165,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
               <p className="text-[11px] text-amber-500/90 pt-0.5">
                 {isRunning
                   ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
-                  : '이 변경은 지금 진행 중인 세션에도 바로 적용돼요'}
+                  : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
               </p>
             )}
           </>

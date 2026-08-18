@@ -20,7 +20,7 @@ interface Props {
   min?: string;
   max?: string;
   placeholder?: string;
-  markedDates?: Set<string>; // 세션 있는 날짜 (YYYY-MM-DD)
+  markedDates?: Set<string>; // 기록 있는 날짜 (YYYY-MM-DD)
   onMonthChange?: (year: number, month: number) => void; // 백엔드 연동 시 월별 fetch용
 }
 

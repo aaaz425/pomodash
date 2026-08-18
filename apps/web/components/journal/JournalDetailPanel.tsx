@@ -154,7 +154,7 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
             <MemoTextarea
               value={draft?.note ?? ''}
               onChange={(e) => setDraft((d) => (d ? { ...d, note: e.target.value } : d))}
-              placeholder="세션에 대한 메모를 남겨보세요..."
+              placeholder="메모를 남겨보세요..."
               className="flex-1 min-h-0 w-full resize-none rounded-lg bg-muted/50 dark:bg-muted/50 border-border px-3 py-2.5 text-base text-foreground placeholder:text-muted-foreground outline-none focus-visible:border-border focus-visible:ring-1 focus-visible:ring-primary"
             />
             <span className="text-xs text-muted-foreground self-end">

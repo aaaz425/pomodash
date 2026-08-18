@@ -89,7 +89,7 @@ export function TaskItem({
               { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
             ]}
           >
-            현재 세션
+            진행 중
           </Text>
         </View>
       )}

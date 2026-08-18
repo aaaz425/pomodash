@@ -56,10 +56,10 @@ const FOCUS_LABELS: Record<TabType, string> = {
 };
 
 const SESSION_LABELS: Record<TabType, string> = {
-  today: '오늘 세션',
-  week: '이번 주 세션',
-  month: '이번 달 세션',
-  all: '전체 세션',
+  today: '오늘 기록',
+  week: '이번 주 기록',
+  month: '이번 달 기록',
+  all: '전체 기록',
 };
 
 export default function DashboardScreen() {
@@ -162,7 +162,7 @@ export default function DashboardScreen() {
               <StatCard
                 label={sessionLabel}
                 Icon={CircleCheck}
-                value={`${sessionCount}세션`}
+                value={`${sessionCount}건`}
                 sub={sessionCountSub}
               />
               <StatCard
@@ -172,10 +172,10 @@ export default function DashboardScreen() {
                 sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
               />
               <StatCard
-                label="세션 평균"
+                label="기록 평균"
                 Icon={ChartColumn}
                 value={avgSessionSeconds === 0 ? '-' : formatDuration(avgSessionSeconds)}
-                sub="세션당 평균 시간"
+                sub="기록당 평균 시간"
               />
             </View>
 

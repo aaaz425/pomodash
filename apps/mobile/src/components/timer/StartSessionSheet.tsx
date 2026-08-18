@@ -61,7 +61,7 @@ export function StartSessionSheet({ visible, onClose }: Props) {
   return (
     <Modal
       visible={visible}
-      title="세션 시작"
+      title="타이머 시작"
       onClose={onClose}
       footer={
         <>
@@ -129,7 +129,7 @@ export function StartSessionSheet({ visible, onClose }: Props) {
               { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
             ]}
           >
-            이번 세션 설정
+            이번 타이머 설정
           </Text>
           <TimerSettingsGroup
             focusMinutes={pendingSettings.focusMinutes}
@@ -148,7 +148,7 @@ export function StartSessionSheet({ visible, onClose }: Props) {
               { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
             ]}
           >
-            이번 세션에서만 적용됩니다 · 작업 기본값은 변경되지 않아요
+            이번에만 적용됩니다 · 작업 기본값은 변경되지 않아요
           </Text>
         </View>
       ) : (
@@ -167,7 +167,7 @@ export function StartSessionSheet({ visible, onClose }: Props) {
               { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
             ]}
           >
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 세션 종료 버튼으로
+            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 타이머 종료 버튼으로
             마무리하세요.
           </Text>
         </View>

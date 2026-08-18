@@ -164,7 +164,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     tier: 'special',
     eventId: 'first-session',
     name: '첫 발걸음',
-    description: '첫 세션 완료',
+    description: '첫 기록 완료',
     icon: 'sparkles',
   },
   {
@@ -200,7 +200,7 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     tier: 'special',
     eventId: 'marathon',
     name: '마라토너',
-    description: '한 세션에서 2시간 이상 집중',
+    description: '한 번에 2시간 이상 집중',
     icon: 'rocket',
   },
 ];
