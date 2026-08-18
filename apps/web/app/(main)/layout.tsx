@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/shared/layout/BottomNav';
 import { PageTransition } from '@/components/shared/layout/PageTransition';
 import { MiniTimerWidget } from '@/components/timer/MiniTimerWidget';
 import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialog';
+import { TimerEngine } from '@/components/timer/TimerEngine';
 import { AppToaster } from '@/components/shared/AppToaster';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -29,6 +30,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <BottomNav />
         <MiniTimerWidget />
         <AbandonedSessionDialog />
+        <TimerEngine />
         <AppToaster />
       </div>
     </StoreProvider>

@@ -2,6 +2,7 @@
 
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
 import { CategoryChart } from '@/components/dashboard/CategoryChart';
@@ -10,7 +11,6 @@ import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { FocusChart } from '@/components/dashboard/FocusChart';
 import { HourlyChart } from '@/components/dashboard/HourlyChart';
 import { MonthlyActivityCard } from '@/components/dashboard/MonthlyActivityCard';
-import { ShareCardModal } from '@/components/dashboard/ShareCardModal';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +35,11 @@ import type { TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
+
+// 캔버스 렌더링 로직이 무거운데 공유 버튼을 눌러야만 열리므로 초기 대시보드 번들에서 제외
+const ShareCardModal = dynamic(() =>
+  import('@/components/dashboard/ShareCardModal').then((mod) => mod.ShareCardModal),
+);
 
 function makeFocusSub(diff: number, label: string): string | undefined {
   if (diff === 0) return undefined;

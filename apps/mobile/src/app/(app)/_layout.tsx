@@ -4,6 +4,7 @@ import { StoreProvider } from '@/store/StoreProvider';
 import { PortalProvider, Portal } from '@/components/shared/Portal';
 import { Toaster } from '@/components/shared/Toast';
 import { MiniTimerWidget } from '@/components/timer/MiniTimerWidget';
+import { TimerEngine } from '@/components/timer/TimerEngine';
 import { useAuth } from '@/store/AuthProvider';
 
 export default function AppGroupLayout() {
@@ -19,6 +20,7 @@ export default function AppGroupLayout() {
         <Portal>
           <MiniTimerWidget />
         </Portal>
+        <TimerEngine />
         <Toaster />
       </PortalProvider>
     </StoreProvider>
