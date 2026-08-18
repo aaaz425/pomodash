@@ -33,7 +33,8 @@ export function CategoryChart({ sessions, tasks, categories }: Props) {
           {/* Donut chart — 옆 범례가 이미 텍스트로 동일 정보를 제공하므로 접근성 트리에서 제외 */}
           <div
             aria-hidden="true"
-            className="relative shrink-0 w-[120px] h-[120px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+            // 다크 모드는 그림자로 깊이를 표현하지 않는 원칙(design.md)이라 라이트 모드에만 적용
+            className="relative shrink-0 w-[120px] h-[120px] dark:drop-shadow-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
           >
             <ResponsiveContainer
               width="100%"

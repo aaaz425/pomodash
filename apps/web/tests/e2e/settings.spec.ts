@@ -68,6 +68,9 @@ test.describe('설정', () => {
       .locator('xpath=ancestor::div[1]')
       .getByRole('button', { name: '메시지 삭제' })
       .click();
+    const confirm = page.getByRole('alertdialog');
+    await expect(confirm).toBeVisible();
+    await confirm.getByRole('button', { name: '삭제' }).click();
     await expect(modal.getByText(messageRenamed)).not.toBeVisible();
   });
 });

@@ -5,6 +5,7 @@ import { Check, GripVertical, Pencil, Plus, Trash2, X } from 'lucide-react-nativ
 import { INPUT_LIMITS } from '@pomodash/shared';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
@@ -101,6 +102,8 @@ export function MotivationalSection() {
 
   const [input, setInput] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const isAtLimit = messages.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX;
 
   function handleAdd() {
@@ -108,6 +111,14 @@ export function MotivationalSection() {
     if (!trimmed || isAtLimit) return;
     void addMessage(trimmed);
     setInput('');
+  }
+
+  async function handleConfirmDelete() {
+    if (deleteIndex === null || isDeleting) return;
+    setIsDeleting(true);
+    await deleteMessage(deleteIndex);
+    setIsDeleting(false);
+    setDeleteIndex(null);
   }
 
   return (
@@ -128,7 +139,7 @@ export function MotivationalSection() {
                 setEditingIndex(null);
               }}
               onCancelEdit={() => setEditingIndex(null)}
-              onDelete={() => void deleteMessage(index)}
+              onDelete={() => setDeleteIndex(index)}
               canDelete={messages.length > INPUT_LIMITS.MESSAGE_COUNT_MIN}
               drag={drag}
               isActive={isActive}
@@ -178,6 +189,17 @@ export function MotivationalSection() {
           {messages.length} / {INPUT_LIMITS.MESSAGE_COUNT_MAX}
         </Text>
       </View>
+
+      <ConfirmModal
+        visible={deleteIndex !== null}
+        title="메시지를 삭제할까요?"
+        description="삭제한 메시지는 복구할 수 없어요."
+        confirmLabel="삭제"
+        destructive
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteIndex(null)}
+        loading={isDeleting}
+      />
     </View>
   );
 }

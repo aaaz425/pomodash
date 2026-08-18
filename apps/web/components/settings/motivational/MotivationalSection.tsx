@@ -20,6 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 import { INPUT_LIMITS } from '@/lib/constants/limits';
 
@@ -152,7 +153,17 @@ export function MotivationalSection() {
 
   const [input, setInput] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const isAtLimit = messages.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX;
+
+  async function handleConfirmDelete() {
+    if (deleteIndex === null || isDeleting) return;
+    setIsDeleting(true);
+    await deleteMessage(deleteIndex);
+    setIsDeleting(false);
+    setDeleteIndex(null);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -200,7 +211,7 @@ export function MotivationalSection() {
                   setEditingIndex(null);
                 }}
                 onCancelEdit={() => setEditingIndex(null)}
-                onDelete={() => deleteMessage(i)}
+                onDelete={() => setDeleteIndex(i)}
                 canDelete={messages.length > 1}
               />
             ))}
@@ -233,6 +244,16 @@ export function MotivationalSection() {
           {messages.length} / {INPUT_LIMITS.MESSAGE_COUNT_MAX}
         </p>
       </div>
+
+      <ConfirmDialog
+        open={deleteIndex !== null}
+        title="메시지를 삭제할까요?"
+        description="삭제한 메시지는 복구할 수 없어요."
+        confirmLabel="삭제"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteIndex(null)}
+        loading={isDeleting}
+      />
     </div>
   );
 }
