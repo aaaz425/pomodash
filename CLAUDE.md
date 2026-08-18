@@ -144,6 +144,7 @@ git switch main && git pull && git branch -D <merged-branch>
 
 ## 참조 문서
 
+@docs/guides/glossary.md
 @docs/guides/data-models.md
 @docs/guides/conventions.md
 @docs/guides/commit-convention.md
