@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { CalendarMonthNav } from '@/components/journal/CalendarMonthNav';
 import { CalendarMonthGrid } from '@/components/journal/CalendarMonthGrid';
 import { CalendarDayModal } from '@/components/journal/CalendarDayModal';
@@ -24,20 +24,13 @@ export function CalendarView({ sessions, tasks, categories, selectedId, onSelect
   const [viewedMonth, setViewedMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const monthData = useMemo(
-    () => getMonthlyActivityData(sessions, viewedMonth),
-    [sessions, viewedMonth],
-  );
+  const monthData = getMonthlyActivityData(sessions, viewedMonth);
 
-  const daySessions = useMemo(
-    () =>
-      selectedDate
-        ? [...getSessionsForDate(sessions, selectedDate)].sort((a, b) =>
-            b.startedAt.localeCompare(a.startedAt),
-          )
-        : [],
-    [sessions, selectedDate],
-  );
+  const daySessions = selectedDate
+    ? [...getSessionsForDate(sessions, selectedDate)].sort((a, b) =>
+        b.startedAt.localeCompare(a.startedAt),
+      )
+    : [];
 
   return (
     <div className="flex flex-col gap-4">

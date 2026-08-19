@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { getFocusTrendData } from '@/lib/dashboard';
@@ -18,10 +17,7 @@ interface Props {
 }
 
 export function FocusChart({ sessions, tasks, categories, tab, focusLabel }: Props) {
-  const { data, categories: usedCats } = useMemo(
-    () => getFocusTrendData(sessions, tasks, categories, tab),
-    [sessions, tasks, categories, tab],
-  );
+  const { data, categories: usedCats } = getFocusTrendData(sessions, tasks, categories, tab);
 
   const hasData = usedCats.length > 0;
 

@@ -1,7 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
-
 import { Badge } from '@/components/shared/Badge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { SrOnlyDataTable } from '@/components/dashboard/SrOnlyDataTable';
@@ -22,7 +20,7 @@ function formatHourLabel(hour: number): string {
 const X_LABEL_HOURS = [0, 6, 12, 18, 23];
 
 export function HourlyChart({ sessions }: Props) {
-  const hourly = useMemo(() => getHourlyFocusSeconds(sessions), [sessions]);
+  const hourly = getHourlyFocusSeconds(sessions);
   const max = Math.max(...hourly, 1);
 
   const peakHour = hourly.indexOf(Math.max(...hourly));
