@@ -7,6 +7,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -26,7 +27,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
+        timeout-minutes: 5
         run: pnpm --filter web exec playwright install --with-deps chromium
 
       - name: Run E2E tests
+        timeout-minutes: 10
         run: pnpm --filter web test:e2e
