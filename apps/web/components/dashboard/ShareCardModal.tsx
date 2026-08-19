@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
@@ -25,15 +25,13 @@ export function ShareCardModal({ data, onClose }: Props) {
 
   // Modal(Dialog)의 Popup 콘텐츠는 마운트 시점보다 한 틱 늦게 DOM에 붙을 수 있어
   // useEffect([data])로는 canvasRef.current가 아직 null인 상태에서 실행될 수 있다.
-  // 콜백 ref로 실제 DOM 부착 시점에 맞춰 그린다.
-  const setCanvasRef = useCallback(
-    (node: HTMLCanvasElement | null) => {
-      canvasRef.current = node;
-      const ctx = node?.getContext('2d');
-      if (ctx) void drawShareCard(ctx, data);
-    },
-    [data],
-  );
+  // 콜백 ref로 실제 DOM 부착 시점에 맞춰 그린다 — React Compiler가 data 의존성 기준으로
+  // 이 함수(와 JSX ref prop)를 자동 메모이즈해 data 변경 시에만 재호출되도록 보장한다.
+  const setCanvasRef = (node: HTMLCanvasElement | null) => {
+    canvasRef.current = node;
+    const ctx = node?.getContext('2d');
+    if (ctx) void drawShareCard(ctx, data);
+  };
 
   const handleDownload = async () => {
     if (!canvasRef.current) return;
