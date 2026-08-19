@@ -49,10 +49,10 @@ test.describe('작업 관리', () => {
     const taskModal = page.getByRole('dialog', { name: '작업 관리' });
     await createTask(page, taskModal, taskName);
 
-    // 타이머 화면에서 세션 시작 시 작업 선택
+    // 타이머 화면에서 타이머 시작 시 작업 선택
     await page.goto('/');
     await page.getByRole('button', { name: '시작' }).click();
-    const startModal = page.getByRole('dialog', { name: '세션 시작' });
+    const startModal = page.getByRole('dialog', { name: '타이머 시작' });
     await startModal.getByText(taskName).click();
     await startModal.getByRole('button', { name: '시작' }).click();
 

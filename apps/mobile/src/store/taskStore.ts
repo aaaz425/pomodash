@@ -259,7 +259,7 @@ export const createTaskStore = () =>
       const inserted = await insertSessionRow(input);
       if (!inserted) {
         set({ sessions: previousSessions });
-        toast('세션 저장에 실패했어요');
+        toast('기록 저장에 실패했어요');
         return false;
       }
       set({ sessions: [inserted, ...previousSessions] });
@@ -275,7 +275,7 @@ export const createTaskStore = () =>
       const { error } = await updateSessionRow(id, patch);
       if (error) {
         set({ sessions: previousSessions });
-        toast('세션 저장에 실패했어요');
+        toast('기록 저장에 실패했어요');
       }
     },
 
@@ -286,7 +286,7 @@ export const createTaskStore = () =>
       const { error } = await deleteSessionRow(id);
       if (error) {
         set({ sessions: previousSessions });
-        toast('세션 삭제에 실패했어요');
+        toast('기록 삭제에 실패했어요');
       }
     },
 

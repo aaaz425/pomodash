@@ -135,7 +135,7 @@ export function ShareCardPreview({ data }: Props) {
                 { color: SHARE_CARD_COLORS.textMuted, fontFamily: FONTS.sansRegular },
               ]}
             >
-              세션 수
+              기록 수
             </Text>
             <Text
               style={[

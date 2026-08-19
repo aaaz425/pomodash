@@ -97,12 +97,12 @@ export function DashboardView() {
 
   const sessionLabel =
     tab === 'today'
-      ? '오늘 세션'
+      ? '오늘 기록'
       : tab === 'week'
-        ? '이번 주 세션'
+        ? '이번 주 기록'
         : tab === 'month'
-          ? '이번 달 세션'
-          : '전체 세션';
+          ? '이번 달 기록'
+          : '전체 기록';
 
   const focusSub: string | undefined = (() => {
     if (tab === 'today' && prevDayFocusSec > 0)
@@ -158,7 +158,7 @@ export function DashboardView() {
         <StatCard
           label={sessionLabel}
           Icon={CircleCheck}
-          value={`${sessionCount}세션`}
+          value={`${sessionCount}건`}
           sub={sessionCountSub}
         />
         <StatCard
@@ -168,10 +168,10 @@ export function DashboardView() {
           sub={maxStreakDays > streakDays ? `최장 ${maxStreakDays}일` : '현재 연속 기록'}
         />
         <StatCard
-          label="세션 평균"
+          label="기록 평균"
           Icon={ChartColumn}
           value={avgSessionSeconds === 0 ? '-' : formatDuration(avgSessionSeconds)}
-          sub="세션당 평균 시간"
+          sub="기록당 평균 시간"
         />
       </div>
 

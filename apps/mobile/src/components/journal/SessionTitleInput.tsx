@@ -41,7 +41,7 @@ export function SessionTitleInput({ value, onChange, taskTitles }: Props) {
         onFocus={() => setFocused(true)}
         onBlur={handleBlur}
         maxLength={INPUT_LIMITS.TITLE_MAX_LENGTH}
-        placeholder="세션 제목 (선택)"
+        placeholder="기록 제목 (선택)"
       />
       {focused && suggestions.length > 0 && (
         <View style={[styles.dropdown, { backgroundColor: theme.card, borderColor: theme.border }]}>

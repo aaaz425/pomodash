@@ -6,10 +6,8 @@ export function JournalEmptyState() {
     <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
       <BookOpen className="w-10 h-10 text-muted-foreground/40" aria-hidden="true" />
       <div className="flex flex-col gap-1">
-        <p className="text-base font-medium text-foreground">아직 기록된 세션이 없어요</p>
-        <p className="text-sm text-muted-foreground">
-          타이머를 시작해 첫 번째 집중 세션을 만들어보세요
-        </p>
+        <p className="text-base font-medium text-foreground">아직 기록이 없어요</p>
+        <p className="text-sm text-muted-foreground">타이머를 시작해 첫 기록을 만들어보세요</p>
       </div>
       <Link
         href="/"

@@ -38,7 +38,7 @@ export function TimerSection() {
       {/* 사이클 */}
       <CycleIndicator />
 
-      {/* 세션 설정 카드 */}
+      {/* 타이머 설정 카드 */}
       <div
         className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
       >

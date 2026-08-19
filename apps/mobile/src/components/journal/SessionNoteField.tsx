@@ -34,7 +34,7 @@ export function SessionNoteField({ note, isEditing, draftNote, onDraftNoteChange
             maxLength={INPUT_LIMITS.NOTE_MAX_LENGTH}
             value={draftNote}
             onChangeText={onDraftNoteChange}
-            placeholder="세션에 대한 메모를 남겨보세요..."
+            placeholder="메모를 남겨보세요..."
             style={styles.noteInput}
           />
           <Text

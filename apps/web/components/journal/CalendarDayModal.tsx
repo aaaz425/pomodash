@@ -43,7 +43,7 @@ export function CalendarDayModal({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
         <DialogPrimitive.Popup
-          aria-label="날짜별 세션"
+          aria-label="날짜별 기록"
           className={[
             'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
             'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',

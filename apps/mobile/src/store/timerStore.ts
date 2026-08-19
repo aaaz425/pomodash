@@ -28,7 +28,7 @@ export const createTimerStore = () => {
       void AsyncStorage.setItem(ACTIVE_TIMER_STORAGE_KEY, JSON.stringify(snapshot));
     },
     loadSnapshot: (fallback) => cachedSnapshot ?? fallback,
-    onSessionTooShort: () => toast('5초 미만 세션은 기록되지 않아요'),
+    onSessionTooShort: () => toast('5초 미만은 기록되지 않아요'),
   };
   return createSharedTimerStore(ports);
 };

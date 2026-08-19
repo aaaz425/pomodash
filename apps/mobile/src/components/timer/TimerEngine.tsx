@@ -43,7 +43,7 @@ export function TimerEngine() {
     if (mode === 'pomodoro') {
       const isLastCycle = phase === 'focus' && cycleCount + 1 >= totalCycles;
       const title = isLastCycle
-        ? '세션 완료!'
+        ? '타이머 완료!'
         : phase === 'focus'
           ? '집중 시간 종료!'
           : '휴식 종료!';

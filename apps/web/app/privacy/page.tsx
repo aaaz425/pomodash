@@ -25,9 +25,7 @@ export default function PrivacyPage() {
         <ul className="list-disc pl-5 flex flex-col gap-1">
           <li>이메일/비밀번호 회원가입 시: 이메일 주소, 비밀번호(암호화 저장)</li>
           <li>카카오 로그인 시: 카카오 계정 이메일 주소</li>
-          <li>
-            서비스 이용 기록: 작업(Task), 카테고리, 집중 세션(Session) 기록, 타이머·알림 등 설정값
-          </li>
+          <li>서비스 이용 기록: 작업(Task), 카테고리, 집중 기록(Session), 타이머·알림 등 설정값</li>
         </ul>
       </LegalSection>
 

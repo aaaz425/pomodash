@@ -25,7 +25,7 @@ export function SessionDetailOverlay({ session, task, category, onClose, onDelet
       <DialogPrimitive.Portal>
         <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
         <DialogPrimitive.Popup
-          aria-label="세션 상세"
+          aria-label="기록 상세"
           className={[
             'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
             'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',

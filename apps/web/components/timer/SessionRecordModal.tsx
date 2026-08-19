@@ -106,7 +106,7 @@ export function SessionRecordModal() {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
           <DialogPrimitive.Popup
-            aria-label="세션 기록"
+            aria-label="기록 작성"
             className={[
               'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
               'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',
@@ -137,7 +137,7 @@ export function SessionRecordModal() {
 
               {/* Session Summary */}
               {isTaskSession ? (
-                /* Case A: 작업 있는 세션 — 작업 정보 표시 */
+                /* Case A: 작업 있는 기록 — 작업 정보 표시 */
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex flex-col gap-2 min-w-0">
                     <span className="text-lg font-semibold tracking-tight text-foreground truncate">
@@ -150,7 +150,7 @@ export function SessionRecordModal() {
                   <SessionProgressBadge />
                 </div>
               ) : (
-                /* Case B: 작업 없는 세션 — 작업 귀속 UI */
+                /* Case B: 작업 없는 기록 — 작업 귀속 UI */
                 <SessionTaskSelector selectedTaskId={selectedTaskId} onSelect={setSelectedTaskId} />
               )}
 
@@ -173,7 +173,7 @@ export function SessionRecordModal() {
               {/* Note Section */}
               <div className="flex flex-col gap-2.5">
                 <MemoTextarea
-                  aria-label="세션 메모"
+                  aria-label="메모"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="무엇을 집중해서 했나요? 짧게 메모해두면 나중에 돌아볼 수 있어요."

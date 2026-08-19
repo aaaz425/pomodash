@@ -28,7 +28,7 @@ export function SessionTitleInput({ value, onChange, taskTitles }: Props) {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         maxLength={INPUT_LIMITS.TITLE_MAX_LENGTH}
-        placeholder="세션 제목 (선택)"
+        placeholder="기록 제목 (선택)"
         className="w-full"
       />
       {focused && suggestions.length > 0 && (

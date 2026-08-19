@@ -24,7 +24,7 @@ export function ListView({ sessions, tasks, categories, selectedId, onSelect }: 
   return (
     <View style={styles.container}>
       <Text style={[styles.count, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}>
-        {sessions.length}개의 세션
+        {sessions.length}개의 기록
       </Text>
       <JournalSessionList
         groups={groups}

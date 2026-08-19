@@ -26,7 +26,7 @@
 | PageSpinner | `components/shared/PageSpinner.tsx`        | 로딩 상태        |
 | AppToaster  | `components/shared/AppToaster.tsx`         | 토스트 알림 컨테이너  |
 | MiniTimerWidget | `components/timer/MiniTimerWidget.tsx` | 타이머 화면 외 다른 페이지에서 뜨는 플로팅 미니 타이머 |
-| AbandonedSessionDialog | `components/timer/AbandonedSessionDialog.tsx` | 일시정지 세션 방치 감지 시 전 페이지 공용으로 뜨는 다이얼로그 |
+| AbandonedSessionDialog | `components/timer/AbandonedSessionDialog.tsx` | 일시정지된 타이머 방치 감지 시 전 페이지 공용으로 뜨는 다이얼로그 |
 
 MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 마운트되어 있어 특정 화면 전용이 아니라 `/(main)` 하위 모든 페이지에서 조건부로 나타난다.
 
@@ -75,7 +75,7 @@ MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 �
 
 **경로:** `/(main)`
 **파일:** `app/(main)/page.tsx`
-**목적:** 타이머 실행이 중심인 화면. 작업 선택은 세션 시작 모달을 통해 이루어진다.
+**목적:** 타이머 실행이 중심인 화면. 작업 선택은 타이머 시작 모달을 통해 이루어진다.
 
 페이지는 `TimerSection` · `SessionRecordModal` · `FocusMode` 3개만 렌더링한다. 작업 목록(`TaskList`)은 화면에 상시 노출되지 않고, `StartSessionModal`과 `SessionTaskSelector` 내부(둘 다 `TaskList mode="select"` 재사용)에서만 나타난다.
 
@@ -86,15 +86,15 @@ TimerSection
 ├─ 현재 작업 표시 (CategoryBadge + 제목, 없으면 "선택된 작업이 없습니다")
 ├─ TimerRing (내부에 TimerGlow 포함, 원형 SVG + 중앙 시간/상태뱃지)
 ├─ CycleIndicator (mode==='free'면 렌더링 안 함)
-├─ 세션 설정 카드 (집중/휴식/사이클 3분할 표시)
+├─ 타이머 설정 카드 (집중/휴식/사이클 3분할 표시)
 └─ TimerControls
     ├─ "집중" 버튼 (실행 중일 때만 활성) → enterFocusMode()
-    ├─ 시작/일시정지 버튼 (세션 미시작 시 StartSessionModal 오픈)
-    ├─ "세션 종료" 버튼 → ConfirmDialog
+    ├─ 시작/일시정지 버튼 (타이머 미시작 시 StartSessionModal 오픈)
+    ├─ "타이머 종료" 버튼 → ConfirmDialog
     └─ StartSessionModal (조건부 마운트)
         └─ TaskList(mode="select") + SegmentedControl(포모도로/자유) + TimerSettingsGroup
-SessionRecordModal (세션 종료 후에만 마운트)
-└─ SessionTaskSelector (미분류 세션에 사후 작업 지정 시)
+SessionRecordModal (타이머 종료 후에만 마운트)
+└─ SessionTaskSelector (미분류 기록에 사후 작업 지정 시)
     └─ TaskList(mode="select")
 FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 ```
@@ -106,11 +106,11 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 | TimerSection     | `components/timer/TimerSection.tsx`      | 메인 타이머 전체 조립             |
 | TimerRing        | `components/timer/TimerRing.tsx`         | 원형 진행률 링 + 시간/상태 표시 (TimerGlow 포함) |
 | TimerGlow        | `components/timer/TimerGlow.tsx`         | phase별 blur 배경광 (장식용)    |
-| SessionProgressBadge | `components/timer/SessionProgressBadge.tsx` | 세션 진행 요약(사이클 또는 자유모드 경과 시간) |
+| SessionProgressBadge | `components/timer/SessionProgressBadge.tsx` | 타이머 진행 요약(사이클 또는 자유모드 경과 시간) |
 | TimerControls    | `components/timer/TimerControls.tsx`     | 집중모드 진입/시작·일시정지/종료 버튼    |
 | CycleIndicator   | `components/timer/CycleIndicator.tsx`    | 사이클 진행 점 표시 (자유 모드는 숨김)  |
-| StartSessionModal | `components/timer/StartSessionModal.tsx` | 세션 시작 전 작업/모드/설정 선택      |
-| SessionTaskSelector | `components/timer/SessionTaskSelector.tsx` | 세션 종료 후 미분류 세션에 작업 사후 지정 |
+| StartSessionModal | `components/timer/StartSessionModal.tsx` | 타이머 시작 전 작업/모드/설정 선택      |
+| SessionTaskSelector | `components/timer/SessionTaskSelector.tsx` | 타이머 종료 후 미분류 기록에 작업 사후 지정 |
 | TaskList         | `components/tasks/TaskList.tsx`          | 작업 목록 (select/manage 겸용), 드래그 정렬 |
 | TaskItem         | `components/tasks/TaskItem.tsx`          | 개별 작업 행                  |
 | TaskFormModal    | `components/tasks/TaskFormModal.tsx`     | 작업 생성/수정 모달             |
@@ -129,12 +129,12 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 
 | 액션       | 동작                     |
 | -------- | ---------------------- |
-| 세션 미시작 상태에서 시작 버튼 클릭 | StartSessionModal 오픈 |
-| 모달에서 작업 선택 | 작업의 목표 시간/사이클이 세션 설정에 자동 반영 |
+| 타이머 미시작 상태에서 시작 버튼 클릭 | StartSessionModal 오픈 |
+| 모달에서 작업 선택 | 작업의 목표 시간/사이클이 타이머 설정에 자동 반영 |
 | 모달 "시작" 클릭 | 작업/설정/모드 확정 후 타이머 시작 |
 | TaskList 하단 "새 작업 추가" | TaskFormModal 오픈, 저장 시 자동 선택까지 이어짐 (인라인 빠른 추가 UI는 없음) |
 | "집중" 버튼(실행 중만 활성) | 전체화면 FocusMode 진입 |
-| 세션 종료    | 확인 후 SessionRecordModal 표시 |
+| 타이머 종료    | 확인 후 SessionRecordModal 표시 |
 
 ### 미니 타이머 / 방치 감지
 
@@ -144,7 +144,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 ### 에지케이스
 
 - 작업 없음: "작업을 추가해서 집중을 시작해보세요" 빈 상태
-- 작업 미선택 상태에서 타이머 시작: 미분류 세션으로 기록
+- 작업 미선택 상태에서 타이머 시작: 미분류 기록으로 저장
 
 ---
 
@@ -168,7 +168,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 
 | 액션    | 동작                                 |
 | ----- | ---------------------------------- |
-| 우상단 X 버튼 | 집중 모드만 종료, 세션은 유지되고 메인 화면으로 복귀 |
+| 우상단 X 버튼 | 집중 모드만 종료, 타이머는 유지되고 메인 화면으로 복귀 |
 | Space 키 | 시작/일시정지 토글 |
 | ESC 키 | 종료확인 다이얼로그가 열려있으면 취소, 아니면 집중 모드 종료 |
 
@@ -180,7 +180,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 **파일:** `app/(main)/dashboard/page.tsx`, `components/dashboard/DashboardView.tsx`
 **목적:** 집중 기록을 집계해 시각화하고 성취감을 준다.
 
-탭(오늘/이번 주/이번 달/전체)에 따라 컴포넌트가 나타나거나 숨겨지지 않는다. `StatCard`×4, `FocusChart`, `CategoryChart`, `HourlyChart`, `MonthlyActivityCard`+`ContributionCalendar`, `BadgeGallery`가 항상 동시에 렌더링되고, 탭 전환은 `StatCard`/`FocusChart`/`CategoryChart`에 전달되는 데이터 필터링에만 영향을 준다. `HourlyChart`(24시간 고정), `MonthlyActivityCard`/`ContributionCalendar`(항상 당월 고정), `BadgeGallery`(항상 전체 세션 기준)는 탭 값을 받지 않는다.
+탭(오늘/이번 주/이번 달/전체)에 따라 컴포넌트가 나타나거나 숨겨지지 않는다. `StatCard`×4, `FocusChart`, `CategoryChart`, `HourlyChart`, `MonthlyActivityCard`+`ContributionCalendar`, `BadgeGallery`가 항상 동시에 렌더링되고, 탭 전환은 `StatCard`/`FocusChart`/`CategoryChart`에 전달되는 데이터 필터링에만 영향을 준다. `HourlyChart`(24시간 고정), `MonthlyActivityCard`/`ContributionCalendar`(항상 당월 고정), `BadgeGallery`(항상 전체 기록 기준)는 탭 값을 받지 않는다.
 
 ### 컴포넌트 트리
 
@@ -188,7 +188,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 DashboardView
 ├─ 헤더 (제목 + 공유 아이콘 버튼 → ShareCardModal 오픈)
 ├─ DashboardTabs (오늘/이번 주/이번 달/전체)
-├─ StatCard ×4 (집중시간/세션수/연속집중일/세션평균, 전일·전주·전월 대비 증감 표시)
+├─ StatCard ×4 (집중시간/기록수/연속집중일/기록평균, 전일·전주·전월 대비 증감 표시)
 ├─ FocusChart (탭 단위 구간별 카테고리 누적 막대) + SrOnlyDataTable
 ├─ CategoryChart (카테고리별 비율 도넛) + SrOnlyDataTable
 ├─ HourlyChart (0~23시 커스텀 막대) + SrOnlyDataTable
@@ -234,19 +234,19 @@ DashboardView
 
 **경로:** `/(main)/journal`
 **파일:** `app/(main)/journal/page.tsx`, `components/journal/JournalView.tsx`
-**목적:** 저장된 세션 기록을 리스트 또는 캘린더로 조회하고, 집중도/방해요소 기반 인사이트를 제공하며, 기록을 수정/삭제한다.
+**목적:** 저장된 기록을 리스트 또는 캘린더로 조회하고, 집중도/방해요소 기반 인사이트를 제공하며, 기록을 수정/삭제한다.
 
-세션이 0개면 `JournalEmptyState`만 표시한다. 세션이 있으면 `InsightsSection`(탭과 무관하게 항상 노출)과 `JournalTabs`(list/calendar) + 선택된 탭 뷰, 그리고 세션 선택 시 공용으로 뜨는 `SessionDetailOverlay`를 렌더링한다.
+기록이 0개면 `JournalEmptyState`만 표시한다. 기록이 있으면 `InsightsSection`(탭과 무관하게 항상 노출)과 `JournalTabs`(list/calendar) + 선택된 탭 뷰, 그리고 기록 선택 시 공용으로 뜨는 `SessionDetailOverlay`를 렌더링한다.
 
 ### 컴포넌트 트리
 
 ```
 JournalView
-├─ 헤더 ("기록" + JournalTabs, 세션 있을 때만 탭 노출)
-├─ (세션 0개) JournalEmptyState  또는
+├─ 헤더 ("기록" + JournalTabs, 기록 있을 때만 탭 노출)
+├─ (기록 0개) JournalEmptyState  또는
 ├─ InsightsSection → InsightCard ×4 (방해요소/집중도추이/카테고리/요일패턴)
 ├─ activeTab==='list' → ListView
-│   ├─ 상단: "N개의 세션" + 필터 버튼(활성 필터 시 점 표시)
+│   ├─ 상단: "N개의 기록" + 필터 버튼(활성 필터 시 점 표시)
 │   ├─ JournalSessionList → SessionListItem ×N (날짜별 그룹)
 │   └─ JournalFilterModal (검색/카테고리/기간)
 │       ├─ JournalSearchField
@@ -256,35 +256,35 @@ JournalView
 │   ├─ CalendarMonthNav (이전/다음 해·달, 오늘 버튼)
 │   ├─ CalendarMonthGrid (월요일~일요일 그리드, 일별 집중분 뱃지)
 │   └─ CalendarDayModal (날짜 선택 시 해당일 SessionListItem 목록)
-└─ SessionDetailOverlay (세션 선택 시, 모바일 하단시트/데스크톱 중앙팝업)
+└─ SessionDetailOverlay (기록 선택 시, 모바일 하단시트/데스크톱 중앙팝업)
     └─ JournalDetailPanel
         ├─ SessionDetailHeader (CategoryBadge, 제목, 날짜/시간범위, 편집/삭제 아이콘)
         ├─ FocusRatingPicker (집중도 3단계)
         ├─ DistractionTagPicker (방해요소 태그, 다중 선택)
         ├─ 메모 (뷰 모드: 텍스트 표시 / 편집 모드: MemoTextarea)
         ├─ SessionStatsRow (집중시간 / 사이클 또는 자유 집중 시간)
-        └─ "세션 삭제" → ConfirmDialog
+        └─ "기록 삭제" → ConfirmDialog
 ```
 
-`JournalDetailPanel`은 리스트뷰/캘린더뷰 어느 쪽에서 세션을 클릭해도 공통으로 열리는 상세 콘텐츠다. `SessionDetailOverlay`는 그 콘텐츠를 담는 반응형 Dialog 셸이다. 편집은 필드별 인라인이 아니라 **패널 전체 단위의 통합 모드**다 — 편집 아이콘 클릭 시 제목/집중도/방해요소/메모가 한 번에 편집 가능 상태로 전환되고, "저장"으로 한 번에 커밋하거나 "취소"로 되돌린다.
+`JournalDetailPanel`은 리스트뷰/캘린더뷰 어느 쪽에서 기록을 클릭해도 공통으로 열리는 상세 콘텐츠다. `SessionDetailOverlay`는 그 콘텐츠를 담는 반응형 Dialog 셸이다. 편집은 필드별 인라인이 아니라 **패널 전체 단위의 통합 모드**다 — 편집 아이콘 클릭 시 제목/집중도/방해요소/메모가 한 번에 편집 가능 상태로 전환되고, "저장"으로 한 번에 커밋하거나 "취소"로 되돌린다.
 
 ### 컴포넌트 표
 
 | 컴포넌트            | 경로                                      | 설명              |
 | --------------- | --------------------------------------- | --------------- |
-| JournalView      | `components/journal/JournalView.tsx`    | 탭/필터/선택 세션 상태 관리, 전체 조립 |
+| JournalView      | `components/journal/JournalView.tsx`    | 탭/필터/선택 기록 상태 관리, 전체 조립 |
 | JournalTabs      | `components/journal/JournalTabs.tsx`    | list/calendar 탭 |
 | InsightsSection / InsightCard | `components/journal/InsightsSection.tsx`, `InsightCard.tsx` | 방해요소·집중도추이·카테고리·요일패턴 인사이트 |
-| ListView         | `components/journal/ListView.tsx`       | 검색/필터 버튼 + 세션 목록 조립 |
-| JournalSessionList / SessionListItem | `components/journal/JournalSessionList.tsx`, `SessionListItem.tsx` | 날짜별 그룹 목록 / 개별 세션 행 |
+| ListView         | `components/journal/ListView.tsx`       | 검색/필터 버튼 + 기록 목록 조립 |
+| JournalSessionList / SessionListItem | `components/journal/JournalSessionList.tsx`, `SessionListItem.tsx` | 날짜별 그룹 목록 / 개별 기록 행 |
 | JournalFilterModal | `components/journal/JournalFilterModal.tsx` | 검색+카테고리+기간 통합 필터 |
 | CalendarView     | `components/journal/CalendarView.tsx`   | 월 네비게이션 + 그리드 조립 |
 | CalendarMonthGrid | `components/journal/CalendarMonthGrid.tsx` | 월간 히트맵 그리드 |
-| CalendarDayModal | `components/journal/CalendarDayModal.tsx` | 선택 날짜의 세션 목록 모달 |
+| CalendarDayModal | `components/journal/CalendarDayModal.tsx` | 선택 날짜의 기록 목록 모달 |
 | SessionDetailOverlay | `components/journal/SessionDetailOverlay.tsx` | 반응형 Dialog 셸 |
-| JournalDetailPanel | `components/journal/JournalDetailPanel.tsx` | 세션 상세 조립(편집 상태 관리) |
+| JournalDetailPanel | `components/journal/JournalDetailPanel.tsx` | 기록 상세 조립(편집 상태 관리) |
 | SessionDetailHeader / SessionStatsRow | `components/journal/SessionDetailHeader.tsx`, `SessionStatsRow.tsx` | 제목/메타/편집 컨트롤, 집중시간·사이클 통계 |
-| JournalEmptyState | `components/journal/JournalEmptyState.tsx` | 세션 0개일 때 안내 |
+| JournalEmptyState | `components/journal/JournalEmptyState.tsx` | 기록 0개일 때 안내 |
 | CategoryBadge   | `components/shared/CategoryBadge.tsx`   | 카테고리 색상 뱃지      |
 | ConfirmDialog   | `components/shared/ConfirmDialog.tsx`   | 삭제 확인           |
 
@@ -295,16 +295,16 @@ JournalView
 | list/calendar 탭 전환 | ListView ↔ CalendarView 전환 (InsightsSection은 유지) |
 | 리스트뷰 필터 버튼 클릭 | JournalFilterModal 오픈 |
 | 필터 적용 | `useJournalFilters` 훅이 세션 필터링 후 날짜별 재그룹핑 |
-| 세션 항목 클릭(리스트/캘린더 공통) | SessionDetailOverlay + JournalDetailPanel 오픈 |
-| 캘린더 날짜 클릭(집중기록 있는 날만 활성) | CalendarDayModal 오픈, 해당일 세션 목록 표시 |
+| 기록 항목 클릭(리스트/캘린더 공통) | SessionDetailOverlay + JournalDetailPanel 오픈 |
+| 캘린더 날짜 클릭(집중기록 있는 날만 활성) | CalendarDayModal 오픈, 해당일 기록 목록 표시 |
 | 상세 패널 편집 아이콘 클릭 | 제목/집중도/방해요소/메모 통합 편집 모드 진입 |
 | 편집 모드에서 "저장"/"취소" | 전체 필드 일괄 커밋 / 원래 값으로 되돌림 |
-| "세션 삭제"    | ConfirmDialog → 확인 시 세션 제거, 오버레이 자동 닫힘 |
+| "기록 삭제"    | ConfirmDialog → 확인 시 기록 제거, 오버레이 자동 닫힘 |
 
 ### 에지케이스
 
 - 기록 없음: JournalEmptyState + "타이머로 이동" 링크
-- 필터 결과 0건: 세션 자체가 없는 것과 별개로 "검색 결과가 없어요" 인라인 표시
+- 필터 결과 0건: 기록 자체가 없는 것과 별개로 "검색 결과가 없어요" 인라인 표시
 - 캘린더뷰에서 미래 날짜/기록 없는 날 클릭: 버튼 비활성화
 
 ---

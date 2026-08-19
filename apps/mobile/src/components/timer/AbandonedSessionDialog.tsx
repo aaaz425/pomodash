@@ -47,11 +47,11 @@ export function AbandonedSessionDialog() {
   return (
     <ConfirmModal
       visible={showAbandonedPrompt}
-      title="이전 세션이 남아있어요"
+      title="이전 타이머가 남아있어요"
       description={
         startedLabel
-          ? `${startedLabel} 시작한 세션이 아직 끝나지 않았어요. 어떻게 할까요?`
-          : '아직 끝나지 않은 세션이 있어요. 어떻게 할까요?'
+          ? `${startedLabel} 시작한 타이머가 아직 끝나지 않았어요. 어떻게 할까요?`
+          : '아직 끝나지 않은 타이머가 있어요. 어떻게 할까요?'
       }
       cancelLabel="이어가기"
       onCancel={dismissAbandonedPrompt}

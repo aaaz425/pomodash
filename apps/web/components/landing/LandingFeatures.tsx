@@ -13,10 +13,10 @@ const FEATURES = [
   },
   {
     icon: BookOpen,
-    title: '세션 회고 메모',
+    title: '집중 회고 메모',
     desc: '집중이 끝날 때마다 짧게 기록을 남기세요. 작은 회고가 성장의 흔적이 됩니다.',
     src: '/landing/journal.png',
-    alt: '세션 기록 화면',
+    alt: '기록 화면',
     width: 2560,
     height: 1600,
   },

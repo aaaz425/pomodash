@@ -16,7 +16,7 @@ const STEPS = [
   {
     step: '03',
     icon: BookOpen,
-    title: '세션을 기록하세요',
+    title: '기록을 남기세요',
     desc: '회고 메모를 남기고 집중도와 방해 요소를 기록하세요.',
   },
   {

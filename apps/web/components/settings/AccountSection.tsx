@@ -127,7 +127,7 @@ export function AccountSection({ user }: Props) {
       <ConfirmDialog
         open={confirmOpen}
         title="정말 탈퇴하시겠어요?"
-        description="모든 작업, 세션 기록, 설정이 영구 삭제되며 복구할 수 없어요."
+        description="모든 작업, 기록, 설정이 영구 삭제되며 복구할 수 없어요."
         confirmLabel="탈퇴 계속하기"
         onConfirm={() => {
           setConfirmOpen(false);

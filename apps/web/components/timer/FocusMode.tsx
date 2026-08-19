@@ -79,7 +79,7 @@ export function FocusMode() {
           {/* Task Section */}
           <div className="relative flex flex-col items-center gap-2">
             <span className="text-sm text-muted-foreground/60">
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중 세션`}
+              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
             </span>
             {task ? (
               <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export function FocusMode() {
               className="gap-1.5 px-4 py-2.5 text-muted-foreground"
             >
               <Square className="w-3.5 h-3.5" fill="currentColor" />
-              세션종료
+              타이머 종료
             </Button>
           </div>
 
@@ -147,9 +147,9 @@ export function FocusMode() {
 
           <ConfirmDialog
             open={showEndConfirm}
-            title="세션을 종료할까요?"
+            title="타이머를 종료할까요?"
             description={`${formatSessionEndSummary(mode, elapsedMinutes, cycleCount, totalCycles)}.`}
-            confirmLabel="세션 종료"
+            confirmLabel="타이머 종료"
             onConfirm={confirmEnd}
             onCancel={cancelEnd}
           />

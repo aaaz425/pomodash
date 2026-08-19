@@ -63,7 +63,7 @@ export function DeleteAccountModal({ visible, onClose }: Props) {
       <ConfirmModal
         visible={visible}
         title="정말 탈퇴하시겠어요?"
-        description="모든 작업, 세션 기록, 설정이 영구 삭제되며 복구할 수 없어요."
+        description="모든 작업, 기록, 설정이 영구 삭제되며 복구할 수 없어요."
         confirmLabel="다음"
         destructive
         onConfirm={() => setStep('verify')}

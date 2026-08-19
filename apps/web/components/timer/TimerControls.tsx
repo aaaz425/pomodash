@@ -69,21 +69,21 @@ export function TimerControls() {
         className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap hover:bg-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
         <Square className="w-3.5 h-3.5" fill="currentColor" />
-        세션 종료
+        타이머 종료
       </Button>
 
       {showStartModal && <StartSessionModal onClose={() => setShowStartModal(false)} />}
 
       <ConfirmDialog
         open={showEndConfirm}
-        title="세션을 종료할까요?"
+        title="타이머를 종료할까요?"
         description={formatSessionEndSummary(
           mode,
           elapsedMinutes,
           cycleCount,
           settings.totalCycles,
         )}
-        confirmLabel="세션 종료"
+        confirmLabel="타이머 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
       />
