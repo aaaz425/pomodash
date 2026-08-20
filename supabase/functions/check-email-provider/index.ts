@@ -19,6 +19,20 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
+  // 인증 없이 호출 가능한 엔드포인트라 이메일 나열 공격에 노출됨 — IP당 요청 빈도를 제한한다.
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
+  const { data: allowed } = await supabaseAdmin.rpc('check_and_record_email_rate_limit', {
+    p_ip: ip,
+    p_limit: 8,
+    p_window_seconds: 600,
+  });
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: '잠시 후 다시 시도해주세요' }), { status: 429 });
+  }
+
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({
     type: 'recovery',
     email,
