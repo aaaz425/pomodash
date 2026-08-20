@@ -59,7 +59,7 @@ vitest는 설치되어 있으나 pre-commit hook은 현재 주석 처리 상태.
 pre-commit:
   commands:
     unit-test:
-      run: npm run test -- --run
+      run: pnpm test -- --run
 ```
 
 ---
@@ -72,7 +72,7 @@ PR 생성 시 GitHub Actions(`.github/workflows/e2e.yml`)에서 자동 실행.
 로컬에서 수동 실행도 가능.
 
 ```bash
-npm run test:e2e
+pnpm test:e2e
 ```
 
 ### 핵심 플로우
