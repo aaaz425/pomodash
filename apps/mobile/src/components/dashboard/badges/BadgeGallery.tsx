@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
@@ -27,12 +27,9 @@ export function BadgeGallery({ sessions, tasks }: Props) {
   const theme = THEME[scheme];
   const [expanded, setExpanded] = useState(false);
 
-  const earnedIds = useMemo(() => getEarnedBadgeIds(sessions, tasks), [sessions, tasks]);
+  const earnedIds = getEarnedBadgeIds(sessions, tasks);
   const earnedCount = earnedIds.size;
-  const earnedBadges = useMemo(
-    () => BADGE_DEFINITIONS.filter((b) => earnedIds.has(b.id)),
-    [earnedIds],
-  );
+  const earnedBadges = BADGE_DEFINITIONS.filter((b) => earnedIds.has(b.id));
 
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>

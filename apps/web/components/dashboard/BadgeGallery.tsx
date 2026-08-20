@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { getEarnedBadgeIds } from '@/lib/badges';
 import {
@@ -23,12 +23,9 @@ const CATEGORY_ORDER: BadgeCategory[] = ['streak', 'total-time', 'diversity', 's
 export function BadgeGallery({ sessions, tasks }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const earnedIds = useMemo(() => getEarnedBadgeIds(sessions, tasks), [sessions, tasks]);
+  const earnedIds = getEarnedBadgeIds(sessions, tasks);
   const earnedCount = earnedIds.size;
-  const earnedBadges = useMemo(
-    () => BADGE_DEFINITIONS.filter((b) => earnedIds.has(b.id)),
-    [earnedIds],
-  );
+  const earnedBadges = BADGE_DEFINITIONS.filter((b) => earnedIds.has(b.id));
 
   return (
     <div className="flex flex-col gap-4 p-5 rounded-lg border border-border bg-card">

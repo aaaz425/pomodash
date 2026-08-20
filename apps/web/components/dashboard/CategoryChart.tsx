@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { getCategoryFocusData } from '@/lib/dashboard';
@@ -16,10 +15,7 @@ interface Props {
 }
 
 export function CategoryChart({ sessions, tasks, categories }: Props) {
-  const data = useMemo(
-    () => getCategoryFocusData(sessions, tasks, categories),
-    [sessions, tasks, categories],
-  );
+  const data = getCategoryFocusData(sessions, tasks, categories);
 
   const totalMinutes = data.reduce((sum, d) => sum + d.minutes, 0);
   const hasData = data.length > 0;

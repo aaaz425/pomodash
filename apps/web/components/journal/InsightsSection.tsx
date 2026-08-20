@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { InsightCard } from '@/components/journal/InsightCard';
 import {
   getCategoryFocusRatings,
@@ -77,13 +76,10 @@ interface Props {
 }
 
 export function InsightsSection({ sessions, tasks, categories }: Props) {
-  const topDistractions = useMemo(() => getTopDistractions(sessions), [sessions]);
-  const ratingTrend = useMemo(() => getFocusRatingTrend(sessions), [sessions]);
-  const categoryRatings = useMemo(
-    () => getCategoryFocusRatings(sessions, tasks, categories),
-    [sessions, tasks, categories],
-  );
-  const lowestDay = useMemo(() => getLowestRatingDayOfWeek(sessions), [sessions]);
+  const topDistractions = getTopDistractions(sessions);
+  const ratingTrend = getFocusRatingTrend(sessions);
+  const categoryRatings = getCategoryFocusRatings(sessions, tasks, categories);
+  const lowestDay = getLowestRatingDayOfWeek(sessions);
 
   const cards = [
     { label: '방해요소', ...topDistractionCopy(topDistractions) },

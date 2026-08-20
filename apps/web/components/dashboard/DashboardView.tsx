@@ -1,7 +1,7 @@
 'use client';
 
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
@@ -62,29 +62,26 @@ export function DashboardView() {
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);
 
-  const filtered = useMemo(() => filterSessionsByTab(sessions, tab), [sessions, tab]);
-  const monthSessions = useMemo(() => filterSessionsByTab(sessions, 'month'), [sessions]);
-  const shareCardData = useMemo(
-    () => buildShareCardData(filtered, sessions, tab),
-    [filtered, sessions, tab],
-  );
+  const filtered = filterSessionsByTab(sessions, tab);
+  const monthSessions = filterSessionsByTab(sessions, 'month');
+  const shareCardData = buildShareCardData(filtered, sessions, tab);
 
-  const totalFocusSeconds = useMemo(() => getTotalFocusSeconds(filtered), [filtered]);
-  const sessionCount = useMemo(() => getSessionCount(filtered), [filtered]);
-  const avgSessionSeconds = useMemo(() => getAvgSessionSeconds(filtered), [filtered]);
-  const streakDays = useMemo(() => getStreakDays(sessions), [sessions]);
-  const maxStreakDays = useMemo(() => getMaxStreakDays(sessions), [sessions]);
-  const monthlyActivity = useMemo(() => getMonthlyActivityData(sessions), [sessions]);
-  const monthFocusSeconds = useMemo(() => getTotalFocusSeconds(monthSessions), [monthSessions]);
-  const busiestDay = useMemo(() => getBusiestDayOfWeek(sessions), [sessions]);
-  const firstSessionDate = useMemo(() => getFirstSessionDate(sessions), [sessions]);
+  const totalFocusSeconds = getTotalFocusSeconds(filtered);
+  const sessionCount = getSessionCount(filtered);
+  const avgSessionSeconds = getAvgSessionSeconds(filtered);
+  const streakDays = getStreakDays(sessions);
+  const maxStreakDays = getMaxStreakDays(sessions);
+  const monthlyActivity = getMonthlyActivityData(sessions);
+  const monthFocusSeconds = getTotalFocusSeconds(monthSessions);
+  const busiestDay = getBusiestDayOfWeek(sessions);
+  const firstSessionDate = getFirstSessionDate(sessions);
 
-  const prevDayFocusSec = useMemo(() => getPrevDayFocusSeconds(sessions), [sessions]);
-  const prevDayCount = useMemo(() => getPrevDaySessionCount(sessions), [sessions]);
-  const prevWeekFocusSec = useMemo(() => getPrevWeekFocusSeconds(sessions), [sessions]);
-  const prevWeekCount = useMemo(() => getPrevWeekSessionCount(sessions), [sessions]);
-  const prevMonthFocusSec = useMemo(() => getPrevMonthFocusSeconds(sessions), [sessions]);
-  const prevMonthCount = useMemo(() => getPrevMonthSessionCount(sessions), [sessions]);
+  const prevDayFocusSec = getPrevDayFocusSeconds(sessions);
+  const prevDayCount = getPrevDaySessionCount(sessions);
+  const prevWeekFocusSec = getPrevWeekFocusSeconds(sessions);
+  const prevWeekCount = getPrevWeekSessionCount(sessions);
+  const prevMonthFocusSec = getPrevMonthFocusSeconds(sessions);
+  const prevMonthCount = getPrevMonthSessionCount(sessions);
 
   const focusLabel =
     tab === 'today'

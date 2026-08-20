@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { groupSessionsByDate } from '@/lib/sessionUtils';
 import type { Session, Task } from '@/types';
 
@@ -14,7 +14,7 @@ export function useJournalFilters(sessions: Session[], tasks: Task[]) {
 
   const hasActiveFilter = !!(searchQuery || selectedCategoryIds.size > 0 || dateFrom || dateTo);
 
-  const filteredSessions = useMemo(() => {
+  const filteredSessions = (() => {
     let result = sessions;
 
     if (selectedCategoryIds.size > 0) {
@@ -38,14 +38,11 @@ export function useJournalFilters(sessions: Session[], tasks: Task[]) {
     if (dateTo) result = result.filter((s) => s.startedAt.slice(0, 10) <= dateTo);
 
     return result;
-  }, [sessions, tasks, selectedCategoryIds, searchQuery, dateFrom, dateTo]);
+  })();
 
-  const groups = useMemo(() => groupSessionsByDate(filteredSessions), [filteredSessions]);
+  const groups = groupSessionsByDate(filteredSessions);
 
-  const markedDates = useMemo(
-    () => new Set(sessions.map((s) => s.startedAt.slice(0, 10))),
-    [sessions],
-  );
+  const markedDates = new Set(sessions.map((s) => s.startedAt.slice(0, 10)));
 
   function reset() {
     setSearchQuery('');
