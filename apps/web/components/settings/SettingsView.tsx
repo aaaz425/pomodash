@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
 import {
   Bell,
   ChevronLeft,
@@ -102,7 +103,11 @@ export function SettingsView() {
   useEffect(() => {
     if (searchParams.get('confirmDelete') !== '1' || deletingRef.current) return;
     deletingRef.current = true;
-    void deleteAccountConfirmed();
+    // 성공 시 서버 액션 내부에서 redirect()로 응답이 끝나 .then이 실행되지 않는다.
+    // 실패했을 때(예: 재인증이 오래돼 거절된 경우)도 조용히 사라지지 않도록 결과를 확인한다.
+    deleteAccountConfirmed().then((result) => {
+      if (result.error) toast(result.error);
+    });
   }, [searchParams]);
 
   if (!hydrated || !userLoaded) return showSkeleton ? <SettingsSkeleton /> : null;
