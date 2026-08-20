@@ -9,9 +9,9 @@ import {
   getHourlyFocusSeconds,
   getMaxStreakDays,
   getMonthlyActivityData,
-  getPrevDayFocusSeconds,
-  getPrevDaySessionCount,
-  getPrevMonthSessionCount,
+  getPrevDayStats,
+  getPrevMonthStats,
+  getPrevWeekStats,
   getSessionCount,
   getStreakDays,
   getTotalFocusSeconds,
@@ -131,20 +131,20 @@ describe('이전 기간 비교 함수', () => {
     makeSession('2024-02-10T10:00:00', 1500), // 전월
   ];
 
-  it('getPrevDayFocusSeconds — 어제 집중 초 합산', () => {
-    expect(getPrevDayFocusSeconds(sessions, TODAY)).toBe(1500); // 900 + 600
+  it('getPrevDayStats — 어제 집중 초 합산·세션 수', () => {
+    expect(getPrevDayStats(sessions, TODAY)).toEqual({ focusSeconds: 1500, count: 2 }); // 900 + 600
   });
 
-  it('getPrevDaySessionCount — 어제 세션 수', () => {
-    expect(getPrevDaySessionCount(sessions, TODAY)).toBe(2);
+  it('getPrevWeekStats — 지난주 집중 초 합산·세션 수', () => {
+    expect(getPrevWeekStats(sessions, TODAY)).toEqual({ focusSeconds: 0, count: 0 });
   });
 
-  it('getPrevMonthSessionCount — 전월 세션 수', () => {
-    expect(getPrevMonthSessionCount(sessions, TODAY)).toBe(1);
+  it('getPrevMonthStats — 전월 집중 초 합산·세션 수', () => {
+    expect(getPrevMonthStats(sessions, TODAY)).toEqual({ focusSeconds: 1500, count: 1 });
   });
 
-  it('getPrevDayFocusSeconds — 어제 세션 없으면 0', () => {
-    expect(getPrevDayFocusSeconds([], TODAY)).toBe(0);
+  it('getPrevDayStats — 어제 세션 없으면 0', () => {
+    expect(getPrevDayStats([], TODAY)).toEqual({ focusSeconds: 0, count: 0 });
   });
 });
 
@@ -233,15 +233,10 @@ describe('getMaxStreakDays', () => {
 });
 
 describe('getBusiestDayOfWeek', () => {
-  const TODAY = new Date('2024-03-15T12:00:00');
-
+  // 이번 달로 필터링하는 책임은 호출부(filterSessionsByTab)에 있음 — 여기서는 받은
+  // 배열을 그대로 요일별로 집계만 한다.
   it('세션 없으면 null', () => {
-    expect(getBusiestDayOfWeek([], TODAY)).toBeNull();
-  });
-
-  it('이달 세션 없으면 null', () => {
-    const sessions = [makeSession('2024-02-10T10:00:00', 3600)];
-    expect(getBusiestDayOfWeek(sessions, TODAY)).toBeNull();
+    expect(getBusiestDayOfWeek([])).toBeNull();
   });
 
   it('가장 집중 시간이 많은 요일 반환', () => {
@@ -250,7 +245,7 @@ describe('getBusiestDayOfWeek', () => {
       makeSession('2024-03-11T14:00:00', 1800), // 월요일
       makeSession('2024-03-12T10:00:00', 1200), // 화요일
     ];
-    expect(getBusiestDayOfWeek(sessions, TODAY)).toBe('월요일');
+    expect(getBusiestDayOfWeek(sessions)).toBe('월요일');
   });
 });
 
