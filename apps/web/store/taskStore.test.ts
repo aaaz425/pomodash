@@ -381,6 +381,46 @@ describe('addSession / updateSessionNote / updateSessionRating / updateSessionTa
     await store.getState().deleteSession(id);
     expect(store.getState().sessions).toHaveLength(0);
   });
+
+  it('addSession 저장 대기 중 다른 세션을 삭제해도 삭제가 덮어써지지 않음(경쟁 상태 방지)', async () => {
+    const store = createTaskStore();
+    await store.getState().addSession(makeSessionInput({ startedAt: '2024-03-14T09:00:00.000Z' }));
+    const idToDelete = store.getState().sessions[0].id;
+
+    let resolveInsert!: (value: Session) => void;
+    mockInsertSession.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store
+      .getState()
+      .addSession(makeSessionInput({ startedAt: '2024-03-16T09:00:00.000Z' }));
+    // addSession의 insert가 아직 대기 중인 상태에서 다른 세션을 삭제
+    await store.getState().deleteSession(idToDelete);
+    expect(store.getState().sessions.some((s) => s.id === idToDelete)).toBe(false);
+
+    resolveInsert({
+      id: 'db-id-new',
+      taskId: null,
+      title: null,
+      mode: 'pomodoro',
+      startedAt: '2024-03-16T09:00:00.000Z',
+      endedAt: '2024-03-16T09:30:00.000Z',
+      completedCycles: 1,
+      totalCycles: 4,
+      focusSeconds: 1500,
+      pausedSeconds: 0,
+      focusPeriods: [],
+      note: null,
+      focusRating: null,
+      distractionTags: [],
+    });
+    await addPromise;
+
+    // addSession의 insert 완료 처리가 삭제 이전 스냅샷으로 덮어써서 삭제된 세션을 되살리면 안 됨
+    expect(store.getState().sessions.some((s) => s.id === idToDelete)).toBe(false);
+    expect(store.getState().sessions.map((s) => s.startedAt)).toEqual(['2024-03-16T09:00:00.000Z']);
+  });
 });
 
 describe('reorderTasks', () => {

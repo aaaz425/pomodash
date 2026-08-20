@@ -112,9 +112,9 @@ export const createTaskStore = () =>
         completed: false,
         createdAt: new Date().toISOString(),
       };
-      const previousTasks = get().tasks;
-      const optimisticTasks = [optimisticTask, ...previousTasks];
-      set({ tasks: optimisticTasks });
+      // 낙관적 반영·롤백 모두 state 콜백으로 최신 상태 위에서 수행 — 대기 중 다른 항목이
+      // 동시에 변경돼도 그 변경을 덮어쓰지 않는다 (스냅샷을 직접 set하면 경쟁 상태 발생)
+      set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
       const inserted = await insertTaskRow({
         title: trimmed,
@@ -125,53 +125,56 @@ export const createTaskStore = () =>
       });
 
       if (!inserted) {
-        set({ tasks: previousTasks });
+        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
         toast('작업 추가에 실패했어요. 다시 시도해주세요');
         return null;
       }
 
-      const finalTasks = optimisticTasks.map((t) => (t.id === tempId ? inserted : t));
-      set({ tasks: finalTasks });
-      void reorderTasksRows(finalTasks.map((t) => t.id));
+      set((state) => ({ tasks: state.tasks.map((t) => (t.id === tempId ? inserted : t)) }));
+      void reorderTasksRows(get().tasks.map((t) => t.id));
       return inserted.id;
     },
 
     toggleTask: async (id) => {
-      const previousTasks = get().tasks;
-      const task = previousTasks.find((t) => t.id === id);
-      if (!task) return;
-      const completed = !task.completed;
-      set({ tasks: previousTasks.map((t) => (t.id === id ? { ...t, completed } : t)) });
+      const original = get().tasks.find((t) => t.id === id);
+      if (!original) return;
+      const completed = !original.completed;
+      set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? { ...t, completed } : t)) }));
       const { error } = await updateTaskRow(id, { completed });
       if (error) {
-        set({ tasks: previousTasks });
+        set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? original : t)) }));
         toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     updateTask: async (id, patch) => {
-      const previousTasks = get().tasks;
-      if (!previousTasks.some((t) => t.id === id)) return;
+      const original = get().tasks.find((t) => t.id === id);
+      if (!original) return;
       const title = patch.title?.trim();
-      set({
-        tasks: previousTasks.map((t) =>
+      set((state) => ({
+        tasks: state.tasks.map((t) =>
           t.id === id ? { ...t, ...patch, title: title ?? t.title } : t,
         ),
-      });
+      }));
       const { error } = await updateTaskRow(id, { ...patch, title });
       if (error) {
-        set({ tasks: previousTasks });
+        set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? original : t)) }));
         toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     deleteTask: async (id) => {
-      const previousTasks = get().tasks;
-      if (!previousTasks.some((t) => t.id === id)) return;
-      set({ tasks: previousTasks.filter((t) => t.id !== id) });
+      const index = get().tasks.findIndex((t) => t.id === id);
+      if (index === -1) return;
+      const target = get().tasks[index];
+      set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
       const { error } = await deleteTaskRow(id);
       if (error) {
-        set({ tasks: previousTasks });
+        set((state) => {
+          const tasks = [...state.tasks];
+          tasks.splice(Math.min(index, tasks.length), 0, target);
+          return { tasks };
+        });
         toast('작업 삭제에 실패했어요. 다시 시도해주세요');
       }
     },
@@ -188,53 +191,59 @@ export const createTaskStore = () =>
     },
 
     addCategory: async ({ name, color }) => {
-      const previousCategories = get().categories;
-      if (previousCategories.length >= CATEGORY_LIMITS.COUNT_MAX) return;
+      if (get().categories.length >= CATEGORY_LIMITS.COUNT_MAX) return;
       const trimmed = name.trim();
       const tempId = generateId();
-      const optimisticCategories = [...previousCategories, { id: tempId, name: trimmed, color }];
-      set({ categories: optimisticCategories });
+      set((state) => ({
+        categories: [...state.categories, { id: tempId, name: trimmed, color }],
+      }));
 
       const inserted = await insertCategoryRow({ name: trimmed, color });
       if (!inserted) {
-        set({ categories: previousCategories });
+        set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
         toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
         return;
       }
-      const finalCategories = optimisticCategories.map((c) => (c.id === tempId ? inserted : c));
-      set({ categories: finalCategories });
-      void reorderCategoriesRows(finalCategories.map((c) => c.id));
+      set((state) => ({
+        categories: state.categories.map((c) => (c.id === tempId ? inserted : c)),
+      }));
+      void reorderCategoriesRows(get().categories.map((c) => c.id));
     },
 
     updateCategory: async (id, { name, color }) => {
-      const previousCategories = get().categories;
-      if (!previousCategories.some((c) => c.id === id)) return;
+      const original = get().categories.find((c) => c.id === id);
+      if (!original) return;
       const trimmed = name.trim();
-      set({
-        categories: previousCategories.map((c) =>
-          c.id === id ? { ...c, name: trimmed, color } : c,
-        ),
-      });
+      set((state) => ({
+        categories: state.categories.map((c) => (c.id === id ? { ...c, name: trimmed, color } : c)),
+      }));
       const { error } = await updateCategoryRow(id, { name: trimmed, color });
       if (error) {
-        set({ categories: previousCategories });
+        set((state) => ({
+          categories: state.categories.map((c) => (c.id === id ? original : c)),
+        }));
         toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     deleteCategory: async (id) => {
-      const previousCategories = get().categories;
-      if (!previousCategories.some((c) => c.id === id)) return { blocked: false };
+      const index = get().categories.findIndex((c) => c.id === id);
+      if (index === -1) return { blocked: false };
 
       // 참조하는 작업이 있으면 DB에서도 막히지만, 낙관적 삭제 후 롤백되는 깜빡임을 피하려고 미리 로컬에서 걸러낸다
       if (get().tasks.some((t) => t.categoryId === id)) {
         return { blocked: true };
       }
 
-      set({ categories: previousCategories.filter((c) => c.id !== id) });
+      const target = get().categories[index];
+      set((state) => ({ categories: state.categories.filter((c) => c.id !== id) }));
       const { error, blocked } = await deleteCategoryRow(id);
       if (error) {
-        set({ categories: previousCategories });
+        set((state) => {
+          const categories = [...state.categories];
+          categories.splice(Math.min(index, categories.length), 0, target);
+          return { categories };
+        });
         toast('카테고리 삭제에 실패했어요. 다시 시도해주세요');
       }
       return { blocked };
@@ -253,39 +262,43 @@ export const createTaskStore = () =>
 
     addSession: async (input) => {
       const tempId = generateId();
-      const previousSessions = get().sessions;
-      set({ sessions: [{ id: tempId, ...input }, ...previousSessions] });
+      set((state) => ({ sessions: [{ id: tempId, ...input }, ...state.sessions] }));
 
       const inserted = await insertSessionRow(input);
       if (!inserted) {
-        set({ sessions: previousSessions });
+        set((state) => ({ sessions: state.sessions.filter((s) => s.id !== tempId) }));
         toast('기록 저장에 실패했어요');
         return false;
       }
-      set({ sessions: [inserted, ...previousSessions] });
+      set((state) => ({ sessions: state.sessions.map((s) => (s.id === tempId ? inserted : s)) }));
       return true;
     },
 
     updateSessionFields: async (id, patch) => {
-      const previousSessions = get().sessions;
-      if (!previousSessions.some((s) => s.id === id)) return;
-      set({
-        sessions: previousSessions.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-      });
+      const original = get().sessions.find((s) => s.id === id);
+      if (!original) return;
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+      }));
       const { error } = await updateSessionRow(id, patch);
       if (error) {
-        set({ sessions: previousSessions });
+        set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? original : s)) }));
         toast('기록 저장에 실패했어요');
       }
     },
 
     deleteSession: async (id) => {
-      const previousSessions = get().sessions;
-      if (!previousSessions.some((s) => s.id === id)) return;
-      set({ sessions: previousSessions.filter((s) => s.id !== id) });
+      const index = get().sessions.findIndex((s) => s.id === id);
+      if (index === -1) return;
+      const target = get().sessions[index];
+      set((state) => ({ sessions: state.sessions.filter((s) => s.id !== id) }));
       const { error } = await deleteSessionRow(id);
       if (error) {
-        set({ sessions: previousSessions });
+        set((state) => {
+          const sessions = [...state.sessions];
+          sessions.splice(Math.min(index, sessions.length), 0, target);
+          return { sessions };
+        });
         toast('기록 삭제에 실패했어요');
       }
     },
