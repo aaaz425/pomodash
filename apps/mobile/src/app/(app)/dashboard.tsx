@@ -11,12 +11,9 @@ import {
   getFirstSessionDate,
   getMaxStreakDays,
   getMonthlyActivityData,
-  getPrevDayFocusSeconds,
-  getPrevDaySessionCount,
-  getPrevMonthFocusSeconds,
-  getPrevMonthSessionCount,
-  getPrevWeekFocusSeconds,
-  getPrevWeekSessionCount,
+  getPrevDayStats,
+  getPrevMonthStats,
+  getPrevWeekStats,
   getSessionCount,
   getStreakDays,
   getTotalFocusSeconds,
@@ -87,38 +84,35 @@ export default function DashboardScreen() {
   const maxStreakDays = getMaxStreakDays(sessions);
   const monthlyActivity = getMonthlyActivityData(sessions);
   const monthFocusSeconds = getTotalFocusSeconds(monthSessions);
-  const busiestDay = getBusiestDayOfWeek(sessions);
+  const busiestDay = getBusiestDayOfWeek(monthSessions);
   const firstSessionDate = getFirstSessionDate(sessions);
 
-  const prevDayFocusSec = getPrevDayFocusSeconds(sessions);
-  const prevDayCount = getPrevDaySessionCount(sessions);
-  const prevWeekFocusSec = getPrevWeekFocusSeconds(sessions);
-  const prevWeekCount = getPrevWeekSessionCount(sessions);
-  const prevMonthFocusSec = getPrevMonthFocusSeconds(sessions);
-  const prevMonthCount = getPrevMonthSessionCount(sessions);
+  const prevDay = getPrevDayStats(sessions);
+  const prevWeek = getPrevWeekStats(sessions);
+  const prevMonth = getPrevMonthStats(sessions);
 
   const focusLabel = FOCUS_LABELS[tab];
   const sessionLabel = SESSION_LABELS[tab];
 
   const focusSub = (() => {
-    if (tab === 'today' && prevDayFocusSec > 0)
-      return makeFocusSub(totalFocusSeconds - prevDayFocusSec, '어제 대비');
-    if (tab === 'week' && prevWeekFocusSec > 0)
-      return makeFocusSub(totalFocusSeconds - prevWeekFocusSec, '전주 대비');
-    if (tab === 'month' && prevMonthFocusSec > 0)
-      return makeFocusSub(totalFocusSeconds - prevMonthFocusSec, '전월 대비');
+    if (tab === 'today' && prevDay.focusSeconds > 0)
+      return makeFocusSub(totalFocusSeconds - prevDay.focusSeconds, '어제 대비');
+    if (tab === 'week' && prevWeek.focusSeconds > 0)
+      return makeFocusSub(totalFocusSeconds - prevWeek.focusSeconds, '전주 대비');
+    if (tab === 'month' && prevMonth.focusSeconds > 0)
+      return makeFocusSub(totalFocusSeconds - prevMonth.focusSeconds, '전월 대비');
     if (tab === 'all' && firstSessionDate)
       return `${firstSessionDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}부터`;
     return undefined;
   })();
 
   const sessionCountSub = (() => {
-    if (tab === 'today' && prevDayCount > 0)
-      return makeCountSub(sessionCount - prevDayCount, '어제 대비');
-    if (tab === 'week' && prevWeekCount > 0)
-      return makeCountSub(sessionCount - prevWeekCount, '전주 대비');
-    if (tab === 'month' && prevMonthCount > 0)
-      return makeCountSub(sessionCount - prevMonthCount, '전월 대비');
+    if (tab === 'today' && prevDay.count > 0)
+      return makeCountSub(sessionCount - prevDay.count, '어제 대비');
+    if (tab === 'week' && prevWeek.count > 0)
+      return makeCountSub(sessionCount - prevWeek.count, '전주 대비');
+    if (tab === 'month' && prevMonth.count > 0)
+      return makeCountSub(sessionCount - prevMonth.count, '전월 대비');
     return undefined;
   })();
 

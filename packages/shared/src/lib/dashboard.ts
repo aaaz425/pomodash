@@ -138,70 +138,55 @@ export function getStreakDays<T extends SessionLike>(
   return streak;
 }
 
-export function getPrevDayFocusSeconds<T extends SessionLike>(
-  sessions: T[],
-  today: Date = new Date(),
-): number {
-  const yesterday = subDays(today, 1);
-  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
+export interface PeriodStats {
+  focusSeconds: number;
+  count: number;
 }
 
-export function getPrevDaySessionCount<T extends SessionLike>(
+function getPeriodStats<T extends SessionLike>(
   sessions: T[],
-  today: Date = new Date(),
-): number {
-  const yesterday = subDays(today, 1);
-  const interval = { start: startOfDay(yesterday), end: endOfDay(yesterday) };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+  interval: { start: Date; end: Date },
+): PeriodStats {
+  let focusSeconds = 0;
+  let count = 0;
+  for (const s of sessions) {
+    if (isWithinInterval(parseISO(s.startedAt), interval)) {
+      focusSeconds += s.focusSeconds;
+      count++;
+    }
+  }
+  return { focusSeconds, count };
 }
 
-export function getPrevWeekFocusSeconds<T extends SessionLike>(
+// count/focusSeconds를 각각 따로 필터링하면 같은 구간을 2번 순회하게 되어 하나로 합침
+export function getPrevDayStats<T extends SessionLike>(
   sessions: T[],
   today: Date = new Date(),
-): number {
+): PeriodStats {
+  const yesterday = subDays(today, 1);
+  return getPeriodStats(sessions, { start: startOfDay(yesterday), end: endOfDay(yesterday) });
+}
+
+export function getPrevWeekStats<T extends SessionLike>(
+  sessions: T[],
+  today: Date = new Date(),
+): PeriodStats {
   const prevWeek = subWeeks(today, 1);
-  const interval = {
+  return getPeriodStats(sessions, {
     start: startOfWeek(prevWeek, { weekStartsOn: 1 }),
     end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
-  };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
+  });
 }
 
-export function getPrevWeekSessionCount<T extends SessionLike>(
+export function getPrevMonthStats<T extends SessionLike>(
   sessions: T[],
   today: Date = new Date(),
-): number {
-  const prevWeek = subWeeks(today, 1);
-  const interval = {
-    start: startOfWeek(prevWeek, { weekStartsOn: 1 }),
-    end: endOfWeek(prevWeek, { weekStartsOn: 1 }),
-  };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
-}
-
-export function getPrevMonthFocusSeconds<T extends SessionLike>(
-  sessions: T[],
-  today: Date = new Date(),
-): number {
+): PeriodStats {
   const prevMonth = subMonths(today, 1);
-  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
-  return sessions
-    .filter((s) => isWithinInterval(parseISO(s.startedAt), interval))
-    .reduce((sum, s) => sum + s.focusSeconds, 0);
-}
-
-export function getPrevMonthSessionCount<T extends SessionLike>(
-  sessions: T[],
-  today: Date = new Date(),
-): number {
-  const prevMonth = subMonths(today, 1);
-  const interval = { start: startOfMonth(prevMonth), end: endOfMonth(prevMonth) };
-  return sessions.filter((s) => isWithinInterval(parseISO(s.startedAt), interval)).length;
+  return getPeriodStats(sessions, {
+    start: startOfMonth(prevMonth),
+    end: endOfMonth(prevMonth),
+  });
 }
 
 export function getMaxStreakDays<T extends SessionLike>(sessions: T[]): number {
@@ -232,11 +217,9 @@ export function getMaxStreakDays<T extends SessionLike>(sessions: T[]): number {
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
-export function getBusiestDayOfWeek<T extends SessionLike>(
-  sessions: T[],
-  today: Date = new Date(),
-): string | null {
-  const monthSessions = filterSessionsByTab(sessions, 'month', today);
+// 호출부가 이미 이번 달로 필터링한 배열(monthSessions)을 갖고 있는 경우가 많아,
+// 여기서 다시 'month'로 필터링하지 않고 인자로 받는다 (중복 순회 방지)
+export function getBusiestDayOfWeek<T extends SessionLike>(monthSessions: T[]): string | null {
   if (monthSessions.length === 0) return null;
 
   const totals = new Array(7).fill(0);
