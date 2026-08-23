@@ -13,13 +13,13 @@ function notify() {
   listeners.forEach((cb) => cb());
 }
 
-function getStoredMode(): ThemeMode {
+export function getStoredMode(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
   const result = ThemeModeSchema.safeParse(localStorage.getItem(STORAGE_KEYS.theme));
   return result.success ? result.data : 'system';
 }
 
-function resolveIsDark(mode: ThemeMode): boolean {
+export function resolveIsDark(mode: ThemeMode): boolean {
   if (typeof window === 'undefined') return true;
   if (mode === 'system') return window.matchMedia('(prefers-color-scheme: dark)').matches;
   return mode === 'dark';
