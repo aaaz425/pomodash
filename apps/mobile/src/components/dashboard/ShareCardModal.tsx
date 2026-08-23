@@ -3,12 +3,12 @@ import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import ViewShot, { captureRef, type ViewShotRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library/legacy';
-import type { ShareCardData } from '@pomodash/shared';
+import { COLOR_THEMES, type ShareCardData } from '@pomodash/shared';
 import { Modal } from '@/components/shared/Modal';
 import { ShareCardPreview } from './ShareCardPreview';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useColorTheme, useThemeScheme } from '@/hooks/use-theme-scheme';
 
 interface Props {
   data: ShareCardData;
@@ -18,6 +18,8 @@ interface Props {
 export function ShareCardModal({ data, onClose }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+  const { colorTheme } = useColorTheme();
+  const palette = COLOR_THEMES[colorTheme].shareCard;
   const viewShotRef = useRef<ViewShotRef>(null);
   const [isBusy, setIsBusy] = useState(false);
 
@@ -116,7 +118,7 @@ export function ShareCardModal({ data, onClose }: Props) {
       }
     >
       <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }}>
-        <ShareCardPreview data={data} />
+        <ShareCardPreview data={data} colors={palette} />
       </ViewShot>
     </Modal>
   );

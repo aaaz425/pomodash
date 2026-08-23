@@ -1,5 +1,6 @@
+import type { ShareCardPalette } from '@pomodash/shared';
 import type { ShareCardData } from '@/types';
-import { SHARE_CARD_COLORS, SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
+import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
 
 const SIZE = SHARE_CARD_SIZE;
 const PADDING = 80;
@@ -14,10 +15,10 @@ async function loadFonts(): Promise<void> {
   ]);
 }
 
-function drawBackground(ctx: CanvasRenderingContext2D): void {
+function drawBackground(ctx: CanvasRenderingContext2D, colors: ShareCardPalette): void {
   const gradient = ctx.createLinearGradient(0, 0, 0, SIZE);
-  gradient.addColorStop(0, SHARE_CARD_COLORS.backgroundTop);
-  gradient.addColorStop(1, SHARE_CARD_COLORS.backgroundBottom);
+  gradient.addColorStop(0, colors.bgTop);
+  gradient.addColorStop(1, colors.bgBottom);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, SIZE, SIZE);
 
@@ -29,17 +30,21 @@ function drawBackground(ctx: CanvasRenderingContext2D): void {
     SIZE * 0.35,
     SIZE * 0.6,
   );
-  glow.addColorStop(0, SHARE_CARD_COLORS.accentSoft);
+  glow.addColorStop(0, colors.accentSoft);
   glow.addColorStop(1, 'transparent');
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, SIZE, SIZE);
 }
 
-function drawHeader(ctx: CanvasRenderingContext2D, periodLabel: string): void {
+function drawHeader(
+  ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
+  periodLabel: string,
+): void {
   ctx.textBaseline = 'middle';
 
   ctx.textAlign = 'left';
-  ctx.fillStyle = SHARE_CARD_COLORS.accent;
+  ctx.fillStyle = colors.accent;
   ctx.font = '700 40px Pretendard';
   ctx.fillText('Pomodash', PADDING, PADDING + 20);
 
@@ -51,35 +56,43 @@ function drawHeader(ctx: CanvasRenderingContext2D, periodLabel: string): void {
   const pillX = SIZE - PADDING - pillWidth;
   const pillY = PADDING + 20 - pillHeight / 2;
 
-  ctx.fillStyle = SHARE_CARD_COLORS.accentSoft;
+  ctx.fillStyle = colors.accentSoft;
   ctx.beginPath();
   ctx.roundRect(pillX, pillY, pillWidth, pillHeight, pillHeight / 2);
   ctx.fill();
 
-  ctx.fillStyle = SHARE_CARD_COLORS.accent;
+  ctx.fillStyle = colors.accent;
   ctx.textAlign = 'center';
   ctx.fillText(pillText, pillX + pillWidth / 2, pillY + pillHeight / 2 + 1);
 }
 
-function drawHeadline(ctx: CanvasRenderingContext2D, headline: string): void {
+function drawHeadline(
+  ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
+  headline: string,
+): void {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = SHARE_CARD_COLORS.accent;
+  ctx.fillStyle = colors.accent;
   ctx.font = '600 32px Pretendard';
   ctx.fillText(headline, CENTER_X, PADDING + 130);
 }
 
-function drawHeroRing(ctx: CanvasRenderingContext2D, centerY: number): void {
+function drawHeroRing(
+  ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
+  centerY: number,
+): void {
   const radius = 230;
   ctx.beginPath();
   ctx.arc(CENTER_X, centerY, radius, 0, Math.PI * 2);
-  ctx.strokeStyle = SHARE_CARD_COLORS.accentSoft;
+  ctx.strokeStyle = colors.accentSoft;
   ctx.lineWidth = 16;
   ctx.stroke();
 
   ctx.beginPath();
   ctx.arc(CENTER_X, centerY, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 1.4);
-  ctx.strokeStyle = SHARE_CARD_COLORS.accent;
+  ctx.strokeStyle = colors.accent;
   ctx.lineWidth = 16;
   ctx.lineCap = 'round';
   ctx.stroke();
@@ -99,6 +112,7 @@ function fittedHeroFontSize(ctx: CanvasRenderingContext2D, text: string): number
 
 function drawHeroStat(
   ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
   centerY: number,
   totalFocusLabel: string,
 ): void {
@@ -106,17 +120,18 @@ function drawHeroStat(
   ctx.textBaseline = 'middle';
 
   const fontSize = fittedHeroFontSize(ctx, totalFocusLabel);
-  ctx.fillStyle = SHARE_CARD_COLORS.textPrimary;
+  ctx.fillStyle = colors.textPrimary;
   ctx.font = `700 ${fontSize}px Pretendard`;
   ctx.fillText(totalFocusLabel, CENTER_X, centerY - 10);
 
-  ctx.fillStyle = SHARE_CARD_COLORS.textSecondary;
+  ctx.fillStyle = colors.textSecondary;
   ctx.font = '400 32px Pretendard';
   ctx.fillText('집중 시간', CENTER_X, centerY + 90);
 }
 
 function drawSecondaryStats(
   ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
   y: number,
   sessionCount: number,
   streakDays: number,
@@ -128,17 +143,17 @@ function drawSecondaryStats(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  ctx.fillStyle = SHARE_CARD_COLORS.textMuted;
+  ctx.fillStyle = colors.textMuted;
   ctx.font = '400 26px Pretendard';
   ctx.fillText('기록 수', leftX, y);
   ctx.fillText('연속 집중일', rightX, y);
 
-  ctx.fillStyle = SHARE_CARD_COLORS.textPrimary;
+  ctx.fillStyle = colors.textPrimary;
   ctx.font = '600 48px Pretendard';
   ctx.fillText(`${sessionCount}`, leftX, y + 60);
   ctx.fillText(`${streakDays}일`, rightX, y + 60);
 
-  ctx.strokeStyle = SHARE_CARD_COLORS.divider;
+  ctx.strokeStyle = colors.divider;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(CENTER_X, y - 40);
@@ -146,10 +161,14 @@ function drawSecondaryStats(
   ctx.stroke();
 }
 
-function drawFooter(ctx: CanvasRenderingContext2D, generatedAtLabel: string): void {
+function drawFooter(
+  ctx: CanvasRenderingContext2D,
+  colors: ShareCardPalette,
+  generatedAtLabel: string,
+): void {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = SHARE_CARD_COLORS.textMuted;
+  ctx.fillStyle = colors.textMuted;
   ctx.font = '400 26px Pretendard';
   ctx.fillText(generatedAtLabel, CENTER_X, SIZE - PADDING);
 }
@@ -157,19 +176,20 @@ function drawFooter(ctx: CanvasRenderingContext2D, generatedAtLabel: string): vo
 export async function drawShareCard(
   ctx: CanvasRenderingContext2D,
   data: ShareCardData,
+  colors: ShareCardPalette,
 ): Promise<void> {
   await loadFonts();
 
   ctx.clearRect(0, 0, SIZE, SIZE);
-  drawBackground(ctx);
-  drawHeader(ctx, data.periodLabel);
-  drawHeadline(ctx, data.headline);
+  drawBackground(ctx, colors);
+  drawHeader(ctx, colors, data.periodLabel);
+  drawHeadline(ctx, colors, data.headline);
 
   const heroCenterY = 490;
-  drawHeroRing(ctx, heroCenterY);
-  drawHeroStat(ctx, heroCenterY, data.totalFocusLabel);
-  drawSecondaryStats(ctx, 860, data.sessionCount, data.streakDays);
-  drawFooter(ctx, data.generatedAtLabel);
+  drawHeroRing(ctx, colors, heroCenterY);
+  drawHeroStat(ctx, colors, heroCenterY, data.totalFocusLabel);
+  drawSecondaryStats(ctx, colors, 860, data.sessionCount, data.streakDays);
+  drawFooter(ctx, colors, data.generatedAtLabel);
 }
 
 function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
