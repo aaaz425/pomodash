@@ -66,5 +66,13 @@ export type {
 } from './lib/badges';
 export { buildHeadline, buildShareCardData } from './lib/shareCard';
 export type { ShareCardData } from './lib/shareCard';
+export { COLOR_THEME_KEYS, COLOR_THEMES, DEFAULT_COLOR_THEME } from './constants/colorThemes';
+export type {
+  ColorThemeKey,
+  AccentPair,
+  ColorThemeAccent,
+  ShareCardPalette,
+  ColorThemeDefinition,
+} from './constants/colorThemes';
 export { createTimerStore } from './store/timerStore';
 export type { TimerStore, TimerStoreApi, TimerSnapshot, TimerStorePorts } from './store/timerStore';

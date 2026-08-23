@@ -79,3 +79,11 @@
 - [x] `feat/rn-settings-sync` — 동기부여 메시지·알림음·기본 타이머값 Supabase `settings` 연동
 - [x] `feat/rn-kakao-eas` — EAS 개발 빌드 전환 + 카카오 로그인
 
+## Phase 9 — 컬러 테마
+
+- [>] `refactor/color-theme-shared-infra` — packages/shared에 컬러 테마(미드나잇/선셋/오션/모노) SSOT 추가
+- [ ] `feat/web-color-theme-setting` — 웹 accent 테마 런타임 적용 + 설정 UI
+- [ ] `feat/mobile-color-theme-setting` — 모바일 accent 테마 적용 + 설정 UI
+- [ ] `feat/timer-ring-color-theme` — 타이머 링·글로우에 컬러 테마 반영 (웹+모바일)
+- [ ] `feat/share-card-theme-redesign` — 공유카드 레이아웃 재설계 + 컬러 테마 자동 연동 (웹+모바일)
+
