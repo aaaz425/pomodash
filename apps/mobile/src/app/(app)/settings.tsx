@@ -23,6 +23,7 @@ import { DeleteAccountModal } from '@/components/settings/DeleteAccountModal';
 import { AboutSection } from '@/components/settings/AboutSection';
 import { NotificationSection } from '@/components/settings/NotificationSection';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
+import { ThemeModal } from '@/components/settings/ThemeModal';
 import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
 import { TaskModal } from '@/components/tasks/TaskModal';
 import { CategoryModal } from '@/components/settings/CategoryModal';
@@ -75,9 +76,9 @@ export default function SettingsScreen() {
 
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
 
-  const [openMenu, setOpenMenu] = useState<'timer' | 'task' | 'category' | 'motivational' | null>(
-    null,
-  );
+  const [openMenu, setOpenMenu] = useState<
+    'theme' | 'timer' | 'task' | 'category' | 'motivational' | null
+  >(null);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const isKakao = user?.user_metadata?.provider === 'kakao';
@@ -160,6 +161,7 @@ export default function SettingsScreen() {
 
                 {activeCategory === 'presets' && (
                   <PresetsCategoryCard
+                    onOpenTheme={() => setOpenMenu('theme')}
                     onOpenTimer={() => setOpenMenu('timer')}
                     onOpenTask={() => setOpenMenu('task')}
                     onOpenCategory={() => setOpenMenu('category')}
@@ -184,6 +186,7 @@ export default function SettingsScreen() {
         </ScrollView>
       </SafeAreaView>
 
+      <ThemeModal visible={openMenu === 'theme'} onClose={() => setOpenMenu(null)} />
       <TimerDefaultsModal visible={openMenu === 'timer'} onClose={() => setOpenMenu(null)} />
       <TaskModal visible={openMenu === 'task'} onClose={() => setOpenMenu(null)} />
       <CategoryModal visible={openMenu === 'category'} onClose={() => setOpenMenu(null)} />

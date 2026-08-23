@@ -1,7 +1,8 @@
 import type { TimerPhase } from '@/types/models';
 
+// focus는 선택된 컬러 테마의 accent를 따라가도록 CSS 변수 참조 (NEUTRAL_HEX_COLOR와 동일 패턴)
 export const PHASE_HEX_COLORS: Record<TimerPhase, string> = {
-  focus: '#10d9a0',
+  focus: 'var(--primary)',
   'short-break': '#60a5fa',
 };
 
@@ -11,12 +12,12 @@ export const PHASE_LABELS: Record<TimerPhase, string> = {
 };
 
 export const PHASE_BADGE_STYLES: Record<TimerPhase, { bg: string; dot: string; text: string }> = {
-  focus: { bg: 'bg-[#10d9a01a]', dot: 'bg-[#10d9a0]', text: 'text-[#10d9a0]' },
+  focus: { bg: 'bg-primary/10', dot: 'bg-primary', text: 'text-primary' },
   'short-break': { bg: 'bg-[#60a5fa1a]', dot: 'bg-[#60a5fa]', text: 'text-[#60a5fa]' },
 };
 
 export const PHASE_GLOW: Record<TimerPhase, string> = {
-  focus: 'bg-[radial-gradient(circle,_#10d9a030_0%,_transparent_70%)]',
+  focus: 'bg-[radial-gradient(circle,_var(--primary-glow)_0%,_transparent_70%)]',
   'short-break': 'bg-[radial-gradient(circle,_#60a5fa30_0%,_transparent_70%)]',
 };
 

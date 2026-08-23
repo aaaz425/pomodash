@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play } from 'lucide-react-native';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
-import { PHASE_BADGE, THEME, withAlpha } from '@/constants/timerColors';
+import { phaseBadge, THEME, withAlpha } from '@/constants/timerColors';
 import { BOTTOM_NAV_HEIGHT } from '@/constants/navItems';
 import { FONTS } from '@/constants/fonts';
 import { formatClock } from '@/lib/format';
@@ -26,7 +26,7 @@ export function MiniTimerWidget() {
 
   if (!hydrated || !sessionStarted || pathname === '/') return null;
 
-  const phaseStyles = PHASE_BADGE[phase];
+  const phaseStyles = phaseBadge(phase, scheme);
   const dotColor = isRunning ? phaseStyles.dot : withAlpha(theme.mutedForeground, 0.5);
   const iconColor = isRunning ? phaseStyles.text : theme.mutedForeground;
 
