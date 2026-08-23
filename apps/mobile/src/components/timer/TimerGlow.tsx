@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type { TimerPhase } from '@pomodash/shared';
-import { PHASE_GLOW_RGBA, THEME } from '@/constants/timerColors';
+import { phaseGlowRgba, THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
 interface Props {
@@ -42,7 +42,7 @@ export function TimerGlow({ phase, isNeutral }: Props) {
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
-  const glowColor = isNeutral ? THEME[scheme].mutedForeground : PHASE_GLOW_RGBA[phase];
+  const glowColor = isNeutral ? THEME[scheme].mutedForeground : phaseGlowRgba(phase, scheme);
 
   return (
     <Animated.View

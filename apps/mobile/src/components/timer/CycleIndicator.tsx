@@ -9,17 +9,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
-import { PHASE_BADGE, THEME } from '@/constants/timerColors';
+import { phaseBadge, THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
 function Dot({
   filled,
   pulsing,
   borderColor,
+  dotColor,
 }: {
   filled: boolean;
   pulsing: boolean;
   borderColor: string;
+  dotColor: string;
 }) {
   const opacity = useSharedValue(1);
 
@@ -42,7 +44,7 @@ function Dot({
     <Animated.View
       style={[
         styles.dot,
-        filled ? { backgroundColor: PHASE_BADGE.focus.dot } : { borderWidth: 1.5, borderColor },
+        filled ? { backgroundColor: dotColor } : { borderWidth: 1.5, borderColor },
         animatedStyle,
       ]}
     />
@@ -57,6 +59,8 @@ export function CycleIndicator() {
 
   if (mode === 'free') return null; // 자유 모드는 고정 사이클이 없음
 
+  const dotColor = phaseBadge('focus', scheme).dot;
+
   return (
     <View style={styles.row}>
       {Array.from({ length: totalCycles }).map((_, i) => {
@@ -69,6 +73,7 @@ export function CycleIndicator() {
             filled={isCompleted || isCurrent}
             pulsing={isCurrent}
             borderColor={THEME[scheme].border}
+            dotColor={dotColor}
           />
         );
       })}

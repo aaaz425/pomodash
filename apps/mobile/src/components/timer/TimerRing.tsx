@@ -10,7 +10,7 @@ import Animated, {
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-import { PHASE_HEX, PHASE_LABELS, PHASE_BADGE, THEME, withAlpha } from '@/constants/timerColors';
+import { phaseHex, PHASE_LABELS, phaseBadge, THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { formatClock } from '@/lib/format';
 import { TimerGlow } from './TimerGlow';
@@ -41,8 +41,8 @@ export function TimerRing() {
   const elapsedFraction =
     mode === 'free' ? 1 : totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
-  const color = isNeutral ? THEME[scheme].mutedForeground : PHASE_HEX[phase];
-  const badge = PHASE_BADGE[phase];
+  const color = isNeutral ? THEME[scheme].mutedForeground : phaseHex(phase, scheme);
+  const badge = phaseBadge(phase, scheme);
 
   const progress = useSharedValue(dashOffset);
   useEffect(() => {
