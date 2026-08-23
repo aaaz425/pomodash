@@ -1,24 +1,33 @@
 import { StyleSheet, View } from 'react-native';
-import { ListChecks, MessageSquareQuote, Tags, Timer } from 'lucide-react-native';
+import { ListChecks, MessageSquareQuote, Palette, Tags, Timer } from 'lucide-react-native';
+import { COLOR_THEMES } from '@pomodash/shared';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
-import { SettingsCard } from '@/components/settings/SettingsCard';
 import { SettingsRowGroup } from '@/components/settings/SettingsRowGroup';
-import { ThemeSection } from '@/components/settings/ThemeSection';
+import { useThemeMode, type ThemeMode } from '@/hooks/use-theme-scheme';
 
 interface Props {
+  onOpenTheme: () => void;
   onOpenTimer: () => void;
   onOpenTask: () => void;
   onOpenCategory: () => void;
   onOpenMotivational: () => void;
 }
 
+const THEME_MODE_LABELS: Record<ThemeMode, string> = {
+  light: '라이트',
+  dark: '다크',
+  system: '시스템',
+};
+
 export function PresetsCategoryCard({
+  onOpenTheme,
   onOpenTimer,
   onOpenTask,
   onOpenCategory,
   onOpenMotivational,
 }: Props) {
+  const { mode, colorTheme } = useThemeMode();
   const taskCount = useTaskStore((s) => s.tasks.filter((t) => !t.completed).length);
   const categoryCount = useTaskStore((s) => s.categories.length);
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
@@ -26,10 +35,13 @@ export function PresetsCategoryCard({
 
   return (
     <View style={styles.container}>
-      <SettingsCard title="테마">
-        <ThemeSection />
-      </SettingsCard>
       <SettingsRowGroup>
+        <SettingsMenuRow
+          Icon={Palette}
+          label="테마"
+          value={`${THEME_MODE_LABELS[mode]} · ${COLOR_THEMES[colorTheme].label}`}
+          onPress={onOpenTheme}
+        />
         <SettingsMenuRow
           Icon={Timer}
           label="타이머 기본값"

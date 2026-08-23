@@ -11,17 +11,19 @@ import {
   Info,
   ListChecks,
   MessageSquareQuote,
+  Palette,
   SlidersHorizontal,
   Tags,
   Timer,
   User,
   type LucideIcon,
 } from 'lucide-react';
+import { COLOR_THEMES } from '@pomodash/shared';
 import { deleteAccountConfirmed } from '@/lib/supabase/actions';
 import { createClient } from '@/lib/supabase/client';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
-import { ThemeSection } from '@/components/settings/ThemeSection';
+import { ThemeModal } from '@/components/settings/ThemeModal';
 import { InstallSection } from '@/components/settings/InstallSection';
 import { AboutSection } from '@/components/settings/AboutSection';
 import { NotificationSection } from '@/components/settings/notification/NotificationSection';
@@ -33,9 +35,17 @@ import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
+import { useTheme, type ThemeMode } from '@/hooks/useTheme';
+import { useAccentTheme } from '@/hooks/useAccentTheme';
 
 type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
-type MenuKey = 'timer' | 'task' | 'category' | 'motivational';
+type MenuKey = 'timer' | 'task' | 'category' | 'motivational' | 'theme';
+
+const THEME_MODE_LABELS: Record<ThemeMode, string> = {
+  light: '라이트',
+  dark: '다크',
+  system: '시스템',
+};
 
 const CATEGORIES: { key: CategoryKey; label: string; Icon: LucideIcon }[] = [
   { key: 'account', label: '계정', Icon: User },
@@ -66,6 +76,8 @@ export function SettingsView() {
   const searchParams = useSearchParams();
   const deletingRef = useRef(false);
 
+  const { mode } = useTheme();
+  const { colorTheme } = useAccentTheme();
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
   const taskCount = useTaskStore((s) => s.tasks.length);
   const categoryCount = useTaskStore((s) => s.categories.length);
@@ -179,36 +191,37 @@ export function SettingsView() {
               )}
 
               {activeCategory === 'presets' && (
-                <div className="flex flex-col gap-6">
-                  <SettingCard title="테마">
-                    <ThemeSection />
-                  </SettingCard>
-                  <div className="rounded-xl border border-border bg-card divide-y divide-border">
-                    <SettingsMenuRow
-                      Icon={Timer}
-                      label="타이머 기본값"
-                      value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
-                      onClick={() => setOpenMenu('timer')}
-                    />
-                    <SettingsMenuRow
-                      Icon={ListChecks}
-                      label="작업 관리"
-                      value={`${taskCount}개`}
-                      onClick={() => setOpenMenu('task')}
-                    />
-                    <SettingsMenuRow
-                      Icon={Tags}
-                      label="카테고리 관리"
-                      value={`${categoryCount}개`}
-                      onClick={() => setOpenMenu('category')}
-                    />
-                    <SettingsMenuRow
-                      Icon={MessageSquareQuote}
-                      label="동기부여 메시지"
-                      value={`${motivationalCount}개`}
-                      onClick={() => setOpenMenu('motivational')}
-                    />
-                  </div>
+                <div className="rounded-xl border border-border bg-card divide-y divide-border">
+                  <SettingsMenuRow
+                    Icon={Palette}
+                    label="테마"
+                    value={`${THEME_MODE_LABELS[mode]} · ${COLOR_THEMES[colorTheme].label}`}
+                    onClick={() => setOpenMenu('theme')}
+                  />
+                  <SettingsMenuRow
+                    Icon={Timer}
+                    label="타이머 기본값"
+                    value={`${defaultTimerSettings.focusMinutes}분 / ${defaultTimerSettings.totalCycles}회 / ${defaultTimerSettings.shortBreakMinutes}분`}
+                    onClick={() => setOpenMenu('timer')}
+                  />
+                  <SettingsMenuRow
+                    Icon={ListChecks}
+                    label="작업 관리"
+                    value={`${taskCount}개`}
+                    onClick={() => setOpenMenu('task')}
+                  />
+                  <SettingsMenuRow
+                    Icon={Tags}
+                    label="카테고리 관리"
+                    value={`${categoryCount}개`}
+                    onClick={() => setOpenMenu('category')}
+                  />
+                  <SettingsMenuRow
+                    Icon={MessageSquareQuote}
+                    label="동기부여 메시지"
+                    value={`${motivationalCount}개`}
+                    onClick={() => setOpenMenu('motivational')}
+                  />
                 </div>
               )}
 
@@ -233,6 +246,7 @@ export function SettingsView() {
         </AnimatePresence>
       </div>
 
+      {openMenu === 'theme' && <ThemeModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'timer' && <TimerDefaultsModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'task' && <TaskManageModal onClose={() => setOpenMenu(null)} />}
       {openMenu === 'category' && <CategoryModal onClose={() => setOpenMenu(null)} />}
