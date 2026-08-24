@@ -78,27 +78,33 @@ function drawHeadline(
   ctx.fillText(headline, CENTER_X, PADDING + 130);
 }
 
-function drawHeroRing(
+// 순수 장식용 도트 필드 — 중심에서 바깥으로 옅어지는 원형 마스크를 alpha 감쇠로 근사.
+// 기존 70% 고정 아크 링은 실제 진행률처럼 오독될 수 있어 제거함.
+function drawHeroOrnament(
   ctx: CanvasRenderingContext2D,
   colors: ShareCardPalette,
   centerY: number,
 ): void {
-  const radius = 230;
-  ctx.beginPath();
-  ctx.arc(CENTER_X, centerY, radius, 0, Math.PI * 2);
-  ctx.strokeStyle = colors.accentSoft;
-  ctx.lineWidth = 16;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(CENTER_X, centerY, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 1.4);
-  ctx.strokeStyle = colors.accent;
-  ctx.lineWidth = 16;
-  ctx.lineCap = 'round';
-  ctx.stroke();
+  const radius = 260;
+  const spacing = 28;
+  const dotRadius = 1.6;
+  ctx.fillStyle = colors.accent;
+  for (let dx = -radius; dx <= radius; dx += spacing) {
+    for (let dy = -radius; dy <= radius; dy += spacing) {
+      const dist = Math.hypot(dx, dy);
+      if (dist > radius) continue;
+      const alpha = 0.5 * (1 - dist / radius);
+      if (alpha <= 0.02) continue;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(CENTER_X + dx, centerY + dy, dotRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
 }
 
-const HERO_MAX_WIDTH = 420; // 장식 링(반지름 230) 안쪽에 들어오도록 제한
+const HERO_MAX_WIDTH = 420; // 도트 장식 필드(반지름 260) 안쪽에 들어오도록 제한
 
 function fittedHeroFontSize(ctx: CanvasRenderingContext2D, text: string): number {
   const maxSize = 120;
@@ -186,7 +192,7 @@ export async function drawShareCard(
   drawHeadline(ctx, colors, data.headline);
 
   const heroCenterY = 490;
-  drawHeroRing(ctx, colors, heroCenterY);
+  drawHeroOrnament(ctx, colors, heroCenterY);
   drawHeroStat(ctx, colors, heroCenterY, data.totalFocusLabel);
   drawSecondaryStats(ctx, colors, 860, data.sessionCount, data.streakDays);
   drawFooter(ctx, colors, data.generatedAtLabel);

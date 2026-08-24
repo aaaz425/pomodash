@@ -11,9 +11,10 @@ interface Props {
   colors: ShareCardPalette;
 }
 
-const STROKE_WIDTH = 12;
-// 웹 캔버스의 arc(-π/2, -π/2 + 1.4π) — 2π 중 70% 구간만 그리는 장식용 링(실제 퍼센트 아님)
-const ARC_RATIO = 0.7;
+// 히어로 도트 장식 격자 크기 — 웹 shareCardCanvas.ts의 drawHeroOrnament와 동일한 시각 의도
+// (중심에서 바깥으로 옅어지는 원형 마스크를 alpha 감쇠로 근사)
+const DOT_GRID = 6;
+const DOT_RADIUS = 2;
 
 export function ShareCardPreview({ data, colors }: Props) {
   const [width, setWidth] = useState(0);
@@ -24,9 +25,20 @@ export function ShareCardPreview({ data, colors }: Props) {
   };
 
   const ringSize = width * 0.4;
-  const radius = ringSize / 2 - STROKE_WIDTH / 2;
-  const circumference = 2 * Math.PI * radius;
-  const arcLength = circumference * ARC_RATIO;
+  const dots: { key: string; x: number; y: number; opacity: number }[] = [];
+  if (ringSize > 0) {
+    const maxDist = ringSize / 2;
+    for (let i = 0; i < DOT_GRID; i++) {
+      for (let j = 0; j < DOT_GRID; j++) {
+        const x = (ringSize / (DOT_GRID - 1)) * i;
+        const y = (ringSize / (DOT_GRID - 1)) * j;
+        const dist = Math.hypot(x - maxDist, y - maxDist);
+        const opacity = Math.max(0, 0.5 * (1 - dist / maxDist));
+        if (opacity <= 0.02) continue;
+        dots.push({ key: `${i}-${j}`, x, y, opacity });
+      }
+    }
+  }
 
   return (
     <View style={styles.square} onLayout={handleLayout}>
@@ -70,26 +82,16 @@ export function ShareCardPreview({ data, colors }: Props) {
           {width > 0 && (
             <View style={{ width: ringSize, height: ringSize }}>
               <Svg width={ringSize} height={ringSize}>
-                <Circle
-                  cx={ringSize / 2}
-                  cy={ringSize / 2}
-                  r={radius}
-                  stroke={colors.accentSoft}
-                  strokeWidth={STROKE_WIDTH}
-                  fill="none"
-                />
-                <Circle
-                  cx={ringSize / 2}
-                  cy={ringSize / 2}
-                  r={radius}
-                  stroke={colors.accent}
-                  strokeWidth={STROKE_WIDTH}
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={`${arcLength} ${circumference}`}
-                  rotation={-90}
-                  origin={`${ringSize / 2}, ${ringSize / 2}`}
-                />
+                {dots.map((dot) => (
+                  <Circle
+                    key={dot.key}
+                    cx={dot.x}
+                    cy={dot.y}
+                    r={DOT_RADIUS}
+                    fill={colors.accent}
+                    opacity={dot.opacity}
+                  />
+                ))}
               </Svg>
               <View style={[StyleSheet.absoluteFill, styles.heroStat]}>
                 <Text
