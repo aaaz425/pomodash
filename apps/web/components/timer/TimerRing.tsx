@@ -16,6 +16,7 @@ const BASE = 240;
 const SW = 18;
 const R = BASE / 2 - SW / 2;
 const CIRC = 2 * Math.PI * R;
+const FREE_MODE_RING_CYCLE_SECONDS = 300; // 5분 주기로 링이 채워졌다 비워지며 반복
 
 export function TimerRing() {
   const hydrated = useHydrated();
@@ -30,9 +31,13 @@ export function TimerRing() {
   const isNeutral = isIdle || isPaused;
   const statusLabel = isIdle ? '대기 중' : isPaused ? '일시정지' : PHASE_LABELS[phase];
 
-  // free 모드는 목표치가 없으므로 링을 가득 채운 채 옅게 표시해 "진행 중"만 알림
+  // free 모드는 목표치가 없으므로 5분 주기로 링을 채웠다 비우며 반복해 "진행 중"을 애니메이션으로 알림
   const elapsedFraction =
-    mode === 'free' ? 1 : totalSeconds > 0 ? (totalSeconds - displaySeconds) / totalSeconds : 0;
+    mode === 'free'
+      ? (displaySeconds % FREE_MODE_RING_CYCLE_SECONDS) / FREE_MODE_RING_CYCLE_SECONDS
+      : totalSeconds > 0
+        ? (totalSeconds - displaySeconds) / totalSeconds
+        : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
   const color = isNeutral ? NEUTRAL_HEX_COLOR : PHASE_HEX_COLORS[phase];
   const badge = PHASE_BADGE_STYLES[phase];
