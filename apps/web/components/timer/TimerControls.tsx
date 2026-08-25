@@ -32,7 +32,7 @@ export function TimerControls() {
   return (
     <div className="flex items-center gap-1.5">
       <Button
-        disabled={!isRunning}
+        disabled={!sessionStarted}
         onClick={enterFocusMode}
         aria-label="집중 모드"
         variant="outline"

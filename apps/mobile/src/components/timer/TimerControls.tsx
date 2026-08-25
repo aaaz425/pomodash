@@ -39,12 +39,12 @@ export function TimerControls() {
     <>
       <View style={styles.row}>
         <Pressable
-          disabled={!isRunning}
+          disabled={!sessionStarted}
           onPress={enterFocusMode}
           style={[
             styles.outlineButton,
             { borderColor: theme.border, backgroundColor: theme.background },
-            !isRunning && styles.disabled,
+            !sessionStarted && styles.disabled,
           ]}
         >
           <Maximize2 size={14} color={theme.mutedForeground} />
