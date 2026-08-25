@@ -16,16 +16,14 @@ export function TimerSection() {
     <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
       {/* 현재 작업 */}
       <div className="flex items-center gap-2 h-5 text-sm text-muted-foreground">
-        {!hydrated ? (
-          showSkeleton && <Skeleton className="h-4 w-24" />
-        ) : task ? (
-          <>
-            {category && <CategoryBadge category={category} />}
-            <span>{task.title}</span>
-          </>
-        ) : (
-          <span className="text-muted-foreground/50">선택된 작업이 없습니다</span>
-        )}
+        {!hydrated
+          ? showSkeleton && <Skeleton className="h-4 w-24" />
+          : task && (
+              <>
+                {category && <CategoryBadge category={category} />}
+                <span>{task.title}</span>
+              </>
+            )}
       </div>
 
       {/* 타이머 링 */}

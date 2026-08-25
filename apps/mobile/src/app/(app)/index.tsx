@@ -8,7 +8,7 @@ import { FocusMode } from '@/components/timer/FocusMode';
 import { SessionCompleteSheet } from '@/components/timer/SessionCompleteSheet';
 import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialog';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
@@ -47,14 +47,7 @@ export default function TimerScreen() {
               </Text>
             </View>
           ) : (
-            <Text
-              style={[
-                styles.taskRow,
-                { color: withAlpha(theme.mutedForeground, 0.5), fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              선택된 작업이 없습니다
-            </Text>
+            <View style={styles.taskRow} />
           )}
 
           <TimerRing />
@@ -89,7 +82,6 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
   },
   taskRow: {
-    fontSize: 14,
     height: 20,
   },
   taskRowFilled: {
