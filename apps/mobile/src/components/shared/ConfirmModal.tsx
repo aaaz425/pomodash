@@ -24,6 +24,8 @@ interface Props {
   inline?: boolean;
   /** true면 확인/취소/3번째 버튼을 전부 비활성화 — 비동기(Supabase 왕복) onConfirm 진행 중 연타 방지 */
   loading?: boolean;
+  /** true면 배경(딤 영역) 탭 시 onCancel 호출 — 파괴적 확인(삭제 등)은 기본값(false)으로 실수 방지 유지 */
+  closeOnBackdropClick?: boolean;
 }
 
 // 웹의 중앙 정렬 ConfirmDialog.tsx 대응 — Modal.tsx(바텀시트)와 별개의 프리미티브.
@@ -41,13 +43,20 @@ export function ConfirmModal({
   onTertiary,
   inline = false,
   loading = false,
+  closeOnBackdropClick = false,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
   const content = (
-    <View style={styles.backdrop}>
-      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+    <Pressable
+      style={styles.backdrop}
+      onPress={closeOnBackdropClick && onCancel && !loading ? onCancel : undefined}
+    >
+      <Pressable
+        onPress={() => {}}
+        style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}
+      >
         <View style={styles.textGroup}>
           <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
             {title}
@@ -121,8 +130,8 @@ export function ConfirmModal({
             </Text>
           </Pressable>
         </View>
-      </View>
-    </View>
+      </Pressable>
+    </Pressable>
   );
 
   if (inline) {

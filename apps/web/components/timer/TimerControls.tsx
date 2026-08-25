@@ -74,6 +74,7 @@ export function TimerControls() {
         title="타이머를 종료할까요?"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
+        closeOnBackdropClick
       />
     </div>
   );
