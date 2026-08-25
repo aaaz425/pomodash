@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Square, Play, Pause } from 'lucide-react';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
@@ -21,7 +20,6 @@ export function FocusMode() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { cycleCount, mode } = useTimer();
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
@@ -76,9 +74,6 @@ export function FocusMode() {
 
           {/* Task Section */}
           <div className="relative flex flex-col items-center gap-2">
-            <span className="text-sm text-muted-foreground/60">
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
-            </span>
             {task ? (
               <div className="flex items-center gap-2">
                 <span className="text-xl font-semibold text-foreground">{task.title}</span>

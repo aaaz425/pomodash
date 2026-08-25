@@ -2,7 +2,6 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play, Square, X } from 'lucide-react-native';
 import { useTimerStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
@@ -23,7 +22,6 @@ export function FocusMode() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { cycleCount, mode } = useTimer();
   const { task, category } = useCurrentTask();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
   const insets = useSafeAreaInsets();
@@ -51,14 +49,6 @@ export function FocusMode() {
           </Pressable>
 
           <View style={styles.taskSection}>
-            <Text
-              style={[
-                styles.taskEyebrow,
-                { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
-            </Text>
             {task ? (
               <View style={styles.taskTitleRow}>
                 <Text
@@ -175,9 +165,6 @@ const styles = StyleSheet.create({
   taskSection: {
     alignItems: 'center',
     gap: 8,
-  },
-  taskEyebrow: {
-    fontSize: 14,
   },
   taskTitle: {
     fontSize: 20,
