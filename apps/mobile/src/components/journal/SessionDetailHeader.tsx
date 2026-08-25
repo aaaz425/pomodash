@@ -21,7 +21,6 @@ interface Props {
   hasRealTitle: boolean;
   taskTitles: string[];
   isEditing: boolean;
-  isSubmitting: boolean;
   draftTitle: string;
   onDraftTitleChange: (value: string) => void;
   onEdit: () => void;
@@ -37,7 +36,6 @@ export function SessionDetailHeader({
   hasRealTitle,
   taskTitles,
   isEditing,
-  isSubmitting,
   draftTitle,
   onDraftTitleChange,
   onEdit,
@@ -55,12 +53,7 @@ export function SessionDetailHeader({
         <View style={styles.editControls}>
           {isEditing ? (
             <>
-              <Pressable
-                onPress={onCancelEdit}
-                disabled={isSubmitting}
-                hitSlop={4}
-                style={[isSubmitting && styles.disabled]}
-              >
+              <Pressable onPress={onCancelEdit} hitSlop={4}>
                 <Text
                   style={[
                     styles.editText,
@@ -72,12 +65,7 @@ export function SessionDetailHeader({
               </Pressable>
               <Pressable
                 onPress={onSaveEdit}
-                disabled={isSubmitting}
-                style={[
-                  styles.saveButton,
-                  { backgroundColor: theme.primary },
-                  isSubmitting && styles.disabled,
-                ]}
+                style={[styles.saveButton, { backgroundColor: theme.primary }]}
               >
                 <Text
                   style={[
@@ -144,9 +132,6 @@ export function SessionDetailHeader({
 const styles = StyleSheet.create({
   header: {
     gap: 8,
-  },
-  disabled: {
-    opacity: 0.4,
   },
   headerTopRow: {
     flexDirection: 'row',
