@@ -25,7 +25,7 @@ export function TaskList({
   selectedTaskId = null,
   onSelect,
   maxHeight,
-  emptyStatePaddingVertical,
+  emptyStatePaddingVertical = 16,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
@@ -70,11 +70,7 @@ export function TaskList({
   return (
     <View>
       {visibleTasks.length === 0 ? (
-        <EmptyState
-          message="아직 작업이 없어요"
-          subMessage="아래에서 작업을 추가해보세요"
-          paddingVertical={emptyStatePaddingVertical}
-        />
+        <EmptyState message="작업이 없습니다" paddingVertical={emptyStatePaddingVertical} />
       ) : mode === 'manage' ? (
         <DraggableFlatList
           data={visibleTasks}
