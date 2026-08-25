@@ -50,9 +50,10 @@ export default function TimerScreen() {
             <View style={styles.taskRow} />
           )}
 
-          <TimerRing />
-
-          <CycleIndicator />
+          <View style={styles.timerGroup}>
+            <TimerRing />
+            <CycleIndicator />
+          </View>
 
           <TimerControls />
         </SafeAreaView>
@@ -77,9 +78,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 24,
+    gap: 48,
     paddingHorizontal: 16,
     paddingVertical: 32,
+  },
+  timerGroup: {
+    alignItems: 'center',
+    gap: 24,
   },
   taskRow: {
     height: 20,

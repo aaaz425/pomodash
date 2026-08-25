@@ -13,7 +13,7 @@ export function TimerSection() {
   const { task, category } = useCurrentTask();
 
   return (
-    <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
+    <section className="flex flex-col items-center justify-center gap-12 flex-1 py-8 sm:py-0 px-4">
       {/* 현재 작업 */}
       <div className="flex items-center gap-2 h-5 text-sm text-muted-foreground">
         {!hydrated
@@ -26,11 +26,11 @@ export function TimerSection() {
             )}
       </div>
 
-      {/* 타이머 링 */}
-      <TimerRing />
-
-      {/* 사이클 */}
-      <CycleIndicator />
+      {/* 타이머 링 + 사이클 */}
+      <div className="flex flex-col items-center gap-6">
+        <TimerRing />
+        <CycleIndicator />
+      </div>
 
       {/* 컨트롤 */}
       <TimerControls />
