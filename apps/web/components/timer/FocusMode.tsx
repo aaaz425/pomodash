@@ -120,7 +120,7 @@ export function FocusMode() {
               ) : (
                 <Play className="w-3.5 h-3.5" fill="currentColor" />
               )}
-              {isRunning ? '일시정지' : '시작'}
+              {isRunning ? '정지' : '시작'}
             </Button>
             <Button
               onClick={requestEnd}
@@ -129,13 +129,13 @@ export function FocusMode() {
               className="gap-1.5 px-4 py-2.5 text-muted-foreground"
             >
               <Square className="w-3.5 h-3.5" fill="currentColor" />
-              타이머 종료
+              종료
             </Button>
           </div>
 
           {/* 키보드 힌트 — 데스크탑 전용 */}
           <p className="absolute bottom-6 text-xs text-muted-foreground/30 hidden sm:block">
-            Space · 일시정지 | Esc · 나가기
+            Space · 정지 | Esc · 나가기
           </p>
 
           <ConfirmDialog

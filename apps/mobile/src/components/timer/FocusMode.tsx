@@ -104,7 +104,7 @@ export function FocusMode() {
                   { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
                 ]}
               >
-                {isRunning ? '일시정지' : '시작'}
+                {isRunning ? '정지' : '시작'}
               </Text>
             </Pressable>
 
@@ -119,7 +119,7 @@ export function FocusMode() {
                   { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
                 ]}
               >
-                타이머 종료
+                종료
               </Text>
             </Pressable>
           </View>

@@ -125,8 +125,7 @@ export function StartSessionModal({ onClose }: Props) {
         <div className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-foreground">자유 집중</span>
           <p className="text-[11px] text-muted-foreground/60">
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 타이머 종료 버튼으로
-            마무리하세요.
+            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 종료 버튼으로 마무리하세요.
           </p>
         </div>
       )}

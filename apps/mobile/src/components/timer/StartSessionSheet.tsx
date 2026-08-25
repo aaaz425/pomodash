@@ -167,8 +167,7 @@ export function StartSessionSheet({ visible, onClose }: Props) {
               { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
             ]}
           >
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 타이머 종료 버튼으로
-            마무리하세요.
+            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 종료 버튼으로 마무리하세요.
           </Text>
         </View>
       )}

@@ -53,7 +53,7 @@ export function TimerControls() {
         ) : (
           <Play className="w-3.5 h-3.5" fill="currentColor" />
         )}
-        {isRunning ? '일시정지' : '시작'}
+        {isRunning ? '정지' : '시작'}
       </Button>
 
       <Button
@@ -64,7 +64,7 @@ export function TimerControls() {
         className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap hover:bg-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
         <Square className="w-3.5 h-3.5" fill="currentColor" />
-        타이머 종료
+        종료
       </Button>
 
       {showStartModal && <StartSessionModal onClose={() => setShowStartModal(false)} />}
