@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flexGrow: 0,
+    flexShrink: 1,
   },
   bodyContent: {
     flexDirection: 'column',

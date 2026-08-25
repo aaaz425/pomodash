@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { TaskList } from '@/components/tasks/TaskList';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
@@ -59,6 +60,7 @@ export function StartSessionModal({ onClose }: Props) {
       onClose={onClose}
       widthClassName="sm:w-[480px]"
       maxHeightClassName="max-h-[90vh]"
+      bodyClassName="flex flex-col p-5 overflow-y-auto min-h-0"
       footer={
         <>
           <Button onClick={onClose} variant="ghost" size="lg" className="px-4 py-2.5">
@@ -77,20 +79,20 @@ export function StartSessionModal({ onClose }: Props) {
     >
       {/* 작업 선택 */}
       <div className="flex flex-col gap-3">
-        <span className="text-sm font-semibold text-foreground">어떤 작업을 할까요?</span>
+        <span className="text-sm font-semibold text-foreground">작업 선택</span>
 
         <TaskList
           mode="select"
           selectedTaskId={pendingTaskId}
           onSelect={handleTaskSelect}
-          listClassName="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto"
+          listClassName="flex flex-col gap-1.5 max-h-[144px] overflow-y-auto"
         />
       </div>
 
-      <div className="h-px bg-border" />
+      <div className="h-px bg-border mt-5" />
 
       {/* 타이머 방식 */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 mt-5">
         <span className="text-sm font-semibold text-foreground">타이머 방식</span>
         <SegmentedControl
           options={MODE_OPTIONS}
@@ -100,35 +102,39 @@ export function StartSessionModal({ onClose }: Props) {
         />
       </div>
 
-      <div className="h-px bg-border" />
-
       {/* 이번 타이머 설정 */}
-      {pendingMode === 'pomodoro' ? (
-        <div className="flex flex-col gap-3">
-          <span className="text-sm font-semibold text-foreground">이번 타이머 설정</span>
-          <TimerSettingsGroup
-            focusMinutes={pendingSettings.focusMinutes}
-            onFocusMinutesChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
-            totalCycles={pendingSettings.totalCycles}
-            onTotalCyclesChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
-            shortBreakMinutes={pendingSettings.shortBreakMinutes}
-            onShortBreakMinutesChange={(v) =>
-              setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))
-            }
-            cyclesLabel="사이클"
-          />
-          <p className="text-[11px] text-muted-foreground/60">
-            이번에만 적용됩니다 · 작업 기본값은 변경되지 않아요
-          </p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-semibold text-foreground">자유 집중</span>
-          <p className="text-[11px] text-muted-foreground/60">
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 종료 버튼으로 마무리하세요.
-          </p>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {pendingMode === 'pomodoro' && (
+          <motion.div
+            key="pomodoro-settings"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-5 pt-5">
+              <div className="h-px bg-border" />
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-semibold text-foreground">이번 타이머 설정</span>
+                <TimerSettingsGroup
+                  focusMinutes={pendingSettings.focusMinutes}
+                  onFocusMinutesChange={(v) =>
+                    setPendingSettings((s) => ({ ...s, focusMinutes: v }))
+                  }
+                  totalCycles={pendingSettings.totalCycles}
+                  onTotalCyclesChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
+                  shortBreakMinutes={pendingSettings.shortBreakMinutes}
+                  onShortBreakMinutesChange={(v) =>
+                    setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))
+                  }
+                  cyclesLabel="사이클"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Modal>
   );
 }

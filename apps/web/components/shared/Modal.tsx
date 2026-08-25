@@ -24,7 +24,7 @@ export function Modal({
   widthClassName = 'sm:w-[400px]',
   backdropClassName = 'bg-black/50 backdrop-blur-sm',
   maxHeightClassName = 'max-h-[85vh]',
-  bodyClassName = 'flex flex-col gap-5 p-5 overflow-y-auto',
+  bodyClassName = 'flex flex-col gap-5 p-5 overflow-y-auto min-h-0',
 }: Props) {
   return (
     <DialogPrimitive.Root
