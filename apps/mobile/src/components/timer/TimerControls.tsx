@@ -2,14 +2,12 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Maximize2, Pause, Play, Square } from 'lucide-react-native';
 import { useTimerStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { StartSessionSheet } from '@/components/timer/StartSessionSheet';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function TimerControls() {
   const scheme = useThemeScheme();
@@ -17,12 +15,9 @@ export function TimerControls() {
 
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
-  const settings = useTimerStore((s) => s.settings);
-  const mode = useTimerStore((s) => s.mode);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
-  const { cycleCount, elapsedMinutes } = useTimer();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
 
   const [showStartSheet, setShowStartSheet] = useState(false);
@@ -106,13 +101,6 @@ export function TimerControls() {
       <ConfirmModal
         visible={showEndConfirm}
         title="타이머를 종료할까요?"
-        description={formatSessionEndSummary(
-          mode,
-          elapsedMinutes,
-          cycleCount,
-          settings.totalCycles,
-        )}
-        confirmLabel="타이머 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
       />

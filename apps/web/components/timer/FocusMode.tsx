@@ -14,16 +14,14 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { cycleCount, elapsedMinutes, mode } = useTimer();
+  const { cycleCount, mode } = useTimer();
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
@@ -148,8 +146,6 @@ export function FocusMode() {
           <ConfirmDialog
             open={showEndConfirm}
             title="타이머를 종료할까요?"
-            description={`${formatSessionEndSummary(mode, elapsedMinutes, cycleCount, totalCycles)}.`}
-            confirmLabel="타이머 종료"
             onConfirm={confirmEnd}
             onCancel={cancelEnd}
           />

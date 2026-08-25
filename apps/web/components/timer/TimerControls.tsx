@@ -3,22 +3,17 @@
 import { useState } from 'react';
 import { Maximize2, Play, Pause, Square } from 'lucide-react';
 import { useTimerStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { StartSessionModal } from '@/components/timer/StartSessionModal';
 import { Button } from '@/components/ui/button';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
-  const settings = useTimerStore((s) => s.settings);
-  const mode = useTimerStore((s) => s.mode);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
-  const { cycleCount, elapsedMinutes } = useTimer();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
   const [showStartModal, setShowStartModal] = useState(false);
 
@@ -77,13 +72,6 @@ export function TimerControls() {
       <ConfirmDialog
         open={showEndConfirm}
         title="타이머를 종료할까요?"
-        description={formatSessionEndSummary(
-          mode,
-          elapsedMinutes,
-          cycleCount,
-          settings.totalCycles,
-        )}
-        confirmLabel="타이머 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
       />
