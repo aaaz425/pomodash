@@ -89,7 +89,7 @@ export function TaskItem({
               { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
             ]}
           >
-            진행 중
+            선택됨
           </Text>
         </View>
       )}

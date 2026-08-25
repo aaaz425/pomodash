@@ -40,6 +40,10 @@ export function StartSessionSheet({ visible, onClose }: Props) {
   const [pendingMode, setPendingMode] = useState<TimerMode>(storeMode);
 
   function handleTaskSelect(taskId: string) {
+    if (taskId === pendingTaskId) {
+      setPendingTaskId(null);
+      return;
+    }
     setPendingTaskId(taskId);
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
