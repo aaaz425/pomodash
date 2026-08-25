@@ -34,7 +34,10 @@ export function Modal({
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Backdrop className={`fixed inset-0 z-50 ${backdropClassName}`} />
+        <DialogPrimitive.Backdrop
+          forceRender
+          className={`fixed inset-0 z-50 ${backdropClassName}`}
+        />
         <DialogPrimitive.Popup
           aria-label={title}
           className={[

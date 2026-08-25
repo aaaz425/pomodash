@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { ChevronDown, ChevronRight } from 'lucide-react-native';
 import { useSettingsStore, useTaskStore, useTimerStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
@@ -149,7 +150,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
         <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
       </View>
 
-      <View style={styles.field}>
+      <View style={[styles.field, { gap: 0 }]}>
         <Pressable onPress={() => setShowTimeSettings((v) => !v)} style={styles.collapseToggle}>
           {showTimeSettings ? (
             <ChevronDown size={14} color={theme.mutedForeground} />
@@ -164,7 +165,11 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
         </Pressable>
 
         {showTimeSettings && (
-          <>
+          <Animated.View
+            entering={FadeIn.duration(200)}
+            exiting={FadeOut.duration(150)}
+            style={styles.timeSettings}
+          >
             <TimerSettingsGroup
               focusMinutes={targetFocusMinutes}
               onFocusMinutesChange={setTargetFocusMinutes}
@@ -174,16 +179,6 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
               onShortBreakMinutesChange={setTargetBreakMinutes}
               disabled={timeFieldsDisabled}
             />
-            <Text
-              style={[
-                styles.summary,
-                { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              총 집중 {targetFocusMinutes * targetCycles}분
-              {targetBreakMinutes > 0 &&
-                ` + 휴식 ${targetBreakMinutes * Math.max(0, targetCycles - 1)}분`}
-            </Text>
             {isActiveTask && (
               <Text
                 style={[
@@ -196,7 +191,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
                   : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
               </Text>
             )}
-          </>
+          </Animated.View>
         )}
       </View>
     </Modal>
@@ -207,6 +202,10 @@ const styles = StyleSheet.create({
   field: {
     gap: 8,
   },
+  timeSettings: {
+    gap: 8,
+    marginTop: 8,
+  },
   label: {
     fontSize: 12,
   },
@@ -215,9 +214,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     alignSelf: 'flex-start',
-  },
-  summary: {
-    fontSize: 12,
   },
   warning: {
     fontSize: 11,

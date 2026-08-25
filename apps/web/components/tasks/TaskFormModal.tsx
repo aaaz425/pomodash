@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useTaskStore, useSettingsStore, useTimerStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
@@ -131,7 +132,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
       </div>
 
       {/* 목표 시간 — 접이식 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <button
           type="button"
           onClick={() => setShowTimeSettings((v) => !v)}
@@ -145,31 +146,37 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
           목표 시간
         </button>
 
-        {showTimeSettings && (
-          <>
-            <TimerSettingsGroup
-              focusMinutes={targetFocusMinutes}
-              onFocusMinutesChange={setTargetFocusMinutes}
-              totalCycles={targetCycles}
-              onTotalCyclesChange={setTargetCycles}
-              shortBreakMinutes={targetBreakMinutes}
-              onShortBreakMinutesChange={setTargetBreakMinutes}
-              disabled={timeFieldsDisabled}
-            />
-            <p className="text-xs text-muted-foreground/60 pt-0.5">
-              총 집중 {targetFocusMinutes * targetCycles}분
-              {targetBreakMinutes > 0 &&
-                ` + 휴식 ${targetBreakMinutes * Math.max(0, targetCycles - 1)}분`}
-            </p>
-            {isActiveTask && (
-              <p className="text-[11px] text-amber-500/90 pt-0.5">
-                {isRunning
-                  ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
-                  : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
-              </p>
-            )}
-          </>
-        )}
+        <AnimatePresence initial={false}>
+          {showTimeSettings && (
+            <motion.div
+              key="task-time-settings"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <div className="flex flex-col gap-2 pt-2">
+                <TimerSettingsGroup
+                  focusMinutes={targetFocusMinutes}
+                  onFocusMinutesChange={setTargetFocusMinutes}
+                  totalCycles={targetCycles}
+                  onTotalCyclesChange={setTargetCycles}
+                  shortBreakMinutes={targetBreakMinutes}
+                  onShortBreakMinutesChange={setTargetBreakMinutes}
+                  disabled={timeFieldsDisabled}
+                />
+                {isActiveTask && (
+                  <p className="text-[11px] text-amber-500/90 pt-0.5">
+                    {isRunning
+                      ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
+                      : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </Modal>
   );
