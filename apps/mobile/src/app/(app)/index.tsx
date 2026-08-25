@@ -1,6 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useHydrated, useTimerStore } from '@/store/StoreProvider';
+import { useHydrated } from '@/store/StoreProvider';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { TimerControls } from '@/components/timer/TimerControls';
@@ -18,16 +18,6 @@ export default function TimerScreen() {
   const theme = THEME[scheme];
   const hydrated = useHydrated();
   const { task, category } = useCurrentTask();
-
-  const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
-  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
-
-  const settingsPills = [
-    { value: `${focusMinutes}분`, label: '집중' },
-    { value: `${shortBreakMinutes}분`, label: '휴식' },
-    { value: `${totalCycles}회`, label: '사이클' },
-  ];
 
   // AsyncStorage에서 진행 중이던 타이머 스냅샷을 불러오기 전엔 기본값(25:00 대기중)이
   // 잠깐 보였다가 실제 상태로 바뀌는 깜빡임이 생길 수 있어 hydrate 전까지는 렌더링을 미룬다.
@@ -71,40 +61,6 @@ export default function TimerScreen() {
 
           <CycleIndicator />
 
-          <View
-            style={[
-              styles.settingsPill,
-              { borderColor: theme.border, backgroundColor: theme.card },
-            ]}
-          >
-            {settingsPills.map(({ value, label }, i) => (
-              <View
-                key={label}
-                style={[
-                  styles.settingsCell,
-                  i > 0 && { borderLeftWidth: 1, borderLeftColor: theme.border },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.settingsValue,
-                    { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-                  ]}
-                >
-                  {value}
-                </Text>
-                <Text
-                  style={[
-                    styles.settingsLabel,
-                    { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                  ]}
-                >
-                  {label}
-                </Text>
-              </View>
-            ))}
-          </View>
-
           <TimerControls />
         </SafeAreaView>
 
@@ -144,23 +100,5 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontSize: 14,
-  },
-  settingsPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 12,
-  },
-  settingsCell: {
-    alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  settingsValue: {
-    fontSize: 14,
-  },
-  settingsLabel: {
-    fontSize: 10,
   },
 });

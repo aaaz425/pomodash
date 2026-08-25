@@ -1,6 +1,5 @@
 'use client';
 
-import { useTimerStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
@@ -11,9 +10,6 @@ import { TimerControls } from '@/components/timer/TimerControls';
 
 export function TimerSection() {
   const { hydrated, showSkeleton } = useDelayedHydration();
-  const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
-  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const { task, category } = useCurrentTask();
 
   return (
@@ -37,22 +33,6 @@ export function TimerSection() {
 
       {/* 사이클 */}
       <CycleIndicator />
-
-      {/* 타이머 설정 카드 */}
-      <div
-        className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
-      >
-        {[
-          { value: `${focusMinutes}분`, label: '집중' },
-          { value: `${shortBreakMinutes}분`, label: '휴식' },
-          { value: `${totalCycles}회`, label: '사이클' },
-        ].map(({ value, label }) => (
-          <div key={label} className="flex flex-col items-center gap-0.5 px-4 py-2.5">
-            <span className="text-sm font-semibold text-foreground">{value}</span>
-            <span className="text-[10px] text-muted-foreground">{label}</span>
-          </div>
-        ))}
-      </div>
 
       {/* 컨트롤 */}
       <TimerControls />
