@@ -30,7 +30,7 @@ test('작업 생성 → 타이머 완료 → 메모 작성 → journal/dashboard
   // 5. 시작
   await startModal.getByRole('button', { name: '시작' }).click();
   await expect(startModal).not.toBeVisible();
-  await expect(page.getByRole('button', { name: '일시정지' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '정지' })).toBeVisible();
 
   // 6. 집중 5분 + 여유 1초 만큼 가상 시간 전진 → 마지막(유일한) 사이클이라 휴식 없이 바로 타이머 종료
   await page.clock.fastForward('05:01');
