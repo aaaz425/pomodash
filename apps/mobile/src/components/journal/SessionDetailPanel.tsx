@@ -38,9 +38,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
-  // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 저장될 수 있음
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const session = sessions.find((s) => s.id === sessionId) ?? null;
 
@@ -75,10 +72,9 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
     setDraft(null);
   }
 
-  async function handleSaveEdit() {
-    if (!draft || !session || isSubmitting) return;
-    setIsSubmitting(true);
-    await updateSessionFields(session.id, {
+  function handleSaveEdit() {
+    if (!draft || !session) return;
+    void updateSessionFields(session.id, {
       title: draft.title.trim() || null,
       focusRating: draft.focusRating,
       distractionTags: draft.distractionTags,
@@ -88,10 +84,9 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
     setDraft(null);
   }
 
-  async function handleDelete() {
-    if (!session || isDeleting) return;
-    setIsDeleting(true);
-    await deleteSession(session.id);
+  function handleDelete() {
+    if (!session) return;
+    void deleteSession(session.id);
     onClose();
   }
 
@@ -104,7 +99,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
         hasRealTitle={hasRealTitle}
         taskTitles={taskTitles}
         isEditing={isEditing}
-        isSubmitting={isSubmitting}
         draftTitle={draft?.title ?? ''}
         onDraftTitleChange={(v) => setDraft((d) => (d ? { ...d, title: v } : d))}
         onEdit={handleEdit}
@@ -168,7 +162,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
         destructive
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
-        loading={isDeleting}
       />
     </Modal>
   );

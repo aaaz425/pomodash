@@ -3,22 +3,17 @@
 import { useState } from 'react';
 import { Maximize2, Play, Pause, Square } from 'lucide-react';
 import { useTimerStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { StartSessionModal } from '@/components/timer/StartSessionModal';
 import { Button } from '@/components/ui/button';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function TimerControls() {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
-  const settings = useTimerStore((s) => s.settings);
-  const mode = useTimerStore((s) => s.mode);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const enterFocusMode = useTimerStore((s) => s.enterFocusMode);
-  const { cycleCount, elapsedMinutes } = useTimer();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
   const [showStartModal, setShowStartModal] = useState(false);
 
@@ -37,7 +32,7 @@ export function TimerControls() {
   return (
     <div className="flex items-center gap-1.5">
       <Button
-        disabled={!isRunning}
+        disabled={!sessionStarted}
         onClick={enterFocusMode}
         aria-label="집중 모드"
         variant="outline"
@@ -58,7 +53,7 @@ export function TimerControls() {
         ) : (
           <Play className="w-3.5 h-3.5" fill="currentColor" />
         )}
-        {isRunning ? '일시정지' : '시작'}
+        {isRunning ? '정지' : '시작'}
       </Button>
 
       <Button
@@ -69,7 +64,7 @@ export function TimerControls() {
         className="gap-1.5 px-3 py-2.5 text-muted-foreground whitespace-nowrap hover:bg-transparent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-muted-foreground"
       >
         <Square className="w-3.5 h-3.5" fill="currentColor" />
-        타이머 종료
+        종료
       </Button>
 
       {showStartModal && <StartSessionModal onClose={() => setShowStartModal(false)} />}
@@ -77,15 +72,9 @@ export function TimerControls() {
       <ConfirmDialog
         open={showEndConfirm}
         title="타이머를 종료할까요?"
-        description={formatSessionEndSummary(
-          mode,
-          elapsedMinutes,
-          cycleCount,
-          settings.totalCycles,
-        )}
-        confirmLabel="타이머 종료"
         onConfirm={confirmEnd}
         onCancel={cancelEnd}
+        closeOnBackdropClick
       />
     </div>
   );

@@ -111,10 +111,10 @@ export function TaskItem({
         {task.title}
       </span>
 
-      {/* 진행 중 뱃지 — 선택 모드 */}
+      {/* 선택됨 뱃지 — 선택 모드 */}
       {mode === 'select' && isSelected && (
         <Badge className="shrink-0 rounded text-[10px] font-semibold bg-primary text-primary-foreground">
-          진행 중
+          선택됨
         </Badge>
       )}
 

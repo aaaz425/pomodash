@@ -63,7 +63,6 @@ export function TimerRing() {
           r={R}
           fill="none"
           stroke={color}
-          strokeOpacity={mode === 'free' ? 0.35 : undefined}
           strokeWidth={SW}
           strokeLinecap="round"
           strokeDasharray={CIRC}

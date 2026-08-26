@@ -154,14 +154,11 @@ export function MotivationalSection() {
   const [input, setInput] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const isAtLimit = messages.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX;
 
-  async function handleConfirmDelete() {
-    if (deleteIndex === null || isDeleting) return;
-    setIsDeleting(true);
-    await deleteMessage(deleteIndex);
-    setIsDeleting(false);
+  function handleConfirmDelete() {
+    if (deleteIndex === null) return;
+    void deleteMessage(deleteIndex);
     setDeleteIndex(null);
   }
 
@@ -252,7 +249,6 @@ export function MotivationalSection() {
         confirmLabel="삭제"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteIndex(null)}
-        loading={isDeleting}
       />
     </div>
   );

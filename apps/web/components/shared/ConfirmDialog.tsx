@@ -16,6 +16,8 @@ interface Props {
   onTertiary?: () => void;
   /** true면 확인/취소/3번째 버튼을 전부 비활성화 — 비동기(Supabase 왕복) onConfirm 진행 중 연타 방지 */
   loading?: boolean;
+  /** true면 배경(딤 영역) 클릭 시 onCancel 호출 — 파괴적 확인(삭제 등)은 기본값(false)으로 실수 방지 유지 */
+  closeOnBackdropClick?: boolean;
 }
 
 // AlertDialog는 바깥 클릭으로 안 닫히는 게 기본 동작(의도적 — 실수로 안 닫히게).
@@ -31,6 +33,7 @@ export function ConfirmDialog({
   tertiaryLabel,
   onTertiary,
   loading = false,
+  closeOnBackdropClick = false,
 }: Props) {
   const hasTertiary = Boolean(tertiaryLabel && onTertiary);
   return (
@@ -41,7 +44,10 @@ export function ConfirmDialog({
       }}
     >
       <AlertDialogPrimitive.Portal>
-        <AlertDialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+        <AlertDialogPrimitive.Backdrop
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          onClick={closeOnBackdropClick && !loading ? onCancel : undefined}
+        />
         <AlertDialogPrimitive.Popup
           aria-label={title}
           className={[

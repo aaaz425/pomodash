@@ -1,6 +1,5 @@
 'use client';
 
-import { useTimerStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
@@ -11,47 +10,26 @@ import { TimerControls } from '@/components/timer/TimerControls';
 
 export function TimerSection() {
   const { hydrated, showSkeleton } = useDelayedHydration();
-  const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
-  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const { task, category } = useCurrentTask();
 
   return (
-    <section className="flex flex-col items-center justify-center gap-6 flex-1 py-8 sm:py-0 px-4">
+    <section className="flex flex-col items-center justify-center gap-12 flex-1 py-8 sm:py-0 px-4">
       {/* 현재 작업 */}
       <div className="flex items-center gap-2 h-5 text-sm text-muted-foreground">
-        {!hydrated ? (
-          showSkeleton && <Skeleton className="h-4 w-24" />
-        ) : task ? (
-          <>
-            {category && <CategoryBadge category={category} />}
-            <span>{task.title}</span>
-          </>
-        ) : (
-          <span className="text-muted-foreground/50">선택된 작업이 없습니다</span>
-        )}
+        {!hydrated
+          ? showSkeleton && <Skeleton className="h-4 w-24" />
+          : task && (
+              <>
+                {category && <CategoryBadge category={category} />}
+                <span>{task.title}</span>
+              </>
+            )}
       </div>
 
-      {/* 타이머 링 */}
-      <TimerRing />
-
-      {/* 사이클 */}
-      <CycleIndicator />
-
-      {/* 타이머 설정 카드 */}
-      <div
-        className={`flex items-center rounded-lg border border-border bg-card divide-x divide-border transition-opacity duration-300 ${hydrated ? 'opacity-100' : 'opacity-0'}`}
-      >
-        {[
-          { value: `${focusMinutes}분`, label: '집중' },
-          { value: `${shortBreakMinutes}분`, label: '휴식' },
-          { value: `${totalCycles}회`, label: '사이클' },
-        ].map(({ value, label }) => (
-          <div key={label} className="flex flex-col items-center gap-0.5 px-4 py-2.5">
-            <span className="text-sm font-semibold text-foreground">{value}</span>
-            <span className="text-[10px] text-muted-foreground">{label}</span>
-          </div>
-        ))}
+      {/* 타이머 링 + 사이클 */}
+      <div className="flex flex-col items-center gap-6">
+        <TimerRing />
+        <CycleIndicator />
       </div>
 
       {/* 컨트롤 */}

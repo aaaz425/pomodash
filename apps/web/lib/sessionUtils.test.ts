@@ -5,7 +5,6 @@ import {
   formatDuration,
   formatFocusPeriodRanges,
   formatFullDate,
-  formatSessionEndSummary,
   formatSessionProgressLabel,
   formatSessionTimeSummary,
   formatTimeRange,
@@ -305,17 +304,5 @@ describe('formatSessionProgressLabel', () => {
     expect(
       formatSessionProgressLabel('free', { cycleCount: 0, totalCycles: 0, focusSeconds: 90 }),
     ).toBe('자유 집중 1분');
-  });
-});
-
-describe('formatSessionEndSummary', () => {
-  it('pomodoro 모드는 사이클 정보를 포함', () => {
-    expect(formatSessionEndSummary('pomodoro', 25, 2, 4)).toBe(
-      '지금까지 25분 · 2 / 4사이클 진행했어요',
-    );
-  });
-
-  it('free 모드는 사이클 언급 없이 경과 시간만', () => {
-    expect(formatSessionEndSummary('free', 7, 0, 0)).toBe('지금까지 7분 집중했어요');
   });
 });

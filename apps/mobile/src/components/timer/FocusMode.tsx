@@ -2,7 +2,6 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play, Square, X } from 'lucide-react-native';
 import { useTimerStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
@@ -12,7 +11,6 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { MESSAGE_ROTATE_INTERVAL_MS, MOTIVATIONAL_MESSAGES } from '@/constants/messages';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 import { TimerRing } from './TimerRing';
 import { CycleIndicator } from './CycleIndicator';
 
@@ -24,8 +22,6 @@ export function FocusMode() {
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const settings = useTimerStore((s) => s.settings);
-  const { cycleCount, elapsedMinutes, mode } = useTimer();
   const { task, category } = useCurrentTask();
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
   const insets = useSafeAreaInsets();
@@ -53,14 +49,6 @@ export function FocusMode() {
           </Pressable>
 
           <View style={styles.taskSection}>
-            <Text
-              style={[
-                styles.taskEyebrow,
-                { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
-            </Text>
             {task ? (
               <View style={styles.taskTitleRow}>
                 <Text
@@ -116,7 +104,7 @@ export function FocusMode() {
                   { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
                 ]}
               >
-                {isRunning ? '일시정지' : '시작'}
+                {isRunning ? '정지' : '시작'}
               </Text>
             </Pressable>
 
@@ -131,7 +119,7 @@ export function FocusMode() {
                   { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
                 ]}
               >
-                타이머 종료
+                종료
               </Text>
             </Pressable>
           </View>
@@ -143,15 +131,9 @@ export function FocusMode() {
           inline
           visible={showEndConfirm}
           title="타이머를 종료할까요?"
-          description={formatSessionEndSummary(
-            mode,
-            elapsedMinutes,
-            cycleCount,
-            settings.totalCycles,
-          )}
-          confirmLabel="타이머 종료"
           onConfirm={confirmEnd}
           onCancel={cancelEnd}
+          closeOnBackdropClick
         />
       </>
     </Modal>
@@ -183,9 +165,6 @@ const styles = StyleSheet.create({
   taskSection: {
     alignItems: 'center',
     gap: 8,
-  },
-  taskEyebrow: {
-    fontSize: 14,
   },
   taskTitle: {
     fontSize: 20,

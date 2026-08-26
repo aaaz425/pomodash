@@ -25,7 +25,7 @@ export function TaskList({
   selectedTaskId = null,
   onSelect,
   maxHeight,
-  emptyStatePaddingVertical,
+  emptyStatePaddingVertical = 16,
 }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
@@ -35,15 +35,12 @@ export function TaskList({
 
   const [editTarget, setEditTarget] = useState<Task | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const visibleTasks = tasks.filter((t) => !t.completed);
 
-  async function handleDelete() {
-    if (!deleteTargetId || isDeleting) return;
-    setIsDeleting(true);
-    await deleteTask(deleteTargetId);
-    setIsDeleting(false);
+  function handleDelete() {
+    if (!deleteTargetId) return;
+    void deleteTask(deleteTargetId);
     setDeleteTargetId(null);
   }
 
@@ -70,11 +67,7 @@ export function TaskList({
   return (
     <View>
       {visibleTasks.length === 0 ? (
-        <EmptyState
-          message="아직 작업이 없어요"
-          subMessage="아래에서 작업을 추가해보세요"
-          paddingVertical={emptyStatePaddingVertical}
-        />
+        <EmptyState message="작업이 없습니다" paddingVertical={emptyStatePaddingVertical} />
       ) : mode === 'manage' ? (
         <DraggableFlatList
           data={visibleTasks}
@@ -117,7 +110,6 @@ export function TaskList({
         destructive
         onConfirm={handleDelete}
         onCancel={() => setDeleteTargetId(null)}
-        loading={isDeleting}
       />
     </View>
   );

@@ -69,7 +69,6 @@ export function CategorySection() {
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [blockedName, setBlockedName] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   function requestDelete(category: Category) {
     if (tasks.some((t) => t.categoryId === category.id)) {
@@ -79,11 +78,9 @@ export function CategorySection() {
     setDeleteTargetId(category.id);
   }
 
-  async function handleDelete() {
-    if (!deleteTargetId || isDeleting) return;
-    setIsDeleting(true);
-    await deleteCategory(deleteTargetId);
-    setIsDeleting(false);
+  function handleDelete() {
+    if (!deleteTargetId) return;
+    void deleteCategory(deleteTargetId);
     setDeleteTargetId(null);
   }
 
@@ -150,7 +147,6 @@ export function CategorySection() {
         destructive
         onConfirm={handleDelete}
         onCancel={() => setDeleteTargetId(null)}
-        loading={isDeleting}
       />
 
       <ConfirmModal

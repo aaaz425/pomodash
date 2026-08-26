@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import type { TimerMode, TimerSettings } from '@pomodash/shared';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { TaskList } from '@/components/tasks/TaskList';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
@@ -39,6 +40,10 @@ export function StartSessionSheet({ visible, onClose }: Props) {
   const [pendingMode, setPendingMode] = useState<TimerMode>(storeMode);
 
   function handleTaskSelect(taskId: string) {
+    if (taskId === pendingTaskId) {
+      setPendingTaskId(null);
+      return;
+    }
     setPendingTaskId(taskId);
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
@@ -98,13 +103,13 @@ export function StartSessionSheet({ visible, onClose }: Props) {
         <Text
           style={[styles.sectionTitle, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}
         >
-          어떤 작업을 할까요?
+          작업 선택
         </Text>
         <TaskList
           mode="select"
           selectedTaskId={pendingTaskId}
           onSelect={handleTaskSelect}
-          maxHeight={180}
+          maxHeight={144}
         />
       </View>
 
@@ -119,58 +124,35 @@ export function StartSessionSheet({ visible, onClose }: Props) {
         <SegmentedControl options={MODE_OPTIONS} value={pendingMode} onChange={setPendingMode} />
       </View>
 
-      <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
-      {pendingMode === 'pomodoro' ? (
-        <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-            ]}
-          >
-            이번 타이머 설정
-          </Text>
-          <TimerSettingsGroup
-            focusMinutes={pendingSettings.focusMinutes}
-            onFocusMinutesChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
-            totalCycles={pendingSettings.totalCycles}
-            onTotalCyclesChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
-            shortBreakMinutes={pendingSettings.shortBreakMinutes}
-            onShortBreakMinutesChange={(v) =>
-              setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))
-            }
-            cyclesLabel="사이클"
-          />
-          <Text
-            style={[
-              styles.hint,
-              { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
-            ]}
-          >
-            이번에만 적용됩니다 · 작업 기본값은 변경되지 않아요
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.sectionSmall}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-            ]}
-          >
-            자유 집중
-          </Text>
-          <Text
-            style={[
-              styles.hint,
-              { color: withAlpha(theme.mutedForeground, 0.6), fontFamily: FONTS.sansRegular },
-            ]}
-          >
-            고정된 사이클 없이 자유롭게 집중 시간을 기록해요. 준비되면 타이머 종료 버튼으로
-            마무리하세요.
-          </Text>
-        </View>
+      {pendingMode === 'pomodoro' && (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(150)}
+          style={styles.pomodoroSection}
+        >
+          <View style={[styles.divider, { backgroundColor: theme.border }]} />
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+              ]}
+            >
+              이번 타이머 설정
+            </Text>
+            <TimerSettingsGroup
+              focusMinutes={pendingSettings.focusMinutes}
+              onFocusMinutesChange={(v) => setPendingSettings((s) => ({ ...s, focusMinutes: v }))}
+              totalCycles={pendingSettings.totalCycles}
+              onTotalCyclesChange={(v) => setPendingSettings((s) => ({ ...s, totalCycles: v }))}
+              shortBreakMinutes={pendingSettings.shortBreakMinutes}
+              onShortBreakMinutesChange={(v) =>
+                setPendingSettings((s) => ({ ...s, shortBreakMinutes: v }))
+              }
+              cyclesLabel="사이클"
+            />
+          </View>
+        </Animated.View>
       )}
     </Modal>
   );
@@ -180,17 +162,14 @@ const styles = StyleSheet.create({
   section: {
     gap: 12,
   },
-  sectionSmall: {
-    gap: 8,
+  pomodoroSection: {
+    gap: 20,
   },
   sectionTitle: {
     fontSize: 14,
   },
   divider: {
     height: 1,
-  },
-  hint: {
-    fontSize: 11,
   },
   footerButton: {
     paddingHorizontal: 16,

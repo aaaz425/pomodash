@@ -18,22 +18,22 @@ test.describe('타이머', () => {
     await expect(page.getByRole('button', { name: '시작' })).toBeVisible();
 
     await startSession(page);
-    await expect(page.getByRole('button', { name: '일시정지' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '정지' })).toBeVisible();
 
-    await page.getByRole('button', { name: '일시정지' }).click();
+    await page.getByRole('button', { name: '정지' }).click();
     await expect(page.getByRole('button', { name: '시작' })).toBeVisible();
   });
 
   test('타이머 종료', async ({ page }) => {
     await startSession(page);
 
-    const endBtn = page.getByRole('button', { name: '타이머 종료' });
+    const endBtn = page.getByRole('button', { name: '종료' });
     await expect(endBtn).toBeEnabled();
     await endBtn.click();
 
     const dialog = page.getByRole('alertdialog');
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: '타이머 종료' }).click();
+    await dialog.getByRole('button', { name: '확인' }).click();
 
     await expect(page.getByRole('button', { name: '시작' })).toBeVisible();
   });

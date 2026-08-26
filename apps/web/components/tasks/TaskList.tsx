@@ -39,7 +39,7 @@ export function TaskList({
   selectedTaskId = null,
   onSelect,
   listClassName,
-  emptyStateClassName = 'py-10',
+  emptyStateClassName = 'py-4',
 }: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
   const tasks = useTaskStore((s) => s.tasks);
@@ -48,7 +48,6 @@ export function TaskList({
 
   const [editTarget, setEditTarget] = useState<Task | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const visibleTasks = tasks.filter((t) => !t.completed);
 
@@ -64,11 +63,9 @@ export function TaskList({
     }
   }
 
-  async function handleDelete() {
-    if (!deleteTargetId || isDeleting) return;
-    setIsDeleting(true);
-    await deleteTask(deleteTargetId);
-    setIsDeleting(false);
+  function handleDelete() {
+    if (!deleteTargetId) return;
+    void deleteTask(deleteTargetId);
     setDeleteTargetId(null);
   }
 
@@ -86,11 +83,7 @@ export function TaskList({
           </div>
         )
       ) : visibleTasks.length === 0 ? (
-        <EmptyState
-          message="아직 작업이 없어요"
-          subMessage="아래에서 작업을 추가해보세요"
-          className={emptyStateClassName}
-        />
+        <EmptyState message="작업이 없습니다" className={emptyStateClassName} />
       ) : (
         <DndContext
           id="task-list"
@@ -144,7 +137,6 @@ export function TaskList({
         confirmLabel="삭제"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTargetId(null)}
-        loading={isDeleting}
       />
     </>
   );

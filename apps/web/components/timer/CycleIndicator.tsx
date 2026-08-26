@@ -9,8 +9,9 @@ export function CycleIndicator() {
   const { phase, mode } = useTimer();
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
+  const sessionStarted = useTimerStore((s) => s.sessionStarted);
 
-  if (mode === 'free') return null; // 자유 모드는 고정 사이클이 없음
+  if (mode === 'free' || !sessionStarted) return null;
 
   return (
     <div

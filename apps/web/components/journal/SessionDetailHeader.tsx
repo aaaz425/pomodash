@@ -16,7 +16,6 @@ interface Props {
   hasRealTitle: boolean;
   taskTitles: string[];
   isEditing: boolean;
-  isSubmitting: boolean;
   draftTitle: string;
   onDraftTitleChange: (value: string) => void;
   onEdit: () => void;
@@ -32,7 +31,6 @@ export function SessionDetailHeader({
   hasRealTitle,
   taskTitles,
   isEditing,
-  isSubmitting,
   draftTitle,
   onDraftTitleChange,
   onEdit,
@@ -49,15 +47,13 @@ export function SessionDetailHeader({
             <div className="flex gap-2">
               <button
                 onClick={onCancelEdit}
-                disabled={isSubmitting}
-                className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={onSaveEdit}
-                disabled={isSubmitting}
-                className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 저장
               </button>

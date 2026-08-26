@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Square, Play, Pause } from 'lucide-react';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
-import { useTimer } from '@/hooks/useTimer';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
@@ -14,16 +13,13 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
-import { formatSessionEndSummary } from '@/lib/sessionUtils';
 
 export function FocusMode() {
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
-  const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const start = useTimerStore((s) => s.start);
   const pause = useTimerStore((s) => s.pause);
   const exitFocusMode = useTimerStore((s) => s.exitFocusMode);
-  const { cycleCount, elapsedMinutes, mode } = useTimer();
   const { task, category } = useCurrentTask();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
@@ -78,9 +74,6 @@ export function FocusMode() {
 
           {/* Task Section */}
           <div className="relative flex flex-col items-center gap-2">
-            <span className="text-sm text-muted-foreground/60">
-              {mode === 'free' ? '자유 집중' : `${cycleCount + 1}번째 집중`}
-            </span>
             {task ? (
               <div className="flex items-center gap-2">
                 <span className="text-xl font-semibold text-foreground">{task.title}</span>
@@ -127,7 +120,7 @@ export function FocusMode() {
               ) : (
                 <Play className="w-3.5 h-3.5" fill="currentColor" />
               )}
-              {isRunning ? '일시정지' : '시작'}
+              {isRunning ? '정지' : '시작'}
             </Button>
             <Button
               onClick={requestEnd}
@@ -136,22 +129,21 @@ export function FocusMode() {
               className="gap-1.5 px-4 py-2.5 text-muted-foreground"
             >
               <Square className="w-3.5 h-3.5" fill="currentColor" />
-              타이머 종료
+              종료
             </Button>
           </div>
 
           {/* 키보드 힌트 — 데스크탑 전용 */}
           <p className="absolute bottom-6 text-xs text-muted-foreground/30 hidden sm:block">
-            Space · 일시정지 | Esc · 나가기
+            Space · 정지 | Esc · 나가기
           </p>
 
           <ConfirmDialog
             open={showEndConfirm}
             title="타이머를 종료할까요?"
-            description={`${formatSessionEndSummary(mode, elapsedMinutes, cycleCount, totalCycles)}.`}
-            confirmLabel="타이머 종료"
             onConfirm={confirmEnd}
             onCancel={cancelEnd}
+            closeOnBackdropClick
           />
         </motion.div>
       )}
