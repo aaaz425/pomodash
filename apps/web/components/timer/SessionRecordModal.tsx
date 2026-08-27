@@ -14,7 +14,6 @@ import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
-import { formatSessionProgressLabel } from '@/lib/sessionUtils';
 import type { FocusRating } from '@/types';
 
 export function SessionRecordModal() {
@@ -225,14 +224,7 @@ export function SessionRecordModal() {
 
       <ConfirmDialog
         open={pendingAction === 'save'}
-        title="이 기록으로 저장할까요?"
-        description={
-          formatSessionProgressLabel(mode, {
-            cycleCount,
-            totalCycles,
-            focusSeconds: accFocusSeconds,
-          }) + (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
-        }
+        title="기록을 저장할까요?"
         confirmLabel="저장"
         onConfirm={handleSave}
         onCancel={() => setPendingAction(null)}
