@@ -1,7 +1,7 @@
 import { createStore } from 'zustand';
 import type { TimerMode, TimerPhase, TimerSettings, RawFocusPeriod } from '../types/timer';
 import { DEFAULT_TIMER_SETTINGS } from '../constants/defaults';
-import { FOCUS_PERIOD_LIMITS } from '../constants/limits';
+import { FOCUS_PERIOD_LIMITS, SESSION_LIMITS } from '../constants/limits';
 import { isSessionStale } from '../lib/sessionStale';
 
 /** 새로고침/재시작 복구용 스냅샷 — isFocusMode/showAbandonedPrompt(순수 UI 상태)는 제외 */
@@ -79,6 +79,7 @@ function resetSessionState() {
     cycleCount: 0,
     currentTaskId: null,
     sessionEnded: false,
+    isFocusMode: false,
     showAbandonedPrompt: false,
     sessionStarted: false,
     settings: DEFAULT_TIMER_SETTINGS,
@@ -282,7 +283,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
             ? creditableElapsed(rawElapsed)
             : creditableElapsed(Math.min(rawElapsed, remainingSeconds));
         const totalFocus = phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds;
-        if (totalFocus < FOCUS_PERIOD_LIMITS.MIN_FOCUS_SECONDS) {
+        if (totalFocus < SESSION_LIMITS.MIN_SESSION_FOCUS_SECONDS) {
           onSessionTooShort?.();
           set(resetSessionState());
           return;
