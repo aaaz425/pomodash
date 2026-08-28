@@ -89,6 +89,7 @@ export function CategorySection() {
       <DraggableFlatList
         data={categories}
         keyExtractor={(c) => c.id}
+        style={styles.scrollList}
         onDragEnd={({ from, to }) => void reorderCategories(from, to)}
         renderItem={({ item, drag, isActive }: RenderItemParams<Category>) => (
           <CategoryRow
@@ -161,6 +162,9 @@ export function CategorySection() {
 }
 
 const styles = StyleSheet.create({
+  scrollList: {
+    maxHeight: 312, // 행(52px) 6개 근사값
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

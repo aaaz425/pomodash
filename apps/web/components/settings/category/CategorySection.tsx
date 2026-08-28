@@ -119,7 +119,7 @@ export function CategorySection() {
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col">
+          <div className="flex flex-col max-h-[312px] overflow-y-auto">
             {categories.map((cat) => (
               <CategoryRow
                 key={cat.id}

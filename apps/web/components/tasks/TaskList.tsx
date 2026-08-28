@@ -96,7 +96,7 @@ export function TaskList({
             items={visibleTasks.map((t) => t.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className={listClassName ?? 'flex flex-col gap-1'}>
+            <div className={listClassName ?? 'flex flex-col gap-1 max-h-[308px] overflow-y-auto'}>
               {visibleTasks.map((task) => (
                 <TaskItem
                   key={task.id}

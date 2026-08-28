@@ -72,7 +72,7 @@ export function TaskList({
         <DraggableFlatList
           data={visibleTasks}
           keyExtractor={(t) => t.id}
-          scrollEnabled={false}
+          style={styles.scrollList}
           onDragEnd={({ from, to }) => void reorderTasks(from, to)}
           renderItem={({ item, drag, isActive }: RenderItemParams<Task>) =>
             renderRow(item, { drag, isActive })
@@ -116,6 +116,9 @@ export function TaskList({
 }
 
 const styles = StyleSheet.create({
+  scrollList: {
+    maxHeight: 308, // 행(48px) 6개 + gap(4px) 5개 근사값
+  },
   list: {
     gap: 4,
   },
