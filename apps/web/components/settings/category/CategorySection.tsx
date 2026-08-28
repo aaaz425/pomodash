@@ -59,7 +59,10 @@ function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
         >
           <GripVertical className="w-3.5 h-3.5" />
         </button>
-        <span className={`w-3 h-3 rounded-full shrink-0 ${category.color}`} />
+        <span
+          className="w-3 h-3 rounded-full shrink-0"
+          style={{ backgroundColor: category.color }}
+        />
         <span className="text-sm text-foreground">{category.name}</span>
       </div>
       <div className="flex items-center gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">

@@ -9,7 +9,6 @@ import type {
   FocusTrendMeta,
   CategoryFocusItem,
 } from '@/types';
-import { CATEGORY_HEX_COLORS } from '@/lib/constants/categoryColors';
 import {
   getMonthlyActivityData,
   filterSessionsByTab,
@@ -42,10 +41,6 @@ export {
   getFirstSessionDate,
 };
 
-function tailwindToHex(colorClass: string): string {
-  return CATEGORY_HEX_COLORS[colorClass as keyof typeof CATEGORY_HEX_COLORS] ?? '#6b7280';
-}
-
 function resolveCategory(
   session: Session,
   taskMap: Map<string, Task>,
@@ -55,7 +50,7 @@ function resolveCategory(
     const task = taskMap.get(session.taskId);
     if (task) {
       const cat = categoryMap.get(task.categoryId);
-      if (cat) return { name: cat.name, color: tailwindToHex(cat.color) };
+      if (cat) return { name: cat.name, color: cat.color };
     }
   }
   return { name: '미분류', color: '#6b7280' };

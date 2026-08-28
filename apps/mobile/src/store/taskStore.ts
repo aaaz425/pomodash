@@ -29,11 +29,11 @@ import type { Session } from '@/types/sessions';
 // 회원가입 시 DB 트리거(handle_new_user)가 심어주는 기본값과 이름을 맞춘 폴백 —
 // fetchCategories 실패(네트워크 오류 등) 시에만 사용
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: '1', name: '공부', color: 'blue' },
-  { id: '2', name: '업무', color: 'green' },
-  { id: '3', name: '운동', color: 'orange' },
-  { id: '4', name: '독서', color: 'purple' },
-  { id: '5', name: '기타', color: 'gray' },
+  { id: '1', name: '공부', color: '#3b82f6' },
+  { id: '2', name: '업무', color: '#22c55e' },
+  { id: '3', name: '운동', color: '#f97316' },
+  { id: '4', name: '독서', color: '#a855f7' },
+  { id: '5', name: '기타', color: '#6b7280' },
 ];
 
 interface TaskStore {

@@ -21,6 +21,8 @@ export { FOCUS_RATING_OPTIONS, FOCUS_RATING_LABELS } from './constants/focusRati
 export { DISTRACTION_TAGS } from './constants/distractionTags';
 export type { DistractionTag } from './constants/distractionTags';
 export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
+export { hexToHsv, hsvToHex } from './lib/color';
+export type { Hsv } from './lib/color';
 export { isSessionStale } from './lib/sessionStale';
 export { deriveTimerDisplay } from './lib/deriveTimerDisplay';
 export type { DeriveTimerDisplayInput, TimerDisplayState } from './lib/deriveTimerDisplay';

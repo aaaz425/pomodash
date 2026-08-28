@@ -11,7 +11,7 @@ export type { TimerPhase, TimerMode, TimerSettings, FocusPeriod, FocusRating };
 export interface Category {
   id: string;
   name: string;
-  color: string; // e.g. 'bg-blue-500'
+  color: string; // hex color, e.g. '#3b82f6'
 }
 
 export interface Task {

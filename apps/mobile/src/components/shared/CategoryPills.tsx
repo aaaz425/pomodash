@@ -1,5 +1,4 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { CATEGORY_HEX } from '@/constants/categoryColors';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
@@ -18,7 +17,7 @@ export function CategoryPills({ categories, selectedId, onChange }: Props) {
   return (
     <View style={styles.row}>
       {categories.map((cat) => {
-        const hex = CATEGORY_HEX[cat.color];
+        const hex = cat.color;
         const active = cat.id === selectedId;
         return (
           <Pressable

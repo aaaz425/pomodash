@@ -1,6 +1,5 @@
 import { format, parseISO, startOfMonth, startOfWeek } from 'date-fns';
 import type { TabType } from '@pomodash/shared';
-import { CATEGORY_HEX } from '@/constants/categoryColors';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
 import type { FocusTrendItem, FocusTrendMeta, CategoryFocusItem } from '@/types/dashboard';
@@ -14,7 +13,7 @@ function resolveCategory(
     const task = taskMap.get(session.taskId);
     if (task) {
       const cat = categoryMap.get(task.categoryId);
-      if (cat) return { name: cat.name, color: CATEGORY_HEX[cat.color] };
+      if (cat) return { name: cat.name, color: cat.color };
     }
   }
   return { name: '미분류', color: '#6b7280' };

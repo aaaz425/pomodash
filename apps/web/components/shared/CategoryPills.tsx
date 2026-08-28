@@ -1,13 +1,7 @@
 'use client';
 
 import type { Category } from '@/types';
-import { type CategoryColorKey, CATEGORY_PILL_STYLES } from '@/lib/constants/categoryColors';
-
-const FALLBACK_PILL = {
-  selected: 'bg-muted border border-primary text-primary',
-  dot: 'bg-primary',
-  unselected: 'bg-muted border border-transparent text-muted-foreground',
-};
+import { withAlpha } from '@/lib/constants/categoryColors';
 
 interface Props {
   categories: Category[];
@@ -23,16 +17,30 @@ export function CategoryPills({ categories, selectedId, onChange, variant = 'sim
     return (
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => {
-          const colors = CATEGORY_PILL_STYLES[cat.color as CategoryColorKey] ?? FALLBACK_PILL;
           const isActive = cat.id === selectedId;
           return (
             <button
               key={cat.id}
               type="button"
               onClick={() => onChange(cat.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${isActive ? colors.selected : colors.unselected}`}
+              className={[
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
+                isActive ? 'border' : 'bg-muted border border-transparent text-muted-foreground',
+              ].join(' ')}
+              style={
+                isActive
+                  ? {
+                      backgroundColor: withAlpha(cat.color, 0.2),
+                      borderColor: cat.color,
+                      color: cat.color,
+                    }
+                  : undefined
+              }
             >
-              <span className={`w-2 h-2 rounded-full shrink-0 ${colors.dot}`} />
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: cat.color }}
+              />
               {cat.name}
             </button>
           );
