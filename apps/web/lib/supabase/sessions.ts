@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
 import { SessionSchema, type Session } from '@/types';
-import { SESSION_LIMITS } from '@/lib/constants/limits';
 
 interface SessionRow {
   id: string;
@@ -47,15 +46,13 @@ interface SessionListResult {
   invalidCount: number;
 }
 
-// 'all' 탭 차트·뱃지처럼 전체 히스토리 raw row가 필요한 화면 전용 — hydrate 시 무조건 호출하지 않고
-// 해당 화면 진입 시에만 lazy 호출한다. SESSION_LIMITS.FETCH_LIMIT 캡은 여전히 존재 (완전 무제한화는 후속 작업).
+// 프로덕션도 Supabase 대시보드에서 Max Rows를 config.toml과 동일하게 올려야 함
 export async function fetchAllSessionsLazy(): Promise<SessionListResult | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('sessions')
     .select(SELECT_COLUMNS)
-    .order('started_at', { ascending: false })
-    .limit(SESSION_LIMITS.FETCH_LIMIT);
+    .order('started_at', { ascending: false });
   if (error || !data) return null;
   const sessions = data.map(toSession).filter((s): s is Session => s !== null);
   return { sessions, invalidCount: data.length - sessions.length };

@@ -17,6 +17,7 @@ interface Props {
   task: Task | null;
   category: Category | null;
   onBack?: () => void;
+  onUpdated: (patch: Partial<Session>) => void;
   onDeleted: () => void;
 }
 
@@ -27,7 +28,14 @@ interface EditDraft {
   note: string;
 }
 
-export function JournalDetailPanel({ session, task, category, onBack, onDeleted }: Props) {
+export function JournalDetailPanel({
+  session,
+  task,
+  category,
+  onBack,
+  onUpdated,
+  onDeleted,
+}: Props) {
   const updateSessionFields = useTaskStore((s) => s.updateSessionFields);
   const deleteSession = useTaskStore((s) => s.deleteSession);
   const sessions = useTaskStore((s) => s.sessions);
@@ -67,12 +75,14 @@ export function JournalDetailPanel({ session, task, category, onBack, onDeleted 
 
   function handleSaveEdit() {
     if (!draft) return;
-    void updateSessionFields(session.id, {
+    const patch = {
       title: draft.title.trim() || null,
       focusRating: draft.focusRating,
       distractionTags: draft.distractionTags,
       note: draft.note.trim() || null,
-    });
+    };
+    void updateSessionFields(session.id, patch);
+    onUpdated(patch);
     setIsEditing(false);
     setDraft(null);
   }

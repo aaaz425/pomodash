@@ -568,8 +568,14 @@ describe('reorderCategories', () => {
   });
 });
 
+// sessions는 hydrate()가 기다리지 않는 별도 fire-and-forget 조회라 마이크로태스크를 한 번 더 흘려보내야 반영됨
+async function flushSessionsFetch() {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe('hydrate', () => {
-  it('fetchTasks/fetchCategories/fetchSessions 결과로 상태가 복원됨', async () => {
+  it('fetchTasks/fetchCategories/fetchAllSessionsLazy 결과로 상태가 복원됨', async () => {
     const task: Task = {
       id: 't1',
       title: '저장된 작업',
@@ -588,6 +594,9 @@ describe('hydrate', () => {
     await store.getState().hydrate();
     expect(store.getState().tasks).toEqual([task]);
     expect(store.getState().categories).toEqual(DEFAULT_CATEGORIES);
+
+    await flushSessionsFetch();
+    expect(store.getState().sessionsHydrated).toBe(true);
   });
 
   it('형식이 안 맞는 항목이 있으면 조용히 빼고 나머지만 복원됨', async () => {
@@ -598,6 +607,8 @@ describe('hydrate', () => {
     const store = createTaskStore();
     await expect(store.getState().hydrate()).resolves.not.toThrow();
     expect(store.getState().tasks).toEqual([]);
+
+    await flushSessionsFetch();
     expect(store.getState().sessions).toEqual([]);
   });
 
@@ -609,7 +620,10 @@ describe('hydrate', () => {
     const store = createTaskStore();
     await store.getState().hydrate();
     expect(store.getState().tasks).toEqual([]);
-    expect(store.getState().sessions).toEqual([]);
     expect(store.getState().categories).toEqual(DEFAULT_CATEGORIES);
+
+    await flushSessionsFetch();
+    expect(store.getState().sessions).toEqual([]);
+    expect(store.getState().sessionsHydrated).toBe(true);
   });
 });

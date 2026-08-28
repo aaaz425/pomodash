@@ -13,9 +13,8 @@ port = 54321
 schemas = ["public", "graphql_public"]
 # Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
-# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
-# for accidental or malicious requests.
-max_rows = 1000
+# 테이블/뷰/함수 전체에 걸리는 API 상한. 완전 무제한 대신 실사용 범위를 넉넉히 넘는 값으로 안전장치를 남겨둔다
+max_rows = 20000
 # Controls whether new tables, views, sequences and functions created in the `public` schema by
 # `postgres` are reachable through the Data API roles (`anon`, `authenticated`, `service_role`)
 # without explicit GRANTs. When unset, new entities are NOT auto-exposed, matching the new cloud

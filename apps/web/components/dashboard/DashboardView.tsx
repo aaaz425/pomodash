@@ -25,6 +25,7 @@ import type { DashboardSummary, TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
+import { useSessionsHydrated } from '@/hooks/useSessionsHydrated';
 import { SKELETON_SHOW_DELAY_MS } from '@/lib/constants';
 
 // 캔버스 렌더링 로직이 무거운데 공유 버튼을 눌러야만 열리므로 초기 대시보드 번들에서 제외
@@ -46,6 +47,7 @@ function makeCountSub(diff: number, label: string): string | undefined {
 
 export function DashboardView() {
   const { hydrated } = useDelayedHydration();
+  const { sessionsHydrated } = useSessionsHydrated();
   const [tab, setTab] = useState<TabType>('week');
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -67,9 +69,8 @@ export function DashboardView() {
     };
   }, [sessions]);
 
-  // useDelayedHydration의 showSkeleton은 store hydration에만 반응해 summary 로딩 중엔 계속 false로
-  // 남는다 — RPC 응답을 기다리는 동안에도 같은 지연 규칙으로 스켈레톤을 보여주기 위해 별도로 추적한다.
-  const loading = !hydrated || !summary;
+  // 모든 탭이 client에서 sessions를 필터링해 쓰므로 summary·sessions 둘 다 기다려야 한다
+  const loading = !hydrated || !sessionsHydrated || !summary;
   const [loadingElapsed, setLoadingElapsed] = useState(false);
   useEffect(() => {
     if (!loading) return;
