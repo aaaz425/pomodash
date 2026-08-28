@@ -64,6 +64,24 @@ export interface DayActivity {
   focusMinutes: number;
 }
 
+export interface PeriodStat {
+  focusSeconds: number;
+  count: number;
+}
+
+// get_dashboard_summary RPC 응답 — 전체 히스토리를 스캔해야 하는 통계만 담는다 (docs/guides/data-models.md 참고)
+export interface DashboardSummary {
+  streakDays: number;
+  maxStreakDays: number;
+  monthlyActivity: DayActivity[];
+  monthFocusSeconds: number;
+  busiestDay: string | null;
+  firstSessionDate: string | null; // ISO 8601
+  prevDay: PeriodStat;
+  prevWeek: PeriodStat;
+  prevMonth: PeriodStat;
+}
+
 export interface FocusTrendItem {
   label: string;
   [key: string]: number | string;

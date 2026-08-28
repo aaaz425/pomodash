@@ -1,7 +1,7 @@
 'use client';
 
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { BadgeGallery } from '@/components/dashboard/BadgeGallery';
@@ -16,22 +16,16 @@ import { Button } from '@/components/ui/button';
 import {
   filterSessionsByTab,
   getAvgSessionSeconds,
-  getBusiestDayOfWeek,
-  getFirstSessionDate,
-  getMaxStreakDays,
-  getMonthlyActivityData,
-  getPrevDayStats,
-  getPrevMonthStats,
-  getPrevWeekStats,
   getSessionCount,
-  getStreakDays,
   getTotalFocusSeconds,
 } from '@/lib/dashboard';
+import { fetchDashboardSummary } from '@/lib/supabase/dashboard';
 import { buildShareCardData } from '@/lib/shareCard';
-import type { TabType } from '@/types';
+import type { DashboardSummary, TabType } from '@/types';
 import { formatDuration } from '@/lib/sessionUtils';
 import { useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
+import { SKELETON_SHOW_DELAY_MS } from '@/lib/constants';
 
 // 캔버스 렌더링 로직이 무거운데 공유 버튼을 눌러야만 열리므로 초기 대시보드 번들에서 제외
 const ShareCardModal = dynamic(() =>
@@ -51,7 +45,7 @@ function makeCountSub(diff: number, label: string): string | undefined {
 }
 
 export function DashboardView() {
-  const { hydrated, showSkeleton } = useDelayedHydration();
+  const { hydrated } = useDelayedHydration();
   const [tab, setTab] = useState<TabType>('week');
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -59,23 +53,46 @@ export function DashboardView() {
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);
 
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+
+  // sessions 배열이 바뀔 때(최초 hydrate 포함, 세션 CRUD 이후)마다 요약 통계를 다시 받아온다.
+  // 재조회 중에도 이전 summary를 유지해 화면이 스켈레톤으로 되돌아가지 않게 한다(stale-while-revalidate).
+  useEffect(() => {
+    let cancelled = false;
+    fetchDashboardSummary().then((result) => {
+      if (!cancelled && result) setSummary(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessions]);
+
+  // useDelayedHydration의 showSkeleton은 store hydration에만 반응해 summary 로딩 중엔 계속 false로
+  // 남는다 — RPC 응답을 기다리는 동안에도 같은 지연 규칙으로 스켈레톤을 보여주기 위해 별도로 추적한다.
+  const loading = !hydrated || !summary;
+  const [loadingElapsed, setLoadingElapsed] = useState(false);
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setTimeout(() => setLoadingElapsed(true), SKELETON_SHOW_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   const filtered = filterSessionsByTab(sessions, tab);
-  const monthSessions = filterSessionsByTab(sessions, 'month');
   const shareCardData = buildShareCardData(filtered, sessions, tab);
 
   const totalFocusSeconds = getTotalFocusSeconds(filtered);
   const sessionCount = getSessionCount(filtered);
   const avgSessionSeconds = getAvgSessionSeconds(filtered);
-  const streakDays = getStreakDays(sessions);
-  const maxStreakDays = getMaxStreakDays(sessions);
-  const monthlyActivity = getMonthlyActivityData(sessions);
-  const monthFocusSeconds = getTotalFocusSeconds(monthSessions);
-  const busiestDay = getBusiestDayOfWeek(monthSessions);
-  const firstSessionDate = getFirstSessionDate(sessions);
+  const streakDays = summary?.streakDays ?? 0;
+  const maxStreakDays = summary?.maxStreakDays ?? 0;
+  const monthlyActivity = summary?.monthlyActivity ?? [];
+  const monthFocusSeconds = summary?.monthFocusSeconds ?? 0;
+  const busiestDay = summary?.busiestDay ?? null;
+  const firstSessionDate = summary?.firstSessionDate ? new Date(summary.firstSessionDate) : null;
 
-  const prevDay = getPrevDayStats(sessions);
-  const prevWeek = getPrevWeekStats(sessions);
-  const prevMonth = getPrevMonthStats(sessions);
+  const prevDay = summary?.prevDay ?? { focusSeconds: 0, count: 0 };
+  const prevWeek = summary?.prevWeek ?? { focusSeconds: 0, count: 0 };
+  const prevMonth = summary?.prevMonth ?? { focusSeconds: 0, count: 0 };
 
   const focusLabel =
     tab === 'today'
@@ -117,7 +134,7 @@ export function DashboardView() {
     return undefined;
   })();
 
-  if (!hydrated) return showSkeleton ? <DashboardSkeleton /> : null;
+  if (loading) return loadingElapsed ? <DashboardSkeleton /> : null;
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 md:p-8 lg:p-10">

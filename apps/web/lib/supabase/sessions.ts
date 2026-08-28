@@ -42,10 +42,14 @@ export function toSession(row: SessionRow): Session | null {
   return parsed.success ? parsed.data : null;
 }
 
-export async function fetchSessions(): Promise<{
+interface SessionListResult {
   sessions: Session[];
   invalidCount: number;
-} | null> {
+}
+
+// 'all' 탭 차트·뱃지처럼 전체 히스토리 raw row가 필요한 화면 전용 — hydrate 시 무조건 호출하지 않고
+// 해당 화면 진입 시에만 lazy 호출한다. SESSION_LIMITS.FETCH_LIMIT 캡은 여전히 존재 (완전 무제한화는 후속 작업).
+export async function fetchAllSessionsLazy(): Promise<SessionListResult | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('sessions')
@@ -55,6 +59,73 @@ export async function fetchSessions(): Promise<{
   if (error || !data) return null;
   const sessions = data.map(toSession).filter((s): s is Session => s !== null);
   return { sessions, invalidCount: data.length - sessions.length };
+}
+
+// 캘린더 월 조회, 대시보드 today/week/month 탭 차트용 — 날짜 구간으로 자연스럽게 좁혀지므로 별도 상한 불필요.
+export async function fetchSessionsInRange(
+  startIso: string,
+  endIso: string,
+): Promise<SessionListResult | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('sessions')
+    .select(SELECT_COLUMNS)
+    .gte('started_at', startIso)
+    .lt('started_at', endIso)
+    .order('started_at', { ascending: true });
+  if (error || !data) return null;
+  const sessions = data.map(toSession).filter((s): s is Session => s !== null);
+  return { sessions, invalidCount: data.length - sessions.length };
+}
+
+export interface SessionsPageParams {
+  cursor?: string | null; // 이전 페이지 마지막 세션의 startedAt — 타이머 세션은 한 번에 하나씩만 생기므로 startedAt 단독으로 안정적인 커서가 된다
+  limit: number;
+  categoryIds?: string[];
+  search?: string; // 작업 제목 검색
+  dateFrom?: string; // YYYY-MM-DD
+  dateTo?: string; // YYYY-MM-DD
+}
+
+export interface SessionsPageResult extends SessionListResult {
+  nextCursor: string | null;
+}
+
+// 저널 리스트 무한스크롤용 커서 기반 페이지네이션. 카테고리/검색 필터는 tasks 테이블과 inner join해
+// 서버에서 처리 — task가 없는(미분류) 세션은 원래 클라이언트 필터 로직과 동일하게 필터 활성 시 제외된다.
+export async function fetchSessionsPage({
+  cursor,
+  limit,
+  categoryIds,
+  search,
+  dateFrom,
+  dateTo,
+}: SessionsPageParams): Promise<SessionsPageResult | null> {
+  const supabase = createClient();
+  const needsTaskJoin = !!(categoryIds?.length || search?.trim());
+  const selectColumns = needsTaskJoin
+    ? `${SELECT_COLUMNS}, tasks!inner(category_id, title)`
+    : SELECT_COLUMNS;
+
+  let query = supabase
+    .from('sessions')
+    .select(selectColumns)
+    .order('started_at', { ascending: false })
+    .limit(limit);
+
+  if (cursor) query = query.lt('started_at', cursor);
+  if (categoryIds?.length) query = query.in('tasks.category_id', categoryIds);
+  if (search?.trim()) query = query.ilike('tasks.title', `%${search.trim()}%`);
+  if (dateFrom) query = query.gte('started_at', `${dateFrom}T00:00:00.000Z`);
+  if (dateTo) query = query.lt('started_at', `${dateTo}T23:59:59.999Z`);
+
+  const { data, error } = await query;
+  if (error || !data) return null;
+
+  const rows = data as unknown as SessionRow[];
+  const sessions = rows.map(toSession).filter((s): s is Session => s !== null);
+  const nextCursor = rows.length === limit ? rows[rows.length - 1].started_at : null;
+  return { sessions, invalidCount: rows.length - sessions.length, nextCursor };
 }
 
 export async function insertSession(input: Omit<Session, 'id'>): Promise<Session | null> {

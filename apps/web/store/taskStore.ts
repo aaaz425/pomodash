@@ -20,7 +20,7 @@ import {
   reorderCategories as reorderCategoriesRows,
 } from '@/lib/supabase/categories';
 import {
-  fetchSessions,
+  fetchAllSessionsLazy,
   insertSession as insertSessionRow,
   updateSession as updateSessionRow,
   deleteSession as deleteSessionRow,
@@ -300,7 +300,7 @@ export const createTaskStore = () =>
       const [tasksResult, categoriesResult, sessionsResult] = await Promise.all([
         fetchTasks(),
         fetchCategories(),
-        fetchSessions(),
+        fetchAllSessionsLazy(),
       ]);
       set({
         tasks: tasksResult?.tasks ?? [],

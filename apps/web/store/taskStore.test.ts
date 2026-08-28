@@ -12,7 +12,7 @@ import {
   reorderCategories,
 } from '@/lib/supabase/categories';
 import {
-  fetchSessions,
+  fetchAllSessionsLazy,
   insertSession,
   updateSession,
   deleteSession,
@@ -33,7 +33,7 @@ vi.mock('@/lib/supabase/categories', () => ({
   reorderCategories: vi.fn(),
 }));
 vi.mock('@/lib/supabase/sessions', () => ({
-  fetchSessions: vi.fn(),
+  fetchAllSessionsLazy: vi.fn(),
   insertSession: vi.fn(),
   updateSession: vi.fn(),
   deleteSession: vi.fn(),
@@ -51,7 +51,7 @@ const mockUpdateCategory = vi.mocked(updateCategory);
 const mockDeleteCategory = vi.mocked(deleteCategory);
 const mockReorderCategories = vi.mocked(reorderCategories);
 
-const mockFetchSessions = vi.mocked(fetchSessions);
+const mockFetchSessions = vi.mocked(fetchAllSessionsLazy);
 const mockInsertSession = vi.mocked(insertSession);
 const mockUpdateSession = vi.mocked(updateSession);
 const mockDeleteSession = vi.mocked(deleteSession);
