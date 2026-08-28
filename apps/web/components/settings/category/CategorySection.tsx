@@ -59,7 +59,10 @@ function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
         >
           <GripVertical className="w-3.5 h-3.5" />
         </button>
-        <span className={`w-3 h-3 rounded-full shrink-0 ${category.color}`} />
+        <span
+          className="w-3 h-3 rounded-full shrink-0"
+          style={{ backgroundColor: category.color }}
+        />
         <span className="text-sm text-foreground">{category.name}</span>
       </div>
       <div className="flex items-center gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
@@ -119,7 +122,7 @@ export function CategorySection() {
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col">
+          <div className="flex flex-col max-h-[312px] overflow-y-auto">
             {categories.map((cat) => (
               <CategoryRow
                 key={cat.id}

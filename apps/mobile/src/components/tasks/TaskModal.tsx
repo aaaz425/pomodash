@@ -8,7 +8,7 @@ interface Props {
 
 export function TaskModal({ visible, onClose }: Props) {
   return (
-    <Modal visible={visible} title="작업 관리" onClose={onClose}>
+    <Modal visible={visible} title="작업 관리" onClose={onClose} scrollable={false}>
       <TaskList mode="manage" />
     </Modal>
   );

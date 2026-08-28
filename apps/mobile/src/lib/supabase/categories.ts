@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
 import { CategorySchema, type Category } from '@/types/tasks';
-import { toMobileColorKey, toDbColor } from '@/constants/categoryColorMap';
 
 interface CategoryRow {
   id: string;
@@ -9,11 +8,7 @@ interface CategoryRow {
 }
 
 export function toCategory(row: CategoryRow): Category | null {
-  const parsed = CategorySchema.safeParse({
-    id: row.id,
-    name: row.name,
-    color: toMobileColorKey(row.color),
-  });
+  const parsed = CategorySchema.safeParse(row);
   return parsed.success ? parsed.data : null;
 }
 
@@ -36,7 +31,7 @@ export async function insertCategory(input: {
 }): Promise<Category | null> {
   const { data, error } = await supabase
     .from('categories')
-    .insert({ name: input.name, color: toDbColor(input.color) })
+    .insert({ name: input.name, color: input.color })
     .select('id, name, color')
     .single();
   if (error || !data) return null;
@@ -49,7 +44,7 @@ export async function updateCategory(
 ): Promise<{ error: boolean }> {
   const { error } = await supabase
     .from('categories')
-    .update({ name: input.name, color: toDbColor(input.color) })
+    .update({ name: input.name, color: input.color })
     .eq('id', id);
   return { error: error !== null };
 }

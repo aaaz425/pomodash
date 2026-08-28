@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Pencil } from 'lucide-react-native';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
-import {
-  CATEGORY_COLOR_KEYS,
-  CATEGORY_HEX,
-  type CategoryColorKey,
-} from '@/constants/categoryColors';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { ColorPickerModal } from '@/components/settings/ColorPickerModal';
+import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import type { Category } from '@/types/tasks';
+
+const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
+const RAINBOW_COLORS = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'];
 
 interface Props {
   category: Category | null; // null = 새 카테고리
@@ -25,11 +28,14 @@ export function CategoryEditModal({ category, onClose }: Props) {
   const updateCategory = useTaskStore((s) => s.updateCategory);
 
   const [name, setName] = useState(category?.name ?? '');
-  const [color, setColor] = useState<CategoryColorKey>(category?.color ?? CATEGORY_COLOR_KEYS[0]);
+  const [color, setColor] = useState(category?.color ?? CATEGORY_PRESET_COLORS[0].hex);
+  const [showPicker, setShowPicker] = useState(false);
+  const isValidColor = HEX_PATTERN.test(color);
+  const isPreset = CATEGORY_PRESET_COLORS.some(({ hex }) => hex === color.toLowerCase());
 
   function handleSave() {
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed || !isValidColor) return;
     if (category) {
       void updateCategory(category.id, { name: trimmed, color });
     } else {
@@ -39,88 +45,123 @@ export function CategoryEditModal({ category, onClose }: Props) {
   }
 
   return (
-    <Modal
-      visible
-      title={category ? '카테고리 편집' : '카테고리 추가'}
-      onClose={onClose}
-      footer={
-        <>
-          <Pressable
-            onPress={onClose}
-            style={[styles.footerButton, { backgroundColor: theme.muted }]}
-          >
-            <Text
-              style={[
-                styles.footerButtonText,
-                { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-              ]}
+    <>
+      <Modal
+        visible
+        title={category ? '카테고리 편집' : '카테고리 추가'}
+        onClose={onClose}
+        footer={
+          <>
+            <CategoryBadge
+              style={styles.footerPreview}
+              category={{
+                id: 'preview',
+                name: name.trim() || '미리보기',
+                color: isValidColor ? color : CATEGORY_PRESET_COLORS[0].hex,
+              }}
+            />
+            <Pressable
+              onPress={onClose}
+              style={[styles.footerButton, { backgroundColor: theme.muted }]}
             >
-              취소
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={handleSave}
-            disabled={!name.trim()}
-            style={[
-              styles.footerButton,
-              { backgroundColor: theme.primary },
-              !name.trim() && styles.disabled,
-            ]}
-          >
-            <Text
-              style={[
-                styles.footerButtonText,
-                { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-              ]}
-            >
-              저장
-            </Text>
-          </Pressable>
-        </>
-      }
-    >
-      <View style={styles.field}>
-        <Text
-          style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
-        >
-          이름
-        </Text>
-        <TextInput
-          autoFocus
-          value={name}
-          onChangeText={setName}
-          onSubmitEditing={handleSave}
-          placeholder="카테고리 이름"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text
-          style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
-        >
-          색상
-        </Text>
-        <View style={styles.swatchRow}>
-          {CATEGORY_COLOR_KEYS.map((key) => {
-            const selected = color === key;
-            return (
-              <Pressable
-                key={key}
-                onPress={() => setColor(key)}
+              <Text
                 style={[
-                  styles.swatch,
-                  { backgroundColor: CATEGORY_HEX[key] },
-                  selected && [
-                    styles.swatchSelected,
-                    { borderColor: theme.foreground, transform: [{ scale: 1.1 }] },
-                  ],
+                  styles.footerButtonText,
+                  { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
                 ]}
-              />
-            );
-          })}
+              >
+                취소
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={handleSave}
+              disabled={!name.trim() || !isValidColor}
+              style={[
+                styles.footerButton,
+                { backgroundColor: theme.primary },
+                (!name.trim() || !isValidColor) && styles.disabled,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.footerButtonText,
+                  { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                저장
+              </Text>
+            </Pressable>
+          </>
+        }
+      >
+        <View style={styles.field}>
+          <Text
+            style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
+          >
+            이름
+          </Text>
+          <TextInput
+            autoFocus
+            value={name}
+            onChangeText={setName}
+            onSubmitEditing={handleSave}
+            placeholder="카테고리 이름"
+          />
         </View>
-      </View>
-    </Modal>
+
+        <View style={styles.field}>
+          <Text
+            style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
+          >
+            색상
+          </Text>
+
+          <View style={styles.swatchRow}>
+            {CATEGORY_PRESET_COLORS.map(({ hex, label }) => {
+              const selected = color.toLowerCase() === hex;
+              return (
+                <Pressable
+                  key={hex}
+                  onPress={() => setColor(hex)}
+                  accessibilityLabel={label}
+                  style={[
+                    styles.swatch,
+                    { backgroundColor: hex },
+                    selected && [styles.swatchSelected, { borderColor: theme.foreground }],
+                  ]}
+                />
+              );
+            })}
+            <Pressable
+              onPress={() => setShowPicker(true)}
+              accessibilityLabel="색상 직접 선택"
+              style={[
+                styles.swatch,
+                !isPreset && [styles.swatchSelected, { borderColor: theme.foreground }],
+              ]}
+            >
+              <LinearGradient
+                colors={RAINBOW_COLORS}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.rainbowFill}
+              />
+              <Pencil size={14} color="#fff" />
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <ColorPickerModal
+        visible={showPicker}
+        initialHex={isValidColor ? color : CATEGORY_PRESET_COLORS[0].hex}
+        onCancel={() => setShowPicker(false)}
+        onConfirm={(hex) => {
+          setColor(hex);
+          setShowPicker(false);
+        }}
+      />
+    </>
   );
 }
 
@@ -131,6 +172,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
   },
+  footerPreview: {
+    marginRight: 'auto',
+  },
   swatchRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -140,9 +184,16 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   swatchSelected: {
     borderWidth: 2,
+    transform: [{ scale: 1.1 }],
+  },
+  rainbowFill: {
+    ...StyleSheet.absoluteFillObject,
   },
   footerButton: {
     paddingHorizontal: 16,

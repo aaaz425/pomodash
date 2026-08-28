@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { formatSessionProgressLabel, normalizeFocusPeriods } from '@pomodash/shared';
+import { normalizeFocusPeriods } from '@pomodash/shared';
 import type { FocusRating } from '@pomodash/shared';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
@@ -184,14 +184,7 @@ export function SessionCompleteSheet() {
 
           <ConfirmModal
             visible={pendingAction === 'save'}
-            title="이 기록으로 저장할까요?"
-            description={
-              formatSessionProgressLabel(mode, {
-                cycleCount,
-                totalCycles,
-                focusSeconds: accFocusSeconds,
-              }) + (!isTaskSession && !selectedTaskId ? ' · 미분류로 저장됩니다' : '')
-            }
+            title="기록을 저장할까요?"
             confirmLabel="저장"
             onConfirm={handleSave}
             onCancel={() => setPendingAction(null)}

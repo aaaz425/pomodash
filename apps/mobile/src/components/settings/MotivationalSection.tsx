@@ -123,6 +123,7 @@ export function MotivationalSection() {
       <DraggableFlatList
         data={messages}
         keyExtractor={(item) => item}
+        style={styles.scrollList}
         onDragEnd={({ from, to }) => void reorderMessages(from, to)}
         renderItem={({ item, getIndex, drag, isActive }: RenderItemParams<string>) => {
           const index = getIndex() ?? 0;
@@ -144,24 +145,6 @@ export function MotivationalSection() {
           );
         }}
       />
-
-      <View style={styles.addRow}>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          onSubmitEditing={handleAdd}
-          placeholder="새 동기부여 메시지 입력"
-          editable={!isAtLimit}
-          style={styles.input}
-        />
-        <Pressable
-          onPress={handleAdd}
-          disabled={!input.trim() || isAtLimit}
-          style={[styles.addButton, { backgroundColor: theme.muted }]}
-        >
-          <Plus size={14} color={theme.mutedForeground} />
-        </Pressable>
-      </View>
 
       <View style={styles.footer}>
         <Text
@@ -187,6 +170,24 @@ export function MotivationalSection() {
         </Text>
       </View>
 
+      <View style={styles.addRow}>
+        <TextInput
+          value={input}
+          onChangeText={setInput}
+          onSubmitEditing={handleAdd}
+          placeholder="새 동기부여 메시지 입력"
+          editable={!isAtLimit}
+          style={styles.input}
+        />
+        <Pressable
+          onPress={handleAdd}
+          disabled={!input.trim() || isAtLimit}
+          style={[styles.addButton, { backgroundColor: theme.muted }]}
+        >
+          <Plus size={14} color={theme.mutedForeground} />
+        </Pressable>
+      </View>
+
       <ConfirmModal
         visible={deleteIndex !== null}
         title="메시지를 삭제할까요?"
@@ -201,6 +202,9 @@ export function MotivationalSection() {
 }
 
 const styles = StyleSheet.create({
+  scrollList: {
+    maxHeight: 264, // 행(44px) 6개 근사값
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

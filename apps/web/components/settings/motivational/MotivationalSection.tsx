@@ -194,7 +194,7 @@ export function MotivationalSection() {
           items={messages.map((_, i) => String(i))}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col max-h-[312px] overflow-y-auto">
             {messages.map((msg, i) => (
               <MessageRow
                 key={i}
@@ -216,6 +216,13 @@ export function MotivationalSection() {
         </SortableContext>
       </DndContext>
 
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground/70">최소 1개는 유지해야 합니다.</p>
+        <p className={`text-xs ${isAtLimit ? 'text-destructive/70' : 'text-muted-foreground/70'}`}>
+          {messages.length} / {INPUT_LIMITS.MESSAGE_COUNT_MAX}
+        </p>
+      </div>
+
       <div className="flex items-center gap-2">
         <TextInput
           value={input}
@@ -233,13 +240,6 @@ export function MotivationalSection() {
           <Plus className="w-4 h-4" />
           추가
         </button>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground/70">최소 1개는 유지해야 합니다.</p>
-        <p className={`text-xs ${isAtLimit ? 'text-destructive/70' : 'text-muted-foreground/70'}`}>
-          {messages.length} / {INPUT_LIMITS.MESSAGE_COUNT_MAX}
-        </p>
       </div>
 
       <ConfirmDialog

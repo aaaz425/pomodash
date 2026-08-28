@@ -1,11 +1,10 @@
 import { z } from 'zod';
 import { TIMER_LIMITS } from '@pomodash/shared';
-import { CATEGORY_COLOR_KEYS, type CategoryColorKey } from '@/constants/categoryColors';
 
 export interface Category {
   id: string;
   name: string;
-  color: CategoryColorKey;
+  color: string; // hex color, e.g. '#3b82f6'
 }
 
 export interface Task {
@@ -20,11 +19,10 @@ export interface Task {
 }
 
 // Supabase 응답도 외부 입력이므로 반드시 검증 후 사용 — lib/supabase/{tasks,categories}.ts에서만 사용
-// (color는 DB의 'bg-blue-500' 형태를 categoryColorMap.ts가 CategoryColorKey로 변환한 뒤 여기로 들어옴)
 export const CategorySchema = z.object({
   id: z.string(),
   name: z.string(),
-  color: z.enum(CATEGORY_COLOR_KEYS),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
 });
 
 export const TaskSchema = z.object({

@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Tag } from 'lucide-react';
 import { useTaskStore, useSettingsStore, useTimerStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
+import { CategoryModal } from '@/components/settings/category/CategoryModal';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
@@ -45,6 +46,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   const [showTimeSettings, setShowTimeSettings] = useState(task !== null);
   // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 생성될 수 있음
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   async function handleSubmit() {
     const trimmed = title.trim();
@@ -80,104 +82,118 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   }
 
   return (
-    <Modal
-      title={task ? '작업 수정' : '새 작업 추가'}
-      onClose={onClose}
-      backdropClassName="bg-black/55 backdrop-blur-sm"
-      maxHeightClassName="max-h-[80vh]"
-      footer={
-        <>
-          <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
-            취소
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!title.trim() || isSubmitting}
-            variant="default"
-            size="lg"
-            className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {task ? '저장' : '추가'}
-          </Button>
-        </>
-      }
-    >
-      {/* 작업 제목 */}
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="task-title" className="text-xs font-medium text-muted-foreground">
-          작업 제목
-        </label>
-        <TextInput
-          id="task-title"
-          autoFocus
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          placeholder="예) 알고리즘 문제 풀기"
-          className="w-full"
-        />
-      </div>
-
-      {/* 카테고리 */}
-      <div className="flex flex-col gap-2" role="group" aria-labelledby="task-category-label">
-        <span id="task-category-label" className="text-xs font-medium text-muted-foreground">
-          카테고리
-        </span>
-        <CategoryPills
-          variant="rich"
-          categories={categories}
-          selectedId={categoryId}
-          onChange={setCategoryId}
-        />
-      </div>
-
-      {/* 목표 시간 — 접이식 */}
-      <div className="flex flex-col">
-        <button
-          type="button"
-          onClick={() => setShowTimeSettings((v) => !v)}
-          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
-        >
-          {showTimeSettings ? (
-            <ChevronDown className="w-3.5 h-3.5" />
-          ) : (
-            <ChevronRight className="w-3.5 h-3.5" />
-          )}
-          목표 시간
-        </button>
-
-        <AnimatePresence initial={false}>
-          {showTimeSettings && (
-            <motion.div
-              key="task-time-settings"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="overflow-hidden"
+    <>
+      <Modal
+        title={task ? '작업 수정' : '새 작업 추가'}
+        onClose={onClose}
+        backdropClassName="bg-black/55 backdrop-blur-sm"
+        maxHeightClassName="max-h-[80vh]"
+        footer={
+          <>
+            <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
+              취소
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!title.trim() || isSubmitting}
+              variant="default"
+              size="lg"
+              className="px-4 font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <div className="flex flex-col gap-2 pt-2">
-                <TimerSettingsGroup
-                  focusMinutes={targetFocusMinutes}
-                  onFocusMinutesChange={setTargetFocusMinutes}
-                  totalCycles={targetCycles}
-                  onTotalCyclesChange={setTargetCycles}
-                  shortBreakMinutes={targetBreakMinutes}
-                  onShortBreakMinutesChange={setTargetBreakMinutes}
-                  disabled={timeFieldsDisabled}
-                />
-                {isActiveTask && (
-                  <p className="text-[11px] text-amber-500/90 pt-0.5">
-                    {isRunning
-                      ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
-                      : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </Modal>
+              {task ? '저장' : '추가'}
+            </Button>
+          </>
+        }
+      >
+        {/* 작업 제목 */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="task-title" className="text-xs font-medium text-muted-foreground">
+            작업 제목
+          </label>
+          <TextInput
+            id="task-title"
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            placeholder="예) 알고리즘 문제 풀기"
+            className="w-full"
+          />
+        </div>
+
+        {/* 카테고리 */}
+        <div className="flex flex-col gap-2" role="group" aria-labelledby="task-category-label">
+          <div className="flex items-center justify-between">
+            <span id="task-category-label" className="text-xs font-medium text-muted-foreground">
+              카테고리
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowCategoryModal(true)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Tag className="w-3 h-3" />
+              편집
+            </button>
+          </div>
+          <CategoryPills
+            variant="rich"
+            categories={categories}
+            selectedId={categoryId}
+            onChange={setCategoryId}
+          />
+        </div>
+
+        {/* 목표 시간 — 접이식 */}
+        <div className="flex flex-col">
+          <button
+            type="button"
+            onClick={() => setShowTimeSettings((v) => !v)}
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
+          >
+            {showTimeSettings ? (
+              <ChevronDown className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronRight className="w-3.5 h-3.5" />
+            )}
+            목표 시간
+          </button>
+
+          <AnimatePresence initial={false}>
+            {showTimeSettings && (
+              <motion.div
+                key="task-time-settings"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-col gap-2 pt-2">
+                  <TimerSettingsGroup
+                    focusMinutes={targetFocusMinutes}
+                    onFocusMinutesChange={setTargetFocusMinutes}
+                    totalCycles={targetCycles}
+                    onTotalCyclesChange={setTargetCycles}
+                    shortBreakMinutes={targetBreakMinutes}
+                    onShortBreakMinutesChange={setTargetBreakMinutes}
+                    disabled={timeFieldsDisabled}
+                  />
+                  {isActiveTask && (
+                    <p className="text-[11px] text-amber-500/90 pt-0.5">
+                      {isRunning
+                        ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
+                        : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </Modal>
+
+      {showCategoryModal && <CategoryModal onClose={() => setShowCategoryModal(false)} />}
+    </>
   );
 }

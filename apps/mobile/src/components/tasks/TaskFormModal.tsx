@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { ChevronDown, ChevronRight } from 'lucide-react-native';
+import { ChevronDown, ChevronRight, Tag } from 'lucide-react-native';
 import { useSettingsStore, useTaskStore, useTimerStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
 import { CategoryPills } from '@/components/shared/CategoryPills';
+import { CategoryModal } from '@/components/settings/CategoryModal';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
@@ -51,6 +52,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   const [showTimeSettings, setShowTimeSettings] = useState(task !== null);
   // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 생성될 수 있음
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   async function handleSubmit() {
     const trimmed = title.trim();
@@ -86,121 +88,151 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
   }
 
   return (
-    <Modal
-      visible
-      title={task ? '작업 수정' : '새 작업 추가'}
-      onClose={onClose}
-      footer={
-        <>
-          <Pressable
-            onPress={onClose}
-            style={[styles.footerButton, { backgroundColor: theme.muted }]}
-          >
-            <Text
+    <>
+      <Modal
+        visible
+        title={task ? '작업 수정' : '새 작업 추가'}
+        onClose={onClose}
+        footer={
+          <>
+            <Pressable
+              onPress={onClose}
+              style={[styles.footerButton, { backgroundColor: theme.muted }]}
+            >
+              <Text
+                style={[
+                  styles.footerButtonText,
+                  { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                취소
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={handleSubmit}
+              disabled={!title.trim() || isSubmitting}
               style={[
-                styles.footerButtonText,
-                { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                styles.footerButton,
+                { backgroundColor: theme.primary },
+                (!title.trim() || isSubmitting) && styles.disabled,
               ]}
             >
-              취소
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={handleSubmit}
-            disabled={!title.trim() || isSubmitting}
-            style={[
-              styles.footerButton,
-              { backgroundColor: theme.primary },
-              (!title.trim() || isSubmitting) && styles.disabled,
-            ]}
-          >
-            <Text
-              style={[
-                styles.footerButtonText,
-                { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-              ]}
-            >
-              {task ? '저장' : '추가'}
-            </Text>
-          </Pressable>
-        </>
-      }
-    >
-      <View style={styles.field}>
-        <Text
-          style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
-        >
-          작업 제목
-        </Text>
-        <TextInput
-          autoFocus
-          value={title}
-          onChangeText={setTitle}
-          onSubmitEditing={handleSubmit}
-          placeholder="예) 알고리즘 문제 풀기"
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text
-          style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
-        >
-          카테고리
-        </Text>
-        <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
-      </View>
-
-      <View style={[styles.field, { gap: 0 }]}>
-        <Pressable onPress={() => setShowTimeSettings((v) => !v)} style={styles.collapseToggle}>
-          {showTimeSettings ? (
-            <ChevronDown size={14} color={theme.mutedForeground} />
-          ) : (
-            <ChevronRight size={14} color={theme.mutedForeground} />
-          )}
+              <Text
+                style={[
+                  styles.footerButtonText,
+                  { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+                ]}
+              >
+                {task ? '저장' : '추가'}
+              </Text>
+            </Pressable>
+          </>
+        }
+      >
+        <View style={styles.field}>
           <Text
             style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
           >
-            목표 시간
+            작업 제목
           </Text>
-        </Pressable>
+          <TextInput
+            autoFocus
+            value={title}
+            onChangeText={setTitle}
+            onSubmitEditing={handleSubmit}
+            placeholder="예) 알고리즘 문제 풀기"
+          />
+        </View>
 
-        {showTimeSettings && (
-          <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(150)}
-            style={styles.timeSettings}
-          >
-            <TimerSettingsGroup
-              focusMinutes={targetFocusMinutes}
-              onFocusMinutesChange={setTargetFocusMinutes}
-              totalCycles={targetCycles}
-              onTotalCyclesChange={setTargetCycles}
-              shortBreakMinutes={targetBreakMinutes}
-              onShortBreakMinutesChange={setTargetBreakMinutes}
-              disabled={timeFieldsDisabled}
-            />
-            {isActiveTask && (
+        <View style={styles.field}>
+          <View style={styles.categoryHeaderRow}>
+            <Text
+              style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
+            >
+              카테고리
+            </Text>
+            <Pressable
+              onPress={() => setShowCategoryModal(true)}
+              style={styles.categoryManageButton}
+            >
+              <Tag size={12} color={theme.mutedForeground} />
               <Text
                 style={[
-                  styles.warning,
-                  { color: withAlpha(AMBER, 0.9), fontFamily: FONTS.sansRegular },
+                  styles.label,
+                  { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
                 ]}
               >
-                {isRunning
-                  ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
-                  : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
+                편집
               </Text>
+            </Pressable>
+          </View>
+          <CategoryPills categories={categories} selectedId={categoryId} onChange={setCategoryId} />
+        </View>
+
+        <View style={[styles.field, { gap: 0 }]}>
+          <Pressable onPress={() => setShowTimeSettings((v) => !v)} style={styles.collapseToggle}>
+            {showTimeSettings ? (
+              <ChevronDown size={14} color={theme.mutedForeground} />
+            ) : (
+              <ChevronRight size={14} color={theme.mutedForeground} />
             )}
-          </Animated.View>
-        )}
-      </View>
-    </Modal>
+            <Text
+              style={[styles.label, { color: theme.mutedForeground, fontFamily: FONTS.sansMedium }]}
+            >
+              목표 시간
+            </Text>
+          </Pressable>
+
+          {showTimeSettings && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(150)}
+              style={styles.timeSettings}
+            >
+              <TimerSettingsGroup
+                focusMinutes={targetFocusMinutes}
+                onFocusMinutesChange={setTargetFocusMinutes}
+                totalCycles={targetCycles}
+                onTotalCyclesChange={setTargetCycles}
+                shortBreakMinutes={targetBreakMinutes}
+                onShortBreakMinutesChange={setTargetBreakMinutes}
+                disabled={timeFieldsDisabled}
+              />
+              {isActiveTask && (
+                <Text
+                  style={[
+                    styles.warning,
+                    { color: withAlpha(AMBER, 0.9), fontFamily: FONTS.sansRegular },
+                  ]}
+                >
+                  {isRunning
+                    ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
+                    : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
+                </Text>
+              )}
+            </Animated.View>
+          )}
+        </View>
+      </Modal>
+
+      <CategoryModal visible={showCategoryModal} onClose={() => setShowCategoryModal(false)} />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   field: {
     gap: 8,
+  },
+  categoryHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  categoryManageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   timeSettings: {
     gap: 8,

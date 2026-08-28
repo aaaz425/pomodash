@@ -6,7 +6,6 @@ import { CATEGORY_LIMITS } from '@pomodash/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CategoryEditModal } from '@/components/settings/CategoryEditModal';
-import { CATEGORY_HEX } from '@/constants/categoryColors';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
@@ -40,7 +39,7 @@ function CategoryRow({
         <Pressable onLongPress={drag} delayLongPress={150} hitSlop={8}>
           <GripVertical size={14} color={withAlpha(theme.mutedForeground, 0.3)} />
         </Pressable>
-        <View style={[styles.dot, { backgroundColor: CATEGORY_HEX[category.color] }]} />
+        <View style={[styles.dot, { backgroundColor: category.color }]} />
         <Text style={[styles.name, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
           {category.name}
         </Text>
@@ -89,6 +88,7 @@ export function CategorySection() {
       <DraggableFlatList
         data={categories}
         keyExtractor={(c) => c.id}
+        style={styles.scrollList}
         onDragEnd={({ from, to }) => void reorderCategories(from, to)}
         renderItem={({ item, drag, isActive }: RenderItemParams<Category>) => (
           <CategoryRow
@@ -161,6 +161,9 @@ export function CategorySection() {
 }
 
 const styles = StyleSheet.create({
+  scrollList: {
+    maxHeight: 312, // 행(52px) 6개 근사값
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

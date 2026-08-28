@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
-import { CATEGORY_HEX } from '@/constants/categoryColors';
 import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import type { Category } from '@/types/tasks';
@@ -10,7 +9,7 @@ interface Props {
 }
 
 export function CategoryBadge({ category, style }: Props) {
-  const hex = CATEGORY_HEX[category.color];
+  const hex = category.color;
 
   return (
     <View style={[styles.badge, { backgroundColor: withAlpha(hex, 0.15) }, style]}>

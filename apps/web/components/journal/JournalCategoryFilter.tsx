@@ -1,6 +1,6 @@
 'use client';
 
-import { type CategoryColorKey, CATEGORY_FILTER_STYLES } from '@/lib/constants/categoryColors';
+import { withAlpha } from '@/lib/constants/categoryColors';
 import type { Category } from '@/types';
 
 interface Props {
@@ -29,9 +29,6 @@ export function JournalCategoryFilter({ categories, selectedCategoryIds, onChang
         </button>
         {categories.map((cat) => {
           const isSelected = selectedCategoryIds.has(cat.id);
-          const colorClass =
-            CATEGORY_FILTER_STYLES[cat.color as CategoryColorKey] ??
-            'bg-muted text-muted-foreground border-border';
           return (
             <button
               key={cat.id}
@@ -44,9 +41,18 @@ export function JournalCategoryFilter({ categories, selectedCategoryIds, onChang
               className={[
                 'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                 isSelected
-                  ? colorClass
+                  ? ''
                   : 'bg-transparent text-muted-foreground border-border hover:border-foreground/40',
               ].join(' ')}
+              style={
+                isSelected
+                  ? {
+                      backgroundColor: withAlpha(cat.color, 0.15),
+                      borderColor: cat.color,
+                      color: cat.color,
+                    }
+                  : undefined
+              }
             >
               {cat.name}
             </button>
