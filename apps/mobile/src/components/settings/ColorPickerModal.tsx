@@ -67,7 +67,7 @@ export function ColorPickerModal({ visible, initialHex, onCancel, onConfirm }: P
   return (
     <Modal
       visible={visible}
-      title="색상 직접 선택"
+      title="색상 입력"
       onClose={onCancel}
       footer={
         <>

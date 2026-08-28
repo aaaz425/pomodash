@@ -49,7 +49,7 @@ export function ColorPickerModal({ initialHex, onCancel, onConfirm }: Props) {
 
   return (
     <Modal
-      title="색상 직접 선택"
+      title="색상 입력"
       onClose={onCancel}
       widthClassName="sm:w-[280px]"
       footer={

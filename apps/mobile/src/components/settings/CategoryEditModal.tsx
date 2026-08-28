@@ -5,6 +5,7 @@ import { Pencil } from 'lucide-react-native';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ColorPickerModal } from '@/components/settings/ColorPickerModal';
 import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
 import { THEME } from '@/constants/timerColors';
@@ -51,6 +52,14 @@ export function CategoryEditModal({ category, onClose }: Props) {
         onClose={onClose}
         footer={
           <>
+            <CategoryBadge
+              style={styles.footerPreview}
+              category={{
+                id: 'preview',
+                name: name.trim() || '미리보기',
+                color: isValidColor ? color : CATEGORY_PRESET_COLORS[0].hex,
+              }}
+            />
             <Pressable
               onPress={onClose}
               style={[styles.footerButton, { backgroundColor: theme.muted }]}
@@ -162,6 +171,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
+  },
+  footerPreview: {
+    marginRight: 'auto',
   },
   swatchRow: {
     flexDirection: 'row',

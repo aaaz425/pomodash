@@ -6,6 +6,7 @@ import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/shared/TextInput';
+import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ColorPickerModal } from '@/components/settings/category/ColorPickerModal';
 import type { Category } from '@/types';
 
@@ -51,6 +52,14 @@ export function CategoryEditModal({ category, onClose }: Props) {
         widthClassName="sm:w-[360px]"
         footer={
           <>
+            <CategoryBadge
+              className="mr-auto"
+              category={{
+                id: 'preview',
+                name: name.trim() || '미리보기',
+                color: isValidColor ? color : CATEGORY_PRESET_COLORS[0].hex,
+              }}
+            />
             <Button onClick={onClose} variant="secondary" size="lg" className="px-4">
               취소
             </Button>
