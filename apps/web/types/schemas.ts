@@ -54,6 +54,28 @@ export const SessionSchema = z.object({
   distractionTags: z.array(z.string().max(INPUT_LIMITS.DISTRACTION_TAG_MAX_LENGTH)).default([]),
 });
 
+const PeriodStatSchema = z.object({
+  focusSeconds: z.number(),
+  count: z.number(),
+});
+
+const DayActivitySchema = z.object({
+  date: z.string(),
+  focusMinutes: z.number(),
+});
+
+export const DashboardSummarySchema = z.object({
+  streakDays: z.number(),
+  maxStreakDays: z.number(),
+  monthlyActivity: z.array(DayActivitySchema),
+  monthFocusSeconds: z.number(),
+  busiestDay: z.string().nullable(),
+  firstSessionDate: z.string().nullable(),
+  prevDay: PeriodStatSchema,
+  prevWeek: PeriodStatSchema,
+  prevMonth: PeriodStatSchema,
+});
+
 export const TimerSettingsSchema = z.object({
   focusMinutes: z.number().min(TIMER_LIMITS.FOCUS_MINUTES_MIN).max(TIMER_LIMITS.FOCUS_MINUTES_MAX),
   shortBreakMinutes: z

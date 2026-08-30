@@ -9,10 +9,18 @@ interface Props {
   task: Task | null;
   category: Category | null;
   onClose: () => void;
+  onUpdated: (patch: Partial<Session>) => void;
   onDeleted: () => void;
 }
 
-export function SessionDetailOverlay({ session, task, category, onClose, onDeleted }: Props) {
+export function SessionDetailOverlay({
+  session,
+  task,
+  category,
+  onClose,
+  onUpdated,
+  onDeleted,
+}: Props) {
   if (!session) return null;
 
   return (
@@ -39,6 +47,7 @@ export function SessionDetailOverlay({ session, task, category, onClose, onDelet
               task={task}
               category={category}
               onBack={onClose}
+              onUpdated={onUpdated}
               onDeleted={onDeleted}
             />
           </div>

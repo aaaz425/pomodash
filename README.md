@@ -33,7 +33,7 @@
 
 ### 요구사항
 
-Node.js 22+, pnpm 11+
+Node.js 22+, pnpm 11+, Docker (로컬 Supabase 스택 사용 시)
 
 ### 설치 및 실행
 
@@ -45,6 +45,19 @@ pnpm dev                      # 웹 (apps/web) → http://localhost:3000
 pnpm --filter mobile start    # 모바일 (Expo)
 ```
 
+### 로컬 Supabase 스택 (선택)
+
+원격 Supabase 프로젝트 대신 로컬 Postgres/Auth/Storage로 개발하려면 Docker 실행 후 아래 명령어를 사용한다.
+
+```bash
+cp apps/web/.env.local.example apps/web/.env.local
+npx supabase start
+```
+
+`supabase start` 출력의 `API_URL`, `ANON_KEY` 값을 `apps/web/.env.local`의 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`에 채워 넣는다. 모바일도 필요하면 `apps/mobile/.env.local.example`을 동일하게 복사해 같은 값을 채운다.
+
+종료는 `npx supabase stop`.
+
 ### 명령어
 
 | 명령어 | 설명 |
@@ -55,6 +68,8 @@ pnpm --filter mobile start    # 모바일 (Expo)
 | `pnpm test` | 단위 테스트 (Vitest) |
 | `pnpm test:e2e` | E2E 테스트 (Playwright) |
 | `pnpm --filter mobile start` | Expo 개발 서버 |
+| `npx supabase start` | 로컬 Supabase 스택 기동 (Docker 필요) |
+| `npx supabase stop` | 로컬 Supabase 스택 종료 |
 
 ### 프로젝트 구조
 

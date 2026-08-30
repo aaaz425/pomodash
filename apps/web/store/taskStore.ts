@@ -20,7 +20,7 @@ import {
   reorderCategories as reorderCategoriesRows,
 } from '@/lib/supabase/categories';
 import {
-  fetchSessions,
+  fetchAllSessionsLazy,
   insertSession as insertSessionRow,
   updateSession as updateSessionRow,
   deleteSession as deleteSessionRow,
@@ -34,6 +34,7 @@ interface TaskStore {
   tasks: Task[];
   categories: Category[];
   sessions: Session[];
+  sessionsHydrated: boolean; // core(tasks/categories) hydrate와 별개로 sessions 전체 조회 완료 여부
 
   addTask: (input: {
     title: string;
@@ -74,6 +75,7 @@ export const createTaskStore = () =>
     tasks: [],
     categories: DEFAULT_CATEGORIES,
     sessions: [],
+    sessionsHydrated: false,
 
     addTask: async ({
       title,
@@ -297,25 +299,24 @@ export const createTaskStore = () =>
     },
 
     hydrate: async () => {
-      const [tasksResult, categoriesResult, sessionsResult] = await Promise.all([
-        fetchTasks(),
-        fetchCategories(),
-        fetchSessions(),
-      ]);
+      const [tasksResult, categoriesResult] = await Promise.all([fetchTasks(), fetchCategories()]);
       set({
         tasks: tasksResult?.tasks ?? [],
         categories: categoriesResult?.categories ?? DEFAULT_CATEGORIES,
-        sessions: sessionsResult?.sessions ?? [],
       });
 
-      // 형식이 안 맞는 데이터가 있어 일부 항목이 조용히 빠졌을 때 사용자에게 알림
-      const invalidCount =
-        (tasksResult?.invalidCount ?? 0) +
-        (categoriesResult?.invalidCount ?? 0) +
-        (sessionsResult?.invalidCount ?? 0);
+      const invalidCount = (tasksResult?.invalidCount ?? 0) + (categoriesResult?.invalidCount ?? 0);
       if (invalidCount > 0) {
         toast(`형식이 맞지 않아 불러오지 못한 기록이 ${invalidCount}건 있어요`);
       }
+
+      // core와 별도로 진행 — 타이머/작업목록 등의 진입을 막지 않는다
+      void fetchAllSessionsLazy().then((sessionsResult) => {
+        set({ sessions: sessionsResult?.sessions ?? [], sessionsHydrated: true });
+        if (sessionsResult?.invalidCount) {
+          toast(`형식이 맞지 않아 불러오지 못한 기록이 ${sessionsResult.invalidCount}건 있어요`);
+        }
+      });
     },
   }));
 

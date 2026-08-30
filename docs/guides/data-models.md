@@ -32,6 +32,14 @@
 향후 개별 타이머 phase(focus / short-break) 1회의 세분화된 실행 기록용으로 예약된 타입.
 현재는 사용하지 않는다. 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
 
+### 대시보드 요약 (DashboardSummary)
+
+스트릭·월간 히트맵·전일/전주/전월 비교·가장 바쁜 요일처럼 세션 전체 히스토리를 스캔해야 하는 통계.
+클라이언트가 전체 `sessions` row를 받아와 집계하던 방식은 세션 수가 늘수록 선형으로 느려지는 구조적 문제가 있었다.
+Postgres RPC `get_dashboard_summary(p_timezone)`가 서버에서 한 번에 계산해 반환하며, `lib/supabase/dashboard.ts`의
+`fetchDashboardSummary()`가 이를 호출하고 Zod로 검증한다. 오늘/이번주/이번달 탭의 원시 세션 목록(필터링·리스트 표시용)은
+여전히 클라이언트가 `sessions`를 들고 계산 — DashboardSummary는 "전체 히스토리 스캔이 필요한 통계"만 담당한다.
+
 ---
 
 ## Core Types
@@ -89,6 +97,24 @@ export interface TimerRecord {
   endedAt: string // ISO 8601
   focusSeconds: number
   pausedSeconds: number
+}
+
+export interface PeriodStat {
+  focusSeconds: number
+  count: number
+}
+
+// get_dashboard_summary RPC 응답 — 전체 히스토리를 스캔해야 하는 통계만 담는다
+export interface DashboardSummary {
+  streakDays: number
+  maxStreakDays: number
+  monthlyActivity: DayActivity[]
+  monthFocusSeconds: number
+  busiestDay: string | null
+  firstSessionDate: string | null // ISO 8601
+  prevDay: PeriodStat
+  prevWeek: PeriodStat
+  prevMonth: PeriodStat
 }
 
 export interface TimerSettings {

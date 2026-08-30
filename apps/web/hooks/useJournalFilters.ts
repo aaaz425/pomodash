@@ -1,48 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { groupSessionsByDate } from '@/lib/sessionUtils';
-import type { Session, Task } from '@/types';
 
-// JournalView의 검색/카테고리/기간 필터 상태와 파생값(필터링된 세션, 날짜별 그룹,
-// 세션 있는 날짜 마킹)을 묶어서 관리한다.
-export function useJournalFilters(sessions: Session[], tasks: Task[]) {
+export function useJournalFilters() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<Set<string>>(new Set());
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
   const hasActiveFilter = !!(searchQuery || selectedCategoryIds.size > 0 || dateFrom || dateTo);
-
-  const filteredSessions = (() => {
-    let result = sessions;
-
-    if (selectedCategoryIds.size > 0) {
-      const taskIds = new Set(
-        tasks.filter((t) => selectedCategoryIds.has(t.categoryId)).map((t) => t.id),
-      );
-      result = result.filter((s) => s.taskId && taskIds.has(s.taskId));
-    }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter((s) =>
-        tasks
-          .find((t) => t.id === s.taskId)
-          ?.title.toLowerCase()
-          .includes(q),
-      );
-    }
-
-    if (dateFrom) result = result.filter((s) => s.startedAt.slice(0, 10) >= dateFrom);
-    if (dateTo) result = result.filter((s) => s.startedAt.slice(0, 10) <= dateTo);
-
-    return result;
-  })();
-
-  const groups = groupSessionsByDate(filteredSessions);
-
-  const markedDates = new Set(sessions.map((s) => s.startedAt.slice(0, 10)));
 
   function reset() {
     setSearchQuery('');
@@ -61,9 +27,6 @@ export function useJournalFilters(sessions: Session[], tasks: Task[]) {
     dateTo,
     setDateTo,
     hasActiveFilter,
-    filteredSessions,
-    groups,
-    markedDates,
     reset,
   };
 }

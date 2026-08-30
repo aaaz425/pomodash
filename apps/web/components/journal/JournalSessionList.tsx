@@ -2,15 +2,14 @@
 
 import { SessionListItem } from '@/components/journal/SessionListItem';
 import { formatDuration } from '@/lib/sessionUtils';
-import type { SessionGroup } from '@/types';
-import type { Category, Task } from '@/types';
+import type { Category, Session, SessionGroup, Task } from '@/types';
 
 interface Props {
   groups: SessionGroup[];
   tasks: Task[];
   categories: Category[];
   selectedId: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (session: Session) => void;
 }
 
 export function JournalSessionList({ groups, tasks, categories, selectedId, onSelect }: Props) {
@@ -46,7 +45,7 @@ export function JournalSessionList({ groups, tasks, categories, selectedId, onSe
                   category={category}
                   sessionIndex={sessionIndex}
                   isSelected={selectedId === session.id}
-                  onSelect={() => onSelect(session.id)}
+                  onSelect={() => onSelect(session)}
                 />
               );
             })}
