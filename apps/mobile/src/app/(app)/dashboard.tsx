@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react-native';
@@ -7,19 +7,13 @@ import {
   formatDuration,
   filterSessionsByTab,
   getAvgSessionSeconds,
-  getBusiestDayOfWeek,
-  getFirstSessionDate,
-  getMaxStreakDays,
-  getMonthlyActivityData,
-  getPrevDayStats,
-  getPrevMonthStats,
-  getPrevWeekStats,
   getSessionCount,
-  getStreakDays,
   getTotalFocusSeconds,
   type TabType,
 } from '@pomodash/shared';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { fetchDashboardSummary } from '@/lib/supabase/dashboard';
+import type { DashboardSummary } from '@/types/dashboard';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -71,25 +65,36 @@ export default function DashboardScreen() {
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);
 
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchDashboardSummary().then((result) => {
+      if (!cancelled && result) setSummary(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessions]);
+
   // React Compiler(reactCompiler: true, app.config.ts)가 자동으로 메모이제이션 —
   // 수동 useMemo가 불필요함을 eslint-plugin-react-compiler로 확인함
   const filtered = filterSessionsByTab(sessions, tab);
-  const monthSessions = filterSessionsByTab(sessions, 'month');
   const shareCardData = buildShareCardData(filtered, sessions, tab);
 
   const totalFocusSeconds = getTotalFocusSeconds(filtered);
   const sessionCount = getSessionCount(filtered);
   const avgSessionSeconds = getAvgSessionSeconds(filtered);
-  const streakDays = getStreakDays(sessions);
-  const maxStreakDays = getMaxStreakDays(sessions);
-  const monthlyActivity = getMonthlyActivityData(sessions);
-  const monthFocusSeconds = getTotalFocusSeconds(monthSessions);
-  const busiestDay = getBusiestDayOfWeek(monthSessions);
-  const firstSessionDate = getFirstSessionDate(sessions);
+  const streakDays = summary?.streakDays ?? 0;
+  const maxStreakDays = summary?.maxStreakDays ?? 0;
+  const monthlyActivity = summary?.monthlyActivity ?? [];
+  const monthFocusSeconds = summary?.monthFocusSeconds ?? 0;
+  const busiestDay = summary?.busiestDay ?? null;
+  const firstSessionDate = summary?.firstSessionDate ? new Date(summary.firstSessionDate) : null;
 
-  const prevDay = getPrevDayStats(sessions);
-  const prevWeek = getPrevWeekStats(sessions);
-  const prevMonth = getPrevMonthStats(sessions);
+  const prevDay = summary?.prevDay ?? { focusSeconds: 0, count: 0 };
+  const prevWeek = summary?.prevWeek ?? { focusSeconds: 0, count: 0 };
+  const prevMonth = summary?.prevMonth ?? { focusSeconds: 0, count: 0 };
 
   const focusLabel = FOCUS_LABELS[tab];
   const sessionLabel = SESSION_LABELS[tab];
@@ -119,7 +124,7 @@ export default function DashboardScreen() {
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        {!hydrated ? (
+        {!hydrated || !summary ? (
           <DashboardSkeleton />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollContent}>
