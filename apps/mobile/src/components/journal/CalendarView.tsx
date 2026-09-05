@@ -1,35 +1,47 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { getMonthlyActivityData, getSessionsForDate } from '@pomodash/shared';
+import { useMonthSessions } from '@/hooks/useMonthSessions';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
+import type { SessionSyncHandle } from './ListView';
 import { CalendarMonthNav } from './CalendarMonthNav';
 import { CalendarMonthGrid } from './CalendarMonthGrid';
 import { CalendarDayModal } from './CalendarDayModal';
 
 interface Props {
-  sessions: Session[];
   tasks: Task[];
   categories: Category[];
   selectedId: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (session: Session) => void;
 }
 
 function addMonths(date: Date, delta: number): Date {
   return new Date(date.getFullYear(), date.getMonth() + delta, 1);
 }
 
-export function CalendarView({ sessions, tasks, categories, selectedId, onSelect }: Props) {
+export const CalendarView = forwardRef<SessionSyncHandle, Props>(function CalendarView(
+  { tasks, categories, selectedId, onSelect },
+  ref,
+) {
   const [viewedMonth, setViewedMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const monthData = getMonthlyActivityData(sessions, viewedMonth);
+  const { items, updateItem, removeItem } = useMonthSessions(viewedMonth);
+  useImperativeHandle(ref, () => ({ updateItem, removeItem }), [updateItem, removeItem]);
+
+  const monthData = getMonthlyActivityData(items, viewedMonth);
 
   const daySessions = selectedDate
-    ? [...getSessionsForDate(sessions, selectedDate)].sort((a, b) =>
+    ? [...getSessionsForDate(items, selectedDate)].sort((a, b) =>
         b.startedAt.localeCompare(a.startedAt),
       )
     : [];
+
+  function handleSelectSession(session: Session) {
+    setSelectedDate(null);
+    onSelect(session);
+  }
 
   return (
     <View style={styles.container}>
@@ -53,15 +65,12 @@ export function CalendarView({ sessions, tasks, categories, selectedId, onSelect
         tasks={tasks}
         categories={categories}
         selectedId={selectedId}
-        onSelectSession={(id) => {
-          setSelectedDate(null);
-          onSelect(id);
-        }}
+        onSelectSession={handleSelectSession}
         onClose={() => setSelectedDate(null)}
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

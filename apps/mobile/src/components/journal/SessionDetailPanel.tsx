@@ -9,13 +9,16 @@ import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import type { Session } from '@/types/sessions';
 import { SessionDetailHeader } from './SessionDetailHeader';
 import { SessionNoteField } from './SessionNoteField';
 import { SessionStatsRow } from './SessionStatsRow';
 
 interface Props {
-  sessionId: string | null;
+  session: Session | null;
   onClose: () => void;
+  onUpdated: (patch: Partial<Session>) => void;
+  onDeleted: () => void;
 }
 
 interface EditDraft {
@@ -25,10 +28,12 @@ interface EditDraft {
   note: string;
 }
 
-export function SessionDetailPanel({ sessionId, onClose }: Props) {
+export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
+  // 동일 날짜 순번 계산용 — 저널 리스트/캘린더는 각자 페이지네이션/월별로 세션을 들고 있어
+  // 전체 히스토리를 아는 전역 store를 그대로 사용한다 (웹 JournalDetailPanel과 동일한 방식)
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);
@@ -38,8 +43,6 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
-
-  const session = sessions.find((s) => s.id === sessionId) ?? null;
 
   if (!session) return null;
 
@@ -74,12 +77,14 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
 
   function handleSaveEdit() {
     if (!draft || !session) return;
-    void updateSessionFields(session.id, {
+    const patch = {
       title: draft.title.trim() || null,
       focusRating: draft.focusRating,
       distractionTags: draft.distractionTags,
       note: draft.note.trim() || null,
-    });
+    };
+    void updateSessionFields(session.id, patch);
+    onUpdated(patch);
     setIsEditing(false);
     setDraft(null);
   }
@@ -87,6 +92,7 @@ export function SessionDetailPanel({ sessionId, onClose }: Props) {
   function handleDelete() {
     if (!session) return;
     void deleteSession(session.id);
+    onDeleted();
     onClose();
   }
 
