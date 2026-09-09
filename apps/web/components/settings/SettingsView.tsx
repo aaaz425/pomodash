@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { COLOR_THEMES } from '@pomodash/shared';
 import { deleteAccountConfirmed } from '@/lib/supabase/actions';
-import { createClient } from '@/lib/supabase/client';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 import { ThemeModal } from '@/components/settings/ThemeModal';
@@ -37,6 +36,7 @@ import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { useTheme, type ThemeMode } from '@/hooks/useTheme';
 import { useAccentTheme } from '@/hooks/useAccentTheme';
+import type { SettingsUser } from '@/types';
 
 type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
 type MenuKey = 'timer' | 'task' | 'category' | 'motivational' | 'theme';
@@ -65,13 +65,15 @@ function SettingCard({ title, children }: { title: string; children: ReactNode }
   );
 }
 
-type SettingsUser = { email: string | null; provider: string | null } | null;
+interface Props {
+  userPromise: Promise<SettingsUser | null>;
+}
 
-export function SettingsView() {
+export function SettingsView({ userPromise }: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
-  const [user, setUser] = useState<SettingsUser>(null);
+  const [user, setUser] = useState<SettingsUser | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
   const searchParams = useSearchParams();
   const deletingRef = useRef(false);
@@ -85,30 +87,17 @@ export function SettingsView() {
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const soundAlert = useSettingsStore((s) => s.soundAlert);
 
-  // 미들웨어가 이미 이 라우트 진입 시점에 세션을 검증하므로, 여기서는 서버 재검증(getUser) 없이
-  // 로컬 세션만 읽는다 — 페이지를 sync 서버 컴포넌트로 유지해 라우트 전환 애니메이션이
-  // settings/loading.tsx의 Suspense 스피너에 끊기지 않도록 하기 위함이기도 하다.
   useEffect(() => {
     let active = true;
-    createClient()
-      .auth.getSession()
-      .then(({ data }) => {
-        if (!active) return;
-        const sessionUser = data.session?.user;
-        setUser(
-          sessionUser
-            ? {
-                email: sessionUser.email ?? null,
-                provider: (sessionUser.user_metadata?.provider as string | undefined) ?? null,
-              }
-            : null,
-        );
-        setUserLoaded(true);
-      });
+    userPromise.then((u) => {
+      if (!active) return;
+      setUser(u);
+      setUserLoaded(true);
+    });
     return () => {
       active = false;
     };
-  }, []);
+  }, [userPromise]);
 
   // 카카오 재인증(회원탈퇴 확인)을 마치고 돌아온 경우 — 재인증 라운드트립 자체가 본인 확인이므로
   // 추가 확인 없이 탈퇴를 마무리한다. 성공 시 서버 액션이 /landing으로 리다이렉트한다.
