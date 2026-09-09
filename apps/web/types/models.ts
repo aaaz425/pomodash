@@ -133,3 +133,8 @@ export interface AuthActionResult {
   pendingConfirmation?: true;
   success?: true;
 }
+
+export interface SettingsUser {
+  email: string | null;
+  provider: string | null;
+}
