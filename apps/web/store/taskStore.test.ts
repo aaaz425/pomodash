@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { createTaskStore } from '@/store/taskStore';
 import { DEFAULT_CATEGORIES } from '@/types';
-import type { Session, Task } from '@/types';
+import type { Category, Session, Task } from '@/types';
 import { fetchTasks, insertTask, updateTask, deleteTask, reorderTasks } from '@/lib/supabase/tasks';
 import {
   fetchCategories,
@@ -239,6 +239,38 @@ describe('updateTask', () => {
 
     expect(store.getState().tasks[0].title).toBe('A');
   });
+
+  it('addTask 저장 대기 중 같은 task를 수정하면, insert 완료 후에도 수정 내용이 유지되고 실제 DB id로 저장됨', async () => {
+    const store = createTaskStore();
+    let resolveInsert!: (value: Task) => void;
+    mockInsertTask.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store.getState().addTask({ title: 'A', categoryId: 'c1' });
+    const tempId = store.getState().tasks[0].id;
+
+    // insert 응답이 오기 전에 같은(tempId) task를 수정
+    const updatePromise = store.getState().updateTask(tempId, { title: 'B' });
+
+    resolveInsert({
+      id: 'db-id-1',
+      title: 'A',
+      categoryId: 'c1',
+      targetFocusMinutes: 25,
+      targetCycles: 4,
+      targetBreakMinutes: 5,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    });
+    await addPromise;
+    await updatePromise;
+
+    expect(store.getState().tasks).toHaveLength(1);
+    expect(store.getState().tasks[0]).toMatchObject({ id: 'db-id-1', title: 'B' });
+    // tempId가 아니라 reconcile된 실제 DB id로 서버에 반영돼야 새로고침 후에도 유지됨
+    expect(mockUpdateTask).toHaveBeenCalledWith('db-id-1', expect.objectContaining({ title: 'B' }));
+  });
 });
 
 describe('deleteTask', () => {
@@ -255,6 +287,35 @@ describe('deleteTask', () => {
     await store.getState().deleteTask('no-such-id');
     expect(store.getState().tasks).toHaveLength(1);
     expect(mockDeleteTask).not.toHaveBeenCalled();
+  });
+
+  it('addTask 저장 대기 중 같은 task를 삭제하면, insert 완료 후에도 삭제된 상태가 유지됨', async () => {
+    const store = createTaskStore();
+    let resolveInsert!: (value: Task) => void;
+    mockInsertTask.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store.getState().addTask({ title: 'A', categoryId: 'c1' });
+    const tempId = store.getState().tasks[0].id;
+
+    const deletePromise = store.getState().deleteTask(tempId);
+
+    resolveInsert({
+      id: 'db-id-1',
+      title: 'A',
+      categoryId: 'c1',
+      targetFocusMinutes: 25,
+      targetCycles: 4,
+      targetBreakMinutes: 5,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    });
+    await addPromise;
+    await deletePromise;
+
+    expect(store.getState().tasks).toHaveLength(0);
+    expect(mockDeleteTask).toHaveBeenCalledWith('db-id-1');
   });
 });
 
@@ -380,6 +441,30 @@ describe('addSession / updateSessionNote / updateSessionRating / updateSessionTa
     const id = store.getState().sessions[0].id;
     await store.getState().deleteSession(id);
     expect(store.getState().sessions).toHaveLength(0);
+  });
+
+  it('addSession 저장 대기 중 같은 세션을 수정하면, insert 완료 후에도 수정 내용이 유지되고 실제 DB id로 저장됨', async () => {
+    const store = createTaskStore();
+    let resolveInsert!: (value: Session) => void;
+    mockInsertSession.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store.getState().addSession(makeSessionInput({ note: '원래 메모' }));
+    const tempId = store.getState().sessions[0].id;
+
+    const updatePromise = store.getState().updateSessionFields(tempId, { note: '수정된 메모' });
+
+    resolveInsert({ id: 'db-id-1', ...makeSessionInput({ note: '원래 메모' }) });
+    await addPromise;
+    await updatePromise;
+
+    const session = store.getState().sessions.find((s) => s.id === 'db-id-1');
+    expect(session?.note).toBe('수정된 메모');
+    expect(mockUpdateSession).toHaveBeenCalledWith(
+      'db-id-1',
+      expect.objectContaining({ note: '수정된 메모' }),
+    );
   });
 
   it('addSession 저장 대기 중 다른 세션을 삭제해도 삭제가 덮어써지지 않음(경쟁 상태 방지)', async () => {
@@ -548,6 +633,56 @@ describe('updateCategory / deleteCategory', () => {
 
     expect(store.getState().categories.find((c) => c.id === categoryId)).toBeDefined();
     expect(mockDeleteCategory).not.toHaveBeenCalled();
+  });
+
+  it('addCategory 저장 대기 중 같은 category를 수정하면, insert 완료 후에도 수정 내용이 유지되고 실제 DB id로 저장됨', async () => {
+    const store = createTaskStore();
+    let resolveInsert!: (value: Category) => void;
+    mockInsertCategory.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store.getState().addCategory({ name: '원래 이름', color: 'bg-pink-500' });
+    const categories = store.getState().categories;
+    const tempId = categories[categories.length - 1].id;
+
+    // insert 응답이 오기 전에 같은(tempId) category를 수정 — 예전엔 이 수정이 나중에 도착한
+    // insert reconcile에 덮어써져 사라졌음
+    const updatePromise = store
+      .getState()
+      .updateCategory(tempId, { name: '수정된 이름', color: 'bg-red-500' });
+
+    resolveInsert({ id: 'db-id-1', name: '원래 이름', color: 'bg-pink-500' });
+    await addPromise;
+    await updatePromise;
+
+    const category = store.getState().categories.find((c) => c.id === 'db-id-1');
+    expect(category).toMatchObject({ name: '수정된 이름', color: 'bg-red-500' });
+    expect(mockUpdateCategory).toHaveBeenCalledWith(
+      'db-id-1',
+      expect.objectContaining({ name: '수정된 이름' }),
+    );
+  });
+
+  it('addCategory 저장 대기 중 같은 category를 삭제하면, insert 완료 후에도 삭제된 상태가 유지됨', async () => {
+    const store = createTaskStore();
+    let resolveInsert!: (value: Category) => void;
+    mockInsertCategory.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveInsert = resolve)),
+    );
+
+    const addPromise = store.getState().addCategory({ name: '원래 이름', color: 'bg-pink-500' });
+    const categories = store.getState().categories;
+    const tempId = categories[categories.length - 1].id;
+
+    const deletePromise = store.getState().deleteCategory(tempId);
+
+    resolveInsert({ id: 'db-id-1', name: '원래 이름', color: 'bg-pink-500' });
+    await addPromise;
+    await deletePromise;
+
+    expect(store.getState().categories.find((c) => c.id === 'db-id-1')).toBeUndefined();
+    expect(mockDeleteCategory).toHaveBeenCalledWith('db-id-1');
   });
 });
 

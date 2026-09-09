@@ -30,6 +30,22 @@ import { type Task, type Category, type Session, DEFAULT_CATEGORIES } from '@/ty
 const CATEGORY_IN_USE_MESSAGE =
   '이 카테고리를 쓰는 작업이 있어요. 작업을 먼저 옮기거나 삭제해주세요';
 
+type PendingIds = Map<string, Promise<string | null>>;
+
+// tempId로 생성 중인 항목에 update/delete가 겹치면, 나중에 도착하는 insert 응답의
+// reconcile이 그 사이의 변경을 통째로 덮어쓴다 — update/delete는 진행 중인 생성이
+// 끝날 때까지 기다렸다가 실제 DB id로 동작해 이 레이스를 막는다
+function trackPendingId(pending: PendingIds, tempId: string, promise: Promise<string | null>) {
+  pending.set(tempId, promise);
+  void promise.finally(() => {
+    if (pending.get(tempId) === promise) pending.delete(tempId);
+  });
+}
+
+function resolvePendingId(pending: PendingIds, id: string): Promise<string | null> {
+  return pending.get(id) ?? Promise.resolve(id);
+}
+
 interface TaskStore {
   tasks: Task[];
   categories: Category[];
@@ -69,8 +85,12 @@ interface TaskStore {
   hydrate: () => Promise<void>;
 }
 
-export const createTaskStore = () =>
-  createStore<TaskStore>()((set, get) => ({
+export const createTaskStore = () => {
+  const pendingTaskIds: PendingIds = new Map();
+  const pendingCategoryIds: PendingIds = new Map();
+  const pendingSessionIds: PendingIds = new Map();
+
+  return createStore<TaskStore>()((set, get) => ({
     // SSR hydration mismatch 방지 — 실제 데이터는 hydrate()로 반영
     tasks: [],
     categories: DEFAULT_CATEGORIES,
@@ -103,60 +123,72 @@ export const createTaskStore = () =>
       // 동시에 변경돼도 그 변경을 덮어쓰지 않는다 (스냅샷을 직접 set하면 경쟁 상태 발생)
       set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
-      const inserted = await insertTaskRow({
-        title: trimmed,
-        categoryId,
-        targetFocusMinutes: focus,
-        targetCycles: cycles,
-        targetBreakMinutes: breakMinutes,
-      });
+      const idPromise = (async () => {
+        const inserted = await insertTaskRow({
+          title: trimmed,
+          categoryId,
+          targetFocusMinutes: focus,
+          targetCycles: cycles,
+          targetBreakMinutes: breakMinutes,
+        });
 
-      if (!inserted) {
-        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
-        toast('작업 추가에 실패했어요. 다시 시도해주세요');
-        return null;
-      }
+        if (!inserted) {
+          set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
+          toast('작업 추가에 실패했어요. 다시 시도해주세요');
+          return null;
+        }
 
-      set((state) => ({ tasks: state.tasks.map((t) => (t.id === tempId ? inserted : t)) }));
-      // 새 작업이 맨 앞으로 온 순서를 position에 반영 — 실패해도 다음 재정렬 때 자연히 맞춰짐
-      void reorderTasksRows(get().tasks.map((t) => t.id));
-      return inserted.id;
+        set((state) => ({ tasks: state.tasks.map((t) => (t.id === tempId ? inserted : t)) }));
+        // 새 작업이 맨 앞으로 온 순서를 position에 반영 — 실패해도 다음 재정렬 때 자연히 맞춰짐
+        void reorderTasksRows(get().tasks.map((t) => t.id));
+        return inserted.id;
+      })();
+      trackPendingId(pendingTaskIds, tempId, idPromise);
+      return idPromise;
     },
 
     toggleTask: async (id) => {
-      const original = get().tasks.find((t) => t.id === id);
+      const targetId = await resolvePendingId(pendingTaskIds, id);
+      if (!targetId) return;
+      const original = get().tasks.find((t) => t.id === targetId);
       if (!original) return;
       const completed = !original.completed;
-      set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? { ...t, completed } : t)) }));
-      const { error } = await updateTaskRow(id, { completed });
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === targetId ? { ...t, completed } : t)),
+      }));
+      const { error } = await updateTaskRow(targetId, { completed });
       if (error) {
-        set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? original : t)) }));
+        set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
         toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     updateTask: async (id, patch) => {
-      const original = get().tasks.find((t) => t.id === id);
+      const targetId = await resolvePendingId(pendingTaskIds, id);
+      if (!targetId) return;
+      const original = get().tasks.find((t) => t.id === targetId);
       if (!original) return;
       const title = patch.title?.trim();
       set((state) => ({
         tasks: state.tasks.map((t) =>
-          t.id === id ? { ...t, ...patch, title: title ?? t.title } : t,
+          t.id === targetId ? { ...t, ...patch, title: title ?? t.title } : t,
         ),
       }));
-      const { error } = await updateTaskRow(id, { ...patch, title });
+      const { error } = await updateTaskRow(targetId, { ...patch, title });
       if (error) {
-        set((state) => ({ tasks: state.tasks.map((t) => (t.id === id ? original : t)) }));
+        set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
         toast('작업 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     deleteTask: async (id) => {
-      const index = get().tasks.findIndex((t) => t.id === id);
+      const targetId = await resolvePendingId(pendingTaskIds, id);
+      if (!targetId) return;
+      const index = get().tasks.findIndex((t) => t.id === targetId);
       if (index === -1) return;
       const target = get().tasks[index];
-      set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
-      const { error } = await deleteTaskRow(id);
+      set((state) => ({ tasks: state.tasks.filter((t) => t.id !== targetId) }));
+      const { error } = await deleteTaskRow(targetId);
       if (error) {
         set((state) => {
           const tasks = [...state.tasks];
@@ -171,35 +203,50 @@ export const createTaskStore = () =>
       const tempId = generateId();
       set((state) => ({ sessions: [{ id: tempId, ...input }, ...state.sessions] }));
 
-      const inserted = await insertSessionRow(input);
-      if (!inserted) {
-        set((state) => ({ sessions: state.sessions.filter((s) => s.id !== tempId) }));
+      const idPromise = (async () => {
+        const inserted = await insertSessionRow(input);
+        if (!inserted) {
+          set((state) => ({ sessions: state.sessions.filter((s) => s.id !== tempId) }));
+          return null;
+        }
+        set((state) => ({ sessions: state.sessions.map((s) => (s.id === tempId ? inserted : s)) }));
+        return inserted.id;
+      })();
+      trackPendingId(pendingSessionIds, tempId, idPromise);
+
+      const insertedId = await idPromise;
+      if (!insertedId) {
         toast('기록 저장에 실패했어요');
         return false;
       }
-      set((state) => ({ sessions: state.sessions.map((s) => (s.id === tempId ? inserted : s)) }));
       return true;
     },
 
     updateSessionFields: async (id, patch) => {
-      const original = get().sessions.find((s) => s.id === id);
+      const targetId = await resolvePendingId(pendingSessionIds, id);
+      if (!targetId) return;
+      const original = get().sessions.find((s) => s.id === targetId);
       if (!original) return;
       set((state) => ({
-        sessions: state.sessions.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+        sessions: state.sessions.map((s) => (s.id === targetId ? { ...s, ...patch } : s)),
       }));
-      const { error } = await updateSessionRow(id, patch);
+      const { error } = await updateSessionRow(targetId, patch);
       if (error) {
-        set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? original : s)) }));
+        set((state) => ({
+          sessions: state.sessions.map((s) => (s.id === targetId ? original : s)),
+        }));
         toast('기록 저장에 실패했어요');
       }
     },
 
     deleteSession: async (id) => {
-      const index = get().sessions.findIndex((s) => s.id === id);
+      const targetId = await resolvePendingId(pendingSessionIds, id);
+      if (!targetId) return;
+      const index = get().sessions.findIndex((s) => s.id === targetId);
       if (index === -1) return;
       const target = get().sessions[index];
-      set((state) => ({ sessions: state.sessions.filter((s) => s.id !== id) }));
-      const { error } = await deleteSessionRow(id);
+      set((state) => ({ sessions: state.sessions.filter((s) => s.id !== targetId) }));
+      const { error } = await deleteSessionRow(targetId);
       if (error) {
         set((state) => {
           const sessions = [...state.sessions];
@@ -232,48 +279,59 @@ export const createTaskStore = () =>
         categories: [...state.categories, { id: tempId, name: trimmed, color }],
       }));
 
-      const inserted = await insertCategoryRow({ name: trimmed, color });
-      if (!inserted) {
-        set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
-        toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
-        return;
-      }
-      set((state) => ({
-        categories: state.categories.map((c) => (c.id === tempId ? inserted : c)),
-      }));
-      void reorderCategoriesRows(get().categories.map((c) => c.id));
+      const idPromise = (async () => {
+        const inserted = await insertCategoryRow({ name: trimmed, color });
+        if (!inserted) {
+          set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
+          toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
+          return null;
+        }
+        set((state) => ({
+          categories: state.categories.map((c) => (c.id === tempId ? inserted : c)),
+        }));
+        void reorderCategoriesRows(get().categories.map((c) => c.id));
+        return inserted.id;
+      })();
+      trackPendingId(pendingCategoryIds, tempId, idPromise);
+      await idPromise;
     },
 
     updateCategory: async (id, { name, color }) => {
-      const original = get().categories.find((c) => c.id === id);
+      const targetId = await resolvePendingId(pendingCategoryIds, id);
+      if (!targetId) return;
+      const original = get().categories.find((c) => c.id === targetId);
       if (!original) return;
       const trimmed = name.trim();
       set((state) => ({
-        categories: state.categories.map((c) => (c.id === id ? { ...c, name: trimmed, color } : c)),
+        categories: state.categories.map((c) =>
+          c.id === targetId ? { ...c, name: trimmed, color } : c,
+        ),
       }));
-      const { error } = await updateCategoryRow(id, { name: trimmed, color });
+      const { error } = await updateCategoryRow(targetId, { name: trimmed, color });
       if (error) {
         set((state) => ({
-          categories: state.categories.map((c) => (c.id === id ? original : c)),
+          categories: state.categories.map((c) => (c.id === targetId ? original : c)),
         }));
         toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
       }
     },
 
     deleteCategory: async (id) => {
-      const index = get().categories.findIndex((c) => c.id === id);
+      const targetId = await resolvePendingId(pendingCategoryIds, id);
+      if (!targetId) return;
+      const index = get().categories.findIndex((c) => c.id === targetId);
       if (index === -1) return;
 
       // 참조하는 작업이 있으면 DB에서 어차피 막히는데, 먼저 지웠다가 롤백되면 화면이 깜빡여서
       // 로컬에 이미 있는 tasks로 미리 걸러 낙관적 삭제 자체를 생략한다(DB 체크는 안전망으로 유지)
-      if (get().tasks.some((t) => t.categoryId === id)) {
+      if (get().tasks.some((t) => t.categoryId === targetId)) {
         toast(CATEGORY_IN_USE_MESSAGE);
         return;
       }
 
       const target = get().categories[index];
-      set((state) => ({ categories: state.categories.filter((c) => c.id !== id) }));
-      const { error, blocked } = await deleteCategoryRow(id);
+      set((state) => ({ categories: state.categories.filter((c) => c.id !== targetId) }));
+      const { error, blocked } = await deleteCategoryRow(targetId);
       if (error) {
         set((state) => {
           const categories = [...state.categories];
@@ -319,6 +377,7 @@ export const createTaskStore = () =>
       });
     },
   }));
+};
 
 export type TaskStoreApi = ReturnType<typeof createTaskStore>;
 export type { TaskStore };
