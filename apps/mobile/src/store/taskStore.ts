@@ -70,7 +70,7 @@ interface TaskStore {
   addSession: (input: Omit<Session, 'id'>) => Promise<boolean>;
   updateSessionFields: (
     id: string,
-    patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
+    patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags' | 'taskId'>>,
   ) => Promise<void>;
   deleteSession: (id: string) => Promise<void>;
 
