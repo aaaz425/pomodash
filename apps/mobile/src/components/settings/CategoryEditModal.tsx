@@ -11,6 +11,7 @@ import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { INPUT_LIMITS } from '@pomodash/shared';
 import type { Category } from '@/types/tasks';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
@@ -106,6 +107,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
             onChangeText={setName}
             onSubmitEditing={handleSave}
             placeholder="카테고리 이름"
+            maxLength={INPUT_LIMITS.NICKNAME_MAX_LENGTH}
           />
         </View>
 
