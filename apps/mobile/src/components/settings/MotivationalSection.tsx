@@ -44,6 +44,7 @@ function MessageRow({
           onChangeText={setDraft}
           onSubmitEditing={() => draft.trim() && onSaveEdit(draft.trim())}
           style={styles.input}
+          maxLength={INPUT_LIMITS.MESSAGE_LENGTH_MAX}
         />
         <Pressable
           onPress={() => draft.trim() && onSaveEdit(draft.trim())}
@@ -178,6 +179,7 @@ export function MotivationalSection() {
           placeholder="새 동기부여 메시지 입력"
           editable={!isAtLimit}
           style={styles.input}
+          maxLength={INPUT_LIMITS.MESSAGE_LENGTH_MAX}
         />
         <Pressable
           onPress={handleAdd}

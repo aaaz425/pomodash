@@ -1,5 +1,5 @@
 import { createStore } from 'zustand';
-import { CATEGORY_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomodash/shared';
 import { generateId } from '@/lib/generateId';
 import { toast } from '@/lib/toast';
 import { withRetry } from '@/lib/retry';
@@ -223,7 +223,7 @@ export const createTaskStore = () => {
     },
 
     addCategory: async ({ name, color }) => {
-      if (get().categories.length >= CATEGORY_LIMITS.COUNT_MAX) return;
+      if (get().categories.length >= INPUT_LIMITS.CATEGORIES_MAX) return;
       const trimmed = name.trim();
       const tempId = generateId();
       set((state) => ({
