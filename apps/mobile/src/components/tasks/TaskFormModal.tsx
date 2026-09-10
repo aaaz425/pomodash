@@ -11,6 +11,7 @@ import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { INPUT_LIMITS } from '@pomodash/shared';
 import type { Task } from '@/types/tasks';
 
 const AMBER = '#F59E0B';
@@ -141,6 +142,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
             onChangeText={setTitle}
             onSubmitEditing={handleSubmit}
             placeholder="예) 알고리즘 문제 풀기"
+            maxLength={INPUT_LIMITS.TITLE_MAX_LENGTH}
           />
         </View>
 

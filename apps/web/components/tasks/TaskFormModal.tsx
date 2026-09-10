@@ -10,6 +10,7 @@ import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 import type { Task } from '@/types';
 
 interface Props {
@@ -118,6 +119,7 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             placeholder="예) 알고리즘 문제 풀기"
             className="w-full"
+            maxLength={INPUT_LIMITS.TITLE_MAX_LENGTH}
           />
         </div>
 

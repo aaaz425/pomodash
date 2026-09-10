@@ -9,10 +9,10 @@ interface Props {
 export function CategoryBadge({ category, className = '' }: Props) {
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${className}`}
+      className={`inline-flex items-center max-w-[110px] px-2 py-0.5 rounded-md text-xs font-medium ${className}`}
       style={{ backgroundColor: withAlpha(category.color, 0.15), color: category.color }}
     >
-      {category.name}
+      <span className="min-w-0 truncate">{category.name}</span>
     </span>
   );
 }

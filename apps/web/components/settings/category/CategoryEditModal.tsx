@@ -11,6 +11,7 @@ import { ColorPickerModal } from '@/components/settings/category/ColorPickerModa
 import type { Category } from '@/types';
 
 import { CATEGORY_PRESET_COLORS } from '@/lib/constants/categoryColors';
+import { INPUT_LIMITS } from '@/lib/constants/limits';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
 const RAINBOW_GRADIENT =
@@ -87,6 +88,7 @@ export function CategoryEditModal({ category, onClose }: Props) {
             onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             placeholder="카테고리 이름"
             className="w-full"
+            maxLength={INPUT_LIMITS.NICKNAME_MAX_LENGTH}
           />
         </div>
 

@@ -4,13 +4,14 @@ import { TIMER_LIMITS, INPUT_LIMITS, SOUND_LIMITS, AUTH_LIMITS } from '@/lib/con
 
 export const CategorySchema = z.object({
   id: z.string(),
-  name: z.string(),
+  // 카테고리 이름도 짧은 라벨이라 닉네임과 동일 기준(NICKNAME_MAX_LENGTH) 재사용
+  name: z.string().max(INPUT_LIMITS.NICKNAME_MAX_LENGTH),
   color: z.string().refine((v) => /^#[0-9a-f]{6}$/i.test(v), { message: 'hex color required' }),
 });
 
 export const TaskSchema = z.object({
   id: z.string(),
-  title: z.string(),
+  title: z.string().max(INPUT_LIMITS.TITLE_MAX_LENGTH),
   categoryId: z.string(),
   targetFocusMinutes: z
     .number()
