@@ -50,7 +50,7 @@ function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
         isDragging ? 'opacity-50' : '',
       ].join(' ')}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <button
           {...attributes}
           {...listeners}
@@ -63,9 +63,9 @@ function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
           className="w-3 h-3 rounded-full shrink-0"
           style={{ backgroundColor: category.color }}
         />
-        <span className="text-sm text-foreground">{category.name}</span>
+        <span className="text-sm text-foreground truncate min-w-0">{category.name}</span>
       </div>
-      <div className="flex items-center gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-0.5 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         <button
           onClick={onEdit}
           aria-label={`${category.name} 편집`}

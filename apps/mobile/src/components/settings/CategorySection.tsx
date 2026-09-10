@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react-native';
-import { CATEGORY_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomodash/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CategoryEditModal } from '@/components/settings/CategoryEditModal';
@@ -40,7 +40,10 @@ function CategoryRow({
           <GripVertical size={14} color={withAlpha(theme.mutedForeground, 0.3)} />
         </Pressable>
         <View style={[styles.dot, { backgroundColor: category.color }]} />
-        <Text style={[styles.name, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
+        <Text
+          numberOfLines={1}
+          style={[styles.name, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}
+        >
           {category.name}
         </Text>
       </View>
@@ -63,7 +66,7 @@ export function CategorySection() {
   const tasks = useTaskStore((s) => s.tasks);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);
   const reorderCategories = useTaskStore((s) => s.reorderCategories);
-  const isAtLimit = categories.length >= CATEGORY_LIMITS.COUNT_MAX;
+  const isAtLimit = categories.length >= INPUT_LIMITS.CATEGORIES_MAX;
 
   const [editTarget, setEditTarget] = useState<Category | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -128,7 +131,7 @@ export function CategorySection() {
             },
           ]}
         >
-          {categories.length} / {CATEGORY_LIMITS.COUNT_MAX}
+          {categories.length} / {INPUT_LIMITS.CATEGORIES_MAX}
         </Text>
       </View>
 
@@ -179,19 +182,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flexShrink: 1,
   },
   dot: {
     width: 12,
     height: 12,
     borderRadius: 6,
+    flexShrink: 0,
   },
   name: {
     fontSize: 14,
+    flexShrink: 1,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+    flexShrink: 0,
   },
   iconButton: {
     width: 32,

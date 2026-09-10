@@ -9,7 +9,6 @@ export type { FocusRating } from './types/session';
 export {
   TIMER_LIMITS,
   FOCUS_PERIOD_LIMITS,
-  CATEGORY_LIMITS,
   AUTH_LIMITS,
   INPUT_LIMITS,
   SOUND_LIMITS,

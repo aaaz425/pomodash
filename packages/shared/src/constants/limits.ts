@@ -17,10 +17,6 @@ export const SESSION_LIMITS = {
   MIN_SESSION_FOCUS_SECONDS: 30,
 } as const;
 
-export const CATEGORY_LIMITS = {
-  COUNT_MAX: 10,
-} as const;
-
 export const AUTH_LIMITS = {
   PASSWORD_MIN_LENGTH: 8,
 } as const;

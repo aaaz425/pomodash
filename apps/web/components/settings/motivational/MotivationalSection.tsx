@@ -87,6 +87,7 @@ function MessageRow({
             }
           }}
           className="flex-1 min-w-0 py-1.5"
+          maxLength={INPUT_LIMITS.MESSAGE_LENGTH_MAX}
         />
         <button
           onClick={handleSave}
@@ -231,6 +232,7 @@ export function MotivationalSection() {
           placeholder="새 동기부여 메시지 입력"
           disabled={isAtLimit}
           className="flex-1 min-w-0 py-2 disabled:opacity-50"
+          maxLength={INPUT_LIMITS.MESSAGE_LENGTH_MAX}
         />
         <button
           onClick={handleAdd}
