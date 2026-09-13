@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { getSessionOrdinalTitle, type FocusRating } from '@pomodash/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
@@ -13,6 +13,7 @@ import type { Session } from '@/types/sessions';
 import { SessionDetailHeader } from './SessionDetailHeader';
 import { SessionNoteField } from './SessionNoteField';
 import { SessionStatsRow } from './SessionStatsRow';
+import { SessionTaskReassignModal } from './SessionTaskReassignModal';
 
 interface Props {
   session: Session | null;
@@ -23,6 +24,7 @@ interface Props {
 
 interface EditDraft {
   title: string;
+  taskId: string | null;
   focusRating: FocusRating | null;
   distractionTags: string[];
   note: string;
@@ -43,11 +45,17 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   if (!session) return null;
 
   const task = tasks.find((t) => t.id === session.taskId) ?? null;
   const category = task ? (categories.find((c) => c.id === task.categoryId) ?? null) : null;
+
+  const editingTask = isEditing ? (tasks.find((t) => t.id === draft?.taskId) ?? null) : task;
+  const editingCategory = isEditing
+    ? (categories.find((c) => c.id === editingTask?.categoryId) ?? null)
+    : category;
 
   const dateKey = session.startedAt.slice(0, 10);
   const sessionIndex = sessions
@@ -63,6 +71,7 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
   function handleEdit() {
     setDraft({
       title: displayTitle,
+      taskId: session?.taskId ?? null,
       focusRating: session?.focusRating ?? null,
       distractionTags: session?.distractionTags ?? [],
       note: session?.note ?? '',
@@ -79,6 +88,7 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
     if (!draft || !session) return;
     const patch = {
       title: draft.title.trim() || null,
+      taskId: draft.taskId,
       focusRating: draft.focusRating,
       distractionTags: draft.distractionTags,
       note: draft.note.trim() || null,
@@ -100,7 +110,7 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
     <Modal visible title="기록 상세" onClose={onClose} keyboardShouldPersistTaps="handled">
       <SessionDetailHeader
         session={session}
-        category={category}
+        category={editingCategory}
         displayTitle={displayTitle}
         hasRealTitle={hasRealTitle}
         taskTitles={taskTitles}
@@ -114,6 +124,37 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
       />
 
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+      {isEditing && (
+        <View style={styles.field}>
+          <Text
+            style={[
+              styles.sectionLabel,
+              { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+            ]}
+          >
+            작업
+          </Text>
+          <View style={styles.taskRow}>
+            <Text
+              numberOfLines={1}
+              style={[styles.taskTitle, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}
+            >
+              {editingTask?.title ?? '미분류'}
+            </Text>
+            <Pressable onPress={() => setShowTaskPicker(true)} style={styles.changeButton}>
+              <Text
+                style={[
+                  styles.changeButtonText,
+                  { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
+                ]}
+              >
+                변경
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
 
       <View style={styles.field}>
         <Text
@@ -169,6 +210,14 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />
+
+      {showTaskPicker && (
+        <SessionTaskReassignModal
+          selectedTaskId={draft?.taskId ?? null}
+          onSelect={(taskId) => setDraft((d) => (d ? { ...d, taskId } : d))}
+          onClose={() => setShowTaskPicker(false)}
+        />
+      )}
     </Modal>
   );
 }
@@ -184,5 +233,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  taskTitle: {
+    flex: 1,
+    fontSize: 14,
+  },
+  changeButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  changeButtonText: {
+    fontSize: 12,
   },
 });

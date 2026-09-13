@@ -128,13 +128,14 @@ export async function insertSession(input: Omit<Session, 'id'>): Promise<Session
 
 export async function updateSession(
   id: string,
-  patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags'>>,
+  patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags' | 'taskId'>>,
 ): Promise<{ error: boolean }> {
   const row: Record<string, unknown> = {};
   if (patch.title !== undefined) row.title = patch.title;
   if (patch.note !== undefined) row.note = patch.note;
   if (patch.focusRating !== undefined) row.focus_rating = patch.focusRating;
   if (patch.distractionTags !== undefined) row.distraction_tags = patch.distractionTags;
+  if (patch.taskId !== undefined) row.task_id = patch.taskId;
 
   const { error } = await supabase.from('sessions').update(row).eq('id', id);
   return { error: error !== null };

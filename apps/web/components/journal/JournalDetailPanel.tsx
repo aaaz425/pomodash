@@ -8,6 +8,7 @@ import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { SessionDetailHeader } from '@/components/journal/SessionDetailHeader';
 import { SessionStatsRow } from '@/components/journal/SessionStatsRow';
+import { SessionTaskReassignModal } from '@/components/journal/SessionTaskReassignModal';
 import { useTaskStore } from '@/store/StoreProvider';
 import { getSessionOrdinalTitle } from '@/lib/sessionUtils';
 import type { Category, FocusRating, Session, Task } from '@/types';
@@ -23,6 +24,7 @@ interface Props {
 
 interface EditDraft {
   title: string;
+  taskId: string | null;
   focusRating: FocusRating | null;
   distractionTags: string[];
   note: string;
@@ -40,6 +42,7 @@ export function JournalDetailPanel({
   const deleteSession = useTaskStore((s) => s.deleteSession);
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
+  const categories = useTaskStore((s) => s.categories);
 
   const sessionIndex = (() => {
     const dateKey = session.startedAt.slice(0, 10);
@@ -52,15 +55,22 @@ export function JournalDetailPanel({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<EditDraft | null>(null);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   const displayTitle =
     session.title ?? task?.title ?? getSessionOrdinalTitle(session.startedAt, sessionIndex);
   const hasRealTitle = session.title !== null || task !== null;
   const taskTitles = [...new Set(tasks.map((t) => t.title))];
 
+  const editingTask = isEditing ? (tasks.find((t) => t.id === draft?.taskId) ?? null) : task;
+  const editingCategory = isEditing
+    ? (categories.find((c) => c.id === editingTask?.categoryId) ?? null)
+    : category;
+
   function handleEdit() {
     setDraft({
       title: displayTitle,
+      taskId: session.taskId,
       focusRating: session.focusRating,
       distractionTags: session.distractionTags,
       note: session.note ?? '',
@@ -77,6 +87,7 @@ export function JournalDetailPanel({
     if (!draft) return;
     const patch = {
       title: draft.title.trim() || null,
+      taskId: draft.taskId,
       focusRating: draft.focusRating,
       distractionTags: draft.distractionTags,
       note: draft.note.trim() || null,
@@ -106,7 +117,7 @@ export function JournalDetailPanel({
 
       <SessionDetailHeader
         session={session}
-        category={category}
+        category={editingCategory}
         displayTitle={displayTitle}
         hasRealTitle={hasRealTitle}
         taskTitles={taskTitles}
@@ -120,6 +131,27 @@ export function JournalDetailPanel({
       />
 
       <div className="border-t border-border" />
+
+      {/* Task Section — 편집 모드에서만 노출 */}
+      {isEditing && (
+        <div className="flex flex-col gap-2">
+          <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            작업
+          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm text-foreground truncate min-w-0">
+              {editingTask?.title ?? '미분류'}
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowTaskPicker(true)}
+              className="shrink-0 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+            >
+              변경
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Focus Rating Section */}
       <div className="flex flex-col gap-2">
@@ -189,6 +221,14 @@ export function JournalDetailPanel({
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />
+
+      {showTaskPicker && (
+        <SessionTaskReassignModal
+          selectedTaskId={draft?.taskId ?? null}
+          onSelect={(taskId) => setDraft((d) => (d ? { ...d, taskId } : d))}
+          onClose={() => setShowTaskPicker(false)}
+        />
+      )}
     </div>
   );
 }
