@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ResetPasswordPage() {
-  // 재설정 링크를 거치지 않고 직접 들어온 경우(세션 없음) — /auth/reset-confirm이
-  // 코드 교환에 성공해야 이 페이지에 도달할 세션이 생긴다.
+  // /auth/reset-confirm의 코드 교환에 성공해야 세션이 생김 — 링크 없이 직접 들어오면 user는 null
   const user = await getCurrentUser();
 
   if (!user) {

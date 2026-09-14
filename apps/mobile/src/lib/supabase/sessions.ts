@@ -65,7 +65,6 @@ export interface SessionsPageResult extends SessionListResult {
   nextCursor: string | null;
 }
 
-// 저널 리스트 무한스크롤용 커서 기반 페이지네이션
 export async function fetchSessionsPage({
   cursor,
   limit,
@@ -86,7 +85,6 @@ export async function fetchSessionsPage({
   return { sessions, invalidCount: rows.length - sessions.length, nextCursor };
 }
 
-// 저널 캘린더 월별 조회용
 export async function fetchSessionsInRange(
   startIso: string,
   endIso: string,

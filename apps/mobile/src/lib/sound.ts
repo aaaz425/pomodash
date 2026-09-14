@@ -36,9 +36,7 @@ function clearScheduled() {
   activePlayers.forEach((p) => {
     try {
       p.remove();
-    } catch {
-      // ignore
-    }
+    } catch {}
   });
   activePlayers = [];
 }
@@ -72,9 +70,7 @@ export async function playAlarm({
         activePlayers = activePlayers.filter((p) => p !== player);
         try {
           player.remove();
-        } catch {
-          // ignore
-        }
+        } catch {}
       }, TONE_DURATION_MS);
       scheduledTimeouts.push(cleanup);
     };

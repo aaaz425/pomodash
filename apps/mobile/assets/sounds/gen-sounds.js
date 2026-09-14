@@ -1,5 +1,4 @@
-// 웹 apps/web/lib/notifications.ts의 Web Audio API 오실레이터 합성을 그대로 수치 계산해
-// PCM WAV로 미리 렌더링한다 (RN에는 오실레이터 합성 API가 없어 expo-audio는 파일 재생만 가능).
+// RN엔 오실레이터 합성 API가 없어 expo-audio는 파일 재생만 가능 — Web Audio 합성을 수치 계산해 PCM WAV로 미리 렌더링
 const fs = require('fs');
 const path = require('path');
 
@@ -40,8 +39,7 @@ function makeBuffer(totalDuration) {
   return new Float64Array(Math.ceil(totalDuration * SAMPLE_RATE));
 }
 
-// 항상 목표 천장까지 맞춰 정규화 — 이전엔 peak > ceiling일 때만 줄여서 겹치는 파셜이
-// 없는 사운드(예: digital)는 상대적으로 더 작게 재생됐음
+// 항상 목표 천장까지 정규화 — peak > ceiling일 때만 줄이면 겹치는 파셜이 없는 사운드가 상대적으로 작게 재생됨
 function normalize(buffer, ceiling = 0.97) {
   let peak = 0;
   for (const s of buffer) peak = Math.max(peak, Math.abs(s));
@@ -81,7 +79,6 @@ function writeWav(filePath, buffer) {
 const OUT_DIR = process.argv[2];
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-// sine
 {
   const buf = makeBuffer(1.5);
   addTone(buf, { type: 'sine', freq: 880, startTime: 0, duration: 1.5, peakGain: 1.0 });
@@ -89,7 +86,6 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
   writeWav(path.join(OUT_DIR, 'sine.wav'), buf);
 }
 
-// chime — C6→E6
 {
   const buf = makeBuffer(1.5);
   addTone(buf, { type: 'triangle', freq: 1046.5, startTime: 0, duration: 0.9, peakGain: 1.0 });
@@ -104,7 +100,7 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
   writeWav(path.join(OUT_DIR, 'chime.wav'), buf);
 }
 
-// bell — 기본음 + 비정수배 배음
+// 비정수배 배음(2.4×, 3.8×)으로 종소리 특유의 불협화음 질감을 냄
 {
   const buf = makeBuffer(1.5);
   addTone(buf, { type: 'sine', freq: 660, startTime: 0, duration: 1.5, peakGain: 1.0 });
@@ -114,7 +110,6 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
   writeWav(path.join(OUT_DIR, 'bell.wav'), buf);
 }
 
-// digital — 사각파 틱 4회
 {
   const buf = makeBuffer(1.5);
   for (let i = 0; i < 4; i++) {

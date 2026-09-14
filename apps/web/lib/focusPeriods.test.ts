@@ -34,7 +34,6 @@ describe('normalizeFocusPeriods', () => {
   });
 
   it('5초 초과 일시정지로 나뉜 인접 구간은 분리 유지', () => {
-    // 0~10s, 다음 구간은 15.001s에 시작 (5001ms 간격), 자체 길이는 5초 이상 유지
     const a = period(0, 10_000);
     const b = period(15_001, 25_000);
     const result = normalizeFocusPeriods([a, b]);
@@ -84,7 +83,6 @@ describe('normalizeFocusPeriods', () => {
   });
 
   it('필터링 후 남은 구간이 100개 이하면 그대로 반환', () => {
-    // 서로 10초씩 떨어진(병합 안 되는) 100개 구간
     const periods = Array.from({ length: 100 }, (_, i) => period(i * 20_000, i * 20_000 + 10_000));
     const result = normalizeFocusPeriods(periods);
     expect(result).toHaveLength(100);
@@ -106,7 +104,6 @@ describe('normalizeFocusPeriods', () => {
   });
 
   it('필터링/병합으로 100개를 초과하지 않게 되면 캡되지 않음', () => {
-    // 150개 구간이 모두 인접(1초 간격)하여 병합되면 결과는 1개 — 캡 미적용
     const periods = Array.from({ length: 150 }, (_, i) => period(i * 6_000, i * 6_000 + 5_000));
     const result = normalizeFocusPeriods(periods);
     expect(result).toHaveLength(1);

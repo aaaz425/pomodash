@@ -8,7 +8,7 @@ import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { subscribeToast } from '@/lib/toast';
 import { Portal } from './Portal';
 
-// 웹 AppToaster(sonner, position="top-center") 대응 — 화면 상단에 잠깐 떴다 사라짐
+// 화면 상단에 잠깐 떴다 사라짐
 export function Toaster() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

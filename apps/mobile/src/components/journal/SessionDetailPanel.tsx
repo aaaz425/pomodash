@@ -34,8 +34,7 @@ export function SessionDetailPanel({ session, onClose, onUpdated, onDeleted }: P
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
-  // 동일 날짜 순번 계산용 — 저널 리스트/캘린더는 각자 페이지네이션/월별로 세션을 들고 있어
-  // 전체 히스토리를 아는 전역 store를 그대로 사용한다 (웹 JournalDetailPanel과 동일한 방식)
+  // 동일 날짜 순번 계산용 — 리스트/캘린더는 페이지네이션/월별로만 세션을 들고 있어 전체 히스토리를 아는 전역 store를 사용
   const sessions = useTaskStore((s) => s.sessions);
   const tasks = useTaskStore((s) => s.tasks);
   const categories = useTaskStore((s) => s.categories);

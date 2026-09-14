@@ -3,8 +3,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import { TaskSchema, STORAGE_KEYS } from '@/types';
 import { initStorage, loadFromStorage, saveToStorage } from './storage';
 
-// SSR guard(typeof window === 'undefined')는 vitest.config.ts가 environment: 'jsdom'으로
-// 고정되어 있어 window가 항상 정의된 상태이므로 이 파일에서는 검증하지 않는다.
+// vitest.config.ts가 environment: 'jsdom' 고정이라 SSR guard는 이 파일에서 검증하지 않는다
 
 beforeEach(() => {
   localStorage.clear();
@@ -70,7 +69,6 @@ describe('loadFromStorage', () => {
   });
 
   it('스키마가 default 값을 채워주는 필드는 누락되어도 파싱 성공', () => {
-    // TaskSchema의 targetFocusMinutes/targetCycles/targetBreakMinutes는 .default()가 있음
     const partial = {
       id: '1',
       title: 'A',

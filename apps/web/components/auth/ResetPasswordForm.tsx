@@ -8,8 +8,7 @@ import { AUTH_LIMITS } from '@/lib/constants/limits';
 import type { AuthActionResult } from '@/types';
 
 interface Props {
-  // 설정 다이얼로그에서 쓸 때만 넘긴다 — 있으면 서버 액션이 리다이렉트 대신 success를
-  // 반환하고, 그 신호로 다이얼로그를 닫는다. /reset-password 단독 페이지는 그대로 홈으로 리다이렉트.
+  // 설정 다이얼로그에서만 넘김 — 있으면 서버 액션이 리다이렉트 대신 success를 반환해 이 신호로 다이얼로그를 닫는다
   onSuccess?: () => void;
 }
 

@@ -1,8 +1,7 @@
 import type { BadgeTier } from '@pomodash/shared';
 import { withAlpha } from './timerColors';
 
-// 웹 apps/web/lib/constants/badges.ts의 BADGE_TIER_STYLES(Tailwind 그라디언트 클래스)를
-// RN용 hex 3-stop 그라디언트로 근사한 것 — 같은 Tailwind 색상 계열의 실제 hex 값을 사용.
+// 웹 BADGE_TIER_STYLES(Tailwind 그라디언트 클래스)를 같은 색상 계열의 실제 hex 3-stop 그라디언트로 근사
 export interface BadgeTierStyle {
   medallionColors: [string, string, string]; // expo-linear-gradient용 3-stop
   ring: string;

@@ -12,8 +12,7 @@ import {
   type AuthActionResult,
 } from '@/types/auth';
 
-// 이메일 인증 링크는 앱의 커스텀 스킴(pomodash://auth/confirm)으로 보낸다 — 웹으로 새지 않고
-// 메일함에서 링크를 누르면 앱이 바로 열려 app/auth/confirm.tsx가 세션 교환을 마무리한다.
+// 비밀번호 재설정은 웹 페이지로 보내야 해서 유지 — 이메일 인증은 커스텀 스킴(pomodash://auth/confirm)으로 앱이 직접 처리
 export const WEB_APP_URL = 'https://pomodash-three.vercel.app';
 
 interface AuthContextValue {
@@ -37,8 +36,7 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-// signUp()이 "이미 가입된 이메일" 응답을 줄 때 보안상 기존 계정의 메타데이터를 안 채워주기 때문에,
-// Edge Function(service_role)으로 직접 조회해야 카카오 가입 여부를 알 수 있다.
+// signUp()은 이미 가입된 이메일이어도 보안상 메타데이터를 안 채워주므로, Edge Function(service_role)으로 직접 조회해야 카카오 가입 여부를 알 수 있다
 async function getExistingProvider(email: string): Promise<string | null> {
   const { data, error } = await supabase.functions.invoke<{
     exists: boolean;
@@ -211,8 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   }
 
-  // 같은 기기에서 다음 사용자가 로그인/가입했을 때 이전 사용자의 진행 중 타이머가
-  // 뜨는 걸 막기 위해, 계정과 무관하게 저장되는 activeTimer를 로그아웃 시 정리한다
+  // activeTimer는 계정과 무관하게 저장되므로, 다음 사용자에게 이전 진행 중 타이머가 보이지 않도록 로그아웃 시 정리
   async function logout(): Promise<void> {
     await supabase.auth.signOut();
     void AsyncStorage.removeItem(ACTIVE_TIMER_STORAGE_KEY);

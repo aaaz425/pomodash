@@ -1,8 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
 
-// Next.js dev 서버(webServer로 띄우는 자식 프로세스)는 .env.local을 알아서 읽지만,
-// Playwright 테스트 실행 프로세스 자체는 별도라 명시적으로 로드해야 함
+// Playwright 테스트 실행 프로세스는 Next.js dev 서버와 별도라 .env.local을 명시적으로 로드해야 함
 config({ path: '.env.local' });
 
 export default defineConfig({

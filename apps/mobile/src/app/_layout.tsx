@@ -31,9 +31,7 @@ function NavigationThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// 인증 상태 확인이 끝나기 전엔 스플래시를 계속 띄워둔다 — AnimatedSplashOverlay가
-// 자기 onLayout에서 SplashScreen.hideAsync()를 호출하므로, 로그인 화면인지 앱 화면인지
-// 정해지기 전에 먼저 마운트되면 안 됨(깜빡임 방지).
+// AnimatedSplashOverlay가 onLayout에서 hideAsync()를 호출하므로, 로그인/앱 화면이 정해지기 전엔 마운트하면 안 됨(깜빡임 방지)
 function RootContent() {
   const { loading } = useAuth();
   if (loading) return null;

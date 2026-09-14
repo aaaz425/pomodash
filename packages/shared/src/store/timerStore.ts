@@ -276,8 +276,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
           get();
         const now = Date.now();
         const rawElapsed = startedAt ? Math.floor((now - startedAt) / 1000) : 0;
-        // free 모드는 목표 시간이 없으므로 clamp 없이 경과 전체를 인정. pomodoro는 탭 방치 등으로
-        // 실제 경과가 목표 시간을 넘어도 목표 시간만큼만 집중 시간으로 인정
+        // free 모드는 clamp 없이 경과 전체 인정, pomodoro는 목표 시간만큼만 인정(탭 방치 방어)
         const elapsed =
           mode === 'free'
             ? creditableElapsed(rawElapsed)
@@ -332,8 +331,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
     };
   });
 
-  // 상태 변경마다 자동 저장 — complete→completeCycle 위임 구조상 subscribe가 더 안전
-  // runningDisplaySeconds는 초당 갱신되므로 스냅샷 값이 실제로 바뀔 때만 저장 호출
+  // subscribe로 상태 변경마다 저장 — 스냅샷 값이 실제로 바뀔 때만 호출(초당 갱신되는 runningDisplaySeconds 제외)
   if (persistSnapshot) {
     store.subscribe((state, prevState) => {
       const snapshot = toTimerSnapshot(state);

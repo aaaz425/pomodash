@@ -88,8 +88,7 @@ export interface SessionsPageResult extends SessionListResult {
   nextCursor: string | null;
 }
 
-// 저널 리스트 무한스크롤용 커서 기반 페이지네이션. 카테고리/검색 필터는 tasks 테이블과 inner join해
-// 서버에서 처리 — task가 없는(미분류) 세션은 원래 클라이언트 필터 로직과 동일하게 필터 활성 시 제외된다.
+// 카테고리/검색 필터는 tasks와 inner join해 서버에서 처리 — 미분류 세션은 필터 활성 시 제외됨(클라이언트 필터와 동일 동작)
 export async function fetchSessionsPage({
   cursor,
   limit,

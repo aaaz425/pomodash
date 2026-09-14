@@ -38,7 +38,6 @@ function ChartCardSkeleton({ height }: { height: number }) {
   );
 }
 
-// 웹 apps/web/components/dashboard/DashboardSkeleton.tsx 대응
 export function DashboardSkeleton() {
   return (
     <View style={styles.container}>

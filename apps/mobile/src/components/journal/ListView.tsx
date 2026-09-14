@@ -61,8 +61,7 @@ function buildRows(groups: ReturnType<typeof groupSessionsByDate<Session>>): Row
   return rows;
 }
 
-// 저널 리스트 무한스크롤 — FlatList가 이 화면의 유일한 스크롤 컨테이너가 되어야 onEndReached가 동작한다
-// (ScrollView 안에 중첩되면 RN이 경고를 내고 페이지네이션 트리거가 안 먹는다)
+// FlatList가 이 화면의 유일한 스크롤 컨테이너여야 onEndReached가 동작 — ScrollView 중첩 시 페이지네이션 트리거가 안 먹음
 export const ListView = forwardRef<SessionSyncHandle, Props>(function ListView(
   { header, tasks, categories, selectedId, onSelect },
   ref,

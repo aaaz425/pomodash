@@ -25,7 +25,6 @@ async function makeMaskableIcon(size, dest) {
   console.log(`✓ ${dest}`)
 }
 
-// 스크린샷 SVG 템플릿 (wide: 1280×800, narrow: 390×844)
 function screenshotSvg(width, height) {
   const iconSize = Math.round(Math.min(width, height) * 0.12)
   const cx = width / 2
@@ -48,14 +47,12 @@ function screenshotSvg(width, height) {
 </svg>`)
 }
 
-// --- 아이콘 ---
 await makeIcon(512, 'public/icon-512.png')
 await makeIcon(192, 'public/icon-192.png')
 await makeIcon(180, 'public/apple-touch-icon.png')
 await makeMaskableIcon(512, 'public/icon-maskable-512.png')
 await makeMaskableIcon(192, 'public/icon-maskable-192.png')
 
-// --- 스크린샷 ---
 await sharp(screenshotSvg(1280, 800)).png().toFile(join(root, 'public/screenshot-wide.png'))
 console.log('✓ public/screenshot-wide.png')
 

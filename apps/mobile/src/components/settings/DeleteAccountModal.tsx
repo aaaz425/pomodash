@@ -12,8 +12,7 @@ interface Props {
   onClose: () => void;
 }
 
-// 웹 AccountSection의 회원탈퇴 플로우 대응 — 1단계 확인 후, 이메일 계정은 비밀번호로,
-// 카카오 계정은 카카오 재인증으로 본인 확인을 한다.
+// 1단계 확인 후, 이메일 계정은 비밀번호로 카카오 계정은 카카오 재인증으로 본인 확인을 한다
 export function DeleteAccountModal({ visible, onClose }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

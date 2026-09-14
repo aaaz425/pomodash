@@ -56,13 +56,11 @@ describe('filterSessionsByTab', () => {
 
   it('이번 주 세션 반환 (월요일 시작)', () => {
     const result = filterSessionsByTab(sessions, 'week', TODAY);
-    // 2024-03-11(Mon)~2024-03-17(Sun) → 15일 2개 + 12일 1개
     expect(result).toHaveLength(3);
   });
 
   it('이번 달 세션 반환', () => {
     const result = filterSessionsByTab(sessions, 'month', TODAY);
-    // 3월 세션: 15일 2개 + 12일 1개 + 10일 1개 + 1일 1개
     expect(result).toHaveLength(5);
   });
 
@@ -206,7 +204,6 @@ describe('getMaxStreakDays', () => {
       makeSession('2024-03-01T10:00:00'),
       makeSession('2024-03-02T10:00:00'),
       makeSession('2024-03-03T10:00:00'),
-      // 공백
       makeSession('2024-03-10T10:00:00'),
       makeSession('2024-03-11T10:00:00'),
       makeSession('2024-03-12T10:00:00'),
@@ -222,7 +219,6 @@ describe('getMaxStreakDays', () => {
       makeSession('2024-03-02T10:00:00'),
       makeSession('2024-03-03T10:00:00'),
     ];
-    // today(3/15)에 세션 없음 → getStreakDays는 0, getMaxStreakDays는 3
     expect(getMaxStreakDays(sessions)).toBe(3);
   });
 
@@ -233,8 +229,7 @@ describe('getMaxStreakDays', () => {
 });
 
 describe('getBusiestDayOfWeek', () => {
-  // 이번 달로 필터링하는 책임은 호출부(filterSessionsByTab)에 있음 — 여기서는 받은
-  // 배열을 그대로 요일별로 집계만 한다.
+  // 월 필터링은 호출부(filterSessionsByTab) 책임 — 여기선 받은 배열을 그대로 집계만 한다
   it('세션 없으면 null', () => {
     expect(getBusiestDayOfWeek([])).toBeNull();
   });
@@ -315,7 +310,6 @@ describe('getHourlyFocusSeconds', () => {
   });
 
   it('여러 시간대에 걸친 구간은 걸친 만큼 각 시간대로 분배됨', () => {
-    // 09:30~11:15 (105분, 120분 상한 이내) — 9/10/11시 세 시간대에 걸침
     const sessions = [
       makeSessionWithPeriods('2024-03-15T09:00:00', 6300, [
         period('2024-03-15T09:30:00', '2024-03-15T11:15:00'),

@@ -32,9 +32,7 @@ const CATEGORY_IN_USE_MESSAGE =
 
 type PendingIds = Map<string, Promise<string | null>>;
 
-// tempId로 생성 중인 항목에 update/delete가 겹치면, 나중에 도착하는 insert 응답의
-// reconcile이 그 사이의 변경을 통째로 덮어쓴다 — update/delete는 진행 중인 생성이
-// 끝날 때까지 기다렸다가 실제 DB id로 동작해 이 레이스를 막는다
+// tempId 생성 중 update/delete가 겹치면 나중 도착한 insert reconcile이 그 변경을 덮어쓰므로, 생성이 끝날 때까지 기다렸다가 실제 DB id로 동작한다
 function trackPendingId(pending: PendingIds, tempId: string, promise: Promise<string | null>) {
   pending.set(tempId, promise);
   void promise.finally(() => {
@@ -119,8 +117,7 @@ export const createTaskStore = () => {
         completed: false,
         createdAt: new Date().toISOString(),
       };
-      // 낙관적 반영·롤백 모두 state 콜백으로 최신 상태 위에서 수행 — 대기 중 다른 항목이
-      // 동시에 변경돼도 그 변경을 덮어쓰지 않는다 (스냅샷을 직접 set하면 경쟁 상태 발생)
+      // 스냅샷을 직접 set하면 대기 중 다른 변경을 덮어쓰므로 state 콜백으로 최신 상태 위에서 반영
       set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
       const idPromise = (async () => {
@@ -322,8 +319,7 @@ export const createTaskStore = () => {
       const index = get().categories.findIndex((c) => c.id === targetId);
       if (index === -1) return;
 
-      // 참조하는 작업이 있으면 DB에서 어차피 막히는데, 먼저 지웠다가 롤백되면 화면이 깜빡여서
-      // 로컬에 이미 있는 tasks로 미리 걸러 낙관적 삭제 자체를 생략한다(DB 체크는 안전망으로 유지)
+      // 낙관적 삭제 후 DB 제약 위반으로 롤백되면 화면이 깜빡이므로, 로컬 tasks로 미리 걸러 생략(DB 체크는 안전망으로 유지)
       if (get().tasks.some((t) => t.categoryId === targetId)) {
         toast(CATEGORY_IN_USE_MESSAGE);
         return;

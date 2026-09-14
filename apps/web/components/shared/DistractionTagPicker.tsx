@@ -29,8 +29,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
   function handleAdd() {
     const trimmed = draft.trim();
     if (trimmed) {
-      // 프리셋 라벨과 같은 텍스트를 입력하면 커스텀으로 따로 추가하지 않고 해당 프리셋을
-      // 선택 처리한다 — 똑같이 생긴 칩이 중복되는 것을 막기 위함.
+      // 프리셋 라벨과 같은 텍스트면 커스텀 추가 대신 프리셋 선택으로 처리 — 똑같이 생긴 칩 중복 방지
       const matchedPreset = DISTRACTION_TAGS.find(
         (tag) => tag.label.toLowerCase() === trimmed.toLowerCase(),
       );
@@ -109,8 +108,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
           />
           <button
             type="button"
-            // mousedown에서 포커스 이동을 막아야 blur(=handleAdd)가 먼저 발동해
-            // 취소하려던 입력이 그대로 추가되는 걸 막을 수 있다.
+            // 포커스 이동을 막아야 blur(=handleAdd)가 먼저 발동해 취소하려던 입력이 그대로 추가되지 않음
             onMouseDown={(e) => e.preventDefault()}
             onClick={handleCancel}
             aria-label="직접입력 취소"

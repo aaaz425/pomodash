@@ -7,8 +7,7 @@ import { toast } from '@/lib/toast';
 // 계정과 무관하게 저장되므로 로그아웃/탈퇴 시 AuthProvider에서 반드시 정리해야 함(다음 사용자에게 이전 세션이 새는 것 방지)
 export const ACTIVE_TIMER_STORAGE_KEY = 'pomodash:active-timer';
 
-// AsyncStorage는 비동기라 공유 스토어의 동기 loadSnapshot 포트 시그니처에 그대로 못 꽂는다.
-// StoreProvider가 hydrate() 호출 전에 preloadTimerSnapshot()으로 먼저 읽어 동기 캐시를 채워둔다.
+// AsyncStorage는 비동기라 동기 loadSnapshot 시그니처에 못 꽂으므로, hydrate() 전에 preloadTimerSnapshot()으로 캐시를 미리 채운다
 let cachedSnapshot: TimerSnapshot | null = null;
 
 export async function preloadTimerSnapshot(): Promise<void> {

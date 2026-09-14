@@ -41,7 +41,6 @@ const CATEGORIES: { key: CategoryKey; label: string; Icon: LucideIcon }[] = [
   { key: 'about', label: '앱 정보', Icon: Info },
 ];
 
-// 웹 SettingsView의 AnimatePresence(mode="popLayout")에 대응
 const TRANSITION_MS = 200;
 const EASING = Easing.out(Easing.cubic);
 
@@ -83,8 +82,7 @@ export default function SettingsScreen() {
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const isKakao = user?.user_metadata?.provider === 'kakao';
 
-  // 탭 화면은 언마운트 안 되고 계속 살아있어서, 벗어날 때 상세 화면 상태를 직접 초기화해야 함 —
-  // React Compiler가 setActiveCategory(항상 안정적인 setter) 기준으로 자동 메모이즈한다.
+  // 탭 화면은 언마운트되지 않으므로, 벗어날 때 상세 화면 상태를 직접 초기화해야 함
   useFocusEffect(() => {
     return () => setActiveCategory(null);
   });

@@ -5,9 +5,7 @@ import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
-// 웹 apps/web/components/shared/layout/BottomNav.tsx 대응 —
-// flat bg-card + 상단 보더만, 네이티브 블러/반투명 없음(expo-router의 unstable-native-tabs 대신
-// 일반 Tabs의 tabBar prop으로 완전히 커스텀 렌더링)
+// flat bg-card + 상단 보더만, 네이티브 블러/반투명 없음 — unstable-native-tabs 대신 tabBar prop으로 완전히 커스텀 렌더링
 export function BottomNav({ state, navigation, insets }: BottomTabBarProps) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

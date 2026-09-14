@@ -77,8 +77,7 @@ export default function DashboardScreen() {
     };
   }, [sessions]);
 
-  // React Compiler(reactCompiler: true, app.config.ts)가 자동으로 메모이제이션 —
-  // 수동 useMemo가 불필요함을 eslint-plugin-react-compiler로 확인함
+  // React Compiler가 자동 메모이제이션 — 수동 useMemo 불필요함을 eslint-plugin-react-compiler로 확인함
   const filtered = filterSessionsByTab(sessions, tab);
   const shareCardData = buildShareCardData(filtered, sessions, tab);
 

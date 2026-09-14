@@ -55,8 +55,7 @@ export function useAccentTheme() {
   );
   const { isDark } = useTheme();
 
-  // 다크/라이트 전환은 useTheme이 처리하지만, 그때도 accent를 다시 주입해야 한다
-  // (인라인 스타일이 .dark 캐스케이드보다 우선순위가 높아 재적용 없이는 이전 모드 값이 남는다).
+  // 인라인 스타일이 .dark 캐스케이드보다 우선순위가 높아, 다크/라이트 전환 시에도 accent를 재주입해야 이전 값이 안 남는다
   useEffect(() => {
     applyAccent(colorTheme, isDark);
   }, [colorTheme, isDark]);

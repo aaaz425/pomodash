@@ -78,8 +78,7 @@ function drawHeadline(
   ctx.fillText(headline, CENTER_X, PADDING + 130);
 }
 
-// 순수 장식용 도트 필드 — 중심에서 바깥으로 옅어지는 원형 마스크를 alpha 감쇠로 근사.
-// 기존 70% 고정 아크 링은 실제 진행률처럼 오독될 수 있어 제거함.
+// 순수 장식용 도트 필드 — 기존 70% 고정 아크 링은 실제 진행률처럼 오독될 수 있어 제거함
 function drawHeroOrnament(
   ctx: CanvasRenderingContext2D,
   colors: ShareCardPalette,

@@ -37,9 +37,7 @@ function stopActiveSequence(ctx: AudioContext, atTime: number): void {
       gain.gain.setValueAtTime(current, atTime);
       gain.gain.linearRampToValueAtTime(0.0001, atTime + 0.03);
       osc.stop(atTime + 0.03);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
   activeNodes = [];
 }
@@ -76,12 +74,11 @@ function playTone(
   return osc;
 }
 
-// 사인파
 function playSine(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   return playTone(ctx, { type: 'sine', freq: 880, startTime, duration: 1.5, peakGain });
 }
 
-// 차임 — C6→E6 2음
+// C6→E6 2음
 function playChime(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   playTone(ctx, { type: 'triangle', freq: 1046.5, startTime, duration: 0.9, peakGain });
   return playTone(ctx, {
@@ -93,7 +90,7 @@ function playChime(ctx: AudioContext, peakGain: number, startTime: number): Osci
   });
 }
 
-// 벨 — 기본음 + 비정수배 배음
+// 비정수배 배음(2.4×, 3.8×)으로 종소리 특유의 불협화음 질감을 냄
 function playBell(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   const last = playTone(ctx, { type: 'sine', freq: 660, startTime, duration: 1.5, peakGain });
   playTone(ctx, {
@@ -113,7 +110,6 @@ function playBell(ctx: AudioContext, peakGain: number, startTime: number): Oscil
   return last;
 }
 
-// 디지털 — 사각파 틱 4회
 function playDigital(ctx: AudioContext, peakGain: number, startTime: number): OscillatorNode {
   let last: OscillatorNode;
   for (let i = 0; i < 4; i++) {
@@ -166,16 +162,12 @@ export function playAlarm({
         if (myGeneration === activeGeneration) onEnded?.();
       };
     }
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 export function stopAlarm(): void {
   if (!sharedCtx) return;
   try {
     stopActiveSequence(sharedCtx, sharedCtx.currentTime);
-  } catch {
-    // ignore
-  }
+  } catch {}
 }

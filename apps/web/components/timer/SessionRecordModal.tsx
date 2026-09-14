@@ -136,7 +136,6 @@ export function SessionRecordModal() {
 
               {/* Session Summary */}
               {isTaskSession ? (
-                /* Case A: 작업 있는 기록 — 작업 정보 표시 */
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex flex-col gap-2 min-w-0">
                     <span className="text-lg font-semibold tracking-tight text-foreground truncate">
@@ -149,7 +148,6 @@ export function SessionRecordModal() {
                   <SessionProgressBadge />
                 </div>
               ) : (
-                /* Case B: 작업 없는 기록 — 작업 귀속 UI */
                 <SessionTaskSelector selectedTaskId={selectedTaskId} onSelect={setSelectedTaskId} />
               )}
 

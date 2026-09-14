@@ -20,7 +20,6 @@ function SessionRowSkeleton() {
   );
 }
 
-// 웹 apps/web/components/journal/JournalSkeleton.tsx 대응
 export function JournalSkeleton() {
   return (
     <View style={styles.container}>

@@ -9,8 +9,6 @@ const OPTIONS: { mode: ThemeMode; label: string }[] = [
   { mode: 'system', label: '시스템' },
 ];
 
-// 웹 ThemeSection의 미니어처 프리뷰까지는 아직 안 만들고 라벨 버튼 3개로 단순화 —
-// UI 다듬는 건 다음 패스에서.
 export function ThemeSection() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

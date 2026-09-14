@@ -6,7 +6,6 @@ const { MIN_FOCUS_SECONDS, MAX_PAUSE_MERGE_SECONDS, MAX_PERIODS } = FOCUS_PERIOD
 export function normalizeFocusPeriods(periods: FocusPeriod[]): FocusPeriod[] {
   if (periods.length === 0) return [];
 
-  // 5초 미만 제거
   const filtered = periods.filter((p) => {
     const durationMs = new Date(p.end).getTime() - new Date(p.start).getTime();
     return durationMs >= MIN_FOCUS_SECONDS * 1000;
@@ -14,7 +13,6 @@ export function normalizeFocusPeriods(periods: FocusPeriod[]): FocusPeriod[] {
 
   if (filtered.length === 0) return [];
 
-  // 인접 구간 병합
   const merged: FocusPeriod[] = [filtered[0]];
   for (let i = 1; i < filtered.length; i++) {
     const prev = merged[merged.length - 1];

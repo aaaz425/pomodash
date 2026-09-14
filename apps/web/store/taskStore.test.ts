@@ -250,7 +250,6 @@ describe('updateTask', () => {
     const addPromise = store.getState().addTask({ title: 'A', categoryId: 'c1' });
     const tempId = store.getState().tasks[0].id;
 
-    // insert 응답이 오기 전에 같은(tempId) task를 수정
     const updatePromise = store.getState().updateTask(tempId, { title: 'B' });
 
     resolveInsert({
@@ -268,7 +267,6 @@ describe('updateTask', () => {
 
     expect(store.getState().tasks).toHaveLength(1);
     expect(store.getState().tasks[0]).toMatchObject({ id: 'db-id-1', title: 'B' });
-    // tempId가 아니라 reconcile된 실제 DB id로 서버에 반영돼야 새로고침 후에도 유지됨
     expect(mockUpdateTask).toHaveBeenCalledWith('db-id-1', expect.objectContaining({ title: 'B' }));
   });
 });
@@ -480,7 +478,6 @@ describe('addSession / updateSessionNote / updateSessionRating / updateSessionTa
     const addPromise = store
       .getState()
       .addSession(makeSessionInput({ startedAt: '2024-03-16T09:00:00.000Z' }));
-    // addSession의 insert가 아직 대기 중인 상태에서 다른 세션을 삭제
     await store.getState().deleteSession(idToDelete);
     expect(store.getState().sessions.some((s) => s.id === idToDelete)).toBe(false);
 
@@ -502,7 +499,6 @@ describe('addSession / updateSessionNote / updateSessionRating / updateSessionTa
     });
     await addPromise;
 
-    // addSession의 insert 완료 처리가 삭제 이전 스냅샷으로 덮어써서 삭제된 세션을 되살리면 안 됨
     expect(store.getState().sessions.some((s) => s.id === idToDelete)).toBe(false);
     expect(store.getState().sessions.map((s) => s.startedAt)).toEqual(['2024-03-16T09:00:00.000Z']);
   });
@@ -514,7 +510,6 @@ describe('reorderTasks', () => {
     const idA = await store.getState().addTask({ title: 'A', categoryId: 'c1' });
     const idB = await store.getState().addTask({ title: 'B', categoryId: 'c1' });
     const idC = await store.getState().addTask({ title: 'C', categoryId: 'c1' });
-    // 현재 순서: [C, B, A] — A를 C 위치로 이동
     await store.getState().reorderTasks(idA!, idC!);
     expect(store.getState().tasks.map((t) => t.id)).toEqual([idA, idC, idB]);
   });
@@ -564,7 +559,6 @@ describe('addCategory', () => {
 
   it('카테고리가 정확히 10개면 추가 시 아무 동작도 하지 않음 (상한)', async () => {
     const store = createTaskStore();
-    // 기본 5개 + 5개 추가 = 10개
     await addNCategories(store, 5);
     expect(store.getState().categories).toHaveLength(10);
     await store.getState().addCategory({ name: '11번째', color: 'bg-pink-500' });
@@ -576,7 +570,6 @@ describe('addCategory', () => {
 
   it('카테고리가 9개일 때는 정상적으로 10개까지 추가 가능', async () => {
     const store = createTaskStore();
-    // 기본 5개 + 4개 추가 = 9개
     await addNCategories(store, 4);
     expect(store.getState().categories).toHaveLength(9);
     await store.getState().addCategory({ name: '10번째', color: 'bg-pink-500' });
@@ -646,8 +639,7 @@ describe('updateCategory / deleteCategory', () => {
     const categories = store.getState().categories;
     const tempId = categories[categories.length - 1].id;
 
-    // insert 응답이 오기 전에 같은(tempId) category를 수정 — 예전엔 이 수정이 나중에 도착한
-    // insert reconcile에 덮어써져 사라졌음
+    // 이 수정이 나중 도착한 insert reconcile에 덮어써져 사라지던 회귀 케이스
     const updatePromise = store
       .getState()
       .updateCategory(tempId, { name: '수정된 이름', color: 'bg-red-500' });

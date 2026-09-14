@@ -7,8 +7,7 @@ import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
-// 이메일 인증 링크(pomodash://auth/confirm?code=...)가 앱을 열면 이 화면이 뜬다.
-// 세션 교환이 끝나면 onAuthStateChange가 세션을 반영하고, (app)/_layout이 알아서 앱으로 전환한다.
+// 세션 교환이 끝나면 onAuthStateChange가 반영하고 (app)/_layout이 알아서 앱으로 전환한다
 export default function AuthConfirmScreen() {
   const { code } = useLocalSearchParams<{ code?: string }>();
   const scheme = useThemeScheme();

@@ -10,8 +10,7 @@ import { FONTS } from '@/constants/fonts';
 import { formatClock } from '@/lib/format';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
-// 웹 apps/web/components/timer/MiniTimerWidget.tsx 대응 — 타이머 탭이 아닌 다른 탭에
-// 있을 때 하단 탭바 위에 캡슐형 위젯으로 진행 상황을 계속 보여준다.
+// 타이머 탭이 아닌 다른 탭에 있을 때 하단 탭바 위에 캡슐형 위젯으로 진행 상황을 계속 보여준다
 export function MiniTimerWidget() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

@@ -26,8 +26,7 @@ import {
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
 
-// 회원가입 시 DB 트리거(handle_new_user)가 심어주는 기본값과 이름을 맞춘 폴백 —
-// fetchCategories 실패(네트워크 오류 등) 시에만 사용
+// fetchCategories 실패 시에만 쓰는 폴백 — DB 트리거(handle_new_user) 기본값과 이름을 맞춤
 const DEFAULT_CATEGORIES: Category[] = [
   { id: '1', name: '공부', color: '#3b82f6' },
   { id: '2', name: '업무', color: '#22c55e' },
@@ -86,9 +85,7 @@ function arrayMove<T>(arr: T[], from: number, to: number): T[] {
 
 type PendingIds = Map<string, Promise<string | null>>;
 
-// tempId로 생성 중인 항목에 update/delete가 겹치면, 나중에 도착하는 insert 응답의
-// reconcile이 그 사이의 변경을 통째로 덮어쓴다 — update/delete는 진행 중인 생성이
-// 끝날 때까지 기다렸다가 실제 DB id로 동작해 이 레이스를 막는다
+// tempId 생성 중 update/delete가 겹치면 나중 도착한 insert reconcile이 그 변경을 덮어쓰므로, 생성이 끝날 때까지 기다렸다가 실제 DB id로 동작한다
 function trackPendingId(pending: PendingIds, tempId: string, promise: Promise<string | null>) {
   pending.set(tempId, promise);
   void promise.finally(() => {
@@ -132,8 +129,7 @@ export const createTaskStore = () => {
         completed: false,
         createdAt: new Date().toISOString(),
       };
-      // 낙관적 반영·롤백 모두 state 콜백으로 최신 상태 위에서 수행 — 대기 중 다른 항목이
-      // 동시에 변경돼도 그 변경을 덮어쓰지 않는다 (스냅샷을 직접 set하면 경쟁 상태 발생)
+      // 스냅샷을 직접 set하면 대기 중 다른 변경을 덮어쓰므로 state 콜백으로 최신 상태 위에서 반영
       set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
       const idPromise = (async () => {

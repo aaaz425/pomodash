@@ -17,7 +17,6 @@ interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
-// 웹 components/ui/skeleton.tsx(animate-pulse)에 대응
 export function Skeleton({ width = '100%', height = 14, borderRadius = 6, style }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

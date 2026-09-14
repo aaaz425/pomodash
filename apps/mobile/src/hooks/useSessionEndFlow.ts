@@ -6,7 +6,6 @@ interface Options {
   pauseOnRequest?: boolean;
 }
 
-// 웹 apps/web/hooks/useSessionEndFlow.ts 대응
 export function useSessionEndFlow({ pauseOnRequest = true }: Options = {}) {
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const pause = useTimerStore((s) => s.pause);
