@@ -37,7 +37,6 @@ export function deriveTimerDisplay(input: DeriveTimerDisplayInput): TimerDisplay
   let justCompleted = false;
 
   if (mode === 'free') {
-    // free 모드: 카운트업, 자동 완료 없음
     displaySeconds = isRunning ? accFocusSeconds + elapsed : accFocusSeconds;
   } else {
     const runningRemaining = Math.max(0, remainingSeconds - elapsed);

@@ -57,8 +57,7 @@ export function DashboardView() {
 
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
 
-  // sessions 배열이 바뀔 때(최초 hydrate 포함, 세션 CRUD 이후)마다 요약 통계를 다시 받아온다.
-  // 재조회 중에도 이전 summary를 유지해 화면이 스켈레톤으로 되돌아가지 않게 한다(stale-while-revalidate).
+  // 재조회 중에도 이전 summary를 유지해 화면이 스켈레톤으로 되돌아가지 않게 한다(stale-while-revalidate)
   useEffect(() => {
     let cancelled = false;
     fetchDashboardSummary().then((result) => {

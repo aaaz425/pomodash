@@ -16,7 +16,6 @@ function MenuRowSkeleton() {
   );
 }
 
-// 웹 apps/web/components/settings/SettingsSkeleton.tsx 대응
 export function SettingsSkeleton() {
   return (
     <View style={styles.container}>

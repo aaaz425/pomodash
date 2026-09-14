@@ -31,8 +31,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
   function handleAdd() {
     const trimmed = draft.trim();
     if (trimmed) {
-      // 프리셋 라벨과 같은 텍스트를 입력하면 커스텀으로 따로 추가하지 않고 해당 프리셋을
-      // 선택 처리한다 — 똑같이 생긴 칩이 중복되는 것을 막기 위함.
+      // 프리셋 라벨과 같은 텍스트면 커스텀 추가 대신 프리셋 선택으로 처리 — 똑같이 생긴 칩 중복 방지
       const matchedPreset = DISTRACTION_TAGS.find(
         (tag) => tag.label.toLowerCase() === trimmed.toLowerCase(),
       );
@@ -53,8 +52,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
   }
 
   function handleBlur() {
-    // 취소 버튼을 눌러도 blur가 먼저 발동해 입력값이 그대로 추가될 수 있어,
-    // 취소 버튼의 onPressIn에서 이 플래그를 세워 이번 blur만 건너뛴다.
+    // 취소 버튼의 onPressIn에서 세운 플래그 — blur가 먼저 발동해 입력값이 그대로 추가되는 것을 막음
     if (skipBlurCommitRef.current) {
       skipBlurCommitRef.current = false;
       return;

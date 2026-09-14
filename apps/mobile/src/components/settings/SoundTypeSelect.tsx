@@ -20,7 +20,6 @@ const VIEWPORT_MARGIN = 8;
 
 const OPTIONS = Object.keys(SOUND_TYPE_LABELS) as SoundType[];
 
-// 웹 apps/web/components/settings/notification/SoundTypeSelect.tsx 대응
 export function SoundTypeSelect({ value, onChange, disabled }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

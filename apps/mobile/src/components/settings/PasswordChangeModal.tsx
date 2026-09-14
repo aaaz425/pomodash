@@ -12,9 +12,7 @@ interface Props {
   onClose: () => void;
 }
 
-// 웹 PasswordChangeDialog 대응 — 회원탈퇴(DeleteAccountModal)와 같은 중앙 카드 모달 패턴으로 통일.
-// 이전엔 설정 화면에 인라인 토글+폼으로 펼쳐졌지만, 카드 안에 폼이 중첩되는 모양이 어색해서
-// 다른 계정 액션(회원탈퇴)과 동일하게 모달로 분리했다.
+// 회원탈퇴(DeleteAccountModal)와 같은 중앙 카드 모달 패턴으로 통일
 export function PasswordChangeModal({ visible, title, onClose }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];

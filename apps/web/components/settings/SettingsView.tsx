@@ -99,13 +99,11 @@ export function SettingsView({ userPromise }: Props) {
     };
   }, [userPromise]);
 
-  // 카카오 재인증(회원탈퇴 확인)을 마치고 돌아온 경우 — 재인증 라운드트립 자체가 본인 확인이므로
-  // 추가 확인 없이 탈퇴를 마무리한다. 성공 시 서버 액션이 /landing으로 리다이렉트한다.
+  // 카카오 재인증(회원탈퇴 확인) 라운드트립 자체가 본인 확인이므로 추가 확인 없이 탈퇴를 마무리한다
   useEffect(() => {
     if (searchParams.get('confirmDelete') !== '1' || deletingRef.current) return;
     deletingRef.current = true;
-    // 성공 시 서버 액션 내부에서 redirect()로 응답이 끝나 .then이 실행되지 않는다.
-    // 실패했을 때(예: 재인증이 오래돼 거절된 경우)도 조용히 사라지지 않도록 결과를 확인한다.
+    // 성공 시 redirect()로 응답이 끝나 .then이 실행되지 않음 — 실패 시에만 결과를 확인해 토스트로 알림
     deleteAccountConfirmed().then((result) => {
       if (result.error) toast(result.error);
     });

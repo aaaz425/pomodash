@@ -19,8 +19,7 @@ export default function TimerScreen() {
   const hydrated = useHydrated();
   const { task, category } = useCurrentTask();
 
-  // AsyncStorage에서 진행 중이던 타이머 스냅샷을 불러오기 전엔 기본값(25:00 대기중)이
-  // 잠깐 보였다가 실제 상태로 바뀌는 깜빡임이 생길 수 있어 hydrate 전까지는 렌더링을 미룬다.
+  // hydrate 전까지 렌더링을 미룸 — 아니면 기본값(25:00 대기중)이 잠깐 보였다 실제 상태로 바뀌는 깜빡임 발생
   if (!hydrated) {
     return (
       <View style={[styles.root, styles.centered, { backgroundColor: theme.background }]}>

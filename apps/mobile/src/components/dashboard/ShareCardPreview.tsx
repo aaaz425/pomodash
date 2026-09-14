@@ -11,8 +11,7 @@ interface Props {
   colors: ShareCardPalette;
 }
 
-// 히어로 도트 장식 격자 크기 — 웹 shareCardCanvas.ts의 drawHeroOrnament와 동일한 시각 의도
-// (중심에서 바깥으로 옅어지는 원형 마스크를 alpha 감쇠로 근사)
+// 히어로 도트 장식 격자 — 중심에서 바깥으로 옅어지는 원형 마스크를 alpha 감쇠로 근사
 const DOT_GRID = 6;
 const DOT_RADIUS = 2;
 
@@ -44,8 +43,7 @@ export function ShareCardPreview({ data, colors }: Props) {
     <View style={styles.square} onLayout={handleLayout}>
       <LinearGradient colors={[colors.bgTop, colors.bgBottom]} style={StyleSheet.absoluteFill} />
       {width > 0 && (
-        // 웹 캔버스는 고정 픽셀 레이아웃이라 글로우 중심을 SIZE*0.35에 고정하지만,
-        // 모바일은 flex 레이아웃이라 히어로 링이 카드 중앙 부근에 오므로 글로우도 중앙에 맞춘다.
+        // flex 레이아웃이라 히어로 링이 카드 중앙 부근에 오므로 글로우도 중앙에 맞춘다(웹은 고정 픽셀이라 SIZE*0.35 고정)
         <Svg width={width} height={width} style={StyleSheet.absoluteFill}>
           <Defs>
             <RadialGradient id="glow" cx="50%" cy="46%" r="65%">

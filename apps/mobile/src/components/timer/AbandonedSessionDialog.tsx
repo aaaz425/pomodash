@@ -5,13 +5,10 @@ import { ko } from 'date-fns/locale';
 import { useTimerStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
-// 웹 apps/web/lib/constants/limits.ts의 SESSION_LIMITS.ABANDONED_CHECK_INTERVAL_MS와 동일 —
-// 아직 packages/shared로 추출되지 않아 값만 맞춰 중복
+// 웹 SESSION_LIMITS.ABANDONED_CHECK_INTERVAL_MS와 동일 — 아직 packages/shared로 추출되지 않아 값만 맞춰 중복
 const ABANDONED_CHECK_INTERVAL_MS = 30 * 1000;
 
-// 웹 apps/web/components/timer/AbandonedSessionDialog.tsx 대응 — mobile timerStore는
-// 영속화가 없어(feat/rn-session-record 계획 참고) 앱 재시작 후 복구되는 시나리오는 없고,
-// 일시정지 상태로 오래 방치된 경우만 감지한다. document.visibilitychange 대신 AppState 사용.
+// document.visibilitychange 대신 AppState로 일시정지 상태 방치를 감지한다
 export function AbandonedSessionDialog() {
   const sessionStarted = useTimerStore((s) => s.sessionStarted);
   const sessionEnded = useTimerStore((s) => s.sessionEnded);

@@ -16,11 +16,7 @@ interface Props {
   /** 3번째 선택지(예: 방치된 세션 "폐기") — 생략하면 버튼 2개 */
   tertiaryLabel?: string;
   onTertiary?: () => void;
-  /**
-   * true면 RN Modal로 감싸지 않고 절대 위치 오버레이로 렌더링한다 — 이미 다른 Modal
-   * 안에서 뜨는 경우(예: FocusMode) Modal을 중첩하면 iOS에서 두 Modal이 동시에
-   * 닫힐 때 화면이 검게 남거나 안 뜨는 문제가 있어서 그 경우에만 사용.
-   */
+  /** true면 절대 위치 오버레이로 렌더링(RN Modal 미사용) — 다른 Modal 안에서 뜰 때 중첩하면 iOS에서 동시에 닫힐 때 화면이 검게 남는 문제가 있어 그 경우에만 사용 */
   inline?: boolean;
   /** true면 확인/취소/3번째 버튼을 전부 비활성화 — 비동기(Supabase 왕복) onConfirm 진행 중 연타 방지 */
   loading?: boolean;
@@ -28,8 +24,7 @@ interface Props {
   closeOnBackdropClick?: boolean;
 }
 
-// 웹의 중앙 정렬 ConfirmDialog.tsx 대응 — Modal.tsx(바텀시트)와 별개의 프리미티브.
-// 웹처럼 바깥 클릭으로는 안 닫힘(의도적) — Android 뒤로가기(onRequestClose)만 취소로 연결.
+// Modal.tsx(바텀시트)와 별개의 중앙 정렬 프리미티브 — 바깥 클릭으로는 안 닫힘(의도적), Android 뒤로가기만 취소로 연결
 export function ConfirmModal({
   visible,
   title,

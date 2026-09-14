@@ -1,6 +1,5 @@
 import { BarChart3, BookOpen, Settings, Timer, type LucideIcon } from 'lucide-react-native';
 
-// 웹 apps/web/components/shared/layout/navItems.ts 미러링
 export interface NavItem {
   name: string; // (app)/ 라우트 파일명과 일치
   icon: LucideIcon;

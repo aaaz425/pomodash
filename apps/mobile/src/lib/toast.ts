@@ -1,5 +1,4 @@
-// 웹 apps/web/components/shared/AppToaster.tsx(sonner) 대응 — zustand 스토어 액션처럼
-// React 트리 바깥(컴포넌트가 아닌 곳)에서도 호출 가능해야 해서 간단한 pub/sub으로 구현한다.
+// zustand 스토어 액션처럼 React 트리 바깥에서도 호출 가능해야 해서 간단한 pub/sub으로 구현한다
 type Listener = (message: string | null) => void;
 
 const TOAST_DURATION_MS = 3000;

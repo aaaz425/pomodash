@@ -68,10 +68,8 @@ describe('getTopDistractions', () => {
 describe('getFocusRatingTrend', () => {
   it('최근 7일과 이전 7일의 평균 집중도를 정상적으로 비교', () => {
     const sessions = [
-      // 최근 7일: 2024-03-09 ~ 2024-03-15
       makeSession({ startedAt: '2024-03-15T09:00:00', focusRating: 3 }),
       makeSession({ startedAt: '2024-03-10T09:00:00', focusRating: 1 }),
-      // 이전 7일: 2024-03-02 ~ 2024-03-08
       makeSession({ startedAt: '2024-03-08T23:00:00', focusRating: 2 }),
       makeSession({ startedAt: '2024-03-03T09:00:00', focusRating: 2 }),
     ];
@@ -160,7 +158,6 @@ describe('getCategoryFocusRatings', () => {
 
 describe('getLowestRatingDayOfWeek', () => {
   it('요일별 평균 중 가장 낮은 요일을 반환', () => {
-    // TODAY(2024-03-15)는 금요일. 화요일(2024-03-12)에 낮은 평점 집중
     const sessions = [
       makeSession({ startedAt: '2024-03-12T09:00:00', focusRating: 1 }), // 화요일
       makeSession({ startedAt: '2024-03-13T09:00:00', focusRating: 3 }), // 수요일

@@ -217,8 +217,7 @@ export function getMaxStreakDays<T extends SessionLike>(sessions: T[]): number {
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
-// 호출부가 이미 이번 달로 필터링한 배열(monthSessions)을 갖고 있는 경우가 많아,
-// 여기서 다시 'month'로 필터링하지 않고 인자로 받는다 (중복 순회 방지)
+// 이미 이번 달로 필터링된 배열을 인자로 받음 — 중복 순회 방지 위해 여기서 다시 필터링하지 않음
 export function getBusiestDayOfWeek<T extends SessionLike>(monthSessions: T[]): string | null {
   if (monthSessions.length === 0) return null;
 

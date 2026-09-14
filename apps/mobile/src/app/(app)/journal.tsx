@@ -25,8 +25,7 @@ export default function JournalScreen() {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [activeTab, setActiveTab] = useState<JournalTab>('list');
 
-  // 리스트/캘린더 각자 페이지네이션·월별로 세션을 따로 들고 있어, 상세 패널에서 수정/삭제하면
-  // 활성 탭 쪽 로컬 상태에 직접 반영해줘야 한다(전역 store만 바꿔선 화면에 안 보임)
+  // 리스트/캘린더가 세션을 각자 로컬 상태로 들고 있어, 상세 패널 수정/삭제 시 활성 탭에 직접 반영해야 함(전역 store만으론 안 보임)
   const listViewRef = useRef<SessionSyncHandle>(null);
   const calendarViewRef = useRef<SessionSyncHandle>(null);
   const activeSyncHandle = activeTab === 'list' ? listViewRef.current : calendarViewRef.current;

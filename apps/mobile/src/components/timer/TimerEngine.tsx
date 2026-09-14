@@ -38,8 +38,7 @@ export function TimerEngine() {
     notifiedRef.current = false;
     let scheduledId: string | null = null;
 
-    // 앱이 백그라운드에 있어도 phase 종료를 알 수 있도록 시작 시점에 미리 예약
-    // free 모드는 자동 완료가 없으므로(사용자가 직접 종료) 예약하지 않음
+    // 백그라운드에서도 phase 종료를 알 수 있게 미리 예약 — free 모드는 자동 완료가 없어 예약하지 않음
     if (mode === 'pomodoro') {
       const isLastCycle = phase === 'focus' && cycleCount + 1 >= totalCycles;
       const title = isLastCycle

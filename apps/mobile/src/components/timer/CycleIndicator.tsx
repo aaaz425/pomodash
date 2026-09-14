@@ -30,7 +30,6 @@ function Dot({
       opacity.value = 1;
       return;
     }
-    // 웹의 Tailwind animate-pulse(2s cubic-bezier, 1↔0.5)에 대응
     opacity.value = withRepeat(
       withTiming(0.5, { duration: 1000, easing: Easing.inOut(Easing.cubic) }),
       -1,

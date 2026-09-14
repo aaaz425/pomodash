@@ -47,8 +47,7 @@ export function AccountSection({ user }: Props) {
         <form
           action={logout}
           onSubmit={() => {
-            // 다음 사용자가 같은 브라우저에서 로그인/가입했을 때 남의 진행 중 타이머가
-            // 뜨는 걸 막기 위해, 계정과 무관하게 저장되는 activeTimer를 로그아웃 시 정리한다
+            // activeTimer는 계정과 무관하게 저장되므로, 다음 사용자에게 남의 타이머가 보이지 않도록 로그아웃 시 정리
             localStorage.removeItem(STORAGE_KEYS.activeTimer);
           }}
         >

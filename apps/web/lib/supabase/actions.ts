@@ -13,8 +13,7 @@ import {
 } from '@/types/schemas';
 import type { AuthActionResult } from '@/types';
 
-// signUp()이 "이미 가입된 이메일" 응답을 줄 때 보안상 기존 계정의 메타데이터를 안 채워주기 때문에,
-// Edge Function(service_role)으로 직접 조회해야 카카오 가입 여부를 알 수 있다.
+// signUp()은 이미 가입된 이메일이어도 보안상 메타데이터를 안 채워주므로, Edge Function(service_role)으로 직접 조회해야 카카오 가입 여부를 알 수 있다
 async function getExistingProvider(
   supabase: SupabaseClient,
   email: string,
@@ -133,8 +132,7 @@ export async function updatePassword(formData: FormData): Promise<AuthActionResu
     return { error: '비밀번호 변경에 실패했어요. 다시 시도해주세요' };
   }
 
-  // /reset-password(이메일 링크로 진입하는 단독 페이지)는 성공 시 홈으로 리다이렉트하지만,
-  // 설정 다이얼로그에서 호출할 땐 리다이렉트 없이 다이얼로그만 닫아야 해서 hidden 필드로 분기한다.
+  // 설정 다이얼로그 호출 시엔 리다이렉트 없이 닫기만 해야 해서 hidden 필드로 분기한다
   if (formData.get('redirectOnSuccess') === '1') {
     redirect('/');
   }

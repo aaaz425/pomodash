@@ -110,7 +110,6 @@ describe('setSoundVolume', () => {
 
   it('반올림 후 clamp가 적용된 값이 저장됨', async () => {
     const store = createSettingsStore();
-    // 105.7 → round(105.7)=106 → clamp(106)=100
     await store.getState().setSoundVolume(105.7);
     expect(store.getState().soundVolume).toBe(100);
   });

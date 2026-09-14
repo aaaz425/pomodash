@@ -44,7 +44,6 @@ describe('timerStore', () => {
 
     expect(store.getState().cycleCount).toBe(1);
     expect(store.getState().phase).toBe('short-break');
-    // 자동 연속 전환 — short-break가 멈춰있지 않고 바로 시작됨
     expect(typeof store.getState().startedAt).toBe('number');
   });
 
@@ -71,7 +70,6 @@ describe('timerStore', () => {
     vi.setSystemTime(new Date('2024-01-01T00:25:00.000Z'));
     store.getState().complete();
 
-    // 자동 연속 전환 — short-break가 멈춰있지 않고 현재 시각으로 바로 시작됨
     expect(store.getState().startedAt).toBe(new Date('2024-01-01T00:25:00.000Z').getTime());
     expect(store.getState().phase).toBe('short-break');
     expect(store.getState().cycleCount).toBe(1);
@@ -87,7 +85,6 @@ describe('timerStore', () => {
     vi.setSystemTime(new Date('2024-01-01T00:05:00.000Z'));
     store.getState().complete();
 
-    // 자동 연속 전환 — focus가 멈춰있지 않고 현재 시각으로 바로 시작됨
     expect(store.getState().startedAt).toBe(new Date('2024-01-01T00:05:00.000Z').getTime());
     expect(store.getState().phase).toBe('focus');
     expect(store.getState().cycleCount).toBe(1);
@@ -400,8 +397,7 @@ describe('timerStore', () => {
     });
 
     it('completeCycle() — 자동 완료 시에는 총 집중 시간이 5초 미만이어도 세션이 정상 종료됨', () => {
-      // 자연 완료로는 사실상 재현 불가능한 케이스라(목표 시간 자체가 최소 5분)
-      // endSession()과 달리 여기서는 5초 미만 세션 폐기를 적용하지 않기로 결정함
+      // 목표 시간을 3초로 낮춰 강제 재현 — endSession()과 달리 자동 완료는 5초 미만 폐기를 적용하지 않기로 결정함
       vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
       const store = createTimerStore();
       store.getState().updateSettings({ focusMinutes: 3 / 60, totalCycles: 1 }); // 3초짜리 단일 사이클
@@ -528,7 +524,6 @@ describe('timerStore', () => {
       store.getState().setMode('free');
       store.getState().start();
 
-      // 기본 focusMinutes(25분)를 훌쩍 넘겨도 pomodoro처럼 25분으로 clamp되지 않아야 함
       vi.setSystemTime(new Date('2024-01-01T01:10:00.000Z'));
       store.getState().endSession();
 

@@ -1,14 +1,12 @@
 import type { ExpoConfig } from 'expo/config';
 import { withEntitlementsPlist, type ConfigPlugin } from 'expo/config-plugins';
 
-// 로컬 iOS 실기기 테스트용 — Apple 계정에 com.pomodash.app이 이미 다른 팀에 등록되어 있어
-// 서명이 안 되는 문제를 피하려고 개발 빌드만 별도 bundle identifier를 쓴다.
-// 카카오 개발자 콘솔에도 iOS 플랫폼으로 com.pomodash.app.dev를 추가 등록해야 한다.
+// com.pomodash.app이 다른 팀에 이미 등록돼 서명이 안 되므로 개발 빌드만 별도 bundle identifier 사용
+// (카카오 개발자 콘솔에도 com.pomodash.app.dev를 iOS 플랫폼으로 추가 등록해야 함)
 const IS_DEV = process.env.APP_VARIANT === 'development';
 
-// 앱은 원격 푸시 없이 로컬 알림(타이머 종료 알림)만 사용하는데, expo-notifications 플러그인이
-// 무조건 aps-environment 엔타이틀먼트를 추가함 — 무료 개인 Apple 개발자 팀은 Push Notifications
-// capability 자체를 지원하지 않아 이 엔타이틀먼트가 있으면 로컬 실기기 서명이 막힌다.
+// expo-notifications가 무조건 aps-environment 엔타이틀먼트를 추가하는데, 무료 개인 Apple 팀은
+// Push Notifications capability를 지원 안 해 이게 있으면 로컬 서명이 막힘 — 로컬 알림만 쓰므로 제거
 const withoutPushEntitlement: ConfigPlugin = (config) =>
   withEntitlementsPlist(config, (config) => {
     delete config.modResults['aps-environment'];
@@ -80,8 +78,7 @@ const config: ExpoConfig = {
         kakaoAppKey: '3cb071760cf3e4e10c48829511386b52',
       },
     ],
-    // ExpoConfig 공식 타입이 config plugin 함수 형태를 아직 반영하지 않아 캐스팅 필요 —
-    // 런타임의 config plugin 리졸버는 함수를 정식으로 지원함
+    // ExpoConfig 타입이 아직 함수형 config plugin을 반영 안 해 캐스팅 필요 — 런타임은 정식 지원함
   ] as ExpoConfig['plugins'],
   experiments: {
     typedRoutes: true,

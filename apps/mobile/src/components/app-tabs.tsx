@@ -10,8 +10,7 @@ export default function AppTabs() {
   return (
     <Tabs
       tabBar={(props) => <BottomNav {...props} />}
-      // 비활성 탭 detach/freeze가 애니메이션과 겹치면 재방문 시 콘텐츠가 안 그려지는
-      // 문제가 있어 둘 다 끔(실측 확인) — 탭 4개짜리 앱이라 비용은 무시할 만함
+      // 비활성 탭 detach/freeze가 애니메이션과 겹치면 재방문 시 콘텐츠가 안 그려져 둘 다 끔(실측 확인, 탭 4개라 비용 무시 가능)
       detachInactiveScreens={false}
       screenOptions={{
         headerShown: false,
