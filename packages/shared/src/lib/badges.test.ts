@@ -1,39 +1,37 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Session, Task } from '@/types';
+import type { FocusPeriod, TimerMode } from '../types/timer';
 import { getEarnedBadgeIds } from './badges';
 
-function makeSession(overrides: Partial<Session> & { startedAt: string }): Session {
-  const focusSeconds = overrides.focusSeconds ?? 1500;
+interface TestSession {
+  taskId: string | null;
+  mode: TimerMode;
+  startedAt: string;
+  focusSeconds: number;
+  focusPeriods: FocusPeriod[];
+  totalCycles: number;
+  completedCycles: number;
+}
+
+interface TestTask {
+  id: string;
+  categoryId: string;
+}
+
+function makeSession(overrides: Partial<TestSession> & { startedAt: string }): TestSession {
   return {
-    id: overrides.startedAt,
     taskId: null,
-    title: null,
     mode: 'pomodoro',
-    endedAt: new Date(new Date(overrides.startedAt).getTime() + focusSeconds * 1000).toISOString(),
     completedCycles: 1,
     totalCycles: 4,
-    focusSeconds,
-    pausedSeconds: 0,
+    focusSeconds: 1500,
     focusPeriods: [],
-    note: null,
-    focusRating: null,
-    distractionTags: [],
     ...overrides,
   };
 }
 
-function makeTask(id: string, categoryId: string): Task {
-  return {
-    id,
-    title: id,
-    categoryId,
-    targetFocusMinutes: 25,
-    targetCycles: 4,
-    targetBreakMinutes: 5,
-    completed: false,
-    createdAt: '2024-01-01T00:00:00.000Z',
-  };
+function makeTask(id: string, categoryId: string): TestTask {
+  return { id, categoryId };
 }
 
 describe('getEarnedBadgeIds', () => {

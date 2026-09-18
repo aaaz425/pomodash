@@ -1,25 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Session } from '@/types';
+import type { FocusPeriod } from '../types/timer';
 import { buildHeadline, buildShareCardData } from './shareCard';
 
-function makeSession(startedAt: string, focusSeconds = 1500): Session {
-  return {
-    id: startedAt,
-    taskId: null,
-    title: null,
-    mode: 'pomodoro',
-    startedAt,
-    endedAt: new Date(new Date(startedAt).getTime() + focusSeconds * 1000).toISOString(),
-    completedCycles: 1,
-    totalCycles: 4,
-    focusSeconds,
-    pausedSeconds: 0,
-    focusPeriods: [],
-    note: null,
-    focusRating: null,
-    distractionTags: [],
-  };
+interface TestSession {
+  startedAt: string;
+  focusSeconds: number;
+  focusPeriods: FocusPeriod[];
+}
+
+function makeSession(startedAt: string, focusSeconds = 1500): TestSession {
+  return { startedAt, focusSeconds, focusPeriods: [] };
 }
 
 const TODAY = new Date('2024-03-15T12:00:00');
