@@ -2,10 +2,11 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { LogOut } from 'lucide-react';
+import { KeyRound, LogOut, Mail, Trash2 } from 'lucide-react';
 import { logout, deleteAccountWithPassword, loginWithKakao } from '@/lib/supabase/actions';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { PasswordField } from '@/components/auth/PasswordField';
 import { PasswordChangeDialog } from '@/components/settings/PasswordChangeDialog';
 import { cn } from '@/lib/utils';
@@ -27,7 +28,7 @@ export function AccountSection({ user }: Props) {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 px-4 py-3.5">
         <p className="text-sm text-muted-foreground">로그인이 필요해요</p>
         <Link href="/login" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
           로그인
@@ -40,46 +41,45 @@ export function AccountSection({ user }: Props) {
   const label = user.email ?? '카카오 계정';
   const isKakao = user.provider === 'kakao';
 
+  async function handleLogout() {
+    // activeTimer는 계정과 무관하게 저장되므로, 다음 사용자에게 남의 타이머가 보이지 않도록 로그아웃 시 정리
+    localStorage.removeItem(STORAGE_KEYS.activeTimer);
+    await logout();
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-foreground truncate">{label}</p>
-        <form
-          action={logout}
-          onSubmit={() => {
-            // activeTimer는 계정과 무관하게 저장되므로, 다음 사용자에게 남의 타이머가 보이지 않도록 로그아웃 시 정리
-            localStorage.removeItem(STORAGE_KEYS.activeTimer);
-          }}
-        >
-          <Button type="submit" variant="outline" size="sm" className="gap-1.5">
-            <LogOut className="w-3.5 h-3.5" />
-            로그아웃
-          </Button>
-        </form>
+    <>
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+        <div className="flex items-center gap-3">
+          <Mail className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm text-foreground">이메일</span>
+        </div>
+        <span className="text-xs text-muted-foreground truncate">{label}</span>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={() => setShowPasswordDialog(true)}
-          className="text-xs text-muted-foreground hover:underline"
-        >
-          {isKakao ? '비밀번호 설정' : '비밀번호 변경'}
-        </button>
-        {!verifying && (
-          <button
-            type="button"
+      <SettingsMenuRow
+        Icon={KeyRound}
+        label={isKakao ? '비밀번호 설정' : '비밀번호 변경'}
+        value=""
+        onClick={() => setShowPasswordDialog(true)}
+      />
+
+      {!verifying && (
+        <>
+          <SettingsMenuRow Icon={LogOut} label="로그아웃" value="" onClick={handleLogout} />
+          <SettingsMenuRow
+            Icon={Trash2}
+            label="회원탈퇴"
+            value=""
+            destructive
             onClick={() => setConfirmOpen(true)}
-            className="text-xs text-destructive hover:underline"
-          >
-            회원탈퇴
-          </button>
-        )}
-      </div>
+          />
+        </>
+      )}
 
       {verifying &&
         (isKakao ? (
-          <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+          <div className="m-4 flex flex-col gap-2 rounded-lg border border-border p-4">
             <p className="text-sm text-muted-foreground">
               카카오 계정 확인이 필요해요. 카카오로 다시 인증하면 탈퇴가 진행돼요.
             </p>
@@ -98,7 +98,7 @@ export function AccountSection({ user }: Props) {
         ) : (
           <form
             action={formAction}
-            className="flex flex-col gap-3 rounded-lg border border-border p-4"
+            className="m-4 flex flex-col gap-3 rounded-lg border border-border p-4"
           >
             <p className="text-sm text-muted-foreground">
               본인 확인을 위해 비밀번호를 입력해주세요.
@@ -128,6 +128,7 @@ export function AccountSection({ user }: Props) {
         title="정말 탈퇴하시겠어요?"
         description="모든 작업, 기록, 설정이 영구 삭제되며 복구할 수 없어요."
         confirmLabel="탈퇴 계속하기"
+        confirmVariant="destructive"
         onConfirm={() => {
           setConfirmOpen(false);
           setVerifying(true);
@@ -141,6 +142,6 @@ export function AccountSection({ user }: Props) {
           onClose={() => setShowPasswordDialog(false)}
         />
       )}
-    </div>
+    </>
   );
 }

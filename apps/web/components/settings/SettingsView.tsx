@@ -167,14 +167,10 @@ export function SettingsView({ userPromise }: Props) {
               </button>
 
               {activeCategory === 'account' && (
-                <SettingCard title="계정">
-                  <div className="flex flex-col gap-4">
-                    <ProfileSection />
-                    <div className="border-t border-border pt-4">
-                      <AccountSection user={user} />
-                    </div>
-                  </div>
-                </SettingCard>
+                <div className="rounded-xl border border-border bg-card divide-y divide-border">
+                  <ProfileSection />
+                  <AccountSection user={user} />
+                </div>
               )}
 
               {activeCategory === 'presets' && (

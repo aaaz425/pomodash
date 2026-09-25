@@ -18,6 +18,7 @@ interface Props {
   loading?: boolean;
   /** true면 배경(딤 영역) 클릭 시 onCancel 호출 — 파괴적 확인(삭제 등)은 기본값(false)으로 실수 방지 유지 */
   closeOnBackdropClick?: boolean;
+  confirmVariant?: 'default' | 'destructive';
 }
 
 // AlertDialog는 바깥 클릭으로 안 닫히는 게 기본 동작(의도적 — 실수로 안 닫히게).
@@ -34,6 +35,7 @@ export function ConfirmDialog({
   onTertiary,
   loading = false,
   closeOnBackdropClick = false,
+  confirmVariant = 'default',
 }: Props) {
   const hasTertiary = Boolean(tertiaryLabel && onTertiary);
   return (
@@ -95,7 +97,7 @@ export function ConfirmDialog({
               <Button
                 onClick={onConfirm}
                 disabled={loading}
-                variant="default"
+                variant={confirmVariant}
                 size="lg"
                 className="px-4 font-semibold"
               >
