@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   soundRepeatCount: 2,
   motivationalMessages: MOTIVATIONAL_MESSAGES,
   defaultTimerSettings: DEFAULT_TIMER_SETTINGS,
+  keepScreenAwake: false,
 };
 
 interface SettingsStore {
@@ -33,10 +34,12 @@ interface SettingsStore {
   soundRepeatCount: number;
   motivationalMessages: string[];
   defaultTimerSettings: TimerSettings;
+  keepScreenAwake: boolean;
 
   setNickname: (nickname: string) => Promise<void>;
   setTimerDefaults: (settings: TimerSettings) => Promise<void>;
   setBrowserNotification: (enabled: boolean) => Promise<void>;
+  setKeepScreenAwake: (enabled: boolean) => Promise<void>;
   setSoundAlert: (enabled: boolean) => Promise<void>;
   setSoundType: (type: SoundType) => Promise<void>;
   setSoundVolume: (volume: number) => Promise<void>;
@@ -58,6 +61,7 @@ function toAppSettings(s: SettingsStore): AppSettings {
     soundRepeatCount: s.soundRepeatCount,
     motivationalMessages: s.motivationalMessages,
     defaultTimerSettings: s.defaultTimerSettings,
+    keepScreenAwake: s.keepScreenAwake,
   };
 }
 
@@ -89,6 +93,9 @@ export const createSettingsStore = () =>
 
       setBrowserNotification: (browserNotification) =>
         persistChange({ browserNotification: get().browserNotification }, { browserNotification }),
+
+      setKeepScreenAwake: (keepScreenAwake) =>
+        persistChange({ keepScreenAwake: get().keepScreenAwake }, { keepScreenAwake }),
 
       setSoundAlert: (soundAlert) =>
         persistChange({ soundAlert: get().soundAlert }, { soundAlert }),

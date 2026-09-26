@@ -7,6 +7,7 @@ import {
   cancelScheduledNotification,
 } from '@/lib/notifications';
 import { playAlarm } from '@/lib/sound';
+import { useKeepAwake } from '@/hooks/useKeepAwake';
 
 // 싱글턴 tick 소유자 — (app)/_layout.tsx에 한 번만 마운트. 개별 컴포넌트는 useTimer()로 읽기만 한다.
 export function TimerEngine() {
@@ -25,6 +26,9 @@ export function TimerEngine() {
   const soundType = useSettingsStore((s) => s.soundType);
   const soundVolume = useSettingsStore((s) => s.soundVolume);
   const soundRepeatCount = useSettingsStore((s) => s.soundRepeatCount);
+  const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);
+
+  useKeepAwake(keepScreenAwake && startedAt !== null);
 
   // 같은 완료 이벤트에서 complete()가 중복 호출되지 않도록 방지 — 싱글턴이라 인스턴스 간 경합 없음
   const notifiedRef = useRef(false);

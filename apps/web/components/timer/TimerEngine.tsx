@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { deriveTimerDisplay } from '@pomodash/shared';
 import { useTimerStore, useSettingsStore, useHydrated } from '@/store/StoreProvider';
 import { playAlarm, sendNotification } from '@/lib/notifications';
+import { useWakeLock } from '@/hooks/useWakeLock';
 
 // 싱글턴 tick 소유자 — layout에 한 번만 마운트. 개별 컴포넌트는 useTimer()로 읽기만 한다.
 export function TimerEngine() {
@@ -24,6 +25,9 @@ export function TimerEngine() {
   const soundVolume = useSettingsStore((s) => s.soundVolume);
   const soundRepeatCount = useSettingsStore((s) => s.soundRepeatCount);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
+  const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);
+
+  useWakeLock(keepScreenAwake && startedAt !== null);
 
   // 같은 완료 이벤트에서 중복 알림 방지 — 싱글턴이라 인스턴스 간 경합 없음
   const notifiedRef = useRef(false);

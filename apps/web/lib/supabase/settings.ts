@@ -12,6 +12,7 @@ interface SettingsRow {
   default_focus_minutes: number;
   default_short_break_minutes: number;
   default_total_cycles: number;
+  keep_screen_awake: boolean;
 }
 
 // Supabase 응답도 외부 입력이므로 localStorage와 동일하게 Zod로 검증 후 사용한다.
@@ -29,6 +30,7 @@ export function toAppSettings(row: SettingsRow): AppSettings | null {
       shortBreakMinutes: row.default_short_break_minutes,
       totalCycles: row.default_total_cycles,
     },
+    keepScreenAwake: row.keep_screen_awake,
   });
   return parsed.success ? parsed.data : null;
 }
@@ -45,6 +47,7 @@ function toRow(settings: AppSettings) {
     default_focus_minutes: settings.defaultTimerSettings.focusMinutes,
     default_short_break_minutes: settings.defaultTimerSettings.shortBreakMinutes,
     default_total_cycles: settings.defaultTimerSettings.totalCycles,
+    keep_screen_awake: settings.keepScreenAwake,
     updated_at: new Date().toISOString(),
   };
 }

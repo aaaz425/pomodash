@@ -132,6 +132,7 @@ export interface AppSettings {
   soundRepeatCount: number     // 1–5
   motivationalMessages: string[] // 1–20개
   defaultTimerSettings: TimerSettings
+  keepScreenAwake: boolean
 }
 ```
 

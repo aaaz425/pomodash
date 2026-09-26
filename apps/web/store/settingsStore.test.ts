@@ -281,6 +281,7 @@ describe('hydrate', () => {
       soundRepeatCount: 4,
       motivationalMessages: ['저장된 메시지'],
       defaultTimerSettings: DEFAULT_TIMER_SETTINGS,
+      keepScreenAwake: true,
     };
     mockFetchSettings.mockResolvedValueOnce(saved);
 
