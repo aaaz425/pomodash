@@ -31,4 +31,5 @@ export const AppSettingsSchema = z.object({
     .min(INPUT_LIMITS.MESSAGE_COUNT_MIN)
     .max(INPUT_LIMITS.MESSAGE_COUNT_MAX),
   defaultTimerSettings: TimerSettingsSchema,
+  keepScreenAwake: z.boolean().default(false),
 });

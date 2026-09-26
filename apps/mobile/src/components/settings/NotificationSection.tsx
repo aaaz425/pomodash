@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
-import { Bell, Pause, Play, Volume2 } from 'lucide-react-native';
+import { Bell, Eye, Pause, Play, Volume2 } from 'lucide-react-native';
 import { SOUND_LIMITS, type SoundType } from '@pomodash/shared';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { SoundTypeSelect } from '@/components/settings/SoundTypeSelect';
@@ -15,11 +15,13 @@ export function NotificationSection() {
   const theme = THEME[scheme];
 
   const browserNotification = useSettingsStore((s) => s.browserNotification);
+  const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);
   const soundAlert = useSettingsStore((s) => s.soundAlert);
   const soundType = useSettingsStore((s) => s.soundType);
   const soundVolume = useSettingsStore((s) => s.soundVolume);
   const soundRepeatCount = useSettingsStore((s) => s.soundRepeatCount);
   const setBrowserNotification = useSettingsStore((s) => s.setBrowserNotification);
+  const setKeepScreenAwake = useSettingsStore((s) => s.setKeepScreenAwake);
   const setSoundAlert = useSettingsStore((s) => s.setSoundAlert);
   const setSoundType = useSettingsStore((s) => s.setSoundType);
   const setSoundVolume = useSettingsStore((s) => s.setSoundVolume);
@@ -73,6 +75,33 @@ export function NotificationSection() {
         <Switch
           value={browserNotification}
           onValueChange={(v) => void handlePushNotificationChange(v)}
+          trackColor={{ true: theme.primary }}
+          style={styles.switch}
+        />
+      </View>
+
+      <View style={styles.toggleRow}>
+        <View style={styles.toggleLeft}>
+          <Eye size={16} color={theme.mutedForeground} />
+          <View>
+            <Text
+              style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}
+            >
+              화면 꺼짐 방지
+            </Text>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+              ]}
+            >
+              타이머 실행 중 화면이 꺼지지 않아요
+            </Text>
+          </View>
+        </View>
+        <Switch
+          value={keepScreenAwake}
+          onValueChange={(v) => void setKeepScreenAwake(v)}
           trackColor={{ true: theme.primary }}
           style={styles.switch}
         />
