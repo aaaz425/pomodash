@@ -12,6 +12,7 @@ const validRow = {
   default_focus_minutes: 50,
   default_short_break_minutes: 10,
   default_total_cycles: 3,
+  keep_screen_awake: true,
 };
 
 describe('toAppSettings', () => {
@@ -25,6 +26,7 @@ describe('toAppSettings', () => {
       soundRepeatCount: 4,
       motivationalMessages: ['메시지1'],
       defaultTimerSettings: { focusMinutes: 50, shortBreakMinutes: 10, totalCycles: 3 },
+      keepScreenAwake: true,
     });
   });
 
