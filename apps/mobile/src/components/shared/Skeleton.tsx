@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface Props {
   width?: DimensionValue;
@@ -19,16 +20,21 @@ interface Props {
 
 export function Skeleton({ width = '100%', height = 14, borderRadius = 6, style }: Props) {
   const scheme = useThemeScheme();
+  const reducedMotion = useReducedMotion();
   const theme = THEME[scheme];
   const opacity = useSharedValue(0.5);
 
   useEffect(() => {
+    if (reducedMotion) {
+      opacity.value = withTiming(0.75, { duration: 300 });
+      return;
+    }
     opacity.value = withRepeat(
       withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
       -1,
       true,
     );
-  }, [opacity]);
+  }, [opacity, reducedMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 

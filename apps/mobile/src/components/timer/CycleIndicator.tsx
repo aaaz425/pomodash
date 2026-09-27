@@ -11,6 +11,7 @@ import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { phaseBadge, THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 function Dot({
   filled,
@@ -52,6 +53,7 @@ function Dot({
 
 export function CycleIndicator() {
   const scheme = useThemeScheme();
+  const reducedMotion = useReducedMotion();
   const { phase, mode } = useTimer();
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
@@ -71,7 +73,7 @@ export function CycleIndicator() {
           <Dot
             key={i}
             filled={isCompleted || isCurrent}
-            pulsing={isCurrent}
+            pulsing={isCurrent && !reducedMotion}
             borderColor={THEME[scheme].border}
             dotColor={dotColor}
           />

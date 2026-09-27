@@ -10,6 +10,7 @@ import Animated, {
 import type { TimerPhase } from '@pomodash/shared';
 import { phaseGlowRgba, THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface Props {
   phase: TimerPhase;
@@ -21,11 +22,16 @@ const SIZE = 320;
 
 export function TimerGlow({ phase, isNeutral }: Props) {
   const scheme = useThemeScheme();
+  const reducedMotion = useReducedMotion();
   const opacity = useSharedValue(isNeutral ? 0.3 : 0.5);
 
   useEffect(() => {
     if (isNeutral) {
       opacity.value = withTiming(0.3, { duration: 300 });
+      return;
+    }
+    if (reducedMotion) {
+      opacity.value = withTiming(0.575, { duration: 300 });
       return;
     }
     // RN은 filter: brightness()가 없어 opacity로 근사 — 1.0까지 올리면 텍스트 뒤에서 밝아져 가독성을 해쳐 0.65로 억제
@@ -35,7 +41,7 @@ export function TimerGlow({ phase, isNeutral }: Props) {
       -1,
       true,
     );
-  }, [isNeutral, opacity]);
+  }, [isNeutral, opacity, reducedMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
