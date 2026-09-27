@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Tag } from 'lucide-react';
 import { useTaskStore, useSettingsStore, useTimerStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
+import { withReducedMotion } from '@/lib/motion';
 import type { Task } from '@/types';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export function TaskFormModal({ task, onClose, onCreated }: Props) {
+  const reducedMotion = useReducedMotion();
   const categories = useTaskStore((s) => s.categories);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
@@ -168,7 +170,10 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                transition={withReducedMotion(!!reducedMotion, {
+                  duration: 0.2,
+                  ease: 'easeInOut',
+                })}
                 className="overflow-hidden"
               >
                 <div className="flex flex-col gap-2 pt-2">

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Bell,
@@ -36,6 +36,7 @@ import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { useTheme, type ThemeMode } from '@/hooks/useTheme';
 import { useAccentTheme } from '@/hooks/useAccentTheme';
+import { withReducedMotion } from '@/lib/motion';
 import type { SettingsUser } from '@/types';
 
 type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
@@ -71,6 +72,7 @@ interface Props {
 
 export function SettingsView({ userPromise }: Props) {
   const { hydrated, showSkeleton } = useDelayedHydration();
+  const reducedMotion = useReducedMotion();
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const [user, setUser] = useState<SettingsUser | null>(null);
@@ -127,7 +129,7 @@ export function SettingsView({ userPromise }: Props) {
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={withReducedMotion(!!reducedMotion, { duration: 0.2, ease: 'easeOut' })}
               className="rounded-xl border border-border bg-card divide-y divide-border"
             >
               {CATEGORIES.map(({ key, label, Icon }) => (
@@ -154,7 +156,7 @@ export function SettingsView({ userPromise }: Props) {
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 16 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={withReducedMotion(!!reducedMotion, { duration: 0.2, ease: 'easeOut' })}
               className="flex flex-col gap-6"
             >
               <button
