@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { TaskList } from '@/components/tasks/TaskList';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
+import { withReducedMotion } from '@/lib/motion';
 import type { TimerMode, TimerSettings } from '@/types';
 
 interface Props {
@@ -20,6 +21,7 @@ const MODE_OPTIONS: { value: TimerMode; label: string }[] = [
 ];
 
 export function StartSessionModal({ onClose }: Props) {
+  const reducedMotion = useReducedMotion();
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
   const storeSettings = useTimerStore((s) => s.settings);
   const storeMode = useTimerStore((s) => s.mode);
@@ -114,7 +116,7 @@ export function StartSessionModal({ onClose }: Props) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            transition={withReducedMotion(!!reducedMotion, { duration: 0.2, ease: 'easeInOut' })}
             className="overflow-hidden"
           >
             <div className="flex flex-col gap-5 pt-5">

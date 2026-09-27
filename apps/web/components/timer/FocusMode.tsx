@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X, Square, Play, Pause } from 'lucide-react';
 import { useTimerStore, useSettingsStore } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
@@ -13,8 +13,10 @@ import { CycleIndicator } from '@/components/timer/CycleIndicator';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { MESSAGE_ROTATE_INTERVAL_MS } from '@/lib/constants/ux';
+import { withReducedMotion } from '@/lib/motion';
 
 export function FocusMode() {
+  const reducedMotion = !!useReducedMotion();
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const start = useTimerStore((s) => s.start);
@@ -59,7 +61,7 @@ export function FocusMode() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.98 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={withReducedMotion(reducedMotion, { duration: 0.25, ease: 'easeOut' })}
           className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-background px-4"
         >
           {/* Exit Button */}
@@ -91,7 +93,7 @@ export function FocusMode() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
+              transition={withReducedMotion(reducedMotion, { duration: 0.3, ease: 'easeOut' })}
               className="text-sm text-muted-foreground/80 text-center max-w-xs"
             >
               {message}
