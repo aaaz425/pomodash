@@ -272,12 +272,13 @@ export const createTaskStore = () => {
       if (get().categories.length >= INPUT_LIMITS.CATEGORIES_MAX) return;
       const trimmed = name.trim();
       const tempId = generateId();
+      const position = get().categories.length;
       set((state) => ({
         categories: [...state.categories, { id: tempId, name: trimmed, color }],
       }));
 
       const idPromise = (async () => {
-        const inserted = await insertCategoryRow({ name: trimmed, color });
+        const inserted = await insertCategoryRow({ name: trimmed, color, position });
         if (!inserted) {
           set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
           toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
@@ -286,7 +287,6 @@ export const createTaskStore = () => {
         set((state) => ({
           categories: state.categories.map((c) => (c.id === tempId ? inserted : c)),
         }));
-        void reorderCategoriesRows(get().categories.map((c) => c.id));
         return inserted.id;
       })();
       trackPendingId(pendingCategoryIds, tempId, idPromise);
