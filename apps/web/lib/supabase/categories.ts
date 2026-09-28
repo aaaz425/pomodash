@@ -29,11 +29,12 @@ export async function fetchCategories(): Promise<{
 export async function insertCategory(input: {
   name: string;
   color: string;
+  position: number;
 }): Promise<Category | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('categories')
-    .insert({ name: input.name, color: input.color })
+    .insert({ name: input.name, color: input.color, position: input.position })
     .select('id, name, color')
     .single();
   if (error || !data) return null;
