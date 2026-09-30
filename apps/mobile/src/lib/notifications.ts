@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
 Notifications.setNotificationHandler({
@@ -8,6 +9,18 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+const TIMER_COMPLETE_CHANNEL_ID = 'timer-complete';
+
+// 채널을 명시적으로 안 만들면 기본 중요도로 생성되어 헤드업 배너/사운드가 안 뜰 수 있음
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync(TIMER_COMPLETE_CHANNEL_ID, {
+    name: '타이머 완료 알림',
+    importance: Notifications.AndroidImportance.HIGH,
+    sound: 'default',
+    vibrationPattern: [0, 250, 250, 250],
+  });
+}
 
 export async function requestNotificationPermissionAsync(): Promise<boolean> {
   const current = await Notifications.getPermissionsAsync();
@@ -34,7 +47,12 @@ export async function scheduleTimerCompleteNotification({
   const granted = await requestNotificationPermissionAsync();
   if (!granted) return null;
   return Notifications.scheduleNotificationAsync({
-    content: { title, body, sound: sound ? 'default' : undefined },
+    content: {
+      title,
+      body,
+      sound: sound ? 'default' : undefined,
+      ...(Platform.OS === 'android' && { channelId: TIMER_COMPLETE_CHANNEL_ID }),
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: Math.max(1, Math.round(secondsFromNow)),
