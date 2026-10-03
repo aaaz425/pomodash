@@ -29,7 +29,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    // CI는 dev 서버(HMR)가 러너 CPU를 뺏어가 브라우저가 멈추는 현상이 있어 프로덕션 빌드로 띄움 — 빌드는 별도 CI 스텝에서 선행
+    command: process.env.CI ? 'npm run start' : 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
