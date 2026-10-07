@@ -82,9 +82,9 @@
 ## Phase 9 — 하이브리드 WebView 전환
 
 - [x] `chore/rn-webview-smoke-test` — react-native-webview 설치 + 퍼블릭 페이지 로드 스모크 테스트
-- [>] `feat/web-embed-mode` — 웹 레이아웃에 embed 모드 추가 (쉘 숨김 + 테마 파라미터)
+- [x] `feat/web-embed-mode` — /embed/dashboard, /embed/journal 라우트 + proxy rewrite로 쉘 숨김 (정적 생성 유지)
 - [ ] `feat/rn-webview-auth-bridge` — 네이티브 세션을 WebView 쿠키로 넘기는 인증 브릿지 (go/no-go 게이트)
-- [ ] `feat/rn-webview-wrapper` — EmbeddedWebScreen 공통 컴포넌트 (마운트 유지 + 뒤로가기 가드)
+- [ ] `feat/rn-webview-wrapper` — EmbeddedWebScreen 공통 컴포넌트 (마운트 유지 + 뒤로가기 가드 + 테마 사전주입 + SW 등록 스킵)
 - [ ] `feat/rn-webview-dashboard` — 대시보드 탭 WebView 전환 (feature flag)
 - [ ] `feat/rn-webview-journal` — 저널 탭 WebView 전환 (feature flag)
 
