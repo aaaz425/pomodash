@@ -26,6 +26,8 @@ import { ShareCardModal } from '@/components/dashboard/ShareCardModal';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { WEBVIEW_DASHBOARD_ENABLED } from '@/constants/featureFlags';
+import { EmbeddedWebScreen } from '@/components/webview/EmbeddedWebScreen';
 
 function makeFocusSub(diff: number, label: string): string | undefined {
   if (diff === 0) return undefined;
@@ -54,6 +56,13 @@ const SESSION_LABELS: Record<TabType, string> = {
 };
 
 export default function DashboardScreen() {
+  if (WEBVIEW_DASHBOARD_ENABLED) {
+    return <EmbeddedWebScreen path="/dashboard" />;
+  }
+  return <NativeDashboardScreen />;
+}
+
+function NativeDashboardScreen() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
   const hydrated = useHydrated();
