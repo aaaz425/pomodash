@@ -85,6 +85,6 @@
 - [x] `feat/web-embed-mode` — /embed/dashboard, /embed/journal 라우트 + proxy rewrite로 쉘 숨김 (정적 생성 유지)
 - [x] `feat/rn-webview-auth-bridge` — 네이티브 세션을 WebView 쿠키로 넘기는 인증 브릿지 (go/no-go 게이트 통과)
 - [x] `feat/rn-webview-wrapper` — EmbeddedWebScreen 공통 컴포넌트 (뒤로가기 가드 + 테마 사전주입 + SW 등록 스킵)
-- [ ] `feat/rn-webview-dashboard` — 대시보드 탭 WebView 전환 (feature flag)
+- [x] `feat/rn-webview-dashboard` — 대시보드 탭 WebView 전환 (feature flag, iOS만 검증 — 안드로이드 미검증)
 - [ ] `feat/rn-webview-journal` — 저널 탭 WebView 전환 (feature flag)
 
