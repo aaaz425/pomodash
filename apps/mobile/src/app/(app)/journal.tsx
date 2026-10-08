@@ -12,8 +12,17 @@ import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import type { Session } from '@/types/sessions';
+import { WEBVIEW_JOURNAL_ENABLED } from '@/constants/featureFlags';
+import { EmbeddedWebScreen } from '@/components/webview/EmbeddedWebScreen';
 
 export default function JournalScreen() {
+  if (WEBVIEW_JOURNAL_ENABLED) {
+    return <EmbeddedWebScreen path="/journal" />;
+  }
+  return <NativeJournalScreen />;
+}
+
+function NativeJournalScreen() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
   const hydrated = useHydrated();
