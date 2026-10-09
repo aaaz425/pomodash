@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { normalizeFocusPeriods } from '@pomodash/shared';
+import { router } from 'expo-router';
+import { normalizeFocusPeriods, formatDuration } from '@pomodash/shared';
 import type { FocusRating } from '@pomodash/shared';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
+import { useAuth } from '@/store/AuthProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { Portal } from '@/components/shared/Portal';
@@ -20,6 +22,7 @@ import { SessionActionButtons } from './SessionActionButtons';
 export function SessionCompleteSheet() {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
+  const { session } = useAuth();
 
   const sessionEnded = useTimerStore((s) => s.sessionEnded);
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
@@ -44,13 +47,6 @@ export function SessionCompleteSheet() {
 
   if (!sessionEnded || sessionEndedAt === null) return null;
 
-  const isTaskSession = currentTaskId !== null;
-  const now = sessionEndedAt;
-  const totalElapsed = sessionStartedAt
-    ? Math.floor((now - sessionStartedAt) / 1000)
-    : accFocusSeconds;
-  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds);
-
   function resetForm() {
     setNote('');
     setFocusRating(null);
@@ -58,6 +54,83 @@ export function SessionCompleteSheet() {
     setSelectedTaskId(null);
     setPendingAction(null);
   }
+
+  function handleSkip() {
+    dismissSessionRecord();
+    resetForm();
+  }
+
+  if (!session) {
+    return (
+      <Portal>
+        <Modal visible={sessionEnded} animationType="fade" transparent onRequestClose={handleSkip}>
+          <View style={styles.root}>
+            <Pressable style={styles.backdrop} onPress={handleSkip} />
+            <View style={styles.sheetWrap} pointerEvents="box-none">
+              <View
+                style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
+              >
+                <SafeAreaView edges={['bottom']}>
+                  <View style={styles.scrollOuter}>
+                    <View style={styles.headerGroup}>
+                      <SessionCompleteHeader />
+                    </View>
+
+                    <Text
+                      style={[
+                        styles.summaryText,
+                        { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                      ]}
+                    >
+                      {mode !== 'free' && `${cycleCount}사이클 동안 `}
+                      {formatDuration(accFocusSeconds)} 집중했어요
+                    </Text>
+
+                    <View style={styles.guestActions}>
+                      <Pressable
+                        onPress={() => {
+                          resetForm();
+                          dismissSessionRecord();
+                          router.push('/login');
+                        }}
+                        style={[styles.cta, { backgroundColor: theme.primary }]}
+                      >
+                        <Text
+                          style={[
+                            styles.ctaText,
+                            { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+                          ]}
+                        >
+                          로그인하고 기록 남기기
+                        </Text>
+                      </Pressable>
+                      <Pressable onPress={handleSkip} style={styles.closeButton}>
+                        <Text
+                          style={[
+                            styles.closeText,
+                            { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
+                          ]}
+                        >
+                          닫기
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </SafeAreaView>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </Portal>
+    );
+  }
+
+  const isTaskSession = currentTaskId !== null;
+  const now = sessionEndedAt;
+  const totalElapsed = sessionStartedAt
+    ? Math.floor((now - sessionStartedAt) / 1000)
+    : accFocusSeconds;
+  const pausedSeconds = Math.max(0, totalElapsed - accFocusSeconds);
 
   async function handleSave() {
     if (isSaving) return;
@@ -93,11 +166,6 @@ export function SessionCompleteSheet() {
     setFocusRating(null);
     setDistractionTags([]);
     setSelectedTaskId(null);
-  }
-
-  function handleSkip() {
-    dismissSessionRecord();
-    resetForm();
   }
 
   return (
@@ -229,6 +297,30 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
+  },
+  summaryText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  guestActions: {
+    gap: 8,
+    marginTop: 12,
+  },
+  cta: {
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  ctaText: {
+    fontSize: 14,
+  },
+  closeButton: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  closeText: {
+    fontSize: 14,
   },
   field: {
     gap: 8,

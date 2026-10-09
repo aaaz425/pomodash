@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { useAuth } from '@/store/AuthProvider';
+import { GuestPrompt } from '@/components/shared/GuestPrompt';
 import { JournalTabs, type JournalTab } from '@/components/journal/JournalTabs';
 import { ListView, type SessionSyncHandle } from '@/components/journal/ListView';
 import { CalendarView } from '@/components/journal/CalendarView';
@@ -16,6 +18,8 @@ import { WEBVIEW_JOURNAL_ENABLED } from '@/constants/featureFlags';
 import { EmbeddedWebScreen } from '@/components/webview/EmbeddedWebScreen';
 
 export default function JournalScreen() {
+  const { session } = useAuth();
+  if (!session) return <GuestPrompt title="로그인하면 기록을 확인할 수 있어요" />;
   if (WEBVIEW_JOURNAL_ENABLED) {
     return <EmbeddedWebScreen path="/journal" />;
   }

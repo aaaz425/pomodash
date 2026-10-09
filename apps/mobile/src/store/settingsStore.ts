@@ -147,7 +147,6 @@ export const createSettingsStore = () =>
       hydrate: async () => {
         const settings = await withRetry(fetchSettings);
         if (settings) set(settings);
-        else toast('설정을 불러오지 못했어요. 다시 시도해주세요');
       },
     };
   });

@@ -44,7 +44,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [settingsStore] = useState<SettingsStoreApi>(createSettingsStore);
   const [hydrated, setHydrated] = useState(false);
 
-  // (app) 그룹 레이아웃이 인증 게이트라 여기선 바로 조회해도 안전 — 로그아웃 시 언마운트되며 스토어도 함께 버려짐
   useEffect(() => {
     Promise.all([
       preloadTimerSnapshot().then(() => timerStore.getState().hydrate()),
