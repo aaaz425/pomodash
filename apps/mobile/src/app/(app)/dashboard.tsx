@@ -12,6 +12,8 @@ import {
   type TabType,
 } from '@pomodash/shared';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
+import { useAuth } from '@/store/AuthProvider';
+import { GuestPrompt } from '@/components/shared/GuestPrompt';
 import { fetchDashboardSummary } from '@/lib/supabase/dashboard';
 import type { DashboardSummary } from '@/types/dashboard';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
@@ -56,6 +58,8 @@ const SESSION_LABELS: Record<TabType, string> = {
 };
 
 export default function DashboardScreen() {
+  const { session } = useAuth();
+  if (!session) return <GuestPrompt title="로그인하면 통계를 확인할 수 있어요" />;
   if (WEBVIEW_DASHBOARD_ENABLED) {
     return <EmbeddedWebScreen path="/dashboard" />;
   }

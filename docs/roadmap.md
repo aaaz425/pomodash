@@ -73,10 +73,10 @@
 - [x] `feat/rn-sync` — 웹 ↔ 앱 데이터 동기화 (Supabase 기반)
 - [x] `feat/rn-session-record` — 세션 종료 시 메모 작성 + Supabase `sessions` 저장
 - [x] `feat/rn-journal` — 기록(세션 히스토리 리스트/캘린더/상세편집)
-- [x] `feat/rn-dashboard` — 대시보드(집중 시간 집계·차트·스트릭)
+- [x] `feat/rn-dashboard` — 대시보드(집중 시간 집계/차트/스트릭)
 - [x] `feat/rn-badges-share` — 뱃지 수집 + 공유 카드
 - [x] `feat/rn-bottom-nav` — 하단 네비게이션 바를 웹과 동일한 커스텀 바로 교체
-- [x] `feat/rn-settings-sync` — 동기부여 메시지·알림음·기본 타이머값 Supabase `settings` 연동
+- [x] `feat/rn-settings-sync` — 동기부여 메시지/알림음/기본 타이머값 Supabase `settings` 연동
 - [x] `feat/rn-kakao-eas` — EAS 개발 빌드 전환 + 카카오 로그인
 
 ## Phase 9 — 하이브리드 WebView 전환
@@ -85,6 +85,10 @@
 - [x] `feat/web-embed-mode` — /embed/dashboard, /embed/journal 라우트 + proxy rewrite로 쉘 숨김 (정적 생성 유지)
 - [x] `feat/rn-webview-auth-bridge` — 네이티브 세션을 WebView 쿠키로 넘기는 인증 브릿지 (go/no-go 게이트 통과)
 - [x] `feat/rn-webview-wrapper` — EmbeddedWebScreen 공통 컴포넌트 (뒤로가기 가드 + 테마 사전주입 + SW 등록 스킵)
-- [x] `feat/rn-webview-dashboard` — 대시보드 탭 WebView 전환 (feature flag, iOS만 검증 — 안드로이드 미검증)
-- [x] `feat/rn-webview-journal` — 저널 탭 WebView 전환 (feature flag)
+- [x] `feat/rn-webview-dashboard` — 대시보드 탭 WebView 전환
+- [x] `feat/rn-webview-journal` — 저널 탭 WebView 전환
+
+## Phase 10 — 비회원 체험 모드
+
+- [x] `feat/guest-mode` — 비로그인 타이머 체험 모드
 

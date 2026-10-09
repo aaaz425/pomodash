@@ -32,6 +32,7 @@ import { TaskManageModal } from '@/components/settings/task/TaskManageModal';
 import { MotivationalModal } from '@/components/settings/motivational/MotivationalModal';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsSkeleton } from '@/components/settings/SettingsSkeleton';
+import { GuestPrompt } from '@/components/shared/GuestPrompt';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { useDelayedHydration } from '@/hooks/useDelayedHydration';
 import { useTheme, type ThemeMode } from '@/hooks/useTheme';
@@ -112,6 +113,7 @@ export function SettingsView({ userPromise }: Props) {
   }, [searchParams]);
 
   if (!hydrated || !userLoaded) return showSkeleton ? <SettingsSkeleton /> : null;
+  if (!user) return <GuestPrompt title="로그인하면 동기화할 수 있어요" />;
 
   const activeLabel = CATEGORIES.find((c) => c.key === activeCategory)?.label;
 

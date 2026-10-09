@@ -14,6 +14,7 @@ import {
 import { useHydrated, useSettingsStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
+import { GuestPrompt } from '@/components/shared/GuestPrompt';
 import { SettingsCard } from '@/components/settings/SettingsCard';
 import { SettingsRowGroup } from '@/components/settings/SettingsRowGroup';
 import { AccountCategoryCard } from '@/components/settings/AccountCategoryCard';
@@ -90,6 +91,8 @@ export default function SettingsScreen() {
   function goTo(next: CategoryKey | null) {
     setActiveCategory(next);
   }
+
+  if (!user) return <GuestPrompt title="로그인하면 동기화할 수 있어요" />;
 
   if (!hydrated) {
     return (

@@ -363,9 +363,6 @@ export const createTaskStore = () => {
         withRetry(fetchCategories),
         withRetry(fetchSessions),
       ]);
-      if (tasksResult === null || categoriesResult === null || sessionsResult === null) {
-        toast('데이터를 불러오지 못했어요. 다시 시도해주세요');
-      }
       set({
         tasks: tasksResult?.tasks ?? [],
         categories: categoriesResult?.categories ?? DEFAULT_CATEGORIES,

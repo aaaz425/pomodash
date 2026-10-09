@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { Check } from 'lucide-react';
 import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
+import { useLoggedIn } from '@/hooks/useLoggedIn';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { SessionProgressBadge } from '@/components/timer/SessionProgressBadge';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -14,10 +16,16 @@ import { MemoTextarea } from '@/components/shared/MemoTextarea';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
+import { formatDuration } from '@/lib/sessionUtils';
 import type { FocusRating } from '@/types';
 
-export function SessionRecordModal() {
+interface Props {
+  loggedInPromise: Promise<boolean>;
+}
+
+export function SessionRecordModal({ loggedInPromise }: Props) {
   const hydrated = useHydrated();
+  const loggedIn = useLoggedIn(loggedInPromise);
   const sessionEnded = useTimerStore((s) => s.sessionEnded);
   const dismissSessionRecord = useTimerStore((s) => s.dismissSessionRecord);
   const cycleCount = useTimerStore((s) => s.cycleCount);
@@ -40,7 +48,67 @@ export function SessionRecordModal() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!hydrated || !sessionEnded || sessionEndedAt === null) return null;
+  if (!hydrated || !sessionEnded || sessionEndedAt === null || loggedIn === null) return null;
+
+  function handleSkip() {
+    dismissSessionRecord();
+    setNote('');
+    setFocusRating(null);
+    setDistractionTags([]);
+    setSelectedTaskId(null);
+    setPendingAction(null);
+  }
+
+  if (!loggedIn) {
+    return (
+      <DialogPrimitive.Root open onOpenChange={(open) => !open && handleSkip()}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+          <DialogPrimitive.Popup
+            aria-label="집중 완료"
+            className={[
+              'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
+              'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',
+              'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:pb-0',
+              'sm:w-[600px] sm:rounded-xl sm:max-h-[85vh]',
+            ].join(' ')}
+          >
+            <div className="flex flex-col items-center gap-5 p-5 sm:gap-7 sm:p-10">
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-full bg-primary/20">
+                  <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary">
+                    <Check
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground"
+                      strokeWidth={2.5}
+                    />
+                  </div>
+                </div>
+                <h2 className="text-[26px] font-bold tracking-tight text-foreground text-center">
+                  집중 완료!
+                </h2>
+                <p className="text-sm text-muted-foreground text-center">
+                  {mode !== 'free' && `${cycleCount}사이클 동안 `}
+                  {formatDuration(accFocusSeconds)} 집중했어요
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  로그인하고 기록 남기기
+                </Link>
+                <Button onClick={handleSkip} variant="ghost" size="lg">
+                  닫기
+                </Button>
+              </div>
+            </div>
+          </DialogPrimitive.Popup>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    );
+  }
 
   const isTaskSession = currentTaskId !== null;
   const now = sessionEndedAt;
@@ -83,15 +151,6 @@ export function SessionRecordModal() {
     setFocusRating(null);
     setDistractionTags([]);
     setSelectedTaskId(null);
-  }
-
-  function handleSkip() {
-    dismissSessionRecord();
-    setNote('');
-    setFocusRating(null);
-    setDistractionTags([]);
-    setSelectedTaskId(null);
-    setPendingAction(null);
   }
 
   return (

@@ -10,12 +10,7 @@ export async function proxy(request: NextRequest) {
   const response = await updateSession(request);
 
   const { pathname, search } = request.nextUrl;
-  const isRedirect = response.status >= 300 && response.status < 400;
-  if (
-    !isRedirect &&
-    EMBED_ROUTES.includes(pathname) &&
-    isEmbedParam(request.nextUrl.searchParams.get('embed'))
-  ) {
+  if (EMBED_ROUTES.includes(pathname) && isEmbedParam(request.nextUrl.searchParams.get('embed'))) {
     const rewriteUrl = new URL(`/embed${pathname}${search}`, request.url);
     const rewriteResponse = NextResponse.rewrite(rewriteUrl);
     response.cookies.getAll().forEach((cookie) => rewriteResponse.cookies.set(cookie));
