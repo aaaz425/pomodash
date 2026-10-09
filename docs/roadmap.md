@@ -90,5 +90,5 @@
 
 ## Phase 10 — 비회원 체험 모드
 
-- [>] `feat/guest-mode` — 비로그인 타이머 체험 모드
+- [x] `feat/guest-mode` — 비로그인 타이머 체험 모드
 
