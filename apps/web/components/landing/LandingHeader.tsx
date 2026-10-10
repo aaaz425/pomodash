@@ -19,10 +19,10 @@ export function LandingHeader() {
           </a>
         </nav>
         <Link
-          href="/login"
+          href="/"
           className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
         >
-          시작하기
+          체험하기
         </Link>
       </div>
     </header>
