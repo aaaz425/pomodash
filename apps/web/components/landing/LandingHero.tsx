@@ -9,29 +9,13 @@ export function LandingHero() {
         습관이 됩니다
       </h1>
       <p className="text-base sm:text-lg text-muted-foreground max-w-md leading-relaxed break-keep">
-        포모도로 타이머로 작업을 계획하고, 집중하고, 기록하세요. 매일의 노력이 쌓여 결과로
-        이어집니다.
+        포모도로 타이머로 작업을 계획하고, 집중하고, 기록하세요
+        <br />
+        매일의 노력이 쌓여 결과로 이어집니다
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <LandingCTA />
-        <a
-          href="#features"
-          className="px-6 py-3 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-        >
-          기능 둘러보기
-        </a>
-        <a
-          href="#how"
-          className="px-6 py-3 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-        >
-          사용법 보기
-        </a>
-        <a
-          href="#achievement"
-          className="px-6 py-3 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-        >
-          나의 성장 확인
-        </a>
+        <LandingCTA href="/" label="체험하기" />
+        <LandingCTA href="/login" label="로그인" variant="secondary" />
       </div>
     </section>
   );
