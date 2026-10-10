@@ -91,5 +91,5 @@
 ## Phase 10 — 비회원 체험 모드
 
 - [x] `feat/guest-mode` — 비로그인 타이머 체험 모드
-- [>] `style/landing-redesign` — 랜딩 페이지 리디자인
+- [x] `style/landing-redesign` — 랜딩 페이지 리디자인
 
