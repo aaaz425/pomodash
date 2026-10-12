@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { getSessionOrdinalTitle, type FocusRating } from '@pomodash/shared';
+import { getSessionOrdinalTitle, type FocusRating } from '@pomoroutine/shared';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';

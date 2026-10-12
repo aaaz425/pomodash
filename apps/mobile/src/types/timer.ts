@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TIMER_LIMITS } from '@pomodash/shared';
+import { TIMER_LIMITS } from '@pomoroutine/shared';
 
 const TimerSettingsSchema = z.object({
   focusMinutes: z.number().min(TIMER_LIMITS.FOCUS_MINUTES_MIN).max(TIMER_LIMITS.FOCUS_MINUTES_MAX),

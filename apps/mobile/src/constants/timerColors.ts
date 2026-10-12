@@ -3,7 +3,7 @@ import {
   DEFAULT_COLOR_THEME,
   type ColorThemeKey,
   type TimerPhase,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 
 // setActiveColorTheme()로 동기 갱신 — 아래 phaseHex/phaseBadge/phaseGlowRgba/THEME가 이 값을 참조
 let activeColorTheme: ColorThemeKey = DEFAULT_COLOR_THEME;

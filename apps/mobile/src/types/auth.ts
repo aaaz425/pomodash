@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AUTH_LIMITS } from '@pomodash/shared';
+import { AUTH_LIMITS } from '@pomoroutine/shared';
 
 export interface AuthActionResult {
   error?: string;

@@ -1,4 +1,4 @@
-import { deriveElapsedMinutes } from '@pomodash/shared';
+import { deriveElapsedMinutes } from '@pomoroutine/shared';
 import { useTimerStore } from '@/store/StoreProvider';
 
 // tick 소유는 TimerEngine((app)/_layout.tsx에 싱글턴 마운트)이 담당 — 이 훅은 순수 읽기 전용

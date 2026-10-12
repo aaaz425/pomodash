@@ -3,7 +3,7 @@ import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import ViewShot, { captureRef, type ViewShotRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library/legacy';
-import { COLOR_THEMES, type ShareCardData } from '@pomodash/shared';
+import { COLOR_THEMES, type ShareCardData } from '@pomoroutine/shared';
 import { Modal } from '@/components/shared/Modal';
 import { ShareCardPreview } from './ShareCardPreview';
 import { THEME } from '@/constants/timerColors';

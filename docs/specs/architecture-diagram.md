@@ -14,7 +14,7 @@ flowchart TB
     subgraph Mobile["apps/mobile (Expo / React Native)"]
         MobileApp["Expo Router / Components / Zustand Stores"]
     end
-    subgraph Shared["packages/shared (@pomodash/shared)"]
+    subgraph Shared["packages/shared (@pomoroutine/shared)"]
         SharedLib["순수 로직: 타이머 계산, 대시보드 집계,\n뱃지, focusPeriods, 세션 유틸"]
     end
 
@@ -52,7 +52,7 @@ flowchart LR
     hooks --> store
     hooks --> lib["lib/ (플랫폼 특화 유틸)"]
     store --> lib
-    store --> SharedPkg["@pomodash/shared"]
+    store --> SharedPkg["@pomoroutine/shared"]
     lib --> SharedPkg
     store --> types["types/ (models.ts, schemas.ts)"]
 ```

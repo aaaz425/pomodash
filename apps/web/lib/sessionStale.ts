@@ -1,1 +1,1 @@
-export { isSessionStale } from '@pomodash/shared';
+export { isSessionStale } from '@pomoroutine/shared';

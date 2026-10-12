@@ -11,7 +11,7 @@ import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-import { INPUT_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Task } from '@/types/tasks';
 
 const AMBER = '#F59E0B';

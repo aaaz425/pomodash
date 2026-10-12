@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { login as kakaoLogin } from '@react-native-seoul/kakao-login';
-import { AUTH_LIMITS } from '@pomodash/shared';
+import { AUTH_LIMITS } from '@pomoroutine/shared';
 import { supabase } from '@/lib/supabase/client';
 import { ACTIVE_TIMER_STORAGE_KEY } from '@/store/timerStore';
 import {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { COLOR_THEMES } from '@pomodash/shared';
+import { COLOR_THEMES } from '@pomoroutine/shared';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';

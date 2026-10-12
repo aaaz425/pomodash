@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { ListChecks, MessageSquareQuote, Palette, Tags, Timer } from 'lucide-react-native';
-import { COLOR_THEMES } from '@pomodash/shared';
+import { COLOR_THEMES } from '@pomoroutine/shared';
 import { useSettingsStore, useTaskStore } from '@/store/StoreProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsRowGroup } from '@/components/settings/SettingsRowGroup';

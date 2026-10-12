@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, type DimensionValue } from 'react-native';
-import { getHourlyFocusSeconds } from '@pomodash/shared';
+import { getHourlyFocusSeconds } from '@pomoroutine/shared';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

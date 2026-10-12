@@ -1,1 +1,1 @@
-export { MOTIVATIONAL_MESSAGES } from '@pomodash/shared';
+export { MOTIVATIONAL_MESSAGES } from '@pomoroutine/shared';

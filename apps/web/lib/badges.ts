@@ -1,1 +1,1 @@
-export { getEarnedBadgeIds } from '@pomodash/shared';
+export { getEarnedBadgeIds } from '@pomoroutine/shared';

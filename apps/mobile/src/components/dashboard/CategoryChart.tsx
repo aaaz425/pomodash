@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
-import { formatDuration } from '@pomodash/shared';
+import { formatDuration } from '@pomoroutine/shared';
 import { getCategoryFocusData } from '@/lib/dashboard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { THEME } from '@/constants/timerColors';

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { TIMER_LIMITS } from '@pomodash/shared';
+import { TIMER_LIMITS } from '@pomoroutine/shared';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

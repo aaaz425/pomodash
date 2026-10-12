@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@pomodash/shared'],
+  transpilePackages: ['@pomoroutine/shared'],
   reactCompiler: true,
   env: {
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version,

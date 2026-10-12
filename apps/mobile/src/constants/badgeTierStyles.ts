@@ -1,4 +1,4 @@
-import type { BadgeTier } from '@pomodash/shared';
+import type { BadgeTier } from '@pomoroutine/shared';
 import { withAlpha } from './timerColors';
 
 // 웹 BADGE_TIER_STYLES(Tailwind 그라디언트 클래스)를 같은 색상 계열의 실제 hex 3-stop 그라디언트로 근사

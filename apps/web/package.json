@@ -19,7 +19,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource/pretendard": "^5.2.5",
     "@hookform/resolvers": "^5.4.0",
-    "@pomodash/shared": "workspace:*",
+    "@pomoroutine/shared": "workspace:*",
     "@supabase/ssr": "^0.12.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

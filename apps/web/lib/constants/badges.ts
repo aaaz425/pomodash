@@ -1,4 +1,4 @@
-import type { BadgeTier } from '@pomodash/shared';
+import type { BadgeTier } from '@pomoroutine/shared';
 
 export type {
   BadgeTier,
@@ -6,8 +6,8 @@ export type {
   BadgeCategory,
   BadgeDefinition,
   SpecialEventId,
-} from '@pomodash/shared';
-export { BADGE_CATEGORY_LABELS, BADGE_DEFINITIONS } from '@pomodash/shared';
+} from '@pomoroutine/shared';
+export { BADGE_CATEGORY_LABELS, BADGE_DEFINITIONS } from '@pomoroutine/shared';
 
 // 등급별 메달 색상 — 실제 금속/보석 톤을 흉내낸 그라디언트 조합 (Tailwind 클래스라 웹 전용)
 export const BADGE_TIER_STYLES: Record<

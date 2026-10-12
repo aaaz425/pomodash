@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { getMonthlyActivityData, getSessionsForDate } from '@pomodash/shared';
+import { getMonthlyActivityData, getSessionsForDate } from '@pomoroutine/shared';
 import { useMonthSessions } from '@/hooks/useMonthSessions';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';

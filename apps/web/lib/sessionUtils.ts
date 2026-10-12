@@ -10,7 +10,7 @@ import {
   formatFocusPeriodRanges,
   hasAbnormalFocusGap,
   formatSessionTimeSummary,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 
 export {
   formatDuration,

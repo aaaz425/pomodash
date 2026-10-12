@@ -18,7 +18,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
-import { COLOR_THEMES } from '@pomodash/shared';
+import { COLOR_THEMES } from '@pomoroutine/shared';
 import { deleteAccountConfirmed } from '@/lib/supabase/actions';
 import { AccountSection } from '@/components/settings/AccountSection';
 import { ProfileSection } from '@/components/settings/ProfileSection';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TIMER_LIMITS, INPUT_LIMITS } from '@pomodash/shared';
+import { TIMER_LIMITS, INPUT_LIMITS } from '@pomoroutine/shared';
 
 export interface Category {
   id: string;

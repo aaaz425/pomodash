@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { DayActivity, PeriodStats } from '@pomodash/shared';
+import type { DayActivity, PeriodStats } from '@pomoroutine/shared';
 
 export interface FocusTrendItem {
   label: string;

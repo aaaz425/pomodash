@@ -1,5 +1,5 @@
 import { format, parseISO, startOfMonth, startOfWeek } from 'date-fns';
-import type { TabType } from '@pomodash/shared';
+import type { TabType } from '@pomoroutine/shared';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
 import type { FocusTrendItem, FocusTrendMeta, CategoryFocusItem } from '@/types/dashboard';

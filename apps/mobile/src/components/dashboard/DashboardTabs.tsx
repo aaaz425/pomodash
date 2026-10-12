@@ -1,4 +1,4 @@
-import type { TabType } from '@pomodash/shared';
+import type { TabType } from '@pomoroutine/shared';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 
 const TABS: { value: TabType; label: string }[] = [

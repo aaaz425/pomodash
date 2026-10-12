@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { INPUT_LIMITS, type FocusRating, type TimerMode } from '@pomodash/shared';
+import { INPUT_LIMITS, type FocusRating, type TimerMode } from '@pomoroutine/shared';
 
 export interface FocusPeriod {
   start: string; // ISO 8601

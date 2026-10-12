@@ -1,4 +1,4 @@
-import type { SoundType } from '@pomodash/shared';
+import type { SoundType } from '@pomoroutine/shared';
 
 // 웹 apps/web/lib/constants/ux.ts의 SOUND_TYPE_LABELS와 동일
 export const SOUND_TYPE_LABELS: Record<SoundType, string> = {

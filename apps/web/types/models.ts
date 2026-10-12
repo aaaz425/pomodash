@@ -4,7 +4,7 @@ import type {
   TimerSettings,
   FocusPeriod,
   FocusRating,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 
 export type { TimerPhase, TimerMode, TimerSettings, FocusPeriod, FocusRating };
 
@@ -53,7 +53,7 @@ export interface TimerRecord {
   pausedSeconds: number;
 }
 
-export type { SoundType } from '@pomodash/shared';
+export type { SoundType } from '@pomoroutine/shared';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';
 
@@ -124,9 +124,9 @@ export interface CategoryRatingItem {
   sampleSize: number;
 }
 
-export type { ShareCardData } from '@pomodash/shared';
+export type { ShareCardData } from '@pomoroutine/shared';
 
-export type { AppSettings } from '@pomodash/shared';
+export type { AppSettings } from '@pomoroutine/shared';
 
 export interface AuthActionResult {
   error?: string;
