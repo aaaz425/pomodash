@@ -1,6 +1,6 @@
 ---
 version: 1.1
-name: pomodash-design-system
+name: pomoroutine-design-system
 description: "민트 단일 액센트로 다크/라이트 두 모드를 지원한다. 다크는 딥 네이비(Linear 기반), 라이트는 뉴트럴 화이트(Cal 기반). 두 모드 모두 '타이머가 주인공' 원칙을 공유한다."
 source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-design-md) 기반 커스터마이징'
 ---

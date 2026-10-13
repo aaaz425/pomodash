@@ -61,7 +61,7 @@ feat/timer-core   (timerStore, useTimer, 절대시간 로직)
 feat/timer-ui     (TimerDisplay, TimerControls 컴포넌트)
 ```
 
-**Pomodash MVP 브랜치 계획 예시:**
+**PomoRoutine MVP 브랜치 계획 예시:**
 
 ```
 chore/project-setup          # Next.js 16 + 패키지 초기 설정
