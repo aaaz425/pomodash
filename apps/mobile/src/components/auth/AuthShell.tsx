@@ -19,7 +19,7 @@ export function AuthShell({ title, children }: Props) {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Text style={[styles.brand, { color: theme.primary, fontFamily: FONTS.sansBold }]}>
-            Pomodash
+            PomoRoutine
           </Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             {title && (

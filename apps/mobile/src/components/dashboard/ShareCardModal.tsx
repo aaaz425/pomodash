@@ -40,7 +40,7 @@ export function ShareCardModal({ data, onClose }: Props) {
       }
       await Sharing.shareAsync(uri, {
         mimeType: 'image/png',
-        dialogTitle: '오늘의 집중 기록 — Pomodash',
+        dialogTitle: '오늘의 집중 기록 — PomoRoutine',
         UTI: 'public.png',
       });
     } finally {

@@ -14,7 +14,7 @@ export function AboutSection() {
     <View style={styles.container}>
       <View style={styles.row}>
         <Text style={[styles.name, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
-          Pomodash
+          PomoRoutine
         </Text>
         <Text
           style={[styles.version, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}

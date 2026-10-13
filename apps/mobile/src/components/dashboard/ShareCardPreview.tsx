@@ -58,7 +58,7 @@ export function ShareCardPreview({ data, colors }: Props) {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.logo, { color: colors.accent, fontFamily: FONTS.sansBold }]}>
-            Pomodash
+            PomoRoutine
           </Text>
           <View style={[styles.pill, { backgroundColor: colors.accentSoft }]}>
             <Text
