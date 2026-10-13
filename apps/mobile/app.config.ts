@@ -1,10 +1,6 @@
 import type { ExpoConfig } from 'expo/config';
 import { withEntitlementsPlist, type ConfigPlugin } from 'expo/config-plugins';
 
-// dev 빌드는 프로덕션과 별도 bundle identifier 사용 — 같은 기기에 둘 다 설치 가능
-// (카카오 개발자 콘솔에도 com.pomoroutine.app.dev를 iOS 플랫폼으로 추가 등록해야 함)
-const IS_DEV = process.env.APP_VARIANT === 'development';
-
 // expo-notifications가 무조건 aps-environment 엔타이틀먼트를 추가하는데, 무료 개인 Apple 팀은
 // Push Notifications capability를 지원 안 해 이게 있으면 로컬 서명이 막힘 — 로컬 알림만 쓰므로 제거
 const withoutPushEntitlement: ConfigPlugin = (config) =>
@@ -22,7 +18,7 @@ const config: ExpoConfig = {
   scheme: 'pomoroutine',
   userInterfaceStyle: 'automatic',
   ios: {
-    bundleIdentifier: IS_DEV ? 'com.pomoroutine.app.dev' : 'com.pomoroutine.app',
+    bundleIdentifier: 'com.pomoroutine.app',
     icon: './assets/expo.icon',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
