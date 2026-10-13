@@ -42,7 +42,7 @@ function screenshotSvg(width, height) {
     <line x1="13" y1="10" x2="15.5" y2="11.5" stroke-width="1.8"/>
     <circle cx="15.5" cy="11.5" r="1.2" fill="#ef4444" stroke="none"/>
   </g>
-  <text x="${cx}" y="${textY}" font-family="system-ui,sans-serif" font-size="${Math.round(iconSize * 0.52)}" font-weight="700" fill="white" text-anchor="middle" letter-spacing="-1">Pomodash</text>
+  <text x="${cx}" y="${textY}" font-family="system-ui,sans-serif" font-size="${Math.round(iconSize * 0.52)}" font-weight="700" fill="white" text-anchor="middle" letter-spacing="-1">PomoRoutine</text>
   <text x="${cx}" y="${textY + Math.round(iconSize * 0.36)}" font-family="system-ui,sans-serif" font-size="${Math.round(iconSize * 0.26)}" fill="#94a3b8" text-anchor="middle">포모도로 타이머 — 작업 계획 · 집중 · 기록</text>
 </svg>`)
 }

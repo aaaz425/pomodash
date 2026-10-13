@@ -10,7 +10,7 @@ export function Sidebar() {
   return (
     <aside className="w-60 shrink-0 h-full flex flex-col justify-start bg-card border-r border-border">
       <div className="h-16 flex items-center px-5 border-b border-border">
-        <span className="text-primary text-base font-bold">Pomodash</span>
+        <span className="text-primary text-base font-bold">PomoRoutine</span>
       </div>
 
       <nav className="flex flex-col gap-0.5 px-2.5 py-3">

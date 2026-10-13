@@ -25,7 +25,7 @@ export function ShareCardModal({ data, onClose }: Props) {
   const { colorTheme } = useAccentTheme();
   const palette = COLOR_THEMES[colorTheme].shareCard;
   const shareSupported = canShareFiles();
-  const filename = `pomodash-share-${data.generatedAtLabel.replaceAll('.', '')}.png`;
+  const filename = `pomoroutine-share-${data.generatedAtLabel.replaceAll('.', '')}.png`;
 
   // Popup 콘텐츠는 마운트보다 한 틱 늦게 DOM에 붙어 useEffect([data])로는 canvasRef가 아직 null일 수 있어, 콜백 ref로 실제 부착 시점에 맞춰 그린다
   const setCanvasRef = (node: HTMLCanvasElement | null) => {
@@ -54,7 +54,7 @@ export function ShareCardModal({ data, onClose }: Props) {
     if (!canvasRef.current) return;
     setIsBusy(true);
     try {
-      await shareCanvasAsPng(canvasRef.current, filename, '오늘의 집중 기록 — Pomodash');
+      await shareCanvasAsPng(canvasRef.current, filename, '오늘의 집중 기록 — PomoRoutine');
     } finally {
       setIsBusy(false);
     }

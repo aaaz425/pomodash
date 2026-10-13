@@ -46,7 +46,7 @@ function drawHeader(
   ctx.textAlign = 'left';
   ctx.fillStyle = colors.accent;
   ctx.font = '700 40px Pretendard';
-  ctx.fillText('Pomodash', PADDING, PADDING + 20);
+  ctx.fillText('PomoRoutine', PADDING, PADDING + 20);
 
   ctx.font = '600 28px Pretendard';
   const pillText = periodLabel;

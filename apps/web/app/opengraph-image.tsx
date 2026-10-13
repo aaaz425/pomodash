@@ -52,7 +52,7 @@ export default function OgImage() {
             lineHeight: 1,
           }}
         >
-          Pomodash
+          PomoRoutine
         </div>
         <div
           style={{

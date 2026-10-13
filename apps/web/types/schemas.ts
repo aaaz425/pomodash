@@ -162,10 +162,10 @@ export const NewPasswordSchema = z
   });
 
 export const STORAGE_KEYS = {
-  activeTimer: 'pomodash:active-timer',
-  version: 'pomodash:version',
+  activeTimer: 'pomoroutine:active-timer',
+  version: 'pomoroutine:version',
   theme: 'theme',
-  colorTheme: 'pomodash:color-theme',
+  colorTheme: 'pomoroutine:color-theme',
 } as const;
 
 export const DEFAULT_CATEGORIES: Category[] = [
