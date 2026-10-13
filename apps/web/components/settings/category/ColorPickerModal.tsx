@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { hexToHsv, hsvToHex, type Hsv } from '@pomodash/shared';
+import { hexToHsv, hsvToHex, type Hsv } from '@pomoroutine/shared';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/shared/TextInput';

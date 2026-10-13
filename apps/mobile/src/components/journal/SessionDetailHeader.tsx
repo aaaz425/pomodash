@@ -5,7 +5,7 @@ import {
   formatFullDate,
   formatTimeRange,
   hasAbnormalFocusGap,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { SessionTitleInput } from '@/components/journal/SessionTitleInput';
 import { THEME } from '@/constants/timerColors';

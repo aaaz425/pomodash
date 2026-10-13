@@ -176,4 +176,4 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: '5', name: '기타', color: '#6b7280' },
 ];
 
-export { DEFAULT_TIMER_SETTINGS } from '@pomodash/shared';
+export { DEFAULT_TIMER_SETTINGS } from '@pomoroutine/shared';

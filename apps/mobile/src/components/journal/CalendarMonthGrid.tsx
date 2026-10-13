@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-import type { DayActivity } from '@pomodash/shared';
+import type { DayActivity } from '@pomoroutine/shared';
 
 const SATURDAY_BLUE = '#3B82F6';
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];

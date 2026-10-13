@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import type { TabType } from '@pomodash/shared';
+import type { TabType } from '@pomoroutine/shared';
 import { getFocusTrendData } from '@/lib/dashboard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { THEME, withAlpha } from '@/constants/timerColors';

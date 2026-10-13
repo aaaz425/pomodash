@@ -4,7 +4,7 @@ import {
   formatDuration,
   formatSessionTimeSummary,
   getSessionOrdinalTitle,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

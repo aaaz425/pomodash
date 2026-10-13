@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import type { DayActivity } from '@pomodash/shared';
+import type { DayActivity } from '@pomoroutine/shared';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

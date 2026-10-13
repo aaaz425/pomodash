@@ -1,4 +1,4 @@
-import type { ShareCardPalette } from '@pomodash/shared';
+import type { ShareCardPalette } from '@pomoroutine/shared';
 import type { ShareCardData } from '@/types';
 import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
 

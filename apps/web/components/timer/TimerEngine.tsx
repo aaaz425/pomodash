@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { deriveTimerDisplay } from '@pomodash/shared';
+import { deriveTimerDisplay } from '@pomoroutine/shared';
 import { useTimerStore, useSettingsStore, useHydrated } from '@/store/StoreProvider';
 import { playAlarm, sendNotification } from '@/lib/notifications';
 import { useWakeLock } from '@/hooks/useWakeLock';

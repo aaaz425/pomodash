@@ -23,7 +23,7 @@ import {
   getMaxStreakDays,
   getBusiestDayOfWeek,
   getFirstSessionDate,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 
 export {
   getMonthlyActivityData,

@@ -10,7 +10,7 @@ import {
   getSessionCount,
   getTotalFocusSeconds,
   type TabType,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { GuestPrompt } from '@/components/shared/GuestPrompt';

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { formatSessionProgressLabel } from '@pomodash/shared';
+import { formatSessionProgressLabel } from '@pomoroutine/shared';
 import { useTimerStore } from '@/store/StoreProvider';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

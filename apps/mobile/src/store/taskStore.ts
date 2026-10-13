@@ -1,5 +1,5 @@
 import { createStore } from 'zustand';
-import { INPUT_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomoroutine/shared';
 import { generateId } from '@/lib/generateId';
 import { toast } from '@/lib/toast';
 import { withRetry } from '@/lib/retry';

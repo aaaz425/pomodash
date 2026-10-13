@@ -7,7 +7,7 @@ import {
   COLOR_THEMES,
   DEFAULT_COLOR_THEME,
   type ColorThemeKey,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { STORAGE_KEYS } from '@/types';
 import { getStoredMode, resolveIsDark, useTheme } from '@/hooks/useTheme';
 

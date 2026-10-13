@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
-import { deriveTimerDisplay } from '@pomodash/shared';
+import { deriveTimerDisplay } from '@pomoroutine/shared';
 import { useTimerStore, useSettingsStore, useHydrated } from '@/store/StoreProvider';
 import {
   scheduleTimerCompleteNotification,

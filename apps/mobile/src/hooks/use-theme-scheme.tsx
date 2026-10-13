@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Appearance, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DEFAULT_COLOR_THEME, type ColorThemeKey } from '@pomodash/shared';
+import { DEFAULT_COLOR_THEME, type ColorThemeKey } from '@pomoroutine/shared';
 import { setActiveColorTheme } from '@/constants/timerColors';
 
 type Scheme = 'light' | 'dark';

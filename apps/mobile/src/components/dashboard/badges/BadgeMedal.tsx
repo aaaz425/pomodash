@@ -11,7 +11,7 @@ import {
   Trophy,
   type LucideIcon,
 } from 'lucide-react-native';
-import type { BadgeDefinition, BadgeIconKey } from '@pomodash/shared';
+import type { BadgeDefinition, BadgeIconKey } from '@pomoroutine/shared';
 import { BADGE_TIER_STYLES } from '@/constants/badgeTierStyles';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

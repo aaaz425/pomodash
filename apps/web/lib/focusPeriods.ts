@@ -1,1 +1,1 @@
-export { normalizeFocusPeriods, clampPeriodDuration } from '@pomodash/shared';
+export { normalizeFocusPeriods, clampPeriodDuration } from '@pomoroutine/shared';

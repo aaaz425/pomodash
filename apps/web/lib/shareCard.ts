@@ -1,1 +1,1 @@
-export { buildHeadline, buildShareCardData } from '@pomodash/shared';
+export { buildHeadline, buildShareCardData } from '@pomoroutine/shared';

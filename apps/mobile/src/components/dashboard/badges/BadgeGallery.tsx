@@ -6,7 +6,7 @@ import {
   BADGE_DEFINITIONS,
   getEarnedBadgeIds,
   type BadgeCategory,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { BadgeMedal } from './BadgeMedal';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { THEME } from '@/constants/timerColors';

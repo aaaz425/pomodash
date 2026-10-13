@@ -4,7 +4,7 @@ import {
   INPUT_LIMITS,
   MOTIVATIONAL_MESSAGES,
   SOUND_LIMITS,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 import { fetchSettings, saveSettings } from '@/lib/supabase/settings';
 import { toast } from '@/lib/toast';
 import { withRetry } from '@/lib/retry';

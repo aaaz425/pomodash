@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createTimerStore as createSharedTimerStore } from '@pomodash/shared';
-import type { TimerStorePorts, TimerSnapshot } from '@pomodash/shared';
+import { createTimerStore as createSharedTimerStore } from '@pomoroutine/shared';
+import type { TimerStorePorts, TimerSnapshot } from '@pomoroutine/shared';
 import { ActiveTimerStateSchema } from '@/types/timer';
 import { toast } from '@/lib/toast';
 
@@ -32,4 +32,4 @@ export const createTimerStore = () => {
   return createSharedTimerStore(ports);
 };
 
-export type { TimerStore, TimerStoreApi } from '@pomodash/shared';
+export type { TimerStore, TimerStoreApi } from '@pomoroutine/shared';

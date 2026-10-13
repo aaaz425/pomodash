@@ -1,6 +1,6 @@
 'use client';
 
-import { COLOR_THEME_KEYS, COLOR_THEMES } from '@pomodash/shared';
+import { COLOR_THEME_KEYS, COLOR_THEMES } from '@pomoroutine/shared';
 import { COLOR_THEME_SWATCH_CLASS } from '@/lib/constants/colorTheme';
 import { useAccentTheme } from '@/hooks/useAccentTheme';
 

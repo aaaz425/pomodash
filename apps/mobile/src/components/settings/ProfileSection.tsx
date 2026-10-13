@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { INPUT_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomoroutine/shared';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
 import { THEME } from '@/constants/timerColors';

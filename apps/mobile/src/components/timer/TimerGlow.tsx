@@ -7,7 +7,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import type { TimerPhase } from '@pomodash/shared';
+import type { TimerPhase } from '@pomoroutine/shared';
 import { phaseGlowRgba, THEME } from '@/constants/timerColors';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { useReducedMotion } from '@/hooks/useReducedMotion';

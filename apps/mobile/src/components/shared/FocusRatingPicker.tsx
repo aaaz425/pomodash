@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { FOCUS_RATING_OPTIONS, type FocusRating } from '@pomodash/shared';
+import { FOCUS_RATING_OPTIONS, type FocusRating } from '@pomoroutine/shared';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

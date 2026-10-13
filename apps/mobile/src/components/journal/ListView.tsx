@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, type ReactNode } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
-import { formatDuration, groupSessionsByDate } from '@pomodash/shared';
+import { formatDuration, groupSessionsByDate } from '@pomoroutine/shared';
 import { useSessionsPage } from '@/hooks/useSessionsPage';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

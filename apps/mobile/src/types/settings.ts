@@ -5,7 +5,7 @@ import {
   TIMER_LIMITS,
   type AppSettings,
   type SoundType,
-} from '@pomodash/shared';
+} from '@pomoroutine/shared';
 
 export type { AppSettings, SoundType };
 

@@ -11,7 +11,7 @@ import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
-import { INPUT_LIMITS } from '@pomodash/shared';
+import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Category } from '@/types/tasks';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
