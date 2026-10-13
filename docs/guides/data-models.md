@@ -142,9 +142,9 @@ Task/Category/Session/AppSettings는 Supabase로 이전되어 더 이상 localSt
 
 ```typescript
 const STORAGE_KEYS = {
-  activeTimer: 'pomodash:active-timer',
-  version: 'pomodash:version',
-  theme: 'theme', // 예외적으로 'pomodash:' 접두사 없음
+  activeTimer: 'pomoroutine:active-timer',
+  version: 'pomoroutine:version',
+  theme: 'theme', // 예외적으로 'pomoroutine:' 접두사 없음
 } as const
 ```
 
@@ -185,11 +185,11 @@ function loadFromStorage<T>(key: string, schema: z.ZodType<T>, fallback: T): T {
 const STORAGE_VERSION = 1
 
 // 버전 불일치 감지 시 초기화 또는 마이그레이션
-const storedVersion = localStorage.getItem('pomodash:version')
+const storedVersion = localStorage.getItem('pomoroutine:version')
 if (Number(storedVersion) !== STORAGE_VERSION) {
   // 마이그레이션 로직 또는 초기화
   localStorage.clear()
-  localStorage.setItem('pomodash:version', String(STORAGE_VERSION))
+  localStorage.setItem('pomoroutine:version', String(STORAGE_VERSION))
 }
 ```
 

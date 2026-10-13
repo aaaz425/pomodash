@@ -1,4 +1,4 @@
-# Pomodash — Claude Context
+# PomoRoutine — Claude Context
 
 ## 프로젝트 개요
 

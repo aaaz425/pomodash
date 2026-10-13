@@ -1,6 +1,6 @@
-# Pomodash
+# PomoRoutine
 
-[![Vercel](https://img.shields.io/badge/배포-Vercel-black?logo=vercel)](https://pomodash-three.vercel.app) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Vercel](https://img.shields.io/badge/배포-Vercel-black?logo=vercel)](https://pomoroutine.com) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 계획하고, 집중하고, 기록한다
 
@@ -38,8 +38,8 @@ Node.js 22+, pnpm 11+, Docker (로컬 Supabase 스택 사용 시)
 ### 설치 및 실행
 
 ```bash
-git clone https://github.com/aaaz425/pomodash.git
-cd pomodash
+git clone https://github.com/aaaz425/pomoroutine.git
+cd pomoroutine
 pnpm install
 pnpm dev                      # 웹 (apps/web) → http://localhost:3000
 pnpm --filter mobile start    # 모바일 (Expo)
