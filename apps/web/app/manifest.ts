@@ -27,14 +27,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1280x800',
         type: 'image/png',
         form_factor: 'wide',
-        label: 'Pomodash 데스크탑',
+        label: 'PomoRoutine 데스크탑',
       },
       {
         src: '/screenshot-narrow.png',
         sizes: '390x844',
         type: 'image/png',
         form_factor: 'narrow',
-        label: 'Pomodash 모바일',
+        label: 'PomoRoutine 모바일',
       },
     ],
   };

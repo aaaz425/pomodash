@@ -5,7 +5,7 @@ export function LandingHeader() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
         <a href="#top" className="text-primary font-bold text-base">
-          Pomodash
+          PomoRoutine
         </a>
         <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
           <a href="#features" className="hover:text-foreground transition-colors">

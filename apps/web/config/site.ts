@@ -3,8 +3,8 @@ export const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   : 'http://localhost:3000';
 
 export const siteConfig = {
-  name: 'Pomodash',
-  title: 'Pomodash — 포모도로 타이머',
+  name: 'PomoRoutine',
+  title: 'PomoRoutine — 포모도로 타이머',
   description:
     '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서. 수험생과 취업준비생을 위한 무료 집중 타이머',
   ogDescription: '작업 계획, 포모도로 집중, 공부 기록을 한 곳에서',

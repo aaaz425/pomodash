@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pomodash-v1';
+const CACHE_NAME = 'pomoroutine-v1';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
