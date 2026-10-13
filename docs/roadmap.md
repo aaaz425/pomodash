@@ -97,6 +97,6 @@
 
 - [x] `chore/rename-shared-package` — @pomodash/shared → @pomoroutine/shared
 - [x] `chore/rename-web-branding` — 웹 브랜딩 텍스트/설정 변경
-- [ ] `chore/rename-mobile-bundle-id` — 번들ID/scheme 변경 + 카카오 재등록
+- [>] `chore/rename-mobile-bundle-id` — 번들ID/scheme 변경 + 카카오 재등록
 - [ ] `docs/rename-pomodash-to-pomoroutine` — 문서 내 서비스명 치환
 

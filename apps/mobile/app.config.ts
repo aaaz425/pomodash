@@ -1,8 +1,8 @@
 import type { ExpoConfig } from 'expo/config';
 import { withEntitlementsPlist, type ConfigPlugin } from 'expo/config-plugins';
 
-// com.pomodash.app이 다른 팀에 이미 등록돼 서명이 안 되므로 개발 빌드만 별도 bundle identifier 사용
-// (카카오 개발자 콘솔에도 com.pomodash.app.dev를 iOS 플랫폼으로 추가 등록해야 함)
+// dev 빌드는 프로덕션과 별도 bundle identifier 사용 — 같은 기기에 둘 다 설치 가능
+// (카카오 개발자 콘솔에도 com.pomoroutine.app.dev를 iOS 플랫폼으로 추가 등록해야 함)
 const IS_DEV = process.env.APP_VARIANT === 'development';
 
 // expo-notifications가 무조건 aps-environment 엔타이틀먼트를 추가하는데, 무료 개인 Apple 팀은
@@ -14,22 +14,22 @@ const withoutPushEntitlement: ConfigPlugin = (config) =>
   });
 
 const config: ExpoConfig = {
-  name: 'Pomodash',
-  slug: 'pomodash',
+  name: 'PomoRoutine',
+  slug: 'pomoroutine',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
-  scheme: 'pomodash',
+  scheme: 'pomoroutine',
   userInterfaceStyle: 'automatic',
   ios: {
-    bundleIdentifier: IS_DEV ? 'com.pomodash.app.dev' : 'com.pomodash.app',
+    bundleIdentifier: IS_DEV ? 'com.pomoroutine.app.dev' : 'com.pomoroutine.app',
     icon: './assets/expo.icon',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
   },
   android: {
-    package: 'com.pomodash.app',
+    package: 'com.pomoroutine.app',
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/images/android-icon-foreground.png',
