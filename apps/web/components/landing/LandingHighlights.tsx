@@ -17,8 +17,8 @@ const HIGHLIGHTS = [
     desc: '집중 요약을 카드로 만들어 다운로드하거나 공유할 수 있어요',
     src: '/landing/share-card.png',
     alt: '공유 카드 화면',
-    width: 960,
-    height: 1197,
+    width: 952,
+    height: 1192,
   },
 ];
 
