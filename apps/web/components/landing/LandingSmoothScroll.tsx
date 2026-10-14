@@ -18,5 +18,9 @@ export function LandingSmoothScroll({ children }: Props) {
 
   if (!enabled) return <>{children}</>;
 
-  return <ReactLenis root>{children}</ReactLenis>;
+  return (
+    <ReactLenis root options={{ syncTouch: true }}>
+      {children}
+    </ReactLenis>
+  );
 }
