@@ -8,22 +8,26 @@ import { LandingCtaSection } from '@/components/landing/LandingCtaSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { LandingSmoothScroll } from '@/components/landing/LandingSmoothScroll';
 import { siteConfig } from '@/config/site';
+import { getCurrentUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const user = await getCurrentUser();
+  const isLoggedIn = !!user;
+
   return (
     <LandingSmoothScroll>
       <div id="top" className="min-h-screen bg-background text-foreground">
-        <LandingHeader />
-        <LandingHero />
+        <LandingHeader isLoggedIn={isLoggedIn} />
+        <LandingHero isLoggedIn={isLoggedIn} />
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingHighlights />
-        <LandingCtaSection />
+        <LandingCtaSection isLoggedIn={isLoggedIn} />
         <LandingFooter />
       </div>
     </LandingSmoothScroll>
