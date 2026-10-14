@@ -55,7 +55,7 @@ export function SoundTypeSelect({ value, onChange }: Props) {
         aria-controls="sound-type-listbox"
         onClick={handleTriggerClick}
         className={[
-          'flex items-center justify-between gap-1.5 w-24 text-sm bg-muted border rounded-lg px-2.5 py-1.5 text-foreground transition-colors disabled:cursor-not-allowed',
+          'flex items-center justify-between gap-1.5 w-20 shrink-0 text-sm bg-muted border rounded-lg px-2 py-1.5 text-foreground transition-colors disabled:cursor-not-allowed',
           open ? 'border-primary ring-1 ring-primary' : 'border-border',
         ].join(' ')}
       >

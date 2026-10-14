@@ -46,21 +46,21 @@ export function SoundAlertSettings() {
 
       <fieldset
         disabled={!soundAlert}
-        className={`flex flex-col gap-4 m-0 p-4 border-0 rounded-xl bg-muted/40 transition-opacity ${
+        className={`flex flex-col gap-4 m-0 p-4 border-0 rounded-xl bg-muted/40 transition-opacity min-w-0 ${
           soundAlert ? '' : 'opacity-40 pointer-events-none'
         }`}
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <label htmlFor="sound-type" className="text-sm text-foreground shrink-0 w-16">
             소리 종류
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 shrink-0">
             <SoundTypeSelect value={soundType} onChange={handleSoundTypeChange} />
             <button
               type="button"
               onClick={toggle}
               aria-label={isPlaying ? '미리듣기 정지' : '미리 듣기'}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
+              className="flex items-center justify-center w-7 h-7 rounded-lg text-muted-foreground hover:bg-card hover:text-foreground transition-colors disabled:cursor-not-allowed shrink-0"
             >
               {isPlaying ? (
                 <Pause className="w-3.5 h-3.5" fill="currentColor" />
@@ -84,15 +84,15 @@ export function SoundAlertSettings() {
               step={5}
               value={soundVolume}
               onChange={(e) => setSoundVolume(Number(e.target.value))}
-              className="flex-1 accent-primary disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 accent-primary disabled:cursor-not-allowed"
             />
-            <span className="text-xs text-muted-foreground w-8 text-right shrink-0">
+            <span className="hidden sm:inline text-xs text-muted-foreground w-8 text-right shrink-0">
               {soundVolume}%
             </span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <span className="text-sm text-foreground shrink-0 w-16">반복 횟수</span>
           <StepperInput
             value={soundRepeatCount}
