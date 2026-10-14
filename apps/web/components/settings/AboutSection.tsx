@@ -1,9 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { Badge } from '@/components/shared/Badge';
+import { LegalModal } from '@/components/legal/LegalModal';
 
 export function AboutSection() {
   const version = process.env.NEXT_PUBLIC_APP_VERSION ?? '—';
+  const [legalDoc, setLegalDoc] = useState<'privacy' | 'terms' | null>(null);
 
   return (
     <div className="flex flex-col gap-4">
@@ -22,19 +27,23 @@ export function AboutSection() {
       </Link>
 
       <div className="flex gap-4">
-        <Link
-          href="/terms"
+        <button
+          type="button"
+          onClick={() => setLegalDoc('terms')}
           className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
         >
           이용약관
-        </Link>
-        <Link
-          href="/privacy"
+        </button>
+        <button
+          type="button"
+          onClick={() => setLegalDoc('privacy')}
           className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
         >
           개인정보처리방침
-        </Link>
+        </button>
       </div>
+
+      {legalDoc && <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />}
     </div>
   );
 }
