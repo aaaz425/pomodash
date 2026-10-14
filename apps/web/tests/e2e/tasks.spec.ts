@@ -29,7 +29,7 @@ test.describe('작업 관리', () => {
   });
 
   test('작업 생성', async ({ page }) => {
-    const taskName = uniqueName('E2E 테스트 작업');
+    const taskName = uniqueName();
     await page.getByRole('button', { name: '작업 관리' }).click();
 
     const taskModal = page.getByRole('dialog', { name: '작업 관리' });
@@ -42,7 +42,7 @@ test.describe('작업 관리', () => {
   });
 
   test('작업 선택 후 타이머 연결', async ({ page }) => {
-    const taskName = uniqueName('E2E 테스트 작업');
+    const taskName = uniqueName();
 
     await page.getByRole('button', { name: '작업 관리' }).click();
     const taskModal = page.getByRole('dialog', { name: '작업 관리' });

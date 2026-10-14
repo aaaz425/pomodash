@@ -8,8 +8,8 @@ test.describe('설정', () => {
   });
 
   test('카테고리 추가 → 수정 → 삭제', async ({ page }) => {
-    const categoryName = uniqueName('E2E카테고리');
-    const categoryRenamed = uniqueName('E2E카테고리수정');
+    const categoryName = uniqueName();
+    const categoryRenamed = uniqueName();
 
     await page.getByRole('button', { name: '카테고리 관리' }).click();
     const modal = page.getByRole('dialog', { name: '카테고리 관리' });
@@ -35,8 +35,8 @@ test.describe('설정', () => {
   });
 
   test('동기부여 메시지 추가 → 수정 → 삭제', async ({ page }) => {
-    const messageText = uniqueName('E2E 동기부여 메시지');
-    const messageRenamed = uniqueName('E2E 동기부여 메시지 수정');
+    const messageText = uniqueName();
+    const messageRenamed = uniqueName();
 
     await page.getByRole('button', { name: '동기부여 메시지' }).click();
     const modal = page.getByRole('dialog', { name: '동기부여 메시지' });
