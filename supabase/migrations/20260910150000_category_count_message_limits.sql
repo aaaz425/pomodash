@@ -6,14 +6,18 @@ alter table public.settings
   add constraint settings_motivational_messages_count
     check (array_length(motivational_messages, 1) between 1 and 20);
 
+create function public.check_message_lengths(messages text[])
+returns boolean
+language sql
+immutable
+as $$
+  select coalesce(bool_and(char_length(m) between 1 and 200), true)
+  from unnest(messages) as m;
+$$;
+
 alter table public.settings
   add constraint settings_motivational_messages_length
-    check (
-      coalesce(
-        (select bool_and(char_length(m) between 1 and 200) from unnest(motivational_messages) as m),
-        true
-      )
-    );
+    check (public.check_message_lengths(motivational_messages));
 
 -- 카테고리 개수는 여러 행에 걸친 집계라 CHECK로 표현할 수 없어 트리거로 강제한다.
 create function public.enforce_category_count_limit()

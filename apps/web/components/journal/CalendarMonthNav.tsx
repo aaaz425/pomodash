@@ -12,7 +12,7 @@ interface Props {
 }
 
 const navButtonClass =
-  'p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors';
+  'shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors';
 
 export function CalendarMonthNav({
   month,
@@ -32,7 +32,7 @@ export function CalendarMonthNav({
       <button onClick={onPrevMonth} aria-label="이전 달" className={navButtonClass}>
         <ChevronLeft className="w-4 h-4" />
       </button>
-      <span className="text-sm font-semibold text-foreground min-w-[110px] text-center">
+      <span className="text-sm font-semibold text-foreground min-w-[96px] text-center shrink-0">
         {label}
       </span>
       <button onClick={onNextMonth} aria-label="다음 달" className={navButtonClass}>
@@ -43,7 +43,7 @@ export function CalendarMonthNav({
       </button>
       <button
         onClick={onToday}
-        className="ml-2 px-2.5 py-1 rounded-md text-xs text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30 transition-colors"
+        className="shrink-0 whitespace-nowrap ml-1 px-2 py-1 rounded-md text-xs text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30 transition-colors"
       >
         오늘
       </button>

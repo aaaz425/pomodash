@@ -23,7 +23,7 @@ interface CardContent {
 }
 
 const EMPTY: CardContent = {
-  text: '아직 데이터가 부족해요',
+  text: '데이터 부족',
   sub: '기록이 쌓이면 패턴을 보여드려요',
 };
 

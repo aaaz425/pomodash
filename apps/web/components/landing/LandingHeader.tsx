@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
-export function LandingHeader() {
+interface Props {
+  isLoggedIn: boolean;
+}
+
+export function LandingHeader({ isLoggedIn }: Props) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
@@ -22,7 +26,7 @@ export function LandingHeader() {
           href="/"
           className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
         >
-          체험하기
+          {isLoggedIn ? '시작하기' : '체험하기'}
         </Link>
       </div>
     </header>
