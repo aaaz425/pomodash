@@ -96,6 +96,7 @@ export function MotivationalSection() {
   const theme = THEME[scheme];
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
+  const messageIds = useSettingsStore((s) => s.messageIds);
   const addMessage = useSettingsStore((s) => s.addMessage);
   const updateMessage = useSettingsStore((s) => s.updateMessage);
   const deleteMessage = useSettingsStore((s) => s.deleteMessage);
@@ -123,7 +124,7 @@ export function MotivationalSection() {
     <View>
       <DraggableFlatList
         data={messages}
-        keyExtractor={(item) => item}
+        keyExtractor={(_, index) => messageIds[index] ?? String(index)}
         style={styles.scrollList}
         onDragEnd={({ from, to }) => void reorderMessages(from, to)}
         renderItem={({ item, getIndex, drag, isActive }: RenderItemParams<string>) => {

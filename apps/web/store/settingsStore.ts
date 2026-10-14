@@ -12,6 +12,7 @@ import {
 } from '@/types';
 import { MOTIVATIONAL_MESSAGES } from '@/lib/constants/messages';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
+import { generateId } from '@/lib/utils';
 
 const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',
@@ -25,6 +26,10 @@ const DEFAULT_SETTINGS: AppSettings = {
   keepScreenAwake: false,
 };
 
+function generateMessageIds(count: number): string[] {
+  return Array.from({ length: count }, () => generateId());
+}
+
 interface SettingsStore {
   nickname: string;
   browserNotification: boolean;
@@ -33,6 +38,7 @@ interface SettingsStore {
   soundVolume: number;
   soundRepeatCount: number;
   motivationalMessages: string[];
+  messageIds: string[];
   defaultTimerSettings: TimerSettings;
   keepScreenAwake: boolean;
 
@@ -82,6 +88,7 @@ export const createSettingsStore = () =>
 
     return {
       ...DEFAULT_SETTINGS,
+      messageIds: generateMessageIds(DEFAULT_SETTINGS.motivationalMessages.length),
 
       setNickname: (nickname) => persistChange({ nickname: get().nickname }, { nickname }),
 
@@ -116,10 +123,11 @@ export const createSettingsStore = () =>
 
       addMessage: async (message) => {
         const curr = get().motivationalMessages;
+        const ids = get().messageIds;
         if (curr.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX) return;
         await persistChange(
-          { motivationalMessages: curr },
-          { motivationalMessages: [...curr, message] },
+          { motivationalMessages: curr, messageIds: ids },
+          { motivationalMessages: [...curr, message], messageIds: [...ids, generateId()] },
         );
       },
 
@@ -133,31 +141,37 @@ export const createSettingsStore = () =>
 
       deleteMessage: async (index) => {
         const curr = get().motivationalMessages;
+        const ids = get().messageIds;
         if (curr.length <= INPUT_LIMITS.MESSAGE_COUNT_MIN) return;
         const motivationalMessages = curr.filter((_, i) => i !== index);
-        await persistChange({ motivationalMessages: curr }, { motivationalMessages });
+        const messageIds = ids.filter((_, i) => i !== index);
+        await persistChange(
+          { motivationalMessages: curr, messageIds: ids },
+          { motivationalMessages, messageIds },
+        );
       },
 
       reorderMessages: async (fromId, toId) => {
         const messages = get().motivationalMessages;
-        const from = parseInt(fromId);
-        const to = parseInt(toId);
-        if (
-          Number.isNaN(from) ||
-          Number.isNaN(to) ||
-          from < 0 ||
-          from >= messages.length ||
-          to < 0 ||
-          to >= messages.length
-        )
-          return;
+        const ids = get().messageIds;
+        const from = ids.indexOf(fromId);
+        const to = ids.indexOf(toId);
+        if (from === -1 || to === -1) return;
         const next = arrayMove(messages, from, to);
-        await persistChange({ motivationalMessages: messages }, { motivationalMessages: next });
+        const nextIds = arrayMove(ids, from, to);
+        await persistChange(
+          { motivationalMessages: messages, messageIds: ids },
+          { motivationalMessages: next, messageIds: nextIds },
+        );
       },
 
       hydrate: async () => {
         const settings = await fetchSettings();
-        if (settings) set(settings);
+        if (settings)
+          set({
+            ...settings,
+            messageIds: generateMessageIds(settings.motivationalMessages.length),
+          });
       },
     };
   });

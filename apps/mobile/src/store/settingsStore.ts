@@ -8,6 +8,7 @@ import {
 import { fetchSettings, saveSettings } from '@/lib/supabase/settings';
 import { toast } from '@/lib/toast';
 import { withRetry } from '@/lib/retry';
+import { generateId } from '@/lib/generateId';
 import type { AppSettings, SoundType } from '@/types/settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -23,6 +24,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 interface SettingsStore extends AppSettings {
+  messageIds: string[];
   setNickname: (nickname: string) => Promise<void>;
   setTimerDefaults: (settings: AppSettings['defaultTimerSettings']) => Promise<void>;
   setBrowserNotification: (enabled: boolean) => Promise<void>;
@@ -52,6 +54,10 @@ function toAppSettings(s: SettingsStore): AppSettings {
   };
 }
 
+function generateMessageIds(count: number): string[] {
+  return Array.from({ length: count }, () => generateId());
+}
+
 export const createSettingsStore = () =>
   createStore<SettingsStore>()((set, get) => {
     // 낙관적으로 먼저 반영하고, 저장 실패하면 이전 값으로 되돌린다
@@ -69,6 +75,7 @@ export const createSettingsStore = () =>
 
     return {
       ...DEFAULT_SETTINGS,
+      messageIds: generateMessageIds(DEFAULT_SETTINGS.motivationalMessages.length),
 
       setNickname: (nickname) => persistChange({ nickname: get().nickname }, { nickname }),
 
@@ -113,10 +120,11 @@ export const createSettingsStore = () =>
 
       addMessage: async (message) => {
         const curr = get().motivationalMessages;
+        const ids = get().messageIds;
         if (curr.length >= INPUT_LIMITS.MESSAGE_COUNT_MAX) return;
         await persistChange(
-          { motivationalMessages: curr },
-          { motivationalMessages: [...curr, message] },
+          { motivationalMessages: curr, messageIds: ids },
+          { motivationalMessages: [...curr, message], messageIds: [...ids, generateId()] },
         );
       },
 
@@ -130,23 +138,39 @@ export const createSettingsStore = () =>
 
       deleteMessage: async (index) => {
         const curr = get().motivationalMessages;
+        const ids = get().messageIds;
         if (curr.length <= INPUT_LIMITS.MESSAGE_COUNT_MIN) return;
         const motivationalMessages = curr.filter((_, i) => i !== index);
-        await persistChange({ motivationalMessages: curr }, { motivationalMessages });
+        const messageIds = ids.filter((_, i) => i !== index);
+        await persistChange(
+          { motivationalMessages: curr, messageIds: ids },
+          { motivationalMessages, messageIds },
+        );
       },
 
       reorderMessages: async (from, to) => {
         const messages = get().motivationalMessages;
+        const ids = get().messageIds;
         if (from < 0 || from >= messages.length || to < 0 || to >= messages.length) return;
         const next = [...messages];
         const [moved] = next.splice(from, 1);
         next.splice(to, 0, moved);
-        await persistChange({ motivationalMessages: messages }, { motivationalMessages: next });
+        const nextIds = [...ids];
+        const [movedId] = nextIds.splice(from, 1);
+        nextIds.splice(to, 0, movedId);
+        await persistChange(
+          { motivationalMessages: messages, messageIds: ids },
+          { motivationalMessages: next, messageIds: nextIds },
+        );
       },
 
       hydrate: async () => {
         const settings = await withRetry(fetchSettings);
-        if (settings) set(settings);
+        if (settings)
+          set({
+            ...settings,
+            messageIds: generateMessageIds(settings.motivationalMessages.length),
+          });
       },
     };
   });

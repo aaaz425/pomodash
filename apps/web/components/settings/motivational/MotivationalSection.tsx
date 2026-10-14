@@ -147,6 +147,7 @@ function MessageRow({
 
 export function MotivationalSection() {
   const messages = useSettingsStore((s) => s.motivationalMessages);
+  const messageIds = useSettingsStore((s) => s.messageIds);
   const addMessage = useSettingsStore((s) => s.addMessage);
   const updateMessage = useSettingsStore((s) => s.updateMessage);
   const deleteMessage = useSettingsStore((s) => s.deleteMessage);
@@ -191,15 +192,12 @@ export function MotivationalSection() {
         modifiers={[restrictToVerticalAxis]}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext
-          items={messages.map((_, i) => String(i))}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={messageIds} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col max-h-[312px] overflow-y-auto">
             {messages.map((msg, i) => (
               <MessageRow
-                key={i}
-                id={String(i)}
+                key={messageIds[i]}
+                id={messageIds[i]}
                 message={msg}
                 isEditing={editingIndex === i}
                 dragDisabled={editingIndex !== null}
