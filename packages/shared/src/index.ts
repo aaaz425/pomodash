@@ -6,6 +6,11 @@ export type {
   RawFocusPeriod,
 } from './types/timer';
 export type { FocusRating } from './types/session';
+export type {
+  ShareCardAction,
+  ShareCardBridgeMessage,
+  WebviewBridgeMessage,
+} from './types/webviewBridge';
 export {
   TIMER_LIMITS,
   FOCUS_PERIOD_LIMITS,

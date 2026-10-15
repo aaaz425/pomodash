@@ -8,6 +8,7 @@ import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { useAuth } from '@/store/AuthProvider';
 import { buildWebviewAuthBridgeSource } from '@/lib/webviewAuthBridge';
+import { handleWebviewMessage } from '@/lib/webviewBridge';
 
 interface Props {
   path: string;
@@ -30,12 +31,7 @@ export function EmbeddedWebScreen({ path }: Props) {
     return () => sub.remove();
   }, [canGoBack]);
 
-  const source =
-    webAppUrl && session
-      ? buildWebviewAuthBridgeSource(webAppUrl, session, `${path}?embed=1`)
-      : null;
-
-  if (!source) {
+  if (!webAppUrl || !session) {
     return (
       <SafeAreaView
         edges={['top', 'left', 'right']}
@@ -55,7 +51,7 @@ export function EmbeddedWebScreen({ path }: Props) {
     >
       <WebView
         ref={webViewRef}
-        source={source}
+        source={buildWebviewAuthBridgeSource(webAppUrl, session, `${path}?embed=1`)}
         style={{ backgroundColor: theme.background }}
         textZoom={Math.round(Math.min(PixelRatio.getFontScale(), MAX_FONT_SIZE_MULTIPLIER) * 100)}
         injectedJavaScriptBeforeContentLoaded={`
@@ -65,6 +61,7 @@ export function EmbeddedWebScreen({ path }: Props) {
           }
           true;
         `}
+        onMessage={(event) => handleWebviewMessage(event.nativeEvent, webAppUrl)}
         onNavigationStateChange={(event: WebViewNavigation) => setCanGoBack(event.canGoBack)}
         startInLoadingState
         renderLoading={() => (

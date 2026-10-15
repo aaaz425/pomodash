@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { COLOR_THEMES } from '@pomoroutine/shared';
+import { COLOR_THEMES, type ShareCardAction } from '@pomoroutine/shared';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/button';
 import { SHARE_CARD_SIZE } from '@/lib/constants/shareCard';
@@ -12,6 +12,7 @@ import {
   drawShareCard,
   shareCanvasAsPng,
 } from '@/lib/shareCardCanvas';
+import { isInNativeApp, postToNativeApp } from '@/lib/nativeApp';
 import type { ShareCardData } from '@/types';
 
 interface Props {
@@ -24,7 +25,8 @@ export function ShareCardModal({ data, onClose }: Props) {
   const [isBusy, setIsBusy] = useState(false);
   const { colorTheme } = useAccentTheme();
   const palette = COLOR_THEMES[colorTheme].shareCard;
-  const shareSupported = canShareFiles();
+  const inNativeApp = isInNativeApp();
+  const shareSupported = inNativeApp || canShareFiles();
   const filename = `pomoroutine-share-${data.generatedAtLabel.replaceAll('.', '')}.png`;
 
   // Popup 콘텐츠는 마운트보다 한 틱 늦게 DOM에 붙어 useEffect([data])로는 canvasRef가 아직 null일 수 있어, 콜백 ref로 실제 부착 시점에 맞춰 그린다
@@ -40,7 +42,17 @@ export function ShareCardModal({ data, onClose }: Props) {
     if (ctx) void drawShareCard(ctx, data, palette);
   }, [data, palette]);
 
+  const sendToNativeApp = (action: ShareCardAction) => {
+    if (!canvasRef.current) return;
+    postToNativeApp({
+      type: 'share-card',
+      action,
+      dataUrl: canvasRef.current.toDataURL('image/png'),
+    });
+  };
+
   const handleDownload = async () => {
+    if (inNativeApp) return sendToNativeApp('save');
     if (!canvasRef.current) return;
     setIsBusy(true);
     try {
@@ -51,6 +63,7 @@ export function ShareCardModal({ data, onClose }: Props) {
   };
 
   const handleShare = async () => {
+    if (inNativeApp) return sendToNativeApp('share');
     if (!canvasRef.current) return;
     setIsBusy(true);
     try {
