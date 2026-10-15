@@ -84,7 +84,11 @@ export function TaskList({
         </ScrollView>
       )}
 
-      <Pressable onPress={() => setEditTarget('new')} style={styles.addButton}>
+      <Pressable
+        onPress={() => setEditTarget('new')}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 24 }}
+        style={styles.addButton}
+      >
         <Plus size={14} color={theme.mutedForeground} />
         <Text
           style={[styles.addLabel, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}

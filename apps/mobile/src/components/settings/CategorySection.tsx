@@ -107,6 +107,7 @@ export function CategorySection() {
         <Pressable
           onPress={() => !isAtLimit && setEditTarget('new')}
           disabled={isAtLimit}
+          hitSlop={{ top: 14, bottom: 14, left: 8, right: 24 }}
           style={[styles.addButton, isAtLimit && styles.disabled]}
         >
           <Plus size={16} color={theme.mutedForeground} />
