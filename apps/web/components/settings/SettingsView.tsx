@@ -84,7 +84,7 @@ export function SettingsView({ userPromise }: Props) {
   const { mode } = useTheme();
   const { colorTheme } = useAccentTheme();
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
-  const taskCount = useTaskStore((s) => s.tasks.length);
+  const taskCount = useTaskStore((s) => s.tasks.filter((t) => !t.completed).length);
   const categoryCount = useTaskStore((s) => s.categories.length);
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
