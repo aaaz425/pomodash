@@ -3,9 +3,8 @@ import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { ColorThemeSection } from '@/components/settings/ColorThemeSection';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -13,8 +12,7 @@ interface Props {
 }
 
 export function ThemeModal({ visible, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <Modal visible={visible} title="테마" onClose={onClose}>

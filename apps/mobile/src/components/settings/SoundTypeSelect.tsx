@@ -5,9 +5,8 @@ import type { SoundType } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { Portal } from '@/components/shared/Portal';
 import { SOUND_TYPE_LABELS } from '@/constants/soundTypes';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   value: SoundType;
@@ -22,8 +21,7 @@ const VIEWPORT_MARGIN = 8;
 const OPTIONS = Object.keys(SOUND_TYPE_LABELS) as SoundType[];
 
 export function SoundTypeSelect({ value, onChange, disabled }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const triggerRef = useRef<View>(null);
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);

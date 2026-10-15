@@ -14,9 +14,8 @@ import type { LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { Portal } from './Portal';
 
 // 네이티브 RN <Modal>은 react-native-screens 환경에서 하단 커스텀 탭바를 못 덮어, 절대위치 View 오버레이를 <Portal>로 렌더링한다.
@@ -46,8 +45,7 @@ export function Modal({
   scrollable = true,
   keyboardShouldPersistTaps = 'never',
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const insets = useSafeAreaInsets();
 
   const [mounted, setMounted] = useState(visible);

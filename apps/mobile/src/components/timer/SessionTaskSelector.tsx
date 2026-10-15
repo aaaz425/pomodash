@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/shared/Text';
 import { TaskList } from '@/components/tasks/TaskList';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { SessionProgressBadge } from './SessionProgressBadge';
 
 interface Props {
@@ -12,8 +12,7 @@ interface Props {
 }
 
 export function SessionTaskSelector({ selectedTaskId, onSelect }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={styles.container}>

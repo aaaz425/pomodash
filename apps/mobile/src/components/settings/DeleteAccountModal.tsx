@@ -4,9 +4,8 @@ import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -15,8 +14,7 @@ interface Props {
 
 // 1단계 확인 후, 이메일 계정은 비밀번호로 카카오 계정은 카카오 재인증으로 본인 확인을 한다
 export function DeleteAccountModal({ visible, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { user, deleteAccount, loginWithKakao } = useAuth();
 
   const [step, setStep] = useState<'confirm' | 'verify'>('confirm');

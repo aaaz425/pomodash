@@ -4,13 +4,11 @@ import Constants from 'expo-constants';
 import type { LegalDocType } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { LegalModal } from '@/components/legal/LegalModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function AboutSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const version = Constants.expoConfig?.version ?? '—';
   const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
 

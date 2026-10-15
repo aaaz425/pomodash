@@ -1,9 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/shared/Text';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import type { Task, Category } from '@/types/tasks';
 import { SessionProgressBadge } from './SessionProgressBadge';
 import { SessionTaskSelector } from './SessionTaskSelector';
@@ -24,8 +23,7 @@ export function SessionTaskSummary({
   selectedTaskId,
   onSelectTask,
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   if (!isTaskSession) {
     return <SessionTaskSelector selectedTaskId={selectedTaskId} onSelect={onSelectTask} />;

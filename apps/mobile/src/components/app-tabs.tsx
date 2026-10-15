@@ -1,11 +1,9 @@
 import { Tabs } from 'expo-router/js-tabs';
 import { BottomNav } from '@/components/BottomNav';
-import { THEME } from '@/constants/timerColors';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function AppTabs() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <Tabs

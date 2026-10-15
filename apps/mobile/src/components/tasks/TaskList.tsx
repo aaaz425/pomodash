@@ -6,9 +6,8 @@ import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { TaskItem } from './TaskItem';
 import { TaskFormModal } from './TaskFormModal';
 import type { Task } from '@/types/tasks';
@@ -28,8 +27,7 @@ export function TaskList({
   maxHeight,
   emptyStatePaddingVertical = 16,
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const tasks = useTaskStore((s) => s.tasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);

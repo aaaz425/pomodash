@@ -2,14 +2,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
 import { Text } from '@/components/shared/Text';
 import { NAV_ITEMS, BOTTOM_NAV_HEIGHT } from '@/constants/navItems';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 // flat bg-card + 상단 보더만, 네이티브 블러/반투명 없음 — unstable-native-tabs 대신 tabBar prop으로 완전히 커스텀 렌더링
 export function BottomNav({ state, navigation, insets }: BottomTabBarProps) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View

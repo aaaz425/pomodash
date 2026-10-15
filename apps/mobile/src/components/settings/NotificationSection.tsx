@@ -8,13 +8,11 @@ import { StepperInput } from '@/components/shared/StepperInput';
 import { Toggle } from '@/components/shared/Toggle';
 import { requestNotificationPermissionAsync } from '@/lib/notifications';
 import { useSoundPreview } from '@/hooks/useSoundPreview';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function NotificationSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);

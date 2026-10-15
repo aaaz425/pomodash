@@ -8,9 +8,8 @@ import { Modal } from '@/components/shared/Modal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { TaskList } from '@/components/tasks/TaskList';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -23,8 +22,7 @@ const MODE_OPTIONS: { value: TimerMode; label: string }[] = [
 ];
 
 export function StartSessionSheet({ visible, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
   const storeSettings = useTimerStore((s) => s.settings);

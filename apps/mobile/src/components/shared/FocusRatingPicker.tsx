@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { FOCUS_RATING_OPTIONS, type FocusRating } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   value: FocusRating | null;
@@ -12,8 +12,7 @@ interface Props {
 }
 
 export function FocusRatingPicker({ value, onChange, disabled = false }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={styles.row}>

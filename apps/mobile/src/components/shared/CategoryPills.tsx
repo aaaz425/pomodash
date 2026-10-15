@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/shared/Text';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import type { Category } from '@/types/tasks';
 
 interface Props {
@@ -12,8 +12,7 @@ interface Props {
 }
 
 export function CategoryPills({ categories, selectedId, onChange }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={styles.row}>

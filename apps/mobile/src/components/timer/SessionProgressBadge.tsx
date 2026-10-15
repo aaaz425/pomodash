@@ -2,15 +2,13 @@ import { StyleSheet, View } from 'react-native';
 import { formatSessionProgressLabel } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { useTimerStore } from '@/store/StoreProvider';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { CycleIndicator } from './CycleIndicator';
 
 // CycleIndicator는 free 모드에서 스스로 숨으므로 여기서 별도 분기하지 않는다
 export function SessionProgressBadge() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const mode = useTimerStore((s) => s.mode);
   const cycleCount = useTimerStore((s) => s.cycleCount);

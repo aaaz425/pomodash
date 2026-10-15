@@ -1,7 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/shared/Text';
-import { useThemeMode, useThemeScheme, type ThemeMode } from '@/hooks/use-theme-scheme';
-import { THEME } from '@/constants/timerColors';
+import { useThemeMode, useThemeTokens, type ThemeMode } from '@/hooks/use-theme-scheme';
 import { FONTS } from '@/constants/fonts';
 
 const OPTIONS: { mode: ThemeMode; label: string }[] = [
@@ -11,8 +10,7 @@ const OPTIONS: { mode: ThemeMode; label: string }[] = [
 ];
 
 export function ThemeSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { mode, setMode } = useThemeMode();
 
   return (

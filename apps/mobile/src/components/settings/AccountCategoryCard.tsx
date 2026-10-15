@@ -5,9 +5,8 @@ import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
 import { SettingsRowGroup } from '@/components/settings/SettingsRowGroup';
 import { ProfileSection } from '@/components/settings/ProfileSection';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   onPasswordChangePress: () => void;
@@ -15,8 +14,7 @@ interface Props {
 }
 
 export function AccountCategoryCard({ onPasswordChangePress, onDeleteAccountPress }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { user, logout } = useAuth();
   const isKakao = user?.user_metadata?.provider === 'kakao';
 

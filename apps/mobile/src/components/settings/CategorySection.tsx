@@ -7,9 +7,9 @@ import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CategoryEditModal } from '@/components/settings/CategoryEditModal';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import type { Category } from '@/types/tasks';
 
 function CategoryRow({
@@ -25,8 +25,7 @@ function CategoryRow({
   drag: () => void;
   isActive: boolean;
 }) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View
@@ -61,8 +60,7 @@ function CategoryRow({
 }
 
 export function CategorySection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const categories = useTaskStore((s) => s.categories);
   const tasks = useTaskStore((s) => s.tasks);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);

@@ -1,15 +1,14 @@
 import { TextInput as RNTextInput, StyleSheet, type TextInputProps } from 'react-native';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function TextInput({
   style,
   maxFontSizeMultiplier = MAX_FONT_SIZE_MULTIPLIER,
   ...props
 }: TextInputProps) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <RNTextInput

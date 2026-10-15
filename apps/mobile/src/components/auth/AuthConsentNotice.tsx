@@ -3,13 +3,11 @@ import { StyleSheet } from 'react-native';
 import type { LegalDocType } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { LegalModal } from '@/components/legal/LegalModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function AuthConsentNotice() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
 
   return (

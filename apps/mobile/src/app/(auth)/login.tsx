@@ -8,13 +8,11 @@ import { AuthDivider } from '@/components/auth/AuthDivider';
 import { KakaoButton } from '@/components/auth/KakaoButton';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function LoginScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { login } = useAuth();
 
   const [email, setEmail] = useState('');

@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/shared/Text';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   message: string;
@@ -11,8 +11,7 @@ interface Props {
 }
 
 export function EmptyState({ message, subMessage, paddingVertical = 40 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={[styles.container, { paddingVertical }]}>

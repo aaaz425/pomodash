@@ -3,9 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { LEGAL_DOCUMENTS, type LegalDocType } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   doc: LegalDocType | null;
@@ -13,8 +12,7 @@ interface Props {
 }
 
 export function LegalModal({ doc, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   // 닫힘 애니메이션 동안 doc이 null이어도 직전 문서를 계속 보여줘야 함
   const [shownDoc, setShownDoc] = useState<LegalDocType>(doc ?? 'terms');
   if (doc && doc !== shownDoc) setShownDoc(doc);

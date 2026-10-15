@@ -1,13 +1,12 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { COLOR_THEME_KEYS, COLOR_THEMES } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useColorTheme, useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useColorTheme, useThemeScheme, useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function ColorThemeSection() {
   const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { colorTheme, setColorTheme } = useColorTheme();
 
   return (

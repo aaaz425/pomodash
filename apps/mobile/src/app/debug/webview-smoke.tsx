@@ -1,13 +1,11 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function WebViewSmokeScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const webAppUrl = process.env.EXPO_PUBLIC_WEB_APP_URL;
 
   if (!webAppUrl) {

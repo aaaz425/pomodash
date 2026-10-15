@@ -3,16 +3,14 @@ import { StyleSheet } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { subscribeToast } from '@/lib/toast';
 import { Portal } from './Portal';
 
 // 화면 상단에 잠깐 떴다 사라짐
 export function Toaster() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const insets = useSafeAreaInsets();
   const [message, setMessage] = useState<string | null>(null);
 

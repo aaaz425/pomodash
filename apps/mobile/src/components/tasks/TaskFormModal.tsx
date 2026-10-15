@@ -9,9 +9,9 @@ import { TextInput } from '@/components/shared/TextInput';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { CategoryModal } from '@/components/settings/CategoryModal';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Task } from '@/types/tasks';
 
@@ -24,8 +24,7 @@ interface Props {
 }
 
 export function TaskFormModal({ task, onClose, onCreated }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const categories = useTaskStore((s) => s.categories);
   const addTask = useTaskStore((s) => s.addTask);

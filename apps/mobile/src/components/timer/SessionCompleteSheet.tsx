@@ -12,17 +12,15 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { Portal } from '@/components/shared/Portal';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { SessionCompleteHeader } from './SessionCompleteHeader';
 import { SessionTaskSummary } from './SessionTaskSummary';
 import { SessionMemoField } from './SessionMemoField';
 import { SessionActionButtons } from './SessionActionButtons';
 
 export function SessionCompleteSheet() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { session } = useAuth();
 
   const sessionEnded = useTimerStore((s) => s.sessionEnded);

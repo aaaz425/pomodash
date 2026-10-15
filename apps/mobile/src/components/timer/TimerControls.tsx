@@ -6,13 +6,11 @@ import { useTimerStore } from '@/store/StoreProvider';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
 import { StartSessionSheet } from '@/components/timer/StartSessionSheet';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function TimerControls() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const sessionStarted = useTimerStore((s) => s.sessionStarted);

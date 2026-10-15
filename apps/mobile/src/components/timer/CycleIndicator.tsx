@@ -10,7 +10,7 @@ import Animated, {
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { phaseBadge, THEME } from '@/constants/timerColors';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeScheme, useColorTheme } from '@/hooks/use-theme-scheme';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 function Dot({
@@ -53,6 +53,7 @@ function Dot({
 
 export function CycleIndicator() {
   const scheme = useThemeScheme();
+  const { colorTheme } = useColorTheme();
   const reducedMotion = useReducedMotion();
   const { phase, mode } = useTimer();
   const cycleCount = useTimerStore((s) => s.cycleCount);
@@ -61,7 +62,7 @@ export function CycleIndicator() {
 
   if (mode === 'free' || !sessionStarted) return null;
 
-  const dotColor = phaseBadge('focus', scheme).dot;
+  const dotColor = phaseBadge('focus', scheme, colorTheme).dot;
 
   return (
     <View style={styles.row}>

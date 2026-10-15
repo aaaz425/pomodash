@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { Appearance, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_COLOR_THEME, type ColorThemeKey } from '@pomoroutine/shared';
-import { setActiveColorTheme } from '@/constants/timerColors';
+import { getThemeTokens, setActiveColorTheme, type ThemeTokens } from '@/constants/timerColors';
 
 type Scheme = 'light' | 'dark';
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -81,4 +81,10 @@ export function useThemeScheme(): Scheme {
   const modeCtx = useContext(ThemeModeContext);
   const mode = modeCtx?.mode ?? 'system';
   return mode === 'system' ? (system === 'dark' ? 'dark' : 'light') : mode;
+}
+
+export function useThemeTokens(): ThemeTokens {
+  const scheme = useThemeScheme();
+  const colorTheme = useContext(ThemeModeContext)?.colorTheme ?? DEFAULT_COLOR_THEME;
+  return getThemeTokens(scheme, colorTheme);
 }

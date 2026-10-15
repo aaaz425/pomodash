@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { THEME, withAlpha } from '@/constants/timerColors';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { withAlpha } from '@/constants/timerColors';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   checked: boolean;
@@ -9,8 +9,7 @@ interface Props {
 }
 
 export function Toggle({ checked, onChange }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const knobStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: withTiming(checked ? 24 : 4, { duration: 150 }) }],

@@ -30,9 +30,8 @@ import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
 import { TaskModal } from '@/components/tasks/TaskModal';
 import { CategoryModal } from '@/components/settings/CategoryModal';
 import { MotivationalModal } from '@/components/settings/MotivationalModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
 
@@ -67,8 +66,7 @@ const detailExit = new Keyframe({
 }).duration(TRANSITION_MS);
 
 export default function SettingsScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { user } = useAuth();
   const hydrated = useHydrated();
 

@@ -9,9 +9,8 @@ import { TextInput } from '@/components/shared/TextInput';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ColorPickerModal } from '@/components/settings/ColorPickerModal';
 import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Category } from '@/types/tasks';
 
@@ -24,8 +23,7 @@ interface Props {
 }
 
 export function CategoryEditModal({ category, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const addCategory = useTaskStore((s) => s.addCategory);
   const updateCategory = useTaskStore((s) => s.updateCategory);
 

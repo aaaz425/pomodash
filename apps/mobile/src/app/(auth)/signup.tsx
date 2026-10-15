@@ -11,13 +11,12 @@ import { AuthConsentNotice } from '@/components/auth/AuthConsentNotice';
 import { KakaoButton } from '@/components/auth/KakaoButton';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function SignupScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { signup } = useAuth();
 
   const [email, setEmail] = useState('');

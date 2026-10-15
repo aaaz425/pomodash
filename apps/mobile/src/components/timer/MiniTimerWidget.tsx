@@ -5,16 +5,17 @@ import { Pause, Play } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
-import { phaseBadge, THEME, withAlpha } from '@/constants/timerColors';
+import { phaseBadge, withAlpha } from '@/constants/timerColors';
 import { BOTTOM_NAV_HEIGHT } from '@/constants/navItems';
 import { FONTS } from '@/constants/fonts';
 import { formatClock } from '@/lib/format';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeScheme, useThemeTokens, useColorTheme } from '@/hooks/use-theme-scheme';
 
 // 타이머 탭이 아닌 다른 탭에 있을 때 하단 탭바 위에 캡슐형 위젯으로 진행 상황을 계속 보여준다
 export function MiniTimerWidget() {
   const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const { colorTheme } = useColorTheme();
+  const theme = useThemeTokens();
   const insets = useSafeAreaInsets();
   const hydrated = useHydrated();
   const pathname = usePathname();
@@ -26,7 +27,7 @@ export function MiniTimerWidget() {
 
   if (!hydrated || !sessionStarted || pathname === '/') return null;
 
-  const phaseStyles = phaseBadge(phase, scheme);
+  const phaseStyles = phaseBadge(phase, scheme, colorTheme);
   const dotColor = isRunning ? phaseStyles.dot : withAlpha(theme.mutedForeground, 0.5);
   const iconColor = isRunning ? phaseStyles.text : theme.mutedForeground;
 

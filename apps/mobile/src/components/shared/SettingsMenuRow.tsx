@@ -1,9 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   Icon: LucideIcon;
@@ -14,8 +13,7 @@ interface Props {
 }
 
 export function SettingsMenuRow({ Icon, label, value, onPress, destructive = false }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <Pressable onPress={onPress} style={styles.row}>

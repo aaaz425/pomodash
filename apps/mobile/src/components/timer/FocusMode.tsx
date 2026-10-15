@@ -6,18 +6,17 @@ import { useTimerStore } from '@/store/StoreProvider';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useSessionEndFlow } from '@/hooks/useSessionEndFlow';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { MESSAGE_ROTATE_INTERVAL_MS, MOTIVATIONAL_MESSAGES } from '@/constants/messages';
 import { TimerRing } from './TimerRing';
 import { CycleIndicator } from './CycleIndicator';
 
 export function FocusMode() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const isFocusMode = useTimerStore((s) => s.isFocusMode);
   const isRunning = useTimerStore((s) => s.startedAt !== null);
   const start = useTimerStore((s) => s.start);

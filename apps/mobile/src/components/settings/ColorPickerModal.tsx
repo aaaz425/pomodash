@@ -6,9 +6,8 @@ import { hexToHsv, hsvToHex, type Hsv } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
 const SV_SIZE = 220;
@@ -22,8 +21,7 @@ interface Props {
 }
 
 export function ColorPickerModal({ visible, initialHex, onCancel, onConfirm }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(initialHex));
   const [color, setColor] = useState(initialHex);

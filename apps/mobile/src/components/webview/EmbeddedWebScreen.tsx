@@ -5,9 +5,8 @@ import WebView, { type WebViewNavigation } from 'react-native-webview';
 import { useFocusEffect } from 'expo-router';
 import { WEBVIEW_TAB_BLUR_EVENT } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
-import { THEME } from '@/constants/timerColors';
 import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeScheme, useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useAuth } from '@/store/AuthProvider';
 import { buildWebviewAuthBridgeSource } from '@/lib/webviewAuthBridge';
 import { handleWebviewMessage } from '@/lib/webviewBridge';
@@ -18,7 +17,7 @@ interface Props {
 
 export function EmbeddedWebScreen({ path }: Props) {
   const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { session } = useAuth();
   const webAppUrl = process.env.EXPO_PUBLIC_WEB_APP_URL;
   const webViewRef = useRef<WebView>(null);

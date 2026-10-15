@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { TimerPhase } from '@pomoroutine/shared';
 import { phaseGlowRgba, THEME } from '@/constants/timerColors';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeScheme, useColorTheme } from '@/hooks/use-theme-scheme';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface Props {
@@ -22,6 +22,7 @@ const SIZE = 320;
 
 export function TimerGlow({ phase, isNeutral }: Props) {
   const scheme = useThemeScheme();
+  const { colorTheme } = useColorTheme();
   const reducedMotion = useReducedMotion();
   const opacity = useSharedValue(isNeutral ? 0.3 : 0.5);
 
@@ -45,7 +46,9 @@ export function TimerGlow({ phase, isNeutral }: Props) {
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
-  const glowColor = isNeutral ? THEME[scheme].mutedForeground : phaseGlowRgba(phase, scheme);
+  const glowColor = isNeutral
+    ? THEME[scheme].mutedForeground
+    : phaseGlowRgba(phase, scheme, colorTheme);
 
   return (
     <Animated.View

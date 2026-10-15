@@ -6,13 +6,12 @@ import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function ForgotPasswordScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { requestPasswordReset } = useAuth();
 
   const [email, setEmail] = useState('');

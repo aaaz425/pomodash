@@ -5,7 +5,6 @@ import {
   type TimerPhase,
 } from '@pomoroutine/shared';
 
-// setActiveColorTheme()로 동기 갱신 — 아래 phaseHex/phaseBadge/phaseGlowRgba/THEME가 이 값을 참조
 let activeColorTheme: ColorThemeKey = DEFAULT_COLOR_THEME;
 
 export function setActiveColorTheme(key: ColorThemeKey): void {
@@ -28,21 +27,30 @@ export function withAlpha(hex: string, alpha: number): string {
 const SHORT_BREAK_HEX = '#60A5FA';
 
 // focus는 선택된 컬러 테마의 accent를 따라감, short-break는 테마와 무관한 고정 파랑
-export function phaseHex(phase: TimerPhase, scheme: 'light' | 'dark'): string {
-  return phase === 'focus' ? COLOR_THEMES[activeColorTheme].accent[scheme].color : SHORT_BREAK_HEX;
+export function phaseHex(
+  phase: TimerPhase,
+  scheme: 'light' | 'dark',
+  colorTheme: ColorThemeKey,
+): string {
+  return phase === 'focus' ? COLOR_THEMES[colorTheme].accent[scheme].color : SHORT_BREAK_HEX;
 }
 
 export function phaseBadge(
   phase: TimerPhase,
   scheme: 'light' | 'dark',
+  colorTheme: ColorThemeKey,
 ): { bg: string; dot: string; text: string } {
-  const hex = phaseHex(phase, scheme);
+  const hex = phaseHex(phase, scheme, colorTheme);
   return { bg: withAlpha(hex, 0.102), dot: hex, text: hex };
 }
 
 // 글로우 중심 색상(alpha 18.8%) — 바깥으로 갈수록 transparent
-export function phaseGlowRgba(phase: TimerPhase, scheme: 'light' | 'dark'): string {
-  return withAlpha(phaseHex(phase, scheme), 0.188);
+export function phaseGlowRgba(
+  phase: TimerPhase,
+  scheme: 'light' | 'dark',
+  colorTheme: ColorThemeKey,
+): string {
+  return withAlpha(phaseHex(phase, scheme, colorTheme), 0.188);
 }
 
 export interface ThemeTokens {
@@ -89,3 +97,15 @@ export const THEME: Record<'light' | 'dark', ThemeTokens> = {
     destructive: '#EF4444',
   },
 };
+
+const themeTokensCache = new Map<string, ThemeTokens>();
+
+export function getThemeTokens(scheme: 'light' | 'dark', colorTheme: ColorThemeKey): ThemeTokens {
+  const key = `${scheme}:${colorTheme}`;
+  const cached = themeTokensCache.get(key);
+  if (cached) return cached;
+  const accent = COLOR_THEMES[colorTheme].accent[scheme];
+  const tokens = { ...THEME[scheme], primary: accent.color, primaryForeground: accent.foreground };
+  themeTokensCache.set(key, tokens);
+  return tokens;
+}
