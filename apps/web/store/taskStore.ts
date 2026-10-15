@@ -26,9 +26,7 @@ import {
   deleteSession as deleteSessionRow,
 } from '@/lib/supabase/sessions';
 import { type Task, type Category, type Session, DEFAULT_CATEGORIES } from '@/types';
-
-const CATEGORY_IN_USE_MESSAGE =
-  '이 카테고리를 쓰는 작업이 있어요. 작업을 먼저 옮기거나 삭제해주세요';
+import { TOAST_MESSAGES } from '@/lib/constants/messages';
 
 type PendingIds = Map<string, Promise<string | null>>;
 
@@ -70,8 +68,8 @@ interface TaskStore {
   updateSessionFields: (
     id: string,
     patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags' | 'taskId'>>,
-  ) => Promise<void>;
-  deleteSession: (id: string) => Promise<void>;
+  ) => Promise<boolean>;
+  deleteSession: (id: string) => Promise<boolean>;
   reorderTasks: (activeId: string, overId: string) => Promise<void>;
   addCategory: (input: { name: string; color: string }) => Promise<void>;
   updateCategory: (id: string, input: { name: string; color: string }) => Promise<void>;
@@ -128,7 +126,7 @@ export const createTaskStore = () => {
 
         if (!inserted) {
           set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
-          toast('작업 추가에 실패했어요. 다시 시도해주세요');
+          toast(TOAST_MESSAGES.taskAddFailed);
           return null;
         }
 
@@ -153,7 +151,7 @@ export const createTaskStore = () => {
       const { error } = await updateTaskRow(targetId, { completed });
       if (error) {
         set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
-        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskSaveFailed);
       }
     },
 
@@ -171,7 +169,7 @@ export const createTaskStore = () => {
       const { error } = await updateTaskRow(targetId, { ...patch, title });
       if (error) {
         set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
-        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskSaveFailed);
       }
     },
 
@@ -189,7 +187,7 @@ export const createTaskStore = () => {
           tasks.splice(Math.min(index, tasks.length), 0, target);
           return { tasks };
         });
-        toast('작업 삭제에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskDeleteFailed);
       }
     },
 
@@ -210,7 +208,7 @@ export const createTaskStore = () => {
 
       const insertedId = await idPromise;
       if (!insertedId) {
-        toast('기록 저장에 실패했어요');
+        toast(TOAST_MESSAGES.sessionSaveFailed);
         return false;
       }
       return true;
@@ -218,9 +216,9 @@ export const createTaskStore = () => {
 
     updateSessionFields: async (id, patch) => {
       const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return;
+      if (!targetId) return false;
       const original = get().sessions.find((s) => s.id === targetId);
-      if (!original) return;
+      if (!original) return false;
       set((state) => ({
         sessions: state.sessions.map((s) => (s.id === targetId ? { ...s, ...patch } : s)),
       }));
@@ -229,15 +227,17 @@ export const createTaskStore = () => {
         set((state) => ({
           sessions: state.sessions.map((s) => (s.id === targetId ? original : s)),
         }));
-        toast('기록 저장에 실패했어요');
+        toast(TOAST_MESSAGES.sessionSaveFailed);
+        return false;
       }
+      return true;
     },
 
     deleteSession: async (id) => {
       const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return;
+      if (!targetId) return false;
       const index = get().sessions.findIndex((s) => s.id === targetId);
-      if (index === -1) return;
+      if (index === -1) return false;
       const target = get().sessions[index];
       set((state) => ({ sessions: state.sessions.filter((s) => s.id !== targetId) }));
       const { error } = await deleteSessionRow(targetId);
@@ -247,8 +247,10 @@ export const createTaskStore = () => {
           sessions.splice(Math.min(index, sessions.length), 0, target);
           return { sessions };
         });
-        toast('기록 삭제에 실패했어요');
+        toast(TOAST_MESSAGES.sessionDeleteFailed);
+        return false;
       }
+      return true;
     },
 
     reorderTasks: async (activeId, overId) => {
@@ -261,7 +263,7 @@ export const createTaskStore = () => {
       const { error } = await reorderTasksRows(next.map((t) => t.id));
       if (error) {
         set({ tasks: previousTasks });
-        toast('순서 저장에 실패했어요');
+        toast(TOAST_MESSAGES.reorderFailed);
       }
     },
 
@@ -278,7 +280,7 @@ export const createTaskStore = () => {
         const inserted = await insertCategoryRow({ name: trimmed, color, position });
         if (!inserted) {
           set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
-          toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
+          toast(TOAST_MESSAGES.categoryAddFailed);
           return null;
         }
         set((state) => ({
@@ -306,7 +308,7 @@ export const createTaskStore = () => {
         set((state) => ({
           categories: state.categories.map((c) => (c.id === targetId ? original : c)),
         }));
-        toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.categorySaveFailed);
       }
     },
 
@@ -318,7 +320,7 @@ export const createTaskStore = () => {
 
       // 낙관적 삭제 후 DB 제약 위반으로 롤백되면 화면이 깜빡이므로, 로컬 tasks로 미리 걸러 생략(DB 체크는 안전망으로 유지)
       if (get().tasks.some((t) => t.categoryId === targetId)) {
-        toast(CATEGORY_IN_USE_MESSAGE);
+        toast(TOAST_MESSAGES.categoryInUse);
         return;
       }
 
@@ -331,7 +333,7 @@ export const createTaskStore = () => {
           categories.splice(Math.min(index, categories.length), 0, target);
           return { categories };
         });
-        toast(blocked ? CATEGORY_IN_USE_MESSAGE : '카테고리 삭제에 실패했어요. 다시 시도해주세요');
+        toast(blocked ? TOAST_MESSAGES.categoryInUse : TOAST_MESSAGES.categoryDeleteFailed);
       }
     },
 
@@ -345,7 +347,7 @@ export const createTaskStore = () => {
       const { error } = await reorderCategoriesRows(next.map((c) => c.id));
       if (error) {
         set({ categories: previousCategories });
-        toast('순서 저장에 실패했어요');
+        toast(TOAST_MESSAGES.reorderFailed);
       }
     },
 
@@ -358,14 +360,14 @@ export const createTaskStore = () => {
 
       const invalidCount = (tasksResult?.invalidCount ?? 0) + (categoriesResult?.invalidCount ?? 0);
       if (invalidCount > 0) {
-        toast(`형식이 맞지 않아 불러오지 못한 기록이 ${invalidCount}건 있어요`);
+        toast(TOAST_MESSAGES.sessionsInvalid(invalidCount));
       }
 
       // core와 별도로 진행 — 타이머/작업목록 등의 진입을 막지 않는다
       void fetchAllSessionsLazy().then((sessionsResult) => {
         set({ sessions: sessionsResult?.sessions ?? [], sessionsHydrated: true });
         if (sessionsResult?.invalidCount) {
-          toast(`형식이 맞지 않아 불러오지 못한 기록이 ${sessionsResult.invalidCount}건 있어요`);
+          toast(TOAST_MESSAGES.sessionsInvalid(sessionsResult.invalidCount));
         }
       });
     },

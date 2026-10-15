@@ -25,6 +25,7 @@ import {
 } from '@/lib/supabase/sessions';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 // fetchCategories 실패 시에만 쓰는 폴백 — DB 트리거(handle_new_user) 기본값과 이름을 맞춤
 const DEFAULT_CATEGORIES: Category[] = [
@@ -70,8 +71,8 @@ interface TaskStore {
   updateSessionFields: (
     id: string,
     patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags' | 'taskId'>>,
-  ) => Promise<void>;
-  deleteSession: (id: string) => Promise<void>;
+  ) => Promise<boolean>;
+  deleteSession: (id: string) => Promise<boolean>;
 
   hydrate: () => Promise<void>;
 }
@@ -140,7 +141,7 @@ export const createTaskStore = () => {
 
         if (!inserted) {
           set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
-          toast('작업 추가에 실패했어요. 다시 시도해주세요');
+          toast(TOAST_MESSAGES.taskAddFailed);
           return null;
         }
 
@@ -164,7 +165,7 @@ export const createTaskStore = () => {
       const { error } = await updateTaskRow(targetId, { completed });
       if (error) {
         set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
-        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskSaveFailed);
       }
     },
 
@@ -182,7 +183,7 @@ export const createTaskStore = () => {
       const { error } = await updateTaskRow(targetId, { ...patch, title });
       if (error) {
         set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
-        toast('작업 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskSaveFailed);
       }
     },
 
@@ -200,7 +201,7 @@ export const createTaskStore = () => {
           tasks.splice(Math.min(index, tasks.length), 0, target);
           return { tasks };
         });
-        toast('작업 삭제에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.taskDeleteFailed);
       }
     },
 
@@ -211,7 +212,7 @@ export const createTaskStore = () => {
       const { error } = await reorderTasksRows(next.map((t) => t.id));
       if (error) {
         set({ tasks: previousTasks });
-        toast('순서 저장에 실패했어요');
+        toast(TOAST_MESSAGES.reorderFailed);
       }
     },
 
@@ -228,7 +229,7 @@ export const createTaskStore = () => {
         const inserted = await insertCategoryRow({ name: trimmed, color, position });
         if (!inserted) {
           set((state) => ({ categories: state.categories.filter((c) => c.id !== tempId) }));
-          toast('카테고리 추가에 실패했어요. 다시 시도해주세요');
+          toast(TOAST_MESSAGES.categoryAddFailed);
           return null;
         }
         set((state) => ({
@@ -256,7 +257,7 @@ export const createTaskStore = () => {
         set((state) => ({
           categories: state.categories.map((c) => (c.id === targetId ? original : c)),
         }));
-        toast('카테고리 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.categorySaveFailed);
       }
     },
 
@@ -280,7 +281,7 @@ export const createTaskStore = () => {
           categories.splice(Math.min(index, categories.length), 0, target);
           return { categories };
         });
-        toast('카테고리 삭제에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.categoryDeleteFailed);
       }
       return { blocked };
     },
@@ -292,7 +293,7 @@ export const createTaskStore = () => {
       const { error } = await reorderCategoriesRows(next.map((c) => c.id));
       if (error) {
         set({ categories: previousCategories });
-        toast('순서 저장에 실패했어요');
+        toast(TOAST_MESSAGES.reorderFailed);
       }
     },
 
@@ -313,7 +314,7 @@ export const createTaskStore = () => {
 
       const insertedId = await idPromise;
       if (!insertedId) {
-        toast('기록 저장에 실패했어요');
+        toast(TOAST_MESSAGES.sessionSaveFailed);
         return false;
       }
       return true;
@@ -321,9 +322,9 @@ export const createTaskStore = () => {
 
     updateSessionFields: async (id, patch) => {
       const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return;
+      if (!targetId) return false;
       const original = get().sessions.find((s) => s.id === targetId);
-      if (!original) return;
+      if (!original) return false;
       set((state) => ({
         sessions: state.sessions.map((s) => (s.id === targetId ? { ...s, ...patch } : s)),
       }));
@@ -332,15 +333,17 @@ export const createTaskStore = () => {
         set((state) => ({
           sessions: state.sessions.map((s) => (s.id === targetId ? original : s)),
         }));
-        toast('기록 저장에 실패했어요');
+        toast(TOAST_MESSAGES.sessionSaveFailed);
+        return false;
       }
+      return true;
     },
 
     deleteSession: async (id) => {
       const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return;
+      if (!targetId) return false;
       const index = get().sessions.findIndex((s) => s.id === targetId);
-      if (index === -1) return;
+      if (index === -1) return false;
       const target = get().sessions[index];
       set((state) => ({ sessions: state.sessions.filter((s) => s.id !== targetId) }));
       const { error } = await deleteSessionRow(targetId);
@@ -350,8 +353,10 @@ export const createTaskStore = () => {
           sessions.splice(Math.min(index, sessions.length), 0, target);
           return { sessions };
         });
-        toast('기록 삭제에 실패했어요');
+        toast(TOAST_MESSAGES.sessionDeleteFailed);
+        return false;
       }
+      return true;
     },
 
     hydrate: async () => {
@@ -372,7 +377,7 @@ export const createTaskStore = () => {
         (categoriesResult?.invalidCount ?? 0) +
         (sessionsResult?.invalidCount ?? 0);
       if (invalidCount > 0) {
-        toast(`형식이 맞지 않아 불러오지 못한 기록이 ${invalidCount}건 있어요`);
+        toast(TOAST_MESSAGES.sessionsInvalid(invalidCount));
       }
     },
   }));

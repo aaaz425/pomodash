@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
-  Animated,
   BackHandler,
   Dimensions,
-  Easing,
   Keyboard,
   Pressable,
   ScrollView,
@@ -12,16 +10,29 @@ import {
   View,
 } from 'react-native';
 import type { LayoutChangeEvent } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
+import { SheetGrabber } from '@/components/shared/SheetGrabber';
 import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useKeyboardTop } from '@/hooks/useKeyboardTop';
+import { createSheetDismissGesture } from '@/lib/sheetDismissGesture';
 
 // 네이티브 RN <Modal>은 react-native-screens 환경에서 하단 커스텀 탭바를 못 덮어, 절대위치 View 오버레이를 <Portal>로 렌더링한다.
 // sheet 높이는 고정 px 필수 — '85%' 같은 퍼센트는 부모 높이가 불확정이라 내용이 잘리는 버그가 있었음(실측 확인)
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+const OPEN_DURATION_MS = 220;
+const CLOSE_DURATION_MS = 180;
 
 interface Props {
   visible: boolean;
@@ -53,64 +64,85 @@ export function Modal({
   const keyboardHeight = keyboardTop === null ? 0 : Math.max(0, rootBottom - keyboardTop);
 
   const [mounted, setMounted] = useState(visible);
-  const [sheetBottom] = useState(() => new Animated.Value(-SCREEN_HEIGHT));
-  const [backdropOpacity] = useState(() => new Animated.Value(0));
+  const translateY = useSharedValue(SCREEN_HEIGHT);
+  const sheetHeight = useSharedValue(SCREEN_HEIGHT);
   // <Portal> 경유 마운트라 Portal 등록 + PortalProvider 재렌더 사이클이 끼어, requestAnimationFrame 추측 방식은 타이밍이 안 맞아 깜빡였음(실측)
   // — 대신 시트가 실제로 레이아웃된 순간(onLayout)을 신호로 애니메이션을 시작한다
   const openAnimationStartedRef = useRef(false);
+  const closeAnimationStarted = useSharedValue(false);
 
   useEffect(() => {
     if (visible) {
       // 열릴 때는 즉시 마운트해야 애니메이션이 보임(닫힐 때만 비동기 콜백에서 처리) — 동기 호출 불가피
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounted(true);
-      sheetBottom.setValue(-SCREEN_HEIGHT);
-      backdropOpacity.setValue(0);
+      translateY.set(SCREEN_HEIGHT);
       openAnimationStartedRef.current = false;
+      closeAnimationStarted.set(false);
     } else {
-      Animated.parallel([
-        Animated.timing(sheetBottom, {
-          toValue: -SCREEN_HEIGHT,
-          duration: 200,
-          easing: Easing.in(Easing.cubic),
-          useNativeDriver: false,
+      if (closeAnimationStarted.get()) return;
+      const config = { duration: CLOSE_DURATION_MS, easing: Easing.in(Easing.cubic) };
+      translateY.set(
+        withTiming(sheetHeight.get(), config, (finished) => {
+          if (finished) scheduleOnRN(setMounted, false);
         }),
-        Animated.timing(backdropOpacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-      ]).start(() => setMounted(false));
+      );
     }
-  }, [visible, sheetBottom, backdropOpacity]);
+  }, [visible, translateY, sheetHeight, closeAnimationStarted]);
 
-  function handleSheetLayout(_event: LayoutChangeEvent) {
+  function handleSheetLayout(event: LayoutChangeEvent) {
+    const height = event.nativeEvent.layout.height;
+    sheetHeight.set(height);
     if (!visible || openAnimationStartedRef.current) return;
     openAnimationStartedRef.current = true;
-    Animated.parallel([
-      Animated.timing(sheetBottom, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
-      Animated.timing(backdropOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: false,
-      }),
-    ]).start();
+    // 화면 높이가 아닌 시트 높이만큼만 이동해야 시작 직후부터 시트가 보임
+    translateY.set(
+      withSequence(
+        withTiming(height, { duration: 0 }),
+        withTiming(0, { duration: OPEN_DURATION_MS, easing: Easing.out(Easing.cubic) }),
+      ),
+    );
   }
+
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.get() - keyboardHeight }],
+  }));
+  // 열기/닫기/드래그 모두 시트 위치에서 파생시켜 백드롭이 손가락을 그대로 따라오게 한다
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: Math.min(1, Math.max(0, 1 - translateY.get() / sheetHeight.get())),
+  }));
+
+  // 부모 렌더를 거쳐 visible=false가 올 때까지 기다리면 그만큼 시트가 멈칫하므로 닫기 애니메이션을 여기서 먼저 시작
+  function handleClose() {
+    closeAnimationStarted.set(true);
+    translateY.set(
+      withTiming(
+        sheetHeight.get(),
+        { duration: CLOSE_DURATION_MS, easing: Easing.out(Easing.cubic) },
+        (finished) => {
+          if (finished) scheduleOnRN(setMounted, false);
+        },
+      ),
+    );
+    onClose();
+  }
+
+  const dismissGesture = createSheetDismissGesture({
+    translateY,
+    sheetHeight,
+    onDismiss: handleClose,
+  });
+  const onHardwareBackPress = useEffectEvent(handleClose);
 
   // 네이티브 <Modal>이 없으니 안드로이드 물리 뒤로가기를 직접 처리
   useEffect(() => {
     if (!visible) return;
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      onClose();
+      onHardwareBackPress();
       return true;
     });
     return () => sub.remove();
-  }, [visible, onClose]);
+  }, [visible]);
 
   if (!mounted) return null;
 
@@ -123,19 +155,14 @@ export function Modal({
         rootRef.current?.measureInWindow((_x, y, _w, height) => setRootBottom(y + height))
       }
     >
-      <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
+      <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
         <Pressable
           style={StyleSheet.absoluteFill}
-          onPress={keyboardHeight > 0 ? Keyboard.dismiss : onClose}
+          onPress={keyboardHeight > 0 ? Keyboard.dismiss : handleClose}
         />
       </Animated.View>
       <View style={styles.sheetWrap} pointerEvents="box-none">
-        <Animated.View
-          style={[
-            styles.sheetPosition,
-            { bottom: sheetBottom, transform: [{ translateY: -keyboardHeight }] },
-          ]}
-        >
+        <Animated.View style={[styles.sheetPosition, sheetAnimatedStyle]}>
           <View
             onLayout={handleSheetLayout}
             style={[
@@ -151,16 +178,25 @@ export function Modal({
               },
             ]}
           >
-            <View style={[styles.header, { borderBottomColor: theme.border }]}>
-              <Text
-                style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}
-              >
-                {title}
-              </Text>
-              <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
-                <X size={18} color={theme.mutedForeground} />
-              </Pressable>
-            </View>
+            {/* 본문 ScrollView, DraggableFlatList와 제스처가 경합하지 않도록 그래버+헤더만 드래그 영역으로 둔다 */}
+            <GestureDetector gesture={dismissGesture}>
+              <View>
+                <SheetGrabber />
+                <View style={[styles.header, { borderBottomColor: theme.border }]}>
+                  <Text
+                    style={[
+                      styles.title,
+                      { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                    ]}
+                  >
+                    {title}
+                  </Text>
+                  <Pressable onPress={handleClose} hitSlop={8} accessibilityLabel="닫기">
+                    <X size={18} color={theme.mutedForeground} />
+                  </Pressable>
+                </View>
+              </View>
+            </GestureDetector>
 
             {scrollable ? (
               <ScrollView
@@ -218,6 +254,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
+    bottom: 0,
   },
   sheet: {
     borderTopLeftRadius: 24,
@@ -230,7 +267,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
     borderBottomWidth: 1,
   },
   title: {

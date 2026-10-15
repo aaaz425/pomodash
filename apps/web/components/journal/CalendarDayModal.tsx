@@ -6,6 +6,8 @@ import { SessionListItem } from '@/components/journal/SessionListItem';
 import { Button } from '@/components/ui/button';
 import type { Category, Session, Task } from '@/types';
 import { useCloseOnNativeTabBlur } from '@/hooks/useCloseOnNativeTabBlur';
+import { SheetGrabber } from '@/components/shared/SheetGrabber';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 
 interface Props {
   date: Date | null;
@@ -27,6 +29,7 @@ export function CalendarDayModal({
   onClose,
 }: Props) {
   useCloseOnNativeTabBlur(onClose);
+  const { sheetRef, handleProps } = useSheetDrag<HTMLDivElement>({ onDismiss: onClose });
 
   if (!date) return null;
 
@@ -44,17 +47,19 @@ export function CalendarDayModal({
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+        <DialogPrimitive.Backdrop className="backdrop-enter fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
         <DialogPrimitive.Popup
+          ref={sheetRef}
           aria-label="날짜별 기록"
           className={[
-            'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
+            'sheet-enter fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
             'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',
             'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:pb-0',
             'sm:w-[480px] sm:rounded-xl sm:max-h-[85vh]',
           ].join(' ')}
         >
-          <div className="flex flex-col gap-3 p-5 sm:p-6">
+          <SheetGrabber {...handleProps} className="sticky top-0 z-10 bg-card pb-1 touch-none" />
+          <div className="flex flex-col gap-3 p-5 pt-3 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold text-foreground">{label}</h2>
               <DialogPrimitive.Close

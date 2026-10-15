@@ -10,6 +10,7 @@ import { toast } from '@/lib/toast';
 import { withRetry } from '@/lib/retry';
 import { generateId } from '@/lib/generateId';
 import type { AppSettings, SoundType } from '@/types/settings';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',
@@ -69,7 +70,7 @@ export const createSettingsStore = () =>
       const { error } = await saveSettings(toAppSettings(get()));
       if (error) {
         set(previous);
-        toast('설정 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.settingsSaveFailed);
       }
     }
 

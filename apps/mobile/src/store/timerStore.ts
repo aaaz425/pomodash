@@ -3,6 +3,7 @@ import { createTimerStore as createSharedTimerStore } from '@pomoroutine/shared'
 import type { TimerStorePorts, TimerSnapshot } from '@pomoroutine/shared';
 import { ActiveTimerStateSchema } from '@/types/timer';
 import { toast } from '@/lib/toast';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 // 계정과 무관하게 저장되므로 로그아웃/탈퇴 시 AuthProvider에서 반드시 정리해야 함(다음 사용자에게 이전 세션이 새는 것 방지)
 export const ACTIVE_TIMER_STORAGE_KEY = 'pomoroutine:active-timer';
@@ -27,7 +28,7 @@ export const createTimerStore = () => {
       void AsyncStorage.setItem(ACTIVE_TIMER_STORAGE_KEY, JSON.stringify(snapshot));
     },
     loadSnapshot: (fallback) => cachedSnapshot ?? fallback,
-    onSessionTooShort: () => toast('30초 미만은 기록되지 않아요'),
+    onSessionTooShort: () => toast(TOAST_MESSAGES.sessionTooShort),
   };
   return createSharedTimerStore(ports);
 };

@@ -1,6 +1,7 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 import type { SoundType } from '@/types/settings';
 import { toast } from '@/lib/toast';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 // 웹 apps/web/lib/notifications.ts의 SOUND_SEQUENCE_INTERVAL과 동일
 const SOUND_SEQUENCE_INTERVAL_MS = 1900;
@@ -86,7 +87,7 @@ export async function playAlarm({
     }, totalDuration);
     scheduledTimeouts.push(endTimeout);
   } catch {
-    toast('소리를 재생하지 못했어요');
+    toast(TOAST_MESSAGES.soundPlayFailed);
     onEnded?.();
   }
 }

@@ -13,6 +13,7 @@ import {
 import { MOTIVATIONAL_MESSAGES } from '@/lib/constants/messages';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
 import { generateId } from '@/lib/utils';
+import { TOAST_MESSAGES } from '@/lib/constants/messages';
 
 const DEFAULT_SETTINGS: AppSettings = {
   nickname: '',
@@ -82,7 +83,7 @@ export const createSettingsStore = () =>
       const { error } = await saveSettings(toAppSettings(get()));
       if (error) {
         set(previous);
-        toast('설정 저장에 실패했어요. 다시 시도해주세요');
+        toast(TOAST_MESSAGES.settingsSaveFailed);
       }
     }
 
