@@ -16,7 +16,7 @@ import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Category } from '@/types/tasks';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
-const RAINBOW_COLORS = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'];
+const RAINBOW_COLORS = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'] as const;
 
 interface Props {
   category: Category | null; // null = 새 카테고리
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   rainbowFill: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   footerButton: {
     paddingHorizontal: 16,
