@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { router } from 'expo-router';
-import { normalizeFocusPeriods, formatDuration } from '@pomoroutine/shared';
+import { normalizeFocusPeriods, formatDuration, TOAST_MESSAGES } from '@pomoroutine/shared';
 import type { FocusRating } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
@@ -10,16 +12,17 @@ import { useAuth } from '@/store/AuthProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { Portal } from '@/components/shared/Portal';
+import { SheetGrabber } from '@/components/shared/SheetGrabber';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { toast } from '@/lib/toast';
+import { createSheetDismissGesture } from '@/lib/sheetDismissGesture';
 import { SessionCompleteHeader } from './SessionCompleteHeader';
 import { SessionTaskSummary } from './SessionTaskSummary';
 import { SessionMemoField } from './SessionMemoField';
 import { SessionActionButtons } from './SessionActionButtons';
-import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 function SessionCompleteSheetContent() {
   const theme = useThemeTokens();
@@ -45,6 +48,17 @@ function SessionCompleteSheetContent() {
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const translateY = useSharedValue(0);
+  const sheetHeight = useSharedValue(0);
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.get() }],
+  }));
+  const dismissGesture = createSheetDismissGesture({
+    translateY,
+    sheetHeight,
+    onDismiss: () => setPendingAction('skip'),
+    snapBackOnDismiss: true,
+  });
 
   if (!sessionEnded || sessionEndedAt === null) return null;
 
@@ -175,10 +189,23 @@ function SessionCompleteSheetContent() {
       transparent
       onRequestClose={() => setPendingAction('skip')}
     >
-      <View style={styles.root}>
+      {/* RN <Modal>은 별도 네이티브 루트라 앱 루트의 GestureHandlerRootView가 닿지 않음 */}
+      <GestureHandlerRootView style={styles.root}>
         <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')} />
         <View style={styles.sheetWrap} pointerEvents="box-none">
-          <View style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Animated.View
+            onLayout={(event) => sheetHeight.set(event.nativeEvent.layout.height)}
+            style={[
+              styles.sheet,
+              { backgroundColor: theme.card, borderColor: theme.border },
+              sheetAnimatedStyle,
+            ]}
+          >
+            <GestureDetector gesture={dismissGesture}>
+              <View style={styles.grabberArea}>
+                <SheetGrabber />
+              </View>
+            </GestureDetector>
             <SafeAreaView edges={['bottom']}>
               <ScrollView
                 contentContainerStyle={styles.scrollOuter}
@@ -234,7 +261,7 @@ function SessionCompleteSheetContent() {
                 </Pressable>
               </ScrollView>
             </SafeAreaView>
-          </View>
+          </Animated.View>
         </View>
 
         <ConfirmModal
@@ -255,7 +282,7 @@ function SessionCompleteSheetContent() {
           onCancel={() => setPendingAction(null)}
           loading={isSaving}
         />
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
@@ -290,8 +317,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     maxHeight: '85%',
   },
+  grabberArea: {
+    paddingBottom: 4,
+  },
   scrollOuter: {
     padding: 20,
+    paddingTop: 12,
   },
   scrollContent: {
     gap: 20,

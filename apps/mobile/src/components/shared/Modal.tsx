@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import type { LayoutChangeEvent } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -20,10 +21,12 @@ import Animated, {
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
+import { SheetGrabber } from '@/components/shared/SheetGrabber';
 import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useKeyboardTop } from '@/hooks/useKeyboardTop';
+import { createSheetDismissGesture } from '@/lib/sheetDismissGesture';
 
 // 네이티브 RN <Modal>은 react-native-screens 환경에서 하단 커스텀 탭바를 못 덮어, 절대위치 View 오버레이를 <Portal>로 렌더링한다.
 // sheet 높이는 고정 px 필수 — '85%' 같은 퍼센트는 부모 높이가 불확정이라 내용이 잘리는 버그가 있었음(실측 확인)
@@ -63,7 +66,6 @@ export function Modal({
   const [mounted, setMounted] = useState(visible);
   const translateY = useSharedValue(SCREEN_HEIGHT);
   const sheetHeight = useSharedValue(SCREEN_HEIGHT);
-  const backdropOpacity = useSharedValue(0);
   // <Portal> 경유 마운트라 Portal 등록 + PortalProvider 재렌더 사이클이 끼어, requestAnimationFrame 추측 방식은 타이밍이 안 맞아 깜빡였음(실측)
   // — 대신 시트가 실제로 레이아웃된 순간(onLayout)을 신호로 애니메이션을 시작한다
   const openAnimationStartedRef = useRef(false);
@@ -74,18 +76,16 @@ export function Modal({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounted(true);
       translateY.set(SCREEN_HEIGHT);
-      backdropOpacity.set(0);
       openAnimationStartedRef.current = false;
     } else {
       const config = { duration: CLOSE_DURATION_MS, easing: Easing.in(Easing.cubic) };
-      backdropOpacity.set(withTiming(0, { duration: CLOSE_DURATION_MS }));
       translateY.set(
         withTiming(sheetHeight.get(), config, (finished) => {
           if (finished) scheduleOnRN(setMounted, false);
         }),
       );
     }
-  }, [visible, translateY, sheetHeight, backdropOpacity]);
+  }, [visible, translateY, sheetHeight]);
 
   function handleSheetLayout(event: LayoutChangeEvent) {
     const height = event.nativeEvent.layout.height;
@@ -99,15 +99,17 @@ export function Modal({
         withTiming(0, { duration: OPEN_DURATION_MS, easing: Easing.out(Easing.cubic) }),
       ),
     );
-    backdropOpacity.set(withTiming(1, { duration: OPEN_DURATION_MS }));
   }
 
   const sheetAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.get() - keyboardHeight }],
   }));
+  // 열기/닫기/드래그 모두 시트 위치에서 파생시켜 백드롭이 손가락을 그대로 따라오게 한다
   const backdropAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.get(),
+    opacity: Math.min(1, Math.max(0, 1 - translateY.get() / sheetHeight.get())),
   }));
+
+  const dismissGesture = createSheetDismissGesture({ translateY, sheetHeight, onDismiss: onClose });
 
   // 네이티브 <Modal>이 없으니 안드로이드 물리 뒤로가기를 직접 처리
   useEffect(() => {
@@ -153,16 +155,25 @@ export function Modal({
               },
             ]}
           >
-            <View style={[styles.header, { borderBottomColor: theme.border }]}>
-              <Text
-                style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}
-              >
-                {title}
-              </Text>
-              <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
-                <X size={18} color={theme.mutedForeground} />
-              </Pressable>
-            </View>
+            {/* 본문 ScrollView, DraggableFlatList와 제스처가 경합하지 않도록 그래버+헤더만 드래그 영역으로 둔다 */}
+            <GestureDetector gesture={dismissGesture}>
+              <View>
+                <SheetGrabber />
+                <View style={[styles.header, { borderBottomColor: theme.border }]}>
+                  <Text
+                    style={[
+                      styles.title,
+                      { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
+                    ]}
+                  >
+                    {title}
+                  </Text>
+                  <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
+                    <X size={18} color={theme.mutedForeground} />
+                  </Pressable>
+                </View>
+              </View>
+            </GestureDetector>
 
             {scrollable ? (
               <ScrollView
@@ -233,7 +244,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
     borderBottomWidth: 1,
   },
   title: {
