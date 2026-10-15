@@ -35,9 +35,6 @@ type PendingIds = Map<string, Promise<string | null>>;
 // tempId 생성 중 update/delete가 겹치면 나중 도착한 insert reconcile이 그 변경을 덮어쓰므로, 생성이 끝날 때까지 기다렸다가 실제 DB id로 동작한다
 function trackPendingId(pending: PendingIds, tempId: string, promise: Promise<string | null>) {
   pending.set(tempId, promise);
-  void promise.finally(() => {
-    if (pending.get(tempId) === promise) pending.delete(tempId);
-  });
 }
 
 function resolvePendingId(pending: PendingIds, id: string): Promise<string | null> {
