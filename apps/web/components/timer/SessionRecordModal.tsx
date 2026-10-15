@@ -20,6 +20,8 @@ import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 import { formatDuration } from '@/lib/sessionUtils';
 import type { FocusRating } from '@/types';
 import { TOAST_MESSAGES } from '@/lib/constants/messages';
+import { SheetGrabber } from '@/components/shared/SheetGrabber';
+import { useSheetDrag } from '@/hooks/useSheetDrag';
 
 interface Props {
   loggedInPromise: Promise<boolean>;
@@ -48,6 +50,10 @@ export function SessionRecordModal({ loggedInPromise }: Props) {
   const [distractionTags, setDistractionTags] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<'skip' | 'save' | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const { sheetRef, handleProps } = useSheetDrag<HTMLDivElement>({
+    onDismiss: () => setPendingAction('skip'),
+    snapBackOnDismiss: true,
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   if (!hydrated || !sessionEnded || sessionEndedAt === null || loggedIn === null) return null;
@@ -65,11 +71,12 @@ export function SessionRecordModal({ loggedInPromise }: Props) {
     return (
       <DialogPrimitive.Root open onOpenChange={(open) => !open && handleSkip()}>
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+          <DialogPrimitive.Backdrop className="backdrop-enter fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
           <DialogPrimitive.Popup
+            ref={sheetRef}
             aria-label="집중 완료"
             className={[
-              'fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
+              'sheet-enter fixed z-50 bg-card border border-border shadow-2xl overflow-y-auto outline-none',
               'bottom-0 left-0 right-0 rounded-t-2xl max-h-[82vh] standalone:pb-[env(safe-area-inset-bottom)]',
               'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:pb-0',
               'sm:w-[600px] sm:rounded-xl sm:max-h-[85vh]',
@@ -175,7 +182,8 @@ export function SessionRecordModal({ loggedInPromise }: Props) {
               'sm:w-[600px] sm:rounded-xl sm:max-h-[85vh]',
             ].join(' ')}
           >
-            <div className="flex flex-col gap-5 p-5 sm:gap-7 sm:p-10">
+            <SheetGrabber {...handleProps} className="sticky top-0 z-10 bg-card pb-1 touch-none" />
+            <div className="flex flex-col gap-5 p-5 pt-3 sm:gap-7 sm:p-10">
               {/* Header */}
               <div className="flex flex-col gap-2.5">
                 <div className="flex flex-col items-center gap-4">
