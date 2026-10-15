@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { deriveTimerDisplay } from '@pomoroutine/shared';
+import { deriveTimerDisplay, getPhaseEndMessage } from '@pomoroutine/shared';
 import { useTimerStore, useSettingsStore, useHydrated } from '@/store/StoreProvider';
 import { playAlarm, sendNotification } from '@/lib/notifications';
 import { useWakeLock } from '@/hooks/useWakeLock';
@@ -16,6 +16,7 @@ export function TimerEngine() {
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
+  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
   const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
   const complete = useTimerStore((s) => s.complete);
   const setRunningDisplaySeconds = useTimerStore((s) => s.setRunningDisplaySeconds);
@@ -60,19 +61,12 @@ export function TimerEngine() {
           if (soundAlert)
             playAlarm({ type: soundType, volume: soundVolume, repeatCount: soundRepeatCount });
           if (browserNotification) {
-            const isLastCycle = phase === 'focus' && cycleCount + 1 >= totalCycles;
-            let title: string;
-            let body: string;
-            if (isLastCycle) {
-              title = '타이머 완료!';
-              body = '모든 사이클을 마쳤어요. 수고했어요!';
-            } else if (phase === 'focus') {
-              title = '집중 시간 종료!';
-              body = '잠깐 쉬어가세요.';
-            } else {
-              title = '휴식 종료!';
-              body = '다시 집중할 시간이에요.';
-            }
+            const { title, body } = getPhaseEndMessage({
+              phase,
+              cycleCount,
+              totalCycles,
+              shortBreakMinutes,
+            });
             sendNotification(title, body);
           }
         }
@@ -105,6 +99,7 @@ export function TimerEngine() {
     cycleCount,
     focusMinutes,
     totalCycles,
+    shortBreakMinutes,
     soundAlert,
     soundType,
     soundVolume,

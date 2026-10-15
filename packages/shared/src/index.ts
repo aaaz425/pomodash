@@ -34,6 +34,8 @@ export { isSessionStale } from './lib/sessionStale';
 export { deriveTimerDisplay } from './lib/deriveTimerDisplay';
 export type { DeriveTimerDisplayInput, TimerDisplayState } from './lib/deriveTimerDisplay';
 export { deriveElapsedMinutes } from './lib/deriveElapsedMinutes';
+export { getPhaseEndMessage } from './lib/phaseEndMessage';
+export type { PhaseEndMessageInput } from './lib/phaseEndMessage';
 export type { DeriveElapsedMinutesInput } from './lib/deriveElapsedMinutes';
 export {
   formatDuration,

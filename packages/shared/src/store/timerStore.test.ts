@@ -66,6 +66,16 @@ describe('timerStore', () => {
     expect(typeof store.getState().startedAt).toBe('number');
   });
 
+  it('completeCycle() — 휴식이 0분이면 short-break를 건너뛰고 바로 focus로 전환', () => {
+    const store = createTimerStore();
+    store.getState().updateSettings({ shortBreakMinutes: 0 });
+    store.getState().completeCycle();
+
+    expect(store.getState().cycleCount).toBe(1);
+    expect(store.getState().phase).toBe('focus');
+    expect(store.getState().remainingSeconds).toBe(DEFAULT_TIMER_SETTINGS.focusMinutes * 60);
+  });
+
   it('completeCycle() — totalCycles(4)회 완료 후 sessionEnded가 true로 설정', () => {
     let now = new Date('2024-01-01T00:00:00.000Z').getTime();
     vi.setSystemTime(now);
