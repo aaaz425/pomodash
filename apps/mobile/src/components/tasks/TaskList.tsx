@@ -79,7 +79,7 @@ export function TaskList({
           contentContainerStyle={styles.list}
         />
       ) : (
-        <ScrollView style={maxHeight ? { maxHeight } : undefined}>
+        <ScrollView style={maxHeight ? { maxHeight } : undefined} nestedScrollEnabled>
           <View style={styles.list}>{visibleTasks.map((t) => renderRow(t))}</View>
         </ScrollView>
       )}
