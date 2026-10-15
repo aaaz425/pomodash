@@ -19,7 +19,10 @@ beforeEach(() => {
 });
 
 function setMessages(store: ReturnType<typeof createSettingsStore>, messages: string[]) {
-  store.setState({ motivationalMessages: messages });
+  store.setState({
+    motivationalMessages: messages,
+    messageIds: messages.map((_, i) => String(i)),
+  });
 }
 
 describe('단순 setter (persist 포함)', () => {
@@ -248,21 +251,21 @@ describe('deleteMessage', () => {
 });
 
 describe('reorderMessages', () => {
-  it('fromId/toId(문자열 인덱스)로 메시지 순서가 변경됨', async () => {
+  it('fromId/toId로 메시지 순서가 변경됨', async () => {
     const store = createSettingsStore();
     setMessages(store, ['a', 'b', 'c']);
     await store.getState().reorderMessages('0', '2');
     expect(store.getState().motivationalMessages).toEqual(['b', 'c', 'a']);
   });
 
-  it('파싱 불가능한 id를 전달하면 아무 동작도 하지 않음', async () => {
+  it('존재하지 않는 id를 전달하면 아무 동작도 하지 않음', async () => {
     const store = createSettingsStore();
     setMessages(store, ['a', 'b', 'c']);
     await store.getState().reorderMessages('x', '1');
     expect(store.getState().motivationalMessages).toEqual(['a', 'b', 'c']);
   });
 
-  it('index가 배열 범위를 벗어나면 아무 동작도 하지 않음', async () => {
+  it('한쪽 id가 목록에 없으면 아무 동작도 하지 않음', async () => {
     const store = createSettingsStore();
     setMessages(store, ['a', 'b', 'c']);
     await store.getState().reorderMessages('5', '0');
