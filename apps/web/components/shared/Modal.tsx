@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCloseOnNativeTabBlur } from '@/hooks/useCloseOnNativeTabBlur';
 
 interface Props {
   title: string;
@@ -26,6 +27,8 @@ export function Modal({
   maxHeightClassName = 'max-h-[85vh]',
   bodyClassName = 'flex flex-col gap-5 p-5 overflow-y-auto min-h-0',
 }: Props) {
+  useCloseOnNativeTabBlur(onClose);
+
   return (
     <DialogPrimitive.Root
       open

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, PixelRatio, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView, { type WebViewNavigation } from 'react-native-webview';
+import { useFocusEffect } from 'expo-router';
+import { WEBVIEW_TAB_BLUR_EVENT } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { THEME } from '@/constants/timerColors';
 import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
@@ -30,6 +32,14 @@ export function EmbeddedWebScreen({ path }: Props) {
     });
     return () => sub.remove();
   }, [canGoBack]);
+
+  useFocusEffect(() => {
+    return () => {
+      webViewRef.current?.injectJavaScript(
+        `window.dispatchEvent(new Event('${WEBVIEW_TAB_BLUR_EVENT}')); true;`,
+      );
+    };
+  });
 
   if (!webAppUrl || !session) {
     return (

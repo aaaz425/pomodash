@@ -3,6 +3,7 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { JournalDetailPanel } from '@/components/journal/JournalDetailPanel';
 import type { Category, Session, Task } from '@/types';
+import { useCloseOnNativeTabBlur } from '@/hooks/useCloseOnNativeTabBlur';
 
 interface Props {
   session: Session | null;
@@ -21,6 +22,8 @@ export function SessionDetailOverlay({
   onUpdated,
   onDeleted,
 }: Props) {
+  useCloseOnNativeTabBlur(onClose);
+
   if (!session) return null;
 
   return (

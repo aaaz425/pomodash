@@ -25,6 +25,7 @@ export { FOCUS_RATING_OPTIONS, FOCUS_RATING_LABELS } from './constants/focusRati
 export { DISTRACTION_TAGS } from './constants/distractionTags';
 export type { DistractionTag } from './constants/distractionTags';
 export { LEGAL_DOCUMENTS } from './constants/legal';
+export { WEBVIEW_TAB_BLUR_EVENT } from './constants/webviewBridge';
 export type { LegalDocType, LegalDocument, LegalBlock } from './constants/legal';
 export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
 export { hexToHsv, hsvToHex } from './lib/color';

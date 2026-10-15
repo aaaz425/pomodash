@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { SessionListItem } from '@/components/journal/SessionListItem';
 import { Button } from '@/components/ui/button';
 import type { Category, Session, Task } from '@/types';
+import { useCloseOnNativeTabBlur } from '@/hooks/useCloseOnNativeTabBlur';
 
 interface Props {
   date: Date | null;
@@ -25,6 +26,8 @@ export function CalendarDayModal({
   onSelectSession,
   onClose,
 }: Props) {
+  useCloseOnNativeTabBlur(onClose);
+
   if (!date) return null;
 
   const label = date.toLocaleDateString('ko-KR', {
