@@ -10,17 +10,26 @@ interface Props {
   label: string;
   value: string;
   onPress: () => void;
+  destructive?: boolean;
 }
 
-export function SettingsMenuRow({ Icon, label, value, onPress }: Props) {
+export function SettingsMenuRow({ Icon, label, value, onPress, destructive = false }: Props) {
   const scheme = useThemeScheme();
   const theme = THEME[scheme];
 
   return (
     <Pressable onPress={onPress} style={styles.row}>
       <View style={styles.left}>
-        <Icon size={16} color={theme.mutedForeground} />
-        <Text style={[styles.label, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
+        <Icon size={16} color={destructive ? theme.destructive : theme.mutedForeground} />
+        <Text
+          style={[
+            styles.label,
+            {
+              color: destructive ? theme.destructive : theme.foreground,
+              fontFamily: FONTS.sansRegular,
+            },
+          ]}
+        >
           {label}
         </Text>
       </View>

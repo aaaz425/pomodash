@@ -100,6 +100,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
           key={text}
           disabled={disabled}
           onPress={() => removeCustom(text)}
+          accessibilityLabel={`${text} 삭제`}
           style={[
             styles.chip,
             { backgroundColor: withAlpha(theme.primary, 0.1), borderColor: theme.primary },
@@ -129,6 +130,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
               skipBlurCommitRef.current = true;
             }}
             onPress={handleCancel}
+            accessibilityLabel="직접입력 취소"
             hitSlop={4}
             style={styles.iconButton}
           >

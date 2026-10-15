@@ -30,7 +30,7 @@ export function SettingsRowGroup({ children }: Props) {
 
 const styles = StyleSheet.create({
   group: {
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     overflow: 'hidden',
   },

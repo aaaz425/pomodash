@@ -172,13 +172,13 @@ export default function SettingsScreen() {
                 )}
 
                 {activeCategory === 'notifications' && (
-                  <SettingsCard title="알림">
+                  <SettingsCard>
                     <NotificationSection />
                   </SettingsCard>
                 )}
 
                 {activeCategory === 'about' && (
-                  <SettingsCard title="앱 정보">
+                  <SettingsCard>
                     <AboutSection />
                   </SettingsCard>
                 )}
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    gap: 16,
+    gap: 24,
   },
   header: {
     gap: 4,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   detail: {
-    gap: 16,
+    gap: 24,
   },
   backRow: {
     flexDirection: 'row',
