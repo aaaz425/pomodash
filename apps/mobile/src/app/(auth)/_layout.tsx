@@ -1,5 +1,6 @@
 import { Redirect, Stack } from 'expo-router';
 import { useAuth } from '@/store/AuthProvider';
+import { PortalProvider } from '@/components/shared/Portal';
 
 export default function AuthGroupLayout() {
   const { session, loading } = useAuth();
@@ -7,5 +8,9 @@ export default function AuthGroupLayout() {
   if (loading) return null;
   if (session) return <Redirect href="/" />;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <PortalProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </PortalProvider>
+  );
 }
