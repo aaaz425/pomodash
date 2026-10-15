@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
 import { TaskList } from '@/components/tasks/TaskList';
 import { THEME, withAlpha } from '@/constants/timerColors';

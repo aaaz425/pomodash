@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Text } from '@/components/shared/Text';
 import { supabase } from '@/lib/supabase/client';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { THEME } from '@/constants/timerColors';

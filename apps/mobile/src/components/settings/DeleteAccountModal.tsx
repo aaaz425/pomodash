@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal as RNModal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal as RNModal, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { PasswordField } from '@/components/auth/PasswordField';

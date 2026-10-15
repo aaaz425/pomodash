@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import type { ShareCardData, ShareCardPalette } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
 
 interface Props {

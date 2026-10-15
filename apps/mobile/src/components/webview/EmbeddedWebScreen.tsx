@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, BackHandler, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView, { type WebViewNavigation } from 'react-native-webview';
+import { Text } from '@/components/shared/Text';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

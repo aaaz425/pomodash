@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hexToHsv, hsvToHex, type Hsv } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
 import { THEME } from '@/constants/timerColors';

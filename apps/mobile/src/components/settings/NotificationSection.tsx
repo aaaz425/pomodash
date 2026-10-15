@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { Bell, Eye, Pause, Play, Volume2 } from 'lucide-react-native';
 import { SOUND_LIMITS, type SoundType } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { SoundTypeSelect } from '@/components/settings/SoundTypeSelect';
 import { StepperInput } from '@/components/shared/StepperInput';

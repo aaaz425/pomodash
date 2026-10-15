@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -11,6 +11,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useHydrated, useSettingsStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';

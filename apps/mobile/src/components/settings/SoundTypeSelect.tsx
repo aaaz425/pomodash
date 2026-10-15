@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import { Check, ChevronDown } from 'lucide-react-native';
 import type { SoundType } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { Portal } from '@/components/shared/Portal';
 import { SOUND_TYPE_LABELS } from '@/constants/soundTypes';
 import { THEME } from '@/constants/timerColors';

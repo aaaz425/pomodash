@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { useThemeMode, useThemeScheme, type ThemeMode } from '@/hooks/use-theme-scheme';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

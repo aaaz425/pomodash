@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
+import { Text } from '@/components/shared/Text';
 import { NAV_ITEMS, BOTTOM_NAV_HEIGHT } from '@/constants/navItems';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

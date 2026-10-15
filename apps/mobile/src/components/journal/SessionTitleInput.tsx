@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { TextInput } from '@/components/shared/TextInput';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

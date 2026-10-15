@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { TaskList } from '@/components/tasks/TaskList';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

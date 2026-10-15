@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import {
   BADGE_CATEGORY_LABELS,
@@ -8,6 +8,7 @@ import {
   type BadgeCategory,
 } from '@pomoroutine/shared';
 import { BadgeMedal } from './BadgeMedal';
+import { Text } from '@/components/shared/Text';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

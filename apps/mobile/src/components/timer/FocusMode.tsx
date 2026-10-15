@@ -1,6 +1,7 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play, Square, X } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useRotatingMessage } from '@/hooks/useRotatingMessage';
 import { useCurrentTask } from '@/hooks/useCurrentTask';

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Animated, {
   Easing,
@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

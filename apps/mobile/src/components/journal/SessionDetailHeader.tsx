@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Pencil, Trash2 } from 'lucide-react-native';
 import {
   formatFocusPeriodRanges,
@@ -6,6 +6,7 @@ import {
   formatTimeRange,
   hasAbnormalFocusGap,
 } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { SessionTitleInput } from '@/components/journal/SessionTitleInput';
 import { THEME } from '@/constants/timerColors';

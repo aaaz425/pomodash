@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Check, GripVertical, Pencil, Trash2 } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';

@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { formatSessionProgressLabel } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore } from '@/store/StoreProvider';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

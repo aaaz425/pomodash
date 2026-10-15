@@ -1,4 +1,4 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   Clock,
@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import type { BadgeDefinition, BadgeIconKey } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { BADGE_TIER_STYLES } from '@/constants/badgeTierStyles';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

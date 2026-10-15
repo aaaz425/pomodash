@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChartColumn, CircleCheck, Flame, Share2, Timer } from 'lucide-react-native';
 import {
@@ -11,6 +11,7 @@ import {
   getTotalFocusSeconds,
   type TabType,
 } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { GuestPrompt } from '@/components/shared/GuestPrompt';

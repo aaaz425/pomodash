@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Minus, Plus } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { THEME } from '@/constants/timerColors';
-import { FONTS } from '@/constants/fonts';
+import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 
 interface Props {
@@ -50,6 +51,7 @@ export function StepperInput({
           <Minus size={12} color={theme.mutedForeground} />
         </Pressable>
         <TextInput
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           inputMode="numeric"
           editable={!disabled}
           value={editing ? raw : String(value)}

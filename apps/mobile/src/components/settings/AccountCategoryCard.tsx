@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LogOut } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsCard } from '@/components/settings/SettingsCard';
 import { ProfileSection } from '@/components/settings/ProfileSection';

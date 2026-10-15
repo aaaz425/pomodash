@@ -1,6 +1,7 @@
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
 import { WEB_APP_URL } from '@/store/AuthProvider';
+import { Text } from '@/components/shared/Text';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';

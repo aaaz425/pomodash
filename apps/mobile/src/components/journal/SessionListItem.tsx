@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import {
   FOCUS_RATING_LABELS,
   formatDuration,
   formatSessionTimeSummary,
   getSessionOrdinalTitle,
 } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

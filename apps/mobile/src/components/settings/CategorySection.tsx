@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CategoryEditModal } from '@/components/settings/CategoryEditModal';

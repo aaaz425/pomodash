@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { TextInput } from '@/components/shared/TextInput';
 import { THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

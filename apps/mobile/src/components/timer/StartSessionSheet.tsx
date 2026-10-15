@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import type { TimerMode, TimerSettings } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';

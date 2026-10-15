@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { Plus } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';

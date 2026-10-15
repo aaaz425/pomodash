@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
 import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';

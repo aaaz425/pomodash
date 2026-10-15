@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pause, Play } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTimer } from '@/hooks/useTimer';
 import { useTimerStore, useHydrated } from '@/store/StoreProvider';
 import { phaseBadge, THEME, withAlpha } from '@/constants/timerColors';

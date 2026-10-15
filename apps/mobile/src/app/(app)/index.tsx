@@ -1,5 +1,6 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text } from '@/components/shared/Text';
 import { useHydrated } from '@/store/StoreProvider';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';

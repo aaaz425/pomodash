@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { normalizeFocusPeriods, formatDuration } from '@pomoroutine/shared';
 import type { FocusRating } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
