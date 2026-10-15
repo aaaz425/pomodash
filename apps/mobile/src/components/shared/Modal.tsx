@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import {
   BackHandler,
@@ -69,6 +69,7 @@ export function Modal({
   // <Portal> 경유 마운트라 Portal 등록 + PortalProvider 재렌더 사이클이 끼어, requestAnimationFrame 추측 방식은 타이밍이 안 맞아 깜빡였음(실측)
   // — 대신 시트가 실제로 레이아웃된 순간(onLayout)을 신호로 애니메이션을 시작한다
   const openAnimationStartedRef = useRef(false);
+  const closeAnimationStarted = useSharedValue(false);
 
   useEffect(() => {
     if (visible) {
@@ -77,7 +78,9 @@ export function Modal({
       setMounted(true);
       translateY.set(SCREEN_HEIGHT);
       openAnimationStartedRef.current = false;
+      closeAnimationStarted.set(false);
     } else {
+      if (closeAnimationStarted.get()) return;
       const config = { duration: CLOSE_DURATION_MS, easing: Easing.in(Easing.cubic) };
       translateY.set(
         withTiming(sheetHeight.get(), config, (finished) => {
@@ -85,7 +88,7 @@ export function Modal({
         }),
       );
     }
-  }, [visible, translateY, sheetHeight]);
+  }, [visible, translateY, sheetHeight, closeAnimationStarted]);
 
   function handleSheetLayout(event: LayoutChangeEvent) {
     const height = event.nativeEvent.layout.height;
@@ -109,17 +112,37 @@ export function Modal({
     opacity: Math.min(1, Math.max(0, 1 - translateY.get() / sheetHeight.get())),
   }));
 
-  const dismissGesture = createSheetDismissGesture({ translateY, sheetHeight, onDismiss: onClose });
+  // 부모 렌더를 거쳐 visible=false가 올 때까지 기다리면 그만큼 시트가 멈칫하므로 닫기 애니메이션을 여기서 먼저 시작
+  function handleClose() {
+    closeAnimationStarted.set(true);
+    translateY.set(
+      withTiming(
+        sheetHeight.get(),
+        { duration: CLOSE_DURATION_MS, easing: Easing.out(Easing.cubic) },
+        (finished) => {
+          if (finished) scheduleOnRN(setMounted, false);
+        },
+      ),
+    );
+    onClose();
+  }
+
+  const dismissGesture = createSheetDismissGesture({
+    translateY,
+    sheetHeight,
+    onDismiss: handleClose,
+  });
+  const onHardwareBackPress = useEffectEvent(handleClose);
 
   // 네이티브 <Modal>이 없으니 안드로이드 물리 뒤로가기를 직접 처리
   useEffect(() => {
     if (!visible) return;
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      onClose();
+      onHardwareBackPress();
       return true;
     });
     return () => sub.remove();
-  }, [visible, onClose]);
+  }, [visible]);
 
   if (!mounted) return null;
 
@@ -135,7 +158,7 @@ export function Modal({
       <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
         <Pressable
           style={StyleSheet.absoluteFill}
-          onPress={keyboardHeight > 0 ? Keyboard.dismiss : onClose}
+          onPress={keyboardHeight > 0 ? Keyboard.dismiss : handleClose}
         />
       </Animated.View>
       <View style={styles.sheetWrap} pointerEvents="box-none">
@@ -168,7 +191,7 @@ export function Modal({
                   >
                     {title}
                   </Text>
-                  <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
+                  <Pressable onPress={handleClose} hitSlop={8} accessibilityLabel="닫기">
                     <X size={18} color={theme.mutedForeground} />
                   </Pressable>
                 </View>
