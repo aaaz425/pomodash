@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, BackHandler, PixelRatio, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView, { type WebViewNavigation } from 'react-native-webview';
 import { Text } from '@/components/shared/Text';
 import { THEME } from '@/constants/timerColors';
-import { FONTS } from '@/constants/fonts';
+import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
 import { useThemeScheme } from '@/hooks/use-theme-scheme';
 import { useAuth } from '@/store/AuthProvider';
 import { buildWebviewAuthBridgeSource } from '@/lib/webviewAuthBridge';
@@ -57,6 +57,7 @@ export function EmbeddedWebScreen({ path }: Props) {
         ref={webViewRef}
         source={source}
         style={{ backgroundColor: theme.background }}
+        textZoom={Math.round(Math.min(PixelRatio.getFontScale(), MAX_FONT_SIZE_MULTIPLIER) * 100)}
         injectedJavaScriptBeforeContentLoaded={`
           localStorage.setItem('theme', '${scheme}');
           if (window.navigator && window.navigator.serviceWorker) {
