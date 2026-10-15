@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { ColorThemeSection } from '@/components/settings/ColorThemeSection';
 import { FONTS } from '@/constants/fonts';
@@ -11,7 +12,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function ThemeModal({ visible, onClose }: Props) {
+function ThemeModalContent({ visible, onClose }: Props) {
   const theme = useThemeTokens();
 
   return (
@@ -30,5 +31,13 @@ export function ThemeModal({ visible, onClose }: Props) {
         <ColorThemeSection />
       </View>
     </Modal>
+  );
+}
+
+export function ThemeModal(props: Props) {
+  return (
+    <Portal>
+      <ThemeModalContent {...props} />
+    </Portal>
   );
 }

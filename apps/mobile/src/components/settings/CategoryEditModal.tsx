@@ -5,6 +5,7 @@ import { Pencil } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { TextInput } from '@/components/shared/TextInput';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ColorPickerModal } from '@/components/settings/ColorPickerModal';
@@ -22,7 +23,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function CategoryEditModal({ category, onClose }: Props) {
+function CategoryEditModalContent({ category, onClose }: Props) {
   const theme = useThemeTokens();
   const addCategory = useTaskStore((s) => s.addCategory);
   const updateCategory = useTaskStore((s) => s.updateCategory);
@@ -208,3 +209,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 });
+
+export function CategoryEditModal(props: Props) {
+  return (
+    <Portal>
+      <CategoryEditModalContent {...props} />
+    </Portal>
+  );
+}

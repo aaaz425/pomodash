@@ -5,6 +5,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hexToHsv, hsvToHex, type Hsv } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { TextInput } from '@/components/shared/TextInput';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
@@ -20,7 +21,7 @@ interface Props {
   onConfirm: (hex: string) => void;
 }
 
-export function ColorPickerModal({ visible, initialHex, onCancel, onConfirm }: Props) {
+function ColorPickerModalContent({ visible, initialHex, onCancel, onConfirm }: Props) {
   const theme = useThemeTokens();
 
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(initialHex));
@@ -213,3 +214,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 });
+
+export function ColorPickerModal(props: Props) {
+  return (
+    <Portal>
+      <ColorPickerModalContent {...props} />
+    </Portal>
+  );
+}

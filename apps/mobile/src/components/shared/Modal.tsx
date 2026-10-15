@@ -18,7 +18,6 @@ import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useKeyboardTop } from '@/hooks/useKeyboardTop';
-import { Portal } from './Portal';
 
 // 네이티브 RN <Modal>은 react-native-screens 환경에서 하단 커스텀 탭바를 못 덮어, 절대위치 View 오버레이를 <Portal>로 렌더링한다.
 // sheet 높이는 고정 px 필수 — '85%' 같은 퍼센트는 부모 높이가 불확정이라 내용이 잘리는 버그가 있었음(실측 확인)
@@ -37,7 +36,6 @@ interface Props {
 }
 
 // 백드롭과 시트를 형제로 분리(부모-자식 아님) — 감싸는 구조였을 때 ScrollView가 Pressable 두 겹과 경합해 스크롤이 안 먹혔음.
-// <Portal>은 별개 이유 — 탭 스크린 트리 바깥(PortalProvider)에서 렌더링해 하단 탭바에 가려지지 않게 함.
 export function Modal({
   visible,
   title,
@@ -117,84 +115,79 @@ export function Modal({
   if (!mounted) return null;
 
   return (
-    <Portal>
-      <View
-        ref={rootRef}
-        style={styles.root}
-        pointerEvents="box-none"
-        onLayout={() =>
-          rootRef.current?.measureInWindow((_x, y, _w, height) => setRootBottom(y + height))
-        }
-      >
-        <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={keyboardHeight > 0 ? Keyboard.dismiss : onClose}
-          />
-        </Animated.View>
-        <View style={styles.sheetWrap} pointerEvents="box-none">
-          <Animated.View
+    <View
+      ref={rootRef}
+      style={styles.root}
+      pointerEvents="box-none"
+      onLayout={() =>
+        rootRef.current?.measureInWindow((_x, y, _w, height) => setRootBottom(y + height))
+      }
+    >
+      <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={keyboardHeight > 0 ? Keyboard.dismiss : onClose}
+        />
+      </Animated.View>
+      <View style={styles.sheetWrap} pointerEvents="box-none">
+        <Animated.View
+          style={[
+            styles.sheetPosition,
+            { bottom: sheetBottom, transform: [{ translateY: -keyboardHeight }] },
+          ]}
+        >
+          <View
+            onLayout={handleSheetLayout}
             style={[
-              styles.sheetPosition,
-              { bottom: sheetBottom, transform: [{ translateY: -keyboardHeight }] },
+              styles.sheet,
+              {
+                backgroundColor: theme.card,
+                borderColor: theme.border,
+                paddingBottom: keyboardHeight > 0 ? 0 : insets.bottom,
+                maxHeight: Math.min(
+                  SCREEN_HEIGHT * 0.85,
+                  SCREEN_HEIGHT - keyboardHeight - insets.top - 16,
+                ),
+              },
             ]}
           >
-            <View
-              onLayout={handleSheetLayout}
-              style={[
-                styles.sheet,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: theme.border,
-                  paddingBottom: keyboardHeight > 0 ? 0 : insets.bottom,
-                  maxHeight: Math.min(
-                    SCREEN_HEIGHT * 0.85,
-                    SCREEN_HEIGHT - keyboardHeight - insets.top - 16,
-                  ),
-                },
-              ]}
-            >
-              <View style={[styles.header, { borderBottomColor: theme.border }]}>
-                <Text
-                  style={[
-                    styles.title,
-                    { color: theme.foreground, fontFamily: FONTS.sansSemiBold },
-                  ]}
-                >
-                  {title}
-                </Text>
-                <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
-                  <X size={18} color={theme.mutedForeground} />
-                </Pressable>
-              </View>
-
-              {scrollable ? (
-                <ScrollView
-                  style={styles.body}
-                  contentContainerStyle={styles.bodyContent}
-                  keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-                >
-                  {children}
-                </ScrollView>
-              ) : (
-                <View style={styles.bodyContent}>{children}</View>
-              )}
-
-              {footer && (
-                <View
-                  style={[
-                    styles.footer,
-                    { backgroundColor: theme.card, borderTopColor: theme.border },
-                  ]}
-                >
-                  {footer}
-                </View>
-              )}
+            <View style={[styles.header, { borderBottomColor: theme.border }]}>
+              <Text
+                style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}
+              >
+                {title}
+              </Text>
+              <Pressable onPress={onClose} hitSlop={8} accessibilityLabel="닫기">
+                <X size={18} color={theme.mutedForeground} />
+              </Pressable>
             </View>
-          </Animated.View>
-        </View>
+
+            {scrollable ? (
+              <ScrollView
+                style={styles.body}
+                contentContainerStyle={styles.bodyContent}
+                keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+              >
+                {children}
+              </ScrollView>
+            ) : (
+              <View style={styles.bodyContent}>{children}</View>
+            )}
+
+            {footer && (
+              <View
+                style={[
+                  styles.footer,
+                  { backgroundColor: theme.card, borderTopColor: theme.border },
+                ]}
+              >
+                {footer}
+              </View>
+            )}
+          </View>
+        </Animated.View>
       </View>
-    </Portal>
+    </View>
   );
 }
 

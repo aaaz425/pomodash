@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, Tag } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
 import { useSettingsStore, useTaskStore, useTimerStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { TextInput } from '@/components/shared/TextInput';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { CategoryModal } from '@/components/settings/CategoryModal';
@@ -23,7 +24,7 @@ interface Props {
   onCreated?: (id: string) => void;
 }
 
-export function TaskFormModal({ task, onClose, onCreated }: Props) {
+function TaskFormModalContent({ task, onClose, onCreated }: Props) {
   const theme = useThemeTokens();
 
   const categories = useTaskStore((s) => s.categories);
@@ -264,3 +265,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 });
+
+export function TaskFormModal(props: Props) {
+  return (
+    <Portal>
+      <TaskFormModalContent {...props} />
+    </Portal>
+  );
+}

@@ -5,6 +5,7 @@ import type { TimerMode, TimerSettings } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { TaskList } from '@/components/tasks/TaskList';
@@ -21,7 +22,7 @@ const MODE_OPTIONS: { value: TimerMode; label: string }[] = [
   { value: 'free', label: '자유' },
 ];
 
-export function StartSessionSheet({ visible, onClose }: Props) {
+function StartSessionSheetContent({ visible, onClose }: Props) {
   const theme = useThemeTokens();
 
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
@@ -179,3 +180,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+export function StartSessionSheet(props: Props) {
+  return (
+    <Portal>
+      <StartSessionSheetContent {...props} />
+    </Portal>
+  );
+}
