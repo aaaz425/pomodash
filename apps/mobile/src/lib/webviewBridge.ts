@@ -5,6 +5,7 @@ import * as MediaLibrary from 'expo-media-library/legacy';
 import type { ShareCardAction } from '@pomoroutine/shared';
 import { PNG_DATA_URL_PREFIX, WebviewBridgeMessageSchema } from '@/types/webviewBridge';
 import { toast } from '@/lib/toast';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 function writeTempPng(dataUrl: string): string {
   const file = new File(Paths.cache, `pomoroutine-share-${Date.now()}.png`);
@@ -34,7 +35,7 @@ async function handleShareCard(action: ShareCardAction, dataUrl: string) {
     return;
   }
   await MediaLibrary.saveToLibraryAsync(uri);
-  toast('사진 앱에 공유 카드를 저장했어요');
+  toast(TOAST_MESSAGES.shareCardSaved);
 }
 
 export function handleWebviewMessage(

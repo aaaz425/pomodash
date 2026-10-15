@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { Check } from 'lucide-react';
+import { toast } from 'sonner';
 import { useTimerStore, useTaskStore, useHydrated } from '@/store/StoreProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 import { useLoggedIn } from '@/hooks/useLoggedIn';
@@ -18,6 +19,7 @@ import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { normalizeFocusPeriods } from '@/lib/focusPeriods';
 import { formatDuration } from '@/lib/sessionUtils';
 import type { FocusRating } from '@/types';
+import { TOAST_MESSAGES } from '@/lib/constants/messages';
 
 interface Props {
   loggedInPromise: Promise<boolean>;
@@ -146,6 +148,7 @@ export function SessionRecordModal({ loggedInPromise }: Props) {
     setIsSaving(false);
     // 실패 시 폼을 그대로 유지해 재시도할 수 있게 함(토스트는 addSession 내부에서 이미 표시됨)
     if (!success) return;
+    toast(TOAST_MESSAGES.sessionSaved);
     dismissSessionRecord();
     setNote('');
     setFocusRating(null);

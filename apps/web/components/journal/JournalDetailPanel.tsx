@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
@@ -12,6 +13,7 @@ import { SessionTaskReassignModal } from '@/components/journal/SessionTaskReassi
 import { useTaskStore } from '@/store/StoreProvider';
 import { getSessionOrdinalTitle } from '@/lib/sessionUtils';
 import type { Category, FocusRating, Session, Task } from '@/types';
+import { TOAST_MESSAGES } from '@/lib/constants/messages';
 
 interface Props {
   session: Session;
@@ -92,14 +94,16 @@ export function JournalDetailPanel({
       distractionTags: draft.distractionTags,
       note: draft.note.trim() || null,
     };
-    void updateSessionFields(session.id, patch);
+    void updateSessionFields(session.id, patch).then(
+      (ok) => ok && toast(TOAST_MESSAGES.sessionUpdated),
+    );
     onUpdated(patch);
     setIsEditing(false);
     setDraft(null);
   }
 
   function handleDelete() {
-    void deleteSession(session.id);
+    void deleteSession(session.id).then((ok) => ok && toast(TOAST_MESSAGES.sessionDeleted));
     onDeleted();
   }
 

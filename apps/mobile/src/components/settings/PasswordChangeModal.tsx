@@ -5,6 +5,8 @@ import { useAuth } from '@/store/AuthProvider';
 import { PasswordField } from '@/components/auth/PasswordField';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
+import { toast } from '@/lib/toast';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 interface Props {
   visible: boolean;
@@ -43,6 +45,7 @@ export function PasswordChangeModal({ visible, title, onClose }: Props) {
       setError(result.error);
       return;
     }
+    toast(TOAST_MESSAGES.passwordUpdated(title));
     handleClose();
   }
 

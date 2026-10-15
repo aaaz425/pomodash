@@ -14,10 +14,12 @@ import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
+import { toast } from '@/lib/toast';
 import { SessionCompleteHeader } from './SessionCompleteHeader';
 import { SessionTaskSummary } from './SessionTaskSummary';
 import { SessionMemoField } from './SessionMemoField';
 import { SessionActionButtons } from './SessionActionButtons';
+import { TOAST_MESSAGES } from '@pomoroutine/shared';
 
 function SessionCompleteSheetContent() {
   const theme = useThemeTokens();
@@ -158,6 +160,7 @@ function SessionCompleteSheetContent() {
     setIsSaving(false);
     // 실패 시 폼을 그대로 유지해 재시도할 수 있게 함(토스트는 addSession 내부에서 이미 표시됨)
     if (!success) return;
+    toast(TOAST_MESSAGES.sessionSaved);
     dismissSessionRecord();
     setNote('');
     setFocusRating(null);
