@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, startTransition } from 'react';
 import { useTheme, type ThemeMode } from '@/hooks/useTheme';
 
 function LightPreview() {
@@ -38,17 +37,14 @@ function DarkPreview() {
 }
 
 function SystemPreview() {
-  const [sysDark, setSysDark] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    startTransition(() => setSysDark(mq.matches));
-    const handler = (e: MediaQueryListEvent) => setSysDark(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return sysDark ? <DarkPreview /> : <LightPreview />;
+  return (
+    <div className="relative w-full h-full">
+      <LightPreview />
+      <div className="absolute inset-0 [clip-path:inset(0_0_0_50%)]">
+        <DarkPreview />
+      </div>
+    </div>
+  );
 }
 
 const OPTIONS: { mode: ThemeMode; label: string }[] = [
