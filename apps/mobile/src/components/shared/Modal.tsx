@@ -5,6 +5,7 @@ import {
   BackHandler,
   Dimensions,
   Easing,
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,7 @@ import { X } from 'lucide-react-native';
 import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
 import { useThemeTokens } from '@/hooks/use-theme-scheme';
+import { useKeyboardTop } from '@/hooks/useKeyboardTop';
 import { Portal } from './Portal';
 
 // 네이티브 RN <Modal>은 react-native-screens 환경에서 하단 커스텀 탭바를 못 덮어, 절대위치 View 오버레이를 <Portal>로 렌더링한다.
@@ -47,6 +49,10 @@ export function Modal({
 }: Props) {
   const theme = useThemeTokens();
   const insets = useSafeAreaInsets();
+  const keyboardTop = useKeyboardTop();
+  const rootRef = useRef<View>(null);
+  const [rootBottom, setRootBottom] = useState(SCREEN_HEIGHT);
+  const keyboardHeight = keyboardTop === null ? 0 : Math.max(0, rootBottom - keyboardTop);
 
   const [mounted, setMounted] = useState(visible);
   const [sheetBottom] = useState(() => new Animated.Value(-SCREEN_HEIGHT));
@@ -112,12 +118,27 @@ export function Modal({
 
   return (
     <Portal>
-      <View style={styles.root} pointerEvents="box-none">
+      <View
+        ref={rootRef}
+        style={styles.root}
+        pointerEvents="box-none"
+        onLayout={() =>
+          rootRef.current?.measureInWindow((_x, y, _w, height) => setRootBottom(y + height))
+        }
+      >
         <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={keyboardHeight > 0 ? Keyboard.dismiss : onClose}
+          />
         </Animated.View>
         <View style={styles.sheetWrap} pointerEvents="box-none">
-          <Animated.View style={[styles.sheetPosition, { bottom: sheetBottom }]}>
+          <Animated.View
+            style={[
+              styles.sheetPosition,
+              { bottom: sheetBottom, transform: [{ translateY: -keyboardHeight }] },
+            ]}
+          >
             <View
               onLayout={handleSheetLayout}
               style={[
@@ -125,7 +146,11 @@ export function Modal({
                 {
                   backgroundColor: theme.card,
                   borderColor: theme.border,
-                  paddingBottom: insets.bottom,
+                  paddingBottom: keyboardHeight > 0 ? 0 : insets.bottom,
+                  maxHeight: Math.min(
+                    SCREEN_HEIGHT * 0.85,
+                    SCREEN_HEIGHT - keyboardHeight - insets.top - 16,
+                  ),
                 },
               ]}
             >
@@ -205,7 +230,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderWidth: 1,
-    maxHeight: SCREEN_HEIGHT * 0.85,
     overflow: 'hidden',
   },
   header: {
