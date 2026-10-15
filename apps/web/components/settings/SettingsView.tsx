@@ -56,12 +56,14 @@ const CATEGORIES: { key: CategoryKey; label: string; Icon: LucideIcon }[] = [
   { key: 'about', label: '앱 정보', Icon: Info },
 ];
 
-function SettingCard({ title, children }: { title: string; children: ReactNode }) {
+function SettingCard({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-card">
-      <div className="px-6 py-4 border-b border-border">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-      </div>
+      {title && (
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+        </div>
+      )}
       <div className="p-6">{children}</div>
     </div>
   );
@@ -84,7 +86,7 @@ export function SettingsView({ userPromise }: Props) {
   const { mode } = useTheme();
   const { colorTheme } = useAccentTheme();
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
-  const taskCount = useTaskStore((s) => s.tasks.length);
+  const taskCount = useTaskStore((s) => s.tasks.filter((t) => !t.completed).length);
   const categoryCount = useTaskStore((s) => s.categories.length);
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);
   const browserNotification = useSettingsStore((s) => s.browserNotification);
@@ -213,7 +215,7 @@ export function SettingsView({ userPromise }: Props) {
               )}
 
               {activeCategory === 'notifications' && (
-                <SettingCard title="알림">
+                <SettingCard>
                   <NotificationSection />
                 </SettingCard>
               )}
@@ -223,7 +225,7 @@ export function SettingsView({ userPromise }: Props) {
                   <SettingCard title="앱 설치">
                     <InstallSection />
                   </SettingCard>
-                  <SettingCard title="앱 정보">
+                  <SettingCard>
                     <AboutSection />
                   </SettingCard>
                 </div>

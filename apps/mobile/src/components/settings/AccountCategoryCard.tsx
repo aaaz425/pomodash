@@ -1,11 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LogOut } from 'lucide-react-native';
+import { StyleSheet, View } from 'react-native';
+import { KeyRound, LogOut, Mail, Trash2 } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
-import { SettingsCard } from '@/components/settings/SettingsCard';
+import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
+import { SettingsRowGroup } from '@/components/settings/SettingsRowGroup';
 import { ProfileSection } from '@/components/settings/ProfileSection';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   onPasswordChangePress: () => void;
@@ -13,89 +14,66 @@ interface Props {
 }
 
 export function AccountCategoryCard({ onPasswordChangePress, onDeleteAccountPress }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { user, logout } = useAuth();
   const isKakao = user?.user_metadata?.provider === 'kakao';
 
   return (
-    <SettingsCard title="계정">
+    <SettingsRowGroup>
       <ProfileSection />
 
-      <View style={[styles.lower, { borderTopColor: theme.border }]}>
-        <View style={styles.topRow}>
-          <Text style={[styles.email, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
-            {user?.email ?? '카카오 계정'}
+      <View style={styles.emailRow}>
+        <View style={styles.left}>
+          <Mail size={16} color={theme.mutedForeground} />
+          <Text style={[styles.label, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
+            이메일
           </Text>
-          <Pressable onPress={logout} style={styles.logoutRow}>
-            <LogOut size={14} color={theme.destructive} />
-            <Text
-              style={[
-                styles.logoutLabel,
-                { color: theme.destructive, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              로그아웃
-            </Text>
-          </Pressable>
         </View>
-
-        <View style={styles.actionsRow}>
-          <Pressable onPress={onPasswordChangePress}>
-            <Text
-              style={[
-                styles.actionLabel,
-                { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              {isKakao ? '비밀번호 설정' : '비밀번호 변경'}
-            </Text>
-          </Pressable>
-          <Pressable onPress={onDeleteAccountPress}>
-            <Text
-              style={[
-                styles.actionLabel,
-                { color: theme.destructive, fontFamily: FONTS.sansRegular },
-              ]}
-            >
-              회원탈퇴
-            </Text>
-          </Pressable>
-        </View>
+        <Text
+          numberOfLines={1}
+          style={[styles.email, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
+        >
+          {user?.email ?? '카카오 계정'}
+        </Text>
       </View>
-    </SettingsCard>
+
+      <SettingsMenuRow
+        Icon={KeyRound}
+        label={isKakao ? '비밀번호 설정' : '비밀번호 변경'}
+        value=""
+        onPress={onPasswordChangePress}
+      />
+      <SettingsMenuRow Icon={LogOut} label="로그아웃" value="" onPress={logout} />
+      <SettingsMenuRow
+        Icon={Trash2}
+        label="회원탈퇴"
+        value=""
+        destructive
+        onPress={onDeleteAccountPress}
+      />
+    </SettingsRowGroup>
   );
 }
 
 const styles = StyleSheet.create({
-  lower: {
-    borderTopWidth: 1,
-    paddingTop: 12,
-    gap: 12,
-  },
-  topRow: {
+  emailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  email: {
-    fontSize: 14,
-    flexShrink: 1,
-  },
-  logoutRow: {
+  left: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 12,
   },
-  logoutLabel: {
-    fontSize: 12,
+  label: {
+    fontSize: 14,
   },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  actionLabel: {
+  email: {
+    flexShrink: 1,
     fontSize: 12,
   },
 });

@@ -1,18 +1,18 @@
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Bell, Eye, Pause, Play, Volume2 } from 'lucide-react-native';
 import { SOUND_LIMITS, type SoundType } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { SoundTypeSelect } from '@/components/settings/SoundTypeSelect';
 import { StepperInput } from '@/components/shared/StepperInput';
+import { Toggle } from '@/components/shared/Toggle';
 import { requestNotificationPermissionAsync } from '@/lib/notifications';
 import { useSoundPreview } from '@/hooks/useSoundPreview';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function NotificationSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const browserNotification = useSettingsStore((s) => s.browserNotification);
   const keepScreenAwake = useSettingsStore((s) => s.keepScreenAwake);
@@ -72,11 +72,9 @@ export function NotificationSection() {
             </Text>
           </View>
         </View>
-        <Switch
-          value={browserNotification}
-          onValueChange={(v) => void handlePushNotificationChange(v)}
-          trackColor={{ true: theme.primary }}
-          style={styles.switch}
+        <Toggle
+          checked={browserNotification}
+          onChange={(v) => void handlePushNotificationChange(v)}
         />
       </View>
 
@@ -99,12 +97,7 @@ export function NotificationSection() {
             </Text>
           </View>
         </View>
-        <Switch
-          value={keepScreenAwake}
-          onValueChange={(v) => void setKeepScreenAwake(v)}
-          trackColor={{ true: theme.primary }}
-          style={styles.switch}
-        />
+        <Toggle checked={keepScreenAwake} onChange={(v) => void setKeepScreenAwake(v)} />
       </View>
 
       <View style={styles.toggleRow}>
@@ -126,12 +119,7 @@ export function NotificationSection() {
             </Text>
           </View>
         </View>
-        <Switch
-          value={soundAlert}
-          onValueChange={handleSoundAlertToggle}
-          trackColor={{ true: theme.primary }}
-          style={styles.switch}
-        />
+        <Toggle checked={soundAlert} onChange={handleSoundAlertToggle} />
       </View>
 
       <View
@@ -217,9 +205,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     flexShrink: 1,
-  },
-  switch: {
-    transform: [{ scale: 0.8 }],
   },
   title: {
     fontSize: 14,

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, BackHandler, PixelRatio, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView, { type WebViewNavigation } from 'react-native-webview';
-import { THEME } from '@/constants/timerColors';
-import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useFocusEffect } from 'expo-router';
+import { WEBVIEW_TAB_BLUR_EVENT } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
+import { FONTS, MAX_FONT_SIZE_MULTIPLIER } from '@/constants/fonts';
+import { useThemeScheme, useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useAuth } from '@/store/AuthProvider';
 import { buildWebviewAuthBridgeSource } from '@/lib/webviewAuthBridge';
+import { handleWebviewMessage } from '@/lib/webviewBridge';
 
 interface Props {
   path: string;
@@ -14,7 +17,7 @@ interface Props {
 
 export function EmbeddedWebScreen({ path }: Props) {
   const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { session } = useAuth();
   const webAppUrl = process.env.EXPO_PUBLIC_WEB_APP_URL;
   const webViewRef = useRef<WebView>(null);
@@ -29,12 +32,15 @@ export function EmbeddedWebScreen({ path }: Props) {
     return () => sub.remove();
   }, [canGoBack]);
 
-  const source =
-    webAppUrl && session
-      ? buildWebviewAuthBridgeSource(webAppUrl, session, `${path}?embed=1`)
-      : null;
+  useFocusEffect(() => {
+    return () => {
+      webViewRef.current?.injectJavaScript(
+        `window.dispatchEvent(new Event('${WEBVIEW_TAB_BLUR_EVENT}')); true;`,
+      );
+    };
+  });
 
-  if (!source) {
+  if (!webAppUrl || !session) {
     return (
       <SafeAreaView
         edges={['top', 'left', 'right']}
@@ -54,8 +60,9 @@ export function EmbeddedWebScreen({ path }: Props) {
     >
       <WebView
         ref={webViewRef}
-        source={source}
+        source={buildWebviewAuthBridgeSource(webAppUrl, session, `${path}?embed=1`)}
         style={{ backgroundColor: theme.background }}
+        textZoom={Math.round(Math.min(PixelRatio.getFontScale(), MAX_FONT_SIZE_MULTIPLIER) * 100)}
         injectedJavaScriptBeforeContentLoaded={`
           localStorage.setItem('theme', '${scheme}');
           if (window.navigator && window.navigator.serviceWorker) {
@@ -63,6 +70,7 @@ export function EmbeddedWebScreen({ path }: Props) {
           }
           true;
         `}
+        onMessage={(event) => handleWebviewMessage(event.nativeEvent, webAppUrl)}
         onNavigationStateChange={(event: WebViewNavigation) => setCanGoBack(event.canGoBack)}
         startInLoadingState
         renderLoading={() => (

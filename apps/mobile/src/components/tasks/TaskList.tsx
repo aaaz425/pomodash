@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { Plus } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { TaskItem } from './TaskItem';
 import { TaskFormModal } from './TaskFormModal';
 import type { Task } from '@/types/tasks';
@@ -27,8 +27,7 @@ export function TaskList({
   maxHeight,
   emptyStatePaddingVertical = 16,
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const tasks = useTaskStore((s) => s.tasks);
   const reorderTasks = useTaskStore((s) => s.reorderTasks);
   const deleteTask = useTaskStore((s) => s.deleteTask);
@@ -80,12 +79,16 @@ export function TaskList({
           contentContainerStyle={styles.list}
         />
       ) : (
-        <ScrollView style={maxHeight ? { maxHeight } : undefined}>
+        <ScrollView style={maxHeight ? { maxHeight } : undefined} nestedScrollEnabled>
           <View style={styles.list}>{visibleTasks.map((t) => renderRow(t))}</View>
         </ScrollView>
       )}
 
-      <Pressable onPress={() => setEditTarget('new')} style={styles.addButton}>
+      <Pressable
+        onPress={() => setEditTarget('new')}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 24 }}
+        style={styles.addButton}
+      >
         <Plus size={14} color={theme.mutedForeground} />
         <Text
           style={[styles.addLabel, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}

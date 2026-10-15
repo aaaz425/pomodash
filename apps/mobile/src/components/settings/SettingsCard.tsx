@@ -1,25 +1,26 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { THEME } from '@/constants/timerColors';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
-  title: string;
+  title?: string;
   children: ReactNode;
 }
 
 export function SettingsCard({ title, children }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
-          {title}
-        </Text>
-      </View>
+      {title && (
+        <View style={[styles.header, { borderBottomColor: theme.border }]}>
+          <Text style={[styles.title, { color: theme.foreground, fontFamily: FONTS.sansSemiBold }]}>
+            {title}
+          </Text>
+        </View>
+      )}
       <View style={styles.body}>{children}</View>
     </View>
   );
@@ -27,20 +28,20 @@ export function SettingsCard({ title, children }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     overflow: 'hidden',
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 16,
     borderBottomWidth: 1,
   },
   title: {
-    fontSize: 13,
+    fontSize: 14,
   },
   body: {
-    padding: 16,
+    padding: 24,
     gap: 12,
   },
 });

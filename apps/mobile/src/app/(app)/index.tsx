@@ -1,5 +1,6 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text } from '@/components/shared/Text';
 import { useHydrated } from '@/store/StoreProvider';
 import { TimerRing } from '@/components/timer/TimerRing';
 import { CycleIndicator } from '@/components/timer/CycleIndicator';
@@ -8,14 +9,12 @@ import { FocusMode } from '@/components/timer/FocusMode';
 import { SessionCompleteSheet } from '@/components/timer/SessionCompleteSheet';
 import { AbandonedSessionDialog } from '@/components/timer/AbandonedSessionDialog';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
 
 export default function TimerScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const hydrated = useHydrated();
   const { task, category } = useCurrentTask();
 

@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { COLOR_THEME_KEYS, COLOR_THEMES } from '@pomoroutine/shared';
-import { THEME } from '@/constants/timerColors';
+import { Text } from '@/components/shared/Text';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useColorTheme, useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useColorTheme, useThemeScheme, useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function ColorThemeSection() {
   const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { colorTheme, setColorTheme } = useColorTheme();
 
   return (
@@ -16,12 +17,21 @@ export function ColorThemeSection() {
         const swatchColor = themeDef.accent[scheme].color;
         const selected = colorTheme === key;
         return (
-          <Pressable key={key} onPress={() => setColorTheme(key)} style={styles.item}>
+          <Pressable
+            key={key}
+            onPress={() => setColorTheme(key)}
+            accessibilityLabel={themeDef.label}
+            accessibilityState={{ selected }}
+            style={styles.item}
+          >
             <View
               style={[
                 styles.swatch,
                 { backgroundColor: swatchColor },
-                selected && [styles.swatchSelected, { borderColor: theme.foreground }],
+                selected && [
+                  styles.swatchSelected,
+                  { outlineColor: withAlpha(theme.foreground, 0.3) },
+                ],
               ]}
             />
             <Text
@@ -43,22 +53,24 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
   },
   item: {
     alignItems: 'center',
     gap: 6,
   },
   swatch: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   swatchSelected: {
-    borderWidth: 2,
+    outlineWidth: 2,
+    outlineOffset: 2,
+    outlineStyle: 'solid',
     transform: [{ scale: 1.1 }],
   },
   label: {
-    fontSize: 11,
+    fontSize: 12,
   },
 });

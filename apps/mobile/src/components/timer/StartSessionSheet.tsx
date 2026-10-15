@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import type { TimerMode, TimerSettings } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
 import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { TaskList } from '@/components/tasks/TaskList';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -21,9 +22,8 @@ const MODE_OPTIONS: { value: TimerMode; label: string }[] = [
   { value: 'free', label: '자유' },
 ];
 
-export function StartSessionSheet({ visible, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+function StartSessionSheetContent({ visible, onClose }: Props) {
+  const theme = useThemeTokens();
 
   const currentTaskId = useTimerStore((s) => s.currentTaskId);
   const storeSettings = useTimerStore((s) => s.settings);
@@ -180,3 +180,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+export function StartSessionSheet(props: Props) {
+  return (
+    <Portal>
+      <StartSessionSheetContent {...props} />
+    </Portal>
+  );
+}

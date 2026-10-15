@@ -1,25 +1,33 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { ChevronRight, type LucideIcon } from 'lucide-react-native';
-import { THEME } from '@/constants/timerColors';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   Icon: LucideIcon;
   label: string;
   value: string;
   onPress: () => void;
+  destructive?: boolean;
 }
 
-export function SettingsMenuRow({ Icon, label, value, onPress }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+export function SettingsMenuRow({ Icon, label, value, onPress, destructive = false }: Props) {
+  const theme = useThemeTokens();
 
   return (
     <Pressable onPress={onPress} style={styles.row}>
       <View style={styles.left}>
-        <Icon size={16} color={theme.mutedForeground} />
-        <Text style={[styles.label, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
+        <Icon size={16} color={destructive ? theme.destructive : theme.mutedForeground} />
+        <Text
+          style={[
+            styles.label,
+            {
+              color: destructive ? theme.destructive : theme.foreground,
+              fontFamily: FONTS.sansRegular,
+            },
+          ]}
+        >
           {label}
         </Text>
       </View>

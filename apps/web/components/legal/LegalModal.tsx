@@ -1,22 +1,18 @@
 'use client';
 
+import { LEGAL_DOCUMENTS, type LegalDocType } from '@pomoroutine/shared';
 import { Modal } from '@/components/shared/Modal';
-import { PrivacyContent } from '@/components/legal/PrivacyContent';
-import { TermsContent } from '@/components/legal/TermsContent';
+import { LegalContent } from '@/components/legal/LegalContent';
 
 interface Props {
-  doc: 'privacy' | 'terms';
+  doc: LegalDocType;
   onClose: () => void;
 }
 
 export function LegalModal({ doc, onClose }: Props) {
   return (
-    <Modal
-      title={doc === 'privacy' ? '개인정보처리방침' : '이용약관'}
-      onClose={onClose}
-      widthClassName="sm:w-[480px]"
-    >
-      {doc === 'privacy' ? <PrivacyContent /> : <TermsContent />}
+    <Modal title={LEGAL_DOCUMENTS[doc].title} onClose={onClose} widthClassName="sm:w-[480px]">
+      <LegalContent doc={doc} />
     </Modal>
   );
 }

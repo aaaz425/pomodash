@@ -24,5 +24,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'session_failed' }, { status: 401 });
   }
 
-  return NextResponse.redirect(new URL(redirectTo, request.url), 303);
+  return new NextResponse(null, { status: 303, headers: { Location: redirectTo } });
 }

@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Plus, X } from 'lucide-react-native';
 import { DISTRACTION_TAGS, INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   value: string[];
@@ -14,8 +15,7 @@ interface Props {
 }
 
 export function DistractionTagPicker({ value, onChange, disabled = false }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
   const skipBlurCommitRef = useRef(false);
@@ -99,6 +99,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
           key={text}
           disabled={disabled}
           onPress={() => removeCustom(text)}
+          accessibilityLabel={`${text} 삭제`}
           style={[
             styles.chip,
             { backgroundColor: withAlpha(theme.primary, 0.1), borderColor: theme.primary },
@@ -128,6 +129,7 @@ export function DistractionTagPicker({ value, onChange, disabled = false }: Prop
               skipBlurCommitRef.current = true;
             }}
             onPress={handleCancel}
+            accessibilityLabel="직접입력 취소"
             hitSlop={4}
             style={styles.iconButton}
           >

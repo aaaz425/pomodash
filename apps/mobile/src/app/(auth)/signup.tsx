@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Link } from 'expo-router';
 import { Mail } from 'lucide-react-native';
 import { AUTH_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { AuthDivider } from '@/components/auth/AuthDivider';
@@ -10,13 +11,12 @@ import { AuthConsentNotice } from '@/components/auth/AuthConsentNotice';
 import { KakaoButton } from '@/components/auth/KakaoButton';
 import { TextInput } from '@/components/shared/TextInput';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export default function SignupScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { signup } = useAuth();
 
   const [email, setEmail] = useState('');

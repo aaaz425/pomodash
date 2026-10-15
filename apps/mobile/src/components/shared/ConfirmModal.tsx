@@ -1,7 +1,7 @@
-import { Modal as RNModal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { THEME } from '@/constants/timerColors';
+import { Modal as RNModal, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -40,8 +40,7 @@ export function ConfirmModal({
   loading = false,
   closeOnBackdropClick = false,
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const content = (
     <Pressable

@@ -1,0 +1,36 @@
+name: Mobile Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/shared/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/mobile-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Expo type declarations
+        run: echo '/// <reference types="expo/types" />' > apps/mobile/expo-env.d.ts
+
+      - name: Typecheck
+        run: pnpm --filter mobile typecheck
+
+      - name: Lint
+        run: pnpm --filter mobile lint

@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { TIMER_LIMITS } from '@pomoroutine/shared';
-import { THEME } from '@/constants/timerColors';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { StepperInput } from './StepperInput';
 
 interface Props {
@@ -26,8 +26,7 @@ export function TimerSettingsGroup({
   cyclesLabel = '횟수',
   disabled = false,
 }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const rows = [
     {

@@ -656,6 +656,29 @@ describe('updateCategory / deleteCategory', () => {
     );
   });
 
+  it('addCategory 저장이 끝난 뒤 tempId로 수정해도 실제 DB id로 저장됨', async () => {
+    const store = createTaskStore();
+    mockInsertCategory.mockResolvedValueOnce({
+      id: 'db-id-2',
+      name: '원래 이름',
+      color: 'bg-pink-500',
+    });
+
+    const addPromise = store.getState().addCategory({ name: '원래 이름', color: 'bg-pink-500' });
+    const categories = store.getState().categories;
+    const tempId = categories[categories.length - 1].id;
+    await addPromise;
+
+    await store.getState().updateCategory(tempId, { name: '수정된 이름', color: 'bg-red-500' });
+
+    const category = store.getState().categories.find((c) => c.id === 'db-id-2');
+    expect(category).toMatchObject({ name: '수정된 이름', color: 'bg-red-500' });
+    expect(mockUpdateCategory).toHaveBeenCalledWith(
+      'db-id-2',
+      expect.objectContaining({ name: '수정된 이름' }),
+    );
+  });
+
   it('addCategory 저장 대기 중 같은 category를 삭제하면, insert 완료 후에도 삭제된 상태가 유지됨', async () => {
     const store = createTaskStore();
     let resolveInsert!: (value: Category) => void;

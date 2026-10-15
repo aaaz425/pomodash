@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hexToHsv, hsvToHex, type Hsv } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
 const SV_SIZE = 220;
@@ -20,9 +21,8 @@ interface Props {
   onConfirm: (hex: string) => void;
 }
 
-export function ColorPickerModal({ visible, initialHex, onCancel, onConfirm }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+function ColorPickerModalContent({ visible, initialHex, onCancel, onConfirm }: Props) {
+  const theme = useThemeTokens();
 
   const [hsv, setHsv] = useState<Hsv>(() => hexToHsv(initialHex));
   const [color, setColor] = useState(initialHex);
@@ -214,3 +214,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 });
+
+export function ColorPickerModal(props: Props) {
+  return (
+    <Portal>
+      <ColorPickerModalContent {...props} />
+    </Portal>
+  );
+}

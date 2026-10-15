@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { Check, GripVertical, Pencil, Plus, Trash2, X } from 'lucide-react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 function MessageRow({
   message,
@@ -31,8 +32,7 @@ function MessageRow({
   drag: () => void;
   isActive: boolean;
 }) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const [draft, setDraft] = useState(message);
 
   if (isEditing) {
@@ -92,8 +92,7 @@ function MessageRow({
 }
 
 export function MotivationalSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const messages = useSettingsStore((s) => s.motivationalMessages);
   const messageIds = useSettingsStore((s) => s.messageIds);

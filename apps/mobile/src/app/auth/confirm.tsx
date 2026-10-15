@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Text } from '@/components/shared/Text';
 import { supabase } from '@/lib/supabase/client';
 import { AuthShell } from '@/components/auth/AuthShell';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 // 세션 교환이 끝나면 onAuthStateChange가 반영하고 (app)/_layout이 알아서 앱으로 전환한다
 export default function AuthConfirmScreen() {
   const { code } = useLocalSearchParams<{ code?: string }>();
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const [error, setError] = useState<string | null>(null);
   const handled = useRef(false);
 

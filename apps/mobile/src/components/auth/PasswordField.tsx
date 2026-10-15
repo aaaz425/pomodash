@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, type TextInputProps } from 'react-native';
+import { Pressable, StyleSheet, View, type TextInputProps } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props extends Omit<TextInputProps, 'secureTextEntry' | 'style'> {
   label: string;
 }
 
 export function PasswordField({ label, ...inputProps }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const [visible, setVisible] = useState(false);
 
   return (

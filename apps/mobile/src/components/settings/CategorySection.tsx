@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import DraggableFlatList, { type RenderItemParams } from 'react-native-draggable-flatlist';
 import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CategoryEditModal } from '@/components/settings/CategoryEditModal';
-import { THEME, withAlpha } from '@/constants/timerColors';
+import { withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import type { Category } from '@/types/tasks';
 
 function CategoryRow({
@@ -24,8 +25,7 @@ function CategoryRow({
   drag: () => void;
   isActive: boolean;
 }) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View
@@ -60,8 +60,7 @@ function CategoryRow({
 }
 
 export function CategorySection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const categories = useTaskStore((s) => s.categories);
   const tasks = useTaskStore((s) => s.tasks);
   const deleteCategory = useTaskStore((s) => s.deleteCategory);
@@ -108,6 +107,7 @@ export function CategorySection() {
         <Pressable
           onPress={() => !isAtLimit && setEditTarget('new')}
           disabled={isAtLimit}
+          hitSlop={{ top: 14, bottom: 14, left: 8, right: 24 }}
           style={[styles.addButton, isAtLimit && styles.disabled]}
         >
           <Plus size={16} color={theme.mutedForeground} />

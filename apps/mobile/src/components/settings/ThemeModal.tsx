@@ -1,19 +1,19 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { ThemeSection } from '@/components/settings/ThemeSection';
 import { ColorThemeSection } from '@/components/settings/ColorThemeSection';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
 }
 
-export function ThemeModal({ visible, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+function ThemeModalContent({ visible, onClose }: Props) {
+  const theme = useThemeTokens();
 
   return (
     <Modal visible={visible} title="테마" onClose={onClose}>
@@ -31,5 +31,13 @@ export function ThemeModal({ visible, onClose }: Props) {
         <ColorThemeSection />
       </View>
     </Modal>
+  );
+}
+
+export function ThemeModal(props: Props) {
+  return (
+    <Portal>
+      <ThemeModalContent {...props} />
+    </Portal>
   );
 }

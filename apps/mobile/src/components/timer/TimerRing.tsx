@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Animated, {
   Easing,
@@ -7,9 +7,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore } from '@/store/StoreProvider';
 import { useTimer } from '@/hooks/useTimer';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeScheme, useColorTheme } from '@/hooks/use-theme-scheme';
 import { phaseHex, PHASE_LABELS, phaseBadge, THEME, withAlpha } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
 import { formatClock } from '@/lib/format';
@@ -27,6 +28,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export function TimerRing() {
   const scheme = useThemeScheme();
+  const { colorTheme } = useColorTheme();
   const { displaySeconds, phase, mode } = useTimer();
   const totalSeconds = useTimerStore((s) =>
     s.phase === 'focus' ? s.settings.focusMinutes * 60 : s.settings.shortBreakMinutes * 60,
@@ -46,8 +48,8 @@ export function TimerRing() {
         ? (totalSeconds - displaySeconds) / totalSeconds
         : 0;
   const dashOffset = CIRC * (1 - elapsedFraction);
-  const color = isNeutral ? THEME[scheme].mutedForeground : phaseHex(phase, scheme);
-  const badge = phaseBadge(phase, scheme);
+  const color = isNeutral ? THEME[scheme].mutedForeground : phaseHex(phase, scheme, colorTheme);
+  const badge = phaseBadge(phase, scheme, colorTheme);
 
   const progress = useSharedValue(dashOffset);
   useEffect(() => {

@@ -6,6 +6,11 @@ export type {
   RawFocusPeriod,
 } from './types/timer';
 export type { FocusRating } from './types/session';
+export type {
+  ShareCardAction,
+  ShareCardBridgeMessage,
+  WebviewBridgeMessage,
+} from './types/webviewBridge';
 export {
   TIMER_LIMITS,
   FOCUS_PERIOD_LIMITS,
@@ -19,6 +24,9 @@ export type { SoundType, AppSettings } from './types/settings';
 export { FOCUS_RATING_OPTIONS, FOCUS_RATING_LABELS } from './constants/focusRating';
 export { DISTRACTION_TAGS } from './constants/distractionTags';
 export type { DistractionTag } from './constants/distractionTags';
+export { LEGAL_DOCUMENTS } from './constants/legal';
+export { WEBVIEW_TAB_BLUR_EVENT } from './constants/webviewBridge';
+export type { LegalDocType, LegalDocument, LegalBlock } from './constants/legal';
 export { normalizeFocusPeriods, clampPeriodDuration } from './lib/focusPeriods';
 export { hexToHsv, hsvToHex } from './lib/color';
 export type { Hsv } from './lib/color';
@@ -26,6 +34,8 @@ export { isSessionStale } from './lib/sessionStale';
 export { deriveTimerDisplay } from './lib/deriveTimerDisplay';
 export type { DeriveTimerDisplayInput, TimerDisplayState } from './lib/deriveTimerDisplay';
 export { deriveElapsedMinutes } from './lib/deriveElapsedMinutes';
+export { getPhaseEndMessage } from './lib/phaseEndMessage';
+export type { PhaseEndMessageInput } from './lib/phaseEndMessage';
 export type { DeriveElapsedMinutesInput } from './lib/deriveElapsedMinutes';
 export {
   formatDuration,

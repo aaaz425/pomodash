@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Check, User } from 'lucide-react-native';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useSettingsStore } from '@/store/StoreProvider';
 import { TextInput } from '@/components/shared/TextInput';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function ProfileSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   const nickname = useSettingsStore((s) => s.nickname);
   const setNickname = useSettingsStore((s) => s.setNickname);
@@ -27,10 +27,14 @@ export function ProfileSection() {
     savedTimerRef.current = setTimeout(() => setSaved(false), 1500);
   }
 
-  const disabled = draft.trim() === nickname;
+  const dirty = draft.trim() !== nickname;
 
   return (
     <View style={styles.row}>
+      <User size={16} color={theme.mutedForeground} />
+      <Text style={[styles.label, { color: theme.foreground, fontFamily: FONTS.sansRegular }]}>
+        닉네임
+      </Text>
       <TextInput
         style={styles.input}
         value={draft}
@@ -44,17 +48,22 @@ export function ProfileSection() {
       />
       <Pressable
         onPress={handleSave}
-        disabled={disabled}
-        style={[styles.button, { backgroundColor: theme.primary }, disabled && styles.disabled]}
+        disabled={!dirty}
+        hitSlop={8}
+        style={[styles.saveButton, !dirty && styles.disabled]}
       >
-        <Text
-          style={[
-            styles.buttonText,
-            { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-          ]}
-        >
-          {saved ? '저장됨' : '저장'}
-        </Text>
+        {saved ? (
+          <Check size={14} color={theme.primary} />
+        ) : (
+          <Text
+            style={[
+              styles.saveText,
+              { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+            ]}
+          >
+            저장
+          </Text>
+        )}
       </Pressable>
     </View>
   );
@@ -64,23 +73,28 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  label: {
+    fontSize: 14,
   },
   input: {
     flex: 1,
-    height: 44,
+    minWidth: 0,
+    height: 32,
+    paddingVertical: 6,
+    borderRadius: 8,
+    fontSize: 14,
   },
-  button: {
-    height: 44,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+  saveButton: {
+    paddingHorizontal: 4,
   },
   disabled: {
     opacity: 0.4,
   },
-  buttonText: {
-    fontSize: 13,
+  saveText: {
+    fontSize: 12,
   },
 });

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { normalizeFocusPeriods, formatDuration } from '@pomoroutine/shared';
 import type { FocusRating } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
 import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { useCurrentTask } from '@/hooks/useCurrentTask';
@@ -11,17 +12,15 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { Portal } from '@/components/shared/Portal';
 import { FocusRatingPicker } from '@/components/shared/FocusRatingPicker';
 import { DistractionTagPicker } from '@/components/shared/DistractionTagPicker';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { SessionCompleteHeader } from './SessionCompleteHeader';
 import { SessionTaskSummary } from './SessionTaskSummary';
 import { SessionMemoField } from './SessionMemoField';
 import { SessionActionButtons } from './SessionActionButtons';
 
-export function SessionCompleteSheet() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+function SessionCompleteSheetContent() {
+  const theme = useThemeTokens();
   const { session } = useAuth();
 
   const sessionEnded = useTimerStore((s) => s.sessionEnded);
@@ -62,66 +61,64 @@ export function SessionCompleteSheet() {
 
   if (!session) {
     return (
-      <Portal>
-        <Modal visible={sessionEnded} animationType="fade" transparent onRequestClose={handleSkip}>
-          <View style={styles.root}>
-            <Pressable style={styles.backdrop} onPress={handleSkip} />
-            <View style={styles.sheetWrap} pointerEvents="box-none">
-              <View
-                style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
-              >
-                <SafeAreaView edges={['bottom']}>
-                  <View style={styles.scrollOuter}>
-                    <View style={styles.headerGroup}>
-                      <SessionCompleteHeader />
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.summaryText,
-                        { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
-                      ]}
-                    >
-                      {mode !== 'free' && `${cycleCount}사이클 동안 `}
-                      {formatDuration(accFocusSeconds)} 집중했어요
-                    </Text>
-
-                    <View style={styles.guestActions}>
-                      <Pressable
-                        onPress={() => {
-                          resetForm();
-                          dismissSessionRecord();
-                          router.push('/login');
-                        }}
-                        style={[styles.cta, { backgroundColor: theme.primary }]}
-                      >
-                        <Text
-                          style={[
-                            styles.ctaText,
-                            { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
-                          ]}
-                        >
-                          로그인하고 기록 남기기
-                        </Text>
-                      </Pressable>
-                      <Pressable onPress={handleSkip} style={styles.closeButton}>
-                        <Text
-                          style={[
-                            styles.closeText,
-                            { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
-                          ]}
-                        >
-                          닫기
-                        </Text>
-                      </Pressable>
-                    </View>
+      <Modal visible={sessionEnded} animationType="fade" transparent onRequestClose={handleSkip}>
+        <View style={styles.root}>
+          <Pressable style={styles.backdrop} onPress={handleSkip} />
+          <View style={styles.sheetWrap} pointerEvents="box-none">
+            <View
+              style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
+            >
+              <SafeAreaView edges={['bottom']}>
+                <View style={styles.scrollOuter}>
+                  <View style={styles.headerGroup}>
+                    <SessionCompleteHeader />
                   </View>
-                </SafeAreaView>
-              </View>
+
+                  <Text
+                    style={[
+                      styles.summaryText,
+                      { color: theme.mutedForeground, fontFamily: FONTS.sansRegular },
+                    ]}
+                  >
+                    {mode !== 'free' && `${cycleCount}사이클 동안 `}
+                    {formatDuration(accFocusSeconds)} 집중했어요
+                  </Text>
+
+                  <View style={styles.guestActions}>
+                    <Pressable
+                      onPress={() => {
+                        resetForm();
+                        dismissSessionRecord();
+                        router.push('/login');
+                      }}
+                      style={[styles.cta, { backgroundColor: theme.primary }]}
+                    >
+                      <Text
+                        style={[
+                          styles.ctaText,
+                          { color: theme.primaryForeground, fontFamily: FONTS.sansSemiBold },
+                        ]}
+                      >
+                        로그인하고 기록 남기기
+                      </Text>
+                    </Pressable>
+                    <Pressable onPress={handleSkip} style={styles.closeButton}>
+                      <Text
+                        style={[
+                          styles.closeText,
+                          { color: theme.mutedForeground, fontFamily: FONTS.sansMedium },
+                        ]}
+                      >
+                        닫기
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </SafeAreaView>
             </View>
           </View>
-        </Modal>
-      </Portal>
+        </View>
+      </Modal>
     );
   }
 
@@ -169,97 +166,101 @@ export function SessionCompleteSheet() {
   }
 
   return (
-    <Portal>
-      <Modal
-        visible={sessionEnded}
-        animationType="fade"
-        transparent
-        onRequestClose={() => setPendingAction('skip')}
-      >
-        <View style={styles.root}>
-          <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')} />
-          <View style={styles.sheetWrap} pointerEvents="box-none">
-            <View
-              style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}
-            >
-              <SafeAreaView edges={['bottom']}>
-                <ScrollView
-                  contentContainerStyle={styles.scrollOuter}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  {/* 입력창 바깥(비어있는 영역)을 탭하면 키보드를 내려 blur를 유도한다 —
+    <Modal
+      visible={sessionEnded}
+      animationType="fade"
+      transparent
+      onRequestClose={() => setPendingAction('skip')}
+    >
+      <View style={styles.root}>
+        <Pressable style={styles.backdrop} onPress={() => setPendingAction('skip')} />
+        <View style={styles.sheetWrap} pointerEvents="box-none">
+          <View style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <SafeAreaView edges={['bottom']}>
+              <ScrollView
+                contentContainerStyle={styles.scrollOuter}
+                keyboardShouldPersistTaps="handled"
+              >
+                {/* 입력창 바깥(비어있는 영역)을 탭하면 키보드를 내려 blur를 유도한다 —
                       RN ScrollView는 keyboardShouldPersistTaps="handled"만으로는 자식이
                       처리하지 않은 빈 영역 탭에서도 blur가 안정적으로 발동하지 않는다. */}
-                  <Pressable style={styles.scrollContent} onPress={() => Keyboard.dismiss()}>
-                    <View style={styles.headerGroup}>
-                      <SessionCompleteHeader />
-                      <View style={[styles.divider, { backgroundColor: theme.border }]} />
-                    </View>
+                <Pressable style={styles.scrollContent} onPress={() => Keyboard.dismiss()}>
+                  <View style={styles.headerGroup}>
+                    <SessionCompleteHeader />
+                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                  </View>
 
-                    <SessionTaskSummary
-                      isTaskSession={isTaskSession}
-                      task={task}
-                      category={category}
-                      selectedTaskId={selectedTaskId}
-                      onSelectTask={setSelectedTaskId}
-                    />
+                  <SessionTaskSummary
+                    isTaskSession={isTaskSession}
+                    task={task}
+                    category={category}
+                    selectedTaskId={selectedTaskId}
+                    onSelectTask={setSelectedTaskId}
+                  />
 
-                    <View style={styles.field}>
-                      <Text
-                        style={[
-                          styles.sectionLabel,
-                          { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                        ]}
-                      >
-                        집중도 (선택)
-                      </Text>
-                      <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
-                    </View>
+                  <View style={styles.field}>
+                    <Text
+                      style={[
+                        styles.sectionLabel,
+                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                      ]}
+                    >
+                      집중도 (선택)
+                    </Text>
+                    <FocusRatingPicker value={focusRating} onChange={setFocusRating} />
+                  </View>
 
-                    <View style={styles.field}>
-                      <Text
-                        style={[
-                          styles.sectionLabel,
-                          { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
-                        ]}
-                      >
-                        방해요소 (선택)
-                      </Text>
-                      <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
-                    </View>
+                  <View style={styles.field}>
+                    <Text
+                      style={[
+                        styles.sectionLabel,
+                        { color: theme.mutedForeground, fontFamily: FONTS.sansSemiBold },
+                      ]}
+                    >
+                      방해요소 (선택)
+                    </Text>
+                    <DistractionTagPicker value={distractionTags} onChange={setDistractionTags} />
+                  </View>
 
-                    <SessionMemoField value={note} onChange={setNote} />
+                  <SessionMemoField value={note} onChange={setNote} />
 
-                    <SessionActionButtons
-                      onSkip={() => setPendingAction('skip')}
-                      onSave={() => setPendingAction('save')}
-                    />
-                  </Pressable>
-                </ScrollView>
-              </SafeAreaView>
-            </View>
+                  <SessionActionButtons
+                    onSkip={() => setPendingAction('skip')}
+                    onSave={() => setPendingAction('save')}
+                  />
+                </Pressable>
+              </ScrollView>
+            </SafeAreaView>
           </View>
-
-          <ConfirmModal
-            visible={pendingAction === 'skip'}
-            title="기록을 건너뛸까요?"
-            description="작성한 메모는 저장되지 않아요"
-            confirmLabel="건너뛰기"
-            destructive
-            onConfirm={handleSkip}
-            onCancel={() => setPendingAction(null)}
-          />
-
-          <ConfirmModal
-            visible={pendingAction === 'save'}
-            title="기록을 저장할까요?"
-            confirmLabel="저장"
-            onConfirm={handleSave}
-            onCancel={() => setPendingAction(null)}
-            loading={isSaving}
-          />
         </View>
-      </Modal>
+
+        <ConfirmModal
+          visible={pendingAction === 'skip'}
+          title="기록을 건너뛸까요?"
+          description="작성한 메모는 저장되지 않아요"
+          confirmLabel="건너뛰기"
+          destructive
+          onConfirm={handleSkip}
+          onCancel={() => setPendingAction(null)}
+        />
+
+        <ConfirmModal
+          visible={pendingAction === 'save'}
+          title="기록을 저장할까요?"
+          confirmLabel="저장"
+          onConfirm={handleSave}
+          onCancel={() => setPendingAction(null)}
+          loading={isSaving}
+        />
+      </View>
+    </Modal>
+  );
+}
+
+export function SessionCompleteSheet() {
+  return (
+    <Portal>
+      <SessionCompleteSheetContent />
     </Portal>
   );
 }

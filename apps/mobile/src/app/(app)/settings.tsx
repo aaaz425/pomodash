@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -11,6 +11,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useHydrated, useSettingsStore } from '@/store/StoreProvider';
 import { useAuth } from '@/store/AuthProvider';
 import { SettingsMenuRow } from '@/components/shared/SettingsMenuRow';
@@ -29,9 +30,8 @@ import { TimerDefaultsModal } from '@/components/settings/TimerDefaultsModal';
 import { TaskModal } from '@/components/tasks/TaskModal';
 import { CategoryModal } from '@/components/settings/CategoryModal';
 import { MotivationalModal } from '@/components/settings/MotivationalModal';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 type CategoryKey = 'account' | 'presets' | 'notifications' | 'about';
 
@@ -66,8 +66,7 @@ const detailExit = new Keyframe({
 }).duration(TRANSITION_MS);
 
 export default function SettingsScreen() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { user } = useAuth();
   const hydrated = useHydrated();
 
@@ -171,13 +170,13 @@ export default function SettingsScreen() {
                 )}
 
                 {activeCategory === 'notifications' && (
-                  <SettingsCard title="알림">
+                  <SettingsCard>
                     <NotificationSection />
                   </SettingsCard>
                 )}
 
                 {activeCategory === 'about' && (
-                  <SettingsCard title="앱 정보">
+                  <SettingsCard>
                     <AboutSection />
                   </SettingsCard>
                 )}
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    gap: 16,
+    gap: 24,
   },
   header: {
     gap: 4,
@@ -220,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   detail: {
-    gap: 16,
+    gap: 24,
   },
   backRow: {
     flexDirection: 'row',

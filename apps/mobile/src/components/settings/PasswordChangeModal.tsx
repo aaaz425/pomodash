@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Modal as RNModal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal as RNModal, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { useAuth } from '@/store/AuthProvider';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Props {
   visible: boolean;
@@ -14,8 +14,7 @@ interface Props {
 
 // 회원탈퇴(DeleteAccountModal)와 같은 중앙 카드 모달 패턴으로 통일
 export function PasswordChangeModal({ visible, title, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const { updatePassword } = useAuth();
 
   const [password, setPassword] = useState('');

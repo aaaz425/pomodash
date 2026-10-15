@@ -1,25 +1,30 @@
-import { Linking, StyleSheet, Text } from 'react-native';
-import { WEB_APP_URL } from '@/store/AuthProvider';
-import { THEME } from '@/constants/timerColors';
+import { useState } from 'react';
+import { StyleSheet } from 'react-native';
+import type { LegalDocType } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
+import { LegalModal } from '@/components/legal/LegalModal';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function AuthConsentNotice() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
+  const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
 
   return (
-    <Text style={[styles.text, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}>
-      가입 시{' '}
-      <Text style={styles.link} onPress={() => Linking.openURL(`${WEB_APP_URL}/terms`)}>
-        이용약관
-      </Text>{' '}
-      및{' '}
-      <Text style={styles.link} onPress={() => Linking.openURL(`${WEB_APP_URL}/privacy`)}>
-        개인정보처리방침
+    <>
+      <Text style={[styles.text, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}>
+        가입 시{' '}
+        <Text style={styles.link} onPress={() => setLegalDoc('terms')}>
+          이용약관
+        </Text>{' '}
+        및{' '}
+        <Text style={styles.link} onPress={() => setLegalDoc('privacy')}>
+          개인정보처리방침
+        </Text>
+        에 동의하는 것으로 간주됩니다
       </Text>
-      에 동의하는 것으로 간주됩니다
-    </Text>
+      <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
+    </>
   );
 }
 

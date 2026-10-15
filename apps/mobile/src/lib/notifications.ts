@@ -17,7 +17,6 @@ if (Platform.OS === 'android') {
   Notifications.setNotificationChannelAsync(TIMER_COMPLETE_CHANNEL_ID, {
     name: '타이머 완료 알림',
     importance: Notifications.AndroidImportance.HIGH,
-    sound: 'default',
     vibrationPattern: [0, 250, 250, 250],
   });
 }

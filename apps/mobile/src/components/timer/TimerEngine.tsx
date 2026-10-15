@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
-import { deriveTimerDisplay } from '@pomoroutine/shared';
+import { deriveTimerDisplay, getPhaseEndMessage } from '@pomoroutine/shared';
 import { useTimerStore, useSettingsStore, useHydrated } from '@/store/StoreProvider';
 import {
   scheduleTimerCompleteNotification,
@@ -19,6 +19,7 @@ export function TimerEngine() {
   const cycleCount = useTimerStore((s) => s.cycleCount);
   const totalCycles = useTimerStore((s) => s.settings.totalCycles);
   const focusMinutes = useTimerStore((s) => s.settings.focusMinutes);
+  const shortBreakMinutes = useTimerStore((s) => s.settings.shortBreakMinutes);
   const accFocusSeconds = useTimerStore((s) => s.accFocusSeconds);
   const complete = useTimerStore((s) => s.complete);
   const setRunningDisplaySeconds = useTimerStore((s) => s.setRunningDisplaySeconds);
@@ -44,17 +45,12 @@ export function TimerEngine() {
 
     // 백그라운드에서도 phase 종료를 알 수 있게 미리 예약 — free 모드는 자동 완료가 없어 예약하지 않음
     if (mode === 'pomodoro') {
-      const isLastCycle = phase === 'focus' && cycleCount + 1 >= totalCycles;
-      const title = isLastCycle
-        ? '타이머 완료!'
-        : phase === 'focus'
-          ? '집중 시간 종료!'
-          : '휴식 종료!';
-      const body = isLastCycle
-        ? '모든 사이클을 마쳤어요. 수고했어요!'
-        : phase === 'focus'
-          ? '잠깐 쉬어가세요.'
-          : '다시 집중할 시간이에요.';
+      const { title, body } = getPhaseEndMessage({
+        phase,
+        cycleCount,
+        totalCycles,
+        shortBreakMinutes,
+      });
       scheduleTimerCompleteNotification({
         title,
         body,
@@ -118,6 +114,7 @@ export function TimerEngine() {
     cycleCount,
     focusMinutes,
     totalCycles,
+    shortBreakMinutes,
     soundAlert,
     soundType,
     soundVolume,

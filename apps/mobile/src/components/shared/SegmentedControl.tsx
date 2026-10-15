@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { THEME } from '@/constants/timerColors';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/shared/Text';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 interface Option<T extends string> {
   value: T;
@@ -15,8 +15,7 @@ interface Props<T extends string> {
 }
 
 export function SegmentedControl<T extends string>({ options, value, onChange }: Props<T>) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
 
   return (
     <View style={[styles.row, { backgroundColor: theme.muted }]}>

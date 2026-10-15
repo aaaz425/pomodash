@@ -243,10 +243,11 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
           });
         } else {
           const seconds = phaseSeconds(settings);
+          const nextPhase = seconds['short-break'] === 0 ? 'focus' : 'short-break';
           set({
             cycleCount: next,
-            phase: 'short-break',
-            remainingSeconds: seconds['short-break'],
+            phase: nextPhase,
+            remainingSeconds: seconds[nextPhase],
             startedAt: now,
             accFocusSeconds: totalFocus,
             rawFocusPeriods: closedPeriods,

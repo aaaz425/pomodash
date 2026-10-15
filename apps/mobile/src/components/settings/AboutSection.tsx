@@ -1,14 +1,16 @@
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
-import { WEB_APP_URL } from '@/store/AuthProvider';
-import { THEME } from '@/constants/timerColors';
+import type { LegalDocType } from '@pomoroutine/shared';
+import { Text } from '@/components/shared/Text';
+import { LegalModal } from '@/components/legal/LegalModal';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 
 export function AboutSection() {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+  const theme = useThemeTokens();
   const version = Constants.expoConfig?.version ?? '—';
+  const [legalDoc, setLegalDoc] = useState<LegalDocType | null>(null);
 
   return (
     <View style={styles.container}>
@@ -26,17 +28,19 @@ export function AboutSection() {
       <View style={styles.links}>
         <Text
           style={[styles.link, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          onPress={() => Linking.openURL(`${WEB_APP_URL}/terms`)}
+          onPress={() => setLegalDoc('terms')}
         >
           이용약관
         </Text>
         <Text
           style={[styles.link, { color: theme.mutedForeground, fontFamily: FONTS.sansRegular }]}
-          onPress={() => Linking.openURL(`${WEB_APP_URL}/privacy`)}
+          onPress={() => setLegalDoc('privacy')}
         >
           개인정보처리방침
         </Text>
       </View>
+
+      <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
     </View>
   );
 }

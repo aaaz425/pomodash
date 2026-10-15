@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pencil } from 'lucide-react-native';
+import { Text } from '@/components/shared/Text';
 import { useTaskStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
+import { Portal } from '@/components/shared/Portal';
 import { TextInput } from '@/components/shared/TextInput';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
 import { ColorPickerModal } from '@/components/settings/ColorPickerModal';
 import { CATEGORY_PRESET_COLORS } from '@/constants/categoryColors';
-import { THEME } from '@/constants/timerColors';
 import { FONTS } from '@/constants/fonts';
-import { useThemeScheme } from '@/hooks/use-theme-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-scheme';
 import { INPUT_LIMITS } from '@pomoroutine/shared';
 import type { Category } from '@/types/tasks';
 
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
-const RAINBOW_COLORS = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'];
+const RAINBOW_COLORS = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'] as const;
 
 interface Props {
   category: Category | null; // null = 새 카테고리
   onClose: () => void;
 }
 
-export function CategoryEditModal({ category, onClose }: Props) {
-  const scheme = useThemeScheme();
-  const theme = THEME[scheme];
+function CategoryEditModalContent({ category, onClose }: Props) {
+  const theme = useThemeTokens();
   const addCategory = useTaskStore((s) => s.addCategory);
   const updateCategory = useTaskStore((s) => s.updateCategory);
 
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   rainbowFill: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   footerButton: {
     paddingHorizontal: 16,
@@ -209,3 +209,11 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 });
+
+export function CategoryEditModal(props: Props) {
+  return (
+    <Portal>
+      <CategoryEditModalContent {...props} />
+    </Portal>
+  );
+}
