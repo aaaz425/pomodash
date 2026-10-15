@@ -2,8 +2,8 @@ import {
   createContext,
   Fragment,
   useContext,
-  useEffect,
   useId,
+  useLayoutEffect,
   useState,
   type ReactNode,
 } from 'react';
@@ -48,7 +48,7 @@ export function Portal({ children }: { children: ReactNode }) {
 
   if (!ctx) throw new Error('Portal must be used within PortalProvider');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     ctx.register(id, children);
     return () => ctx.unregister(id);
   });
