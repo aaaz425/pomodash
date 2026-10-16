@@ -619,6 +619,63 @@ describe('timerStore', () => {
     });
   });
 
+  describe('syncDefaultSettings()', () => {
+    const userDefaults = { focusMinutes: 50, shortBreakMinutes: 10, totalCycles: 2 };
+
+    it('대기 상태에서는 설정과 remainingSeconds에 바로 반영됨', () => {
+      const store = createTimerStore();
+
+      store.getState().syncDefaultSettings(userDefaults);
+
+      expect(store.getState().settings).toEqual(userDefaults);
+      expect(store.getState().remainingSeconds).toBe(50 * 60);
+    });
+
+    it('세션 진행 중에는 현재 설정을 유지함', () => {
+      const store = createTimerStore();
+      store.getState().start();
+
+      store.getState().syncDefaultSettings(userDefaults);
+
+      expect(store.getState().settings).toEqual(DEFAULT_TIMER_SETTINGS);
+      expect(store.getState().defaultSettings).toEqual(userDefaults);
+    });
+
+    it('setCurrentTask(null)과 dismissSessionRecord()는 사용자 기본값으로 복원함', () => {
+      const store = createTimerStore();
+      store.getState().syncDefaultSettings(userDefaults);
+      store.getState().updateSettings({ focusMinutes: 30 });
+
+      store.getState().setCurrentTask(null);
+      expect(store.getState().settings).toEqual(userDefaults);
+
+      store.getState().updateSettings({ focusMinutes: 30 });
+      store.getState().start();
+      store.getState().endSession();
+      store.getState().dismissSessionRecord();
+      expect(store.getState().settings).toEqual(userDefaults);
+      expect(store.getState().remainingSeconds).toBe(50 * 60);
+    });
+
+    it('hydrate() — 대기 상태 스냅샷의 이전 설정 대신 사용자 기본값을 적용함', () => {
+      const store = createTimerStore({
+        loadSnapshot: () =>
+          savedSnapshot({
+            sessionStarted: false,
+            sessionStartedAt: null,
+            settings: { focusMinutes: 15, shortBreakMinutes: 5, totalCycles: 4 },
+            remainingSeconds: 15 * 60,
+          }),
+      });
+      store.getState().syncDefaultSettings(userDefaults);
+
+      store.getState().hydrate();
+
+      expect(store.getState().settings).toEqual(userDefaults);
+      expect(store.getState().remainingSeconds).toBe(50 * 60);
+    });
+  });
+
   describe('hydrate() — 방치된 세션 감지', () => {
     it('lastActiveAt이 세션의 집중 시간(focusMinutes)을 초과하면 showAbandonedPrompt가 true로 설정됨', () => {
       const lastActiveAt = new Date('2024-01-01T00:00:00.000Z').getTime();

@@ -227,7 +227,7 @@ CRUD/순서 변경 모두 동일 패턴: taskStore 액션 → optimistic update(
 ### Acceptance Criteria
 
 **타이머 기본값**
-- [ ] 집중 시간: 5–120분 범위, StepperInput으로 변경
+- [ ] 집중 시간: 1–120분 범위, StepperInput으로 변경
 - [ ] 휴식 시간: 0–60분 범위
 - [ ] 사이클 수: 1–10회 범위
 - [ ] 변경 즉시 Supabase에 저장
