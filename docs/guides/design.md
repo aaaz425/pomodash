@@ -1,7 +1,7 @@
 ---
-version: 1.1
+version: 1.2
 name: pomoroutine-design-system
-description: "민트 단일 액센트로 다크/라이트 두 모드를 지원한다. 다크는 딥 네이비(Linear 기반), 라이트는 뉴트럴 화이트(Cal 기반). 두 모드 모두 '타이머가 주인공' 원칙을 공유한다."
+description: "컬러 테마별 단일 액센트로 다크/라이트 두 모드를 지원한다. 다크는 딥 네이비(Linear 기반), 라이트는 뉴트럴 화이트(Cal 기반). 두 모드 모두 '타이머가 주인공' 원칙을 공유한다."
 source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-design-md) 기반 커스터마이징'
 ---
 
@@ -10,18 +10,29 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 > **"타이머가 주인공이다. UI는 배경이다."**
 
 집중 모드에서 타이머 숫자와 진행 링만 남기고 나머지는 배경으로 물러난다.
-색상은 민트 단일 액센트만 쓴다. 장식은 없다.
+색상은 선택한 컬러 테마의 액센트 하나만 쓴다. 장식은 없다.
 
 **핵심 원칙:**
 
 - 다크 / 라이트 두 모드 지원 (시스템 설정 따라감, 사용자 수동 전환 가능)
-- 단일 크로매틱 액센트 (민트) — 두 모드 동일하게 적용
+- 테마별 단일 크로매틱 액센트 — 한 화면에는 액센트 하나만 쓴다
 - 표면 계층으로 깊이 표현 — 그림자 최소화
 - 집중 모드 진입 시 UI 최소화 (타이머 + 동기부여 메시지만 노출)
 
 ---
 
 ## 2. 색상 팔레트
+
+### 2-0. 컬러 테마
+
+액센트(`primary`)는 설정에서 고르는 컬러 테마 4종 중 하나를 따른다. 정의는 `packages/shared/src/constants/colorThemes.ts`의 `COLOR_THEMES`가 단일 원천이다. 아래 2-1, 2-2의 민트 액센트 값은 기본 테마(미드나잇) 기준이다.
+
+| 테마 | 키 | 라이트 액센트 | 다크 액센트 |
+| ---- | -- | ------------- | ----------- |
+| 미드나잇 (기본) | `midnight` | `#0aaa7d` | `#10d9a0` |
+| 선셋 | `sunset` | `#ff8a4c` | `#ff8a4c` |
+| 오션 | `ocean` | `#38bdf8` | `#38bdf8` |
+| 모노 | `mono` | `#27272a` | `#f4f4f5` |
 
 ### 2-1. 다크 모드 (기본) — Linear 기반
 
@@ -45,7 +56,7 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 | `ink-subtle`   | `#64748b` | 3차 텍스트, 비활성     |
 | `ink-tertiary` | `#475569` | 비활성, 비어있는 상태  |
 
-#### 액센트 (민트)
+#### 액센트 (미드나잇 테마)
 
 | 토큰            | Hex         | 용도                                   |
 | --------------- | ----------- | -------------------------------------- |
@@ -58,9 +69,8 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 
 | 세션      | 토큰            | Hex       | 용도                         |
 | --------- | --------------- | --------- | ---------------------------- |
-| 집중      | `session-focus` | `#10d9a0` | 민트 — 집중 세션 기본 액센트 |
+| 집중      | `session-focus` | `#10d9a0` | 테마 액센트 따라감 (미드나잇 기준값) |
 | 짧은 휴식 | `session-short` | `#60a5fa` | 블루 — 짧은 휴식             |
-| 긴 휴식   | `session-long`  | `#a78bfa` | 바이올렛 — 긴 휴식           |
 
 #### 시맨틱
 
@@ -95,7 +105,7 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 | `ink-subtle`   | `#6b7280` | 3차 텍스트, 비활성     |
 | `ink-tertiary` | `#9ca3af` | 비활성, 비어있는 상태  |
 
-#### 액센트 (민트 — 라이트 조정)
+#### 액센트 (미드나잇 테마 — 라이트 조정)
 
 | 토큰            | Hex         | 용도                                            |
 | --------------- | ----------- | ----------------------------------------------- |
@@ -111,7 +121,6 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 | --------- | ------------ | ------------- | --------- |
 | 집중      | `#10d9a0`    | `#0aaa7d`     | 집중 세션 |
 | 짧은 휴식 | `#60a5fa`    | `#2563eb`     | 짧은 휴식 |
-| 긴 휴식   | `#a78bfa`    | `#7c3aed`     | 긴 휴식   |
 
 #### 시맨틱 (공통)
 
@@ -120,7 +129,7 @@ source: 'dark — linear.app DESIGN.md / light — cal.com DESIGN.md (awesome-de
 
 ---
 
-색상 사용 규칙(민트를 어디에 쓰고 어디에 쓰지 않는지)은 8장 Do/Don't에 통합되어 있다.
+색상 사용 규칙(액센트를 어디에 쓰고 어디에 쓰지 않는지)은 8장 Do/Don't에 통합되어 있다.
 
 ---
 
@@ -201,7 +210,7 @@ Inter 대비 한글 글리프를 내장하므로 한글/영문이 동일 폰트�
 크기: 240px (기본) / 180px (소형)
 트랙 원: stroke #10d9a01a (primary 10% 불투명도), stroke-width 8px
 진행 원: stroke {현재 세션 컬러}, stroke-width 8px
-      → 집중: #10d9a0 / 짧은 휴식: #60a5fa / 긴 휴식: #a78bfa
+      → 집중: primary (테마 액센트) / 짧은 휴식: #60a5fa
 진행 방향: 12시 기준 시계 방향
 중앙: timer-display 타이포 (Geist Mono 80px 700)
      → 남은 시간 MM:SS
@@ -209,18 +218,17 @@ Inter 대비 한글 글리프를 내장하므로 한글/영문이 동일 폰트�
 집중 모드: 링 크기 300px로 확대 (framer-motion layoutId)
 ```
 
-### 5-2. 세션 뱃지 (SessionBadge)
+### 5-2. 페이즈 뱃지 (TimerRing 상태 뱃지)
 
-현재 타이머 단계를 나타내는 pill.
+현재 타이머 단계를 나타내는 pill. 스타일은 `lib/constants/timerColors.ts`의 `PHASE_BADGE_STYLES`.
 
 ```
 형태: rounded-full, 패딩 4px 12px
 텍스트: caption (12px 600), 세션별 컬러
 배경: 세션 컬러 15% 불투명도
 예시:
-  집중 중  → 배경 #10d9a026, 텍스트 #10d9a0
-  짧은 휴식 → 배경 #60a5fa26, 텍스트 #60a5fa
-  긴 휴식  → 배경 #a78bfa26, 텍스트 #a78bfa
+  집중 중  → 배경 primary 10%, 텍스트 primary
+  휴식 중  → 배경 #60a5fa1a, 텍스트 #60a5fa
 ```
 
 ### 5-3. 사이클 카운터 (CycleIndicator)
@@ -355,7 +363,7 @@ focus ring: none (테두리 컬러 변경으로 대체)
 ```
 타이머 링이 100%에 도달했을 때:
   - 링: scale 1 → 1.05 → 1 (0.4s spring)
-  - 세션 뱃지: 순간 bright flash (0.3s)
+  - 페이즈 뱃지: 순간 bright flash (0.3s)
   - 사이클 점: 완료된 점에 pop (scale 0 → 1.2 → 1)
 ```
 
@@ -385,21 +393,21 @@ focus ring: none (테두리 컬러 변경으로 대체)
 
 ### Do
 
-- 민트(`primary`)는 타이머 링 진행, 시작 버튼, 포커스 링에만 사용
+- 액센트(`primary`)는 타이머 링 진행, 시작 버튼, 포커스 링에만 사용
 - 표면 계층(canvas → surface-1 → surface-2 → surface-3)으로만 깊이 표현
 - 버튼 반경은 `rounded-md` (8px)
 - 타이머 숫자는 항상 Geist Mono (tabular 숫자)
-- 세션 타입별 컬러(민트/블루/바이올렛)는 일관되게 유지
+- 페이즈 컬러(집중=테마 액센트, 휴식=블루)는 일관되게 유지
 - 집중 모드 전환에 `layoutId` + framer-motion 사용
 
 ### Don't
 
 - 그림자(box-shadow)로 깊이 표현하지 않는다 (다크 모드)
-- 민트를 배경 fill이나 섹션 색상, 대기/비활성 상태 표시에 쓰지 않는다
-- 세션 컬러 3종(민트/블루/바이올렛) 외 색상을 UI 주요 요소에 추가하지 않는다
-- 두 번째 크로매틱 액센트(오렌지, 핑크 등) 도입 금지 — 두 모드 모두 민트로 통일
+- 액센트를 배경 fill이나 섹션 색상, 대기/비활성 상태 표시에 쓰지 않는다
+- 페이즈 컬러 2종(액센트/블루) 외 색상을 UI 주요 요소에 추가하지 않는다
+- 한 테마 안에서 두 번째 크로매틱 액센트 도입 금지 — 액센트는 테마 정의(`COLOR_THEMES`)에서만 바꾼다
 - 인라인 `style={}` 색상 지정 금지 — 반드시 Tailwind 클래스
 - 집중 모드에서 타이머 + 동기부여 메시지 외 요소 노출 금지
-- 라이트 모드에서 민트 텍스트에 `#10d9a0` 직접 사용 금지 — `#0aaa7d`(`primary-text`) 사용
+- 라이트 모드에서 미드나잇 테마 민트 텍스트에 `#10d9a0` 직접 사용 금지 — `#0aaa7d`(`primary-text`) 사용
 - 장식적 그라디언트 / 스포트라이트 카드 금지
 

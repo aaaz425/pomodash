@@ -1,22 +1,24 @@
 # Data Models
 
 프로젝트 전체에서 사용하는 TypeScript 타입 정의.
-인터페이스는 `types/models.ts`, Zod 스키마와 기본값은 `types/schemas.ts`에 위치한다. `types/index.ts`는 둘을 re-export하는 barrel이다.
+인터페이스는 `types/models.ts`, Zod 스키마와 기본값은 `types/schemas.ts`에 위치한다. `types/index.ts`는 둘을 re-export하는 barrel이다. 웹과 모바일이 공유하는 타입(`TimerPhase`, `TimerMode`, `TimerSettings`, `FocusPeriod`, `AppSettings` 등)은 `packages/shared`에서 정의하고 `types/models.ts`가 re-export한다.
 
 ## 개념 계층 (Concept Hierarchy)
 
 ### 세션 (Session)
 
-특정 작업에 할당된 집중 작업 단위. 한 세션은 `totalCycles`회의 사이클로 구성되며,
-마지막 사이클이 끝나면 세션 기록 모달이 표시되고 세션이 마무리된다.
-사용자는 세션을 시작/종료하며 작업을 관리한다.
+타이머를 한 번 실행한 기록. 작업 연결은 선택 사항이며(`taskId` null이면 미분류), 한 세션은 `totalCycles`회의 사이클로 구성된다.
+마지막 사이클이 끝나거나 사용자가 종료하면 기록 모달이 표시되고, 저장하면 세션이 남는다. 건너뛰면 기록은 저장되지 않는다.
+타이머 시간 설정은 작업과 무관하게 설정의 타이머 기본값에서 시작하고, 시작할 때마다 그 회차에 한해 조정할 수 있다.
 
 **세션 메모(note):** 세션이 완전히 끝난 후 사용자가 1회 작성하는 회고 메모. 최대 500자.
 사이클마다 작성하는 것이 아니라, 마지막 사이클 완료 시점에 한 번만 표시된다.
 
 **집중 시간 집계 원칙:** `endedAt - startedAt`은 일시정지를 포함한 경과 시간이므로 집계에 사용하면 가짜 집중 시간이 된다. 집중 시간 통계는 반드시 `focusSeconds`만 사용한다. 타임라인 블록 표시는 `focusPeriods` 배열을 사용한다.
 
-**focusPeriods 정규화:** 저장 전 `lib/focusPeriods.ts`의 `normalizeFocusPeriods()`를 반드시 통과시킨다.
+**최소 기록 시간:** 세션 전체 집중 시간이 30초(`SESSION_LIMITS.MIN_SESSION_FOCUS_SECONDS`) 미만이면 기록을 만들지 않고 타이머를 초기화한다.
+
+**focusPeriods 정규화:** 저장 전 `normalizeFocusPeriods()`(`packages/shared`)를 반드시 통과시킨다. 기록 모달(웹 `SessionRecordModal`, 모바일 `SessionCompleteSheet`)이 저장 직전에 호출한다.
 
 - 5초 미만 집중 구간 드롭 (노이즈)
 - 5초 이하 일시정지로 나뉜 인접 구간 병합
@@ -51,7 +53,7 @@ export type TimerMode = 'pomodoro' | 'free'
 export interface Category {
   id: string
   name: string
-  color: string // Tailwind color class (e.g. 'bg-blue-500')
+  color: string // hex color (e.g. '#3b82f6')
 }
 
 export interface Task {
@@ -69,6 +71,7 @@ export interface FocusPeriod {
 export interface Session {
   id: string
   taskId: string | null // null = 미분류
+  title: string | null // taskId와 독립된 세션별 라벨, 저널 상세 편집에서만 설정, 최대 100자
   mode: TimerMode // 'free'는 completedCycles/totalCycles가 0 — "N/M 사이클" 대신 별도 표시 필요
   startedAt: string // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
   endedAt: string // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
@@ -134,13 +137,14 @@ export interface AppSettings {
 
 ## localStorage Keys
 
-Task/Category/Session/AppSettings는 Supabase로 이전되어 더 이상 localStorage에 저장하지 않는다(`lib/supabase/*.ts`에서 Zod로 검증). localStorage에는 새로고침 복구용 활성 타이머 스냅샷과 테마만 남아있다.
+Task/Category/Session/AppSettings는 Supabase로 이전되어 더 이상 localStorage에 저장하지 않는다(`lib/supabase/*.ts`에서 Zod로 검증). localStorage에는 새로고침 복구용 활성 타이머 스냅샷과 테마(라이트/다크, 컬러 테마)만 남아있다.
 
 ```typescript
 const STORAGE_KEYS = {
   activeTimer: 'pomoroutine:active-timer',
   version: 'pomoroutine:version',
   theme: 'theme', // 예외적으로 'pomoroutine:' 접두사 없음
+  colorTheme: 'pomoroutine:color-theme',
 } as const
 ```
 
@@ -193,11 +197,11 @@ if (Number(storedVersion) !== STORAGE_VERSION) {
 
 ```typescript
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: '1', name: '공부', color: 'bg-blue-500' },
-  { id: '2', name: '업무', color: 'bg-green-500' },
-  { id: '3', name: '운동', color: 'bg-orange-500' },
-  { id: '4', name: '독서', color: 'bg-purple-500' },
-  { id: '5', name: '기타', color: 'bg-gray-500' },
+  { id: '1', name: '공부', color: '#3b82f6' },
+  { id: '2', name: '업무', color: '#22c55e' },
+  { id: '3', name: '운동', color: '#f97316' },
+  { id: '4', name: '독서', color: '#a855f7' },
+  { id: '5', name: '기타', color: '#6b7280' },
 ]
 
 const DEFAULT_TIMER_SETTINGS: TimerSettings = {

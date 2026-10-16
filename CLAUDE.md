@@ -20,7 +20,7 @@ pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 네�
 pnpm dev          # 웹 로컬 개발 서버 (apps/web)
 pnpm build        # 웹 프로덕션 빌드 — 커밋 전 반드시 통과 확인
 pnpm lint         # 전체 워크스페이스 린트
-pnpm test         # 웹 단위 테스트 (vitest)
+pnpm test         # 단위 테스트 (packages/shared + apps/web, vitest)
 pnpm --filter mobile start   # Expo 개발 서버 (apps/mobile)
 ```
 

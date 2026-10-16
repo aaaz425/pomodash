@@ -7,7 +7,7 @@ pnpm workspace 모노레포. 아래 구조는 `apps/web/` 기준이다. `apps/mo
 ```
 apps/web/
   app/                  # 라우팅 세그먼트만 — 비즈니스 로직 금지
-  config/               # 앱 설정 선언 (site.ts, analytics.ts)
+  config/               # 앱 설정 선언 (site.ts)
   components/
     ui/                 # shadcn/ui — 직접 수정 금지
     timer/              # 타이머 feature
@@ -16,24 +16,28 @@ apps/web/
     journal/            # 기록 feature
     settings/           # 설정 feature
     landing/            # 랜딩 페이지 feature
+    auth/               # 로그인/회원가입 폼
+    legal/              # 약관/개인정보처리방침 콘텐츠와 모달
     shared/             # 여러 feature에서 공유하는 컴포넌트
       layout/           # 반응형 레이아웃 전용 (app 레이어에서만 사용)
   store/                # Zustand 스토어 (createStore 팩토리 패턴)
-    StoreProvider.tsx   # SSR 안전 초기화용 Provider — app/layout.tsx에 마운트
+    StoreProvider.tsx   # SSR 안전 초기화용 Provider — app/(main)/layout.tsx, app/embed/layout.tsx에 마운트
   hooks/                # 브라우저 API 추상화 + 재사용 로직 훅
   lib/
     constants/          # 검증·비즈니스·UX 상수 SSOT (limits, ux, categoryColors, timerColors …)
+    supabase/           # Supabase 클라이언트 + 테이블별 조회/저장 (Zod 검증)
     storage.ts          # localStorage 추상화 + Zod 파싱
     notifications.ts    # Web Notifications API + 사운드 재생
-    dashboard.ts        # 대시보드 집계 순수 함수
+    dashboard.ts        # 대시보드 집계 (packages/shared 함수 + 웹 전용 조합)
     sessionUtils.ts     # 세션 포맷팅·그룹핑
-    focusPeriods.ts     # 집중 구간 정규화 알고리즘
+    focusPeriods.ts     # packages/shared 정규화 함수 re-export
     utils.ts            # cn(), generateId() 등 범용 유틸
   types/
     models.ts           # TypeScript 인터페이스 + 타입 별칭
     schemas.ts          # Zod 스키마 + 기본값 + STORAGE_KEYS
     index.ts             # barrel (re-export — 기존 import 경로 유지)
 
+packages/shared/        # 웹/모바일 공유 순수 로직 (timerStore 팩토리, 집계, 뱃지, 상수, 공용 타입)
 docs/                   # 루트 유지 — 웹/모바일 공통 프로젝트 문서
 supabase/                # 루트 유지 — 웹/모바일이 공유하는 백엔드 스키마
 ```

@@ -25,9 +25,13 @@ version: 1.0
 
 | 대상                   | 핵심 테스트 케이스                                                     |
 | ---------------------- | ---------------------------------------------------------------------- |
-| `lib/storage.ts`       | Zod 파싱 실패 시 fallback 반환, SSR 환경(`window === undefined`) guard |
-| `store/timerStore.ts`  | `pause()` 후 `startedAt === null`, 절대시간 기반 잔여 시간 계산        |
-| `lib/notifications.ts` | 권한 없을 때 조용히 실패                                               |
+| `packages/shared/src/store/timerStore.ts` | `pause()` 후 `startedAt === null`, 절대시간 기반 잔여 시간 계산, 기본값 동기화 |
+| `packages/shared/src/lib/*` | focusPeriods 정규화, 뱃지, 공유 카드, 방치 감지 등 웹/모바일 공용 순수 로직 |
+| `apps/web/store/*.ts`  | 웹 포트 주입(localStorage 저장/복원), taskStore/settingsStore 낙관적 업데이트와 롤백 |
+| `apps/web/lib/storage.ts` | Zod 파싱 실패 시 fallback 반환, SSR 환경(`window === undefined`) guard |
+| `apps/web/lib/supabase/*.ts` | DB row → 도메인 타입 변환과 Zod 검증 실패 처리 |
+
+`pnpm test`는 Turborepo로 `packages/shared`와 `apps/web`의 Vitest를 함께 실행한다. 모바일은 단위 테스트 없이 CI에서 타입체크와 린트만 돌린다(`.github/workflows/mobile-check.yml`).
 
 ### 파일 위치
 
@@ -38,8 +42,8 @@ lib/
   storage.ts
   storage.test.ts   ← 여기
 store/
-  timerStore.ts
-  timerStore.test.ts
+  taskStore.ts
+  taskStore.test.ts
 ```
 
 ### 테스트 퍼스트 패턴
@@ -53,7 +57,7 @@ store/
 
 ### lefthook 연동
 
-vitest는 설치되어 있으나 pre-commit hook은 현재 주석 처리 상태. 활성화하려면 `lefthook.yml`에서 주석 해제:
+pre-commit hook은 prettier, 타입체크, 린트만 실행하고 단위 테스트는 주석 처리 상태. 활성화하려면 `lefthook.yml`에서 주석 해제:
 
 ```yaml
 pre-commit:
@@ -79,6 +83,7 @@ pnpm test:e2e
 
 ```
 tests/e2e/
+  auth.setup.ts       # 테스트 계정 로그인 후 storageState 저장 (나머지 스펙이 재사용)
   full-flow.spec.ts   # 작업 생성 → 타이머 → 세션 기록 → 대시보드 집계 전체 흐름
   settings.spec.ts    # 설정 페이지 스모크 테스트
   timer.spec.ts       # 타이머 시작 → 일시정지 → 재개 → 완료
@@ -89,7 +94,8 @@ tests/e2e/
 ### 브라우저 설정
 
 Chromium 단일 브라우저 실행. `playwright.config.ts` 참고.
-CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 재사용.
+CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 재사용. 서버가 없으면 dev 서버 대신 프로덕션 빌드(`build && start`)로 띄운다.
+테스트 계정 정보는 CI 시크릿 `E2E_TEST_EMAIL`, `E2E_TEST_PASSWORD`로 주입한다.
 
 ---
 
