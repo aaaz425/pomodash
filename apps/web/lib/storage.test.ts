@@ -27,10 +27,6 @@ describe('loadFromStorage', () => {
     id: 'fallback',
     title: 'fallback',
     categoryId: 'c1',
-    targetFocusMinutes: 25,
-    targetCycles: 4,
-    targetBreakMinutes: 5,
-    completed: false,
     createdAt: '2024-01-01T00:00:00.000Z',
   };
 
@@ -43,10 +39,6 @@ describe('loadFromStorage', () => {
       id: '1',
       title: 'A',
       categoryId: 'c1',
-      targetFocusMinutes: 25,
-      targetCycles: 4,
-      targetBreakMinutes: 5,
-      completed: false,
       createdAt: '2024-01-01T00:00:00.000Z',
     };
     localStorage.setItem('k', JSON.stringify(task));
@@ -66,24 +58,6 @@ describe('loadFromStorage', () => {
   it('JSON은 유효하지만 스키마 검증에 실패하면 fallback 반환', () => {
     localStorage.setItem('k', JSON.stringify({ wrong: 'shape' }));
     expect(loadFromStorage('k', schema, fallback)).toBe(fallback);
-  });
-
-  it('스키마가 default 값을 채워주는 필드는 누락되어도 파싱 성공', () => {
-    const partial = {
-      id: '1',
-      title: 'A',
-      categoryId: 'c1',
-      completed: false,
-      createdAt: '2024-01-01T00:00:00.000Z',
-    };
-    localStorage.setItem('k', JSON.stringify(partial));
-    const result = loadFromStorage('k', schema, fallback);
-    expect(result).not.toBe(fallback);
-    expect(result).toMatchObject({
-      targetFocusMinutes: 25,
-      targetCycles: 4,
-      targetBreakMinutes: 5,
-    });
   });
 });
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TIMER_LIMITS, INPUT_LIMITS } from '@pomoroutine/shared';
+import { INPUT_LIMITS } from '@pomoroutine/shared';
 
 export interface Category {
   id: string;
@@ -11,10 +11,6 @@ export interface Task {
   id: string;
   title: string;
   categoryId: string;
-  targetFocusMinutes: number; // 사이클당 집중 시간 (분)
-  targetCycles: number; // 목표 사이클 수 (회)
-  targetBreakMinutes: number; // 사이클 간 휴식 시간 (분)
-  completed: boolean;
   createdAt: string; // ISO 8601
 }
 
@@ -30,15 +26,5 @@ export const TaskSchema = z.object({
   id: z.string(),
   title: z.string().max(INPUT_LIMITS.TITLE_MAX_LENGTH),
   categoryId: z.string(),
-  targetFocusMinutes: z
-    .number()
-    .min(TIMER_LIMITS.FOCUS_MINUTES_MIN)
-    .max(TIMER_LIMITS.FOCUS_MINUTES_MAX),
-  targetCycles: z.number().min(TIMER_LIMITS.CYCLES_MIN).max(TIMER_LIMITS.CYCLES_MAX),
-  targetBreakMinutes: z
-    .number()
-    .min(TIMER_LIMITS.BREAK_MINUTES_MIN)
-    .max(TIMER_LIMITS.BREAK_MINUTES_MAX),
-  completed: z.boolean(),
   createdAt: z.string(),
 });

@@ -13,7 +13,6 @@ interface Props {
   shortBreakMinutes: number;
   onShortBreakMinutesChange: (v: number) => void;
   cyclesLabel?: string;
-  disabled?: boolean;
 }
 
 export function TimerSettingsGroup({
@@ -24,7 +23,6 @@ export function TimerSettingsGroup({
   shortBreakMinutes,
   onShortBreakMinutesChange,
   cyclesLabel = '횟수',
-  disabled = false,
 }: Props) {
   const theme = useThemeTokens();
 
@@ -74,7 +72,6 @@ export function TimerSettingsGroup({
             max={row.max}
             step={row.step}
             unit={row.unit}
-            disabled={disabled}
           />
         </View>
       ))}

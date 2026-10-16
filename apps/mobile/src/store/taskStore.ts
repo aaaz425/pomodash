@@ -41,23 +41,8 @@ interface TaskStore {
   categories: Category[];
   sessions: Session[];
 
-  addTask: (input: {
-    title: string;
-    categoryId: string;
-    targetFocusMinutes?: number;
-    targetCycles?: number;
-    targetBreakMinutes?: number;
-  }) => Promise<string | null>;
-  toggleTask: (id: string) => Promise<void>;
-  updateTask: (
-    id: string,
-    patch: Partial<
-      Pick<
-        Task,
-        'title' | 'categoryId' | 'targetFocusMinutes' | 'targetCycles' | 'targetBreakMinutes'
-      >
-    >,
-  ) => Promise<void>;
+  addTask: (input: { title: string; categoryId: string }) => Promise<string | null>;
+  updateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'categoryId'>>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   reorderTasks: (fromIndex: number, toIndex: number) => Promise<void>;
 
@@ -105,39 +90,20 @@ export const createTaskStore = () => {
     categories: [],
     sessions: [],
 
-    addTask: async ({
-      title,
-      categoryId,
-      targetFocusMinutes,
-      targetCycles,
-      targetBreakMinutes,
-    }) => {
+    addTask: async ({ title, categoryId }) => {
       const trimmed = title.trim();
-      const focus = targetFocusMinutes ?? 25;
-      const cycles = targetCycles ?? 4;
-      const breakMinutes = targetBreakMinutes ?? 5;
       const tempId = generateId();
       const optimisticTask: Task = {
         id: tempId,
         title: trimmed,
         categoryId,
-        targetFocusMinutes: focus,
-        targetCycles: cycles,
-        targetBreakMinutes: breakMinutes,
-        completed: false,
         createdAt: new Date().toISOString(),
       };
       // 스냅샷을 직접 set하면 대기 중 다른 변경을 덮어쓰므로 state 콜백으로 최신 상태 위에서 반영
       set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
 
       const idPromise = (async () => {
-        const inserted = await insertTaskRow({
-          title: trimmed,
-          categoryId,
-          targetFocusMinutes: focus,
-          targetCycles: cycles,
-          targetBreakMinutes: breakMinutes,
-        });
+        const inserted = await insertTaskRow({ title: trimmed, categoryId });
 
         if (!inserted) {
           set((state) => ({ tasks: state.tasks.filter((t) => t.id !== tempId) }));
@@ -151,22 +117,6 @@ export const createTaskStore = () => {
       })();
       trackPendingId(pendingTaskIds, tempId, idPromise);
       return idPromise;
-    },
-
-    toggleTask: async (id) => {
-      const targetId = await resolvePendingId(pendingTaskIds, id);
-      if (!targetId) return;
-      const original = get().tasks.find((t) => t.id === targetId);
-      if (!original) return;
-      const completed = !original.completed;
-      set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === targetId ? { ...t, completed } : t)),
-      }));
-      const { error } = await updateTaskRow(targetId, { completed });
-      if (error) {
-        set((state) => ({ tasks: state.tasks.map((t) => (t.id === targetId ? original : t)) }));
-        toast(TOAST_MESSAGES.taskSaveFailed);
-      }
     },
 
     updateTask: async (id, patch) => {

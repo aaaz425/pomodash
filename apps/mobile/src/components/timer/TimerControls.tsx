@@ -20,6 +20,7 @@ export function TimerControls() {
   const { showEndConfirm, requestEnd, confirmEnd, cancelEnd } = useSessionEndFlow();
 
   const [showStartSheet, setShowStartSheet] = useState(false);
+  const [startSheetKey, setStartSheetKey] = useState(0);
 
   function handleStartPress() {
     if (isRunning) {
@@ -27,6 +28,7 @@ export function TimerControls() {
       return;
     }
     if (!sessionStarted) {
+      setStartSheetKey((k) => k + 1);
       setShowStartSheet(true);
       return;
     }
@@ -96,7 +98,11 @@ export function TimerControls() {
           </Text>
         </Pressable>
       </View>
-      <StartSessionSheet visible={showStartSheet} onClose={() => setShowStartSheet(false)} />
+      <StartSessionSheet
+        key={startSheetKey}
+        visible={showStartSheet}
+        onClose={() => setShowStartSheet(false)}
+      />
       <ConfirmModal
         visible={showEndConfirm}
         title="타이머를 종료할까요?"

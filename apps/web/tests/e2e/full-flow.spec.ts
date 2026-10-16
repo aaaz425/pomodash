@@ -17,7 +17,6 @@ test('작업 생성 → 타이머 완료 → 메모 작성 → journal/dashboard
   await addModal.getByRole('button', { name: '추가' }).click();
   await expect(addModal).not.toBeVisible();
 
-  // 시작 모달 초기값은 테스트 계정의 타이머 기본값을 따르므로 증감 버튼 대신 직접 입력
   await startModal.getByLabel('집중 시간 (단위: 분)').fill('5');
   await startModal.getByLabel('집중 시간 (단위: 분)').press('Enter');
   await startModal.getByLabel('사이클 (단위: 회)').fill('1');

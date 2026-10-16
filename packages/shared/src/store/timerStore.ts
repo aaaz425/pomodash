@@ -48,7 +48,6 @@ export interface TimerStore extends TimerSnapshot {
   completeCycle: () => void;
   updateSettings: (patch: Partial<TimerSettings>) => void;
   syncDefaultSettings: (defaults: TimerSettings) => void;
-  applyActiveTaskTimeUpdate: (patch: Partial<TimerSettings>) => void;
   endSession: () => void;
   dismissSessionRecord: () => void;
   enterFocusMode: () => void;
@@ -200,20 +199,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         set({ phase, remainingSeconds: seconds[phase], startedAt: null });
       },
 
-      // 작업 선택 시 해당 작업의 설정 적용, 해제 시 기본값으로 복원
-      setCurrentTask: (taskId) => {
-        if (taskId === null) {
-          const { defaultSettings } = get();
-          const seconds = phaseSeconds(defaultSettings);
-          set({
-            currentTaskId: null,
-            settings: defaultSettings,
-            remainingSeconds: seconds.focus,
-          });
-        } else {
-          set({ currentTaskId: taskId });
-        }
-      },
+      setCurrentTask: (taskId) => set({ currentTaskId: taskId }),
 
       completeCycle: () => {
         const {
@@ -260,20 +246,10 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         }
       },
 
-      // 영속화 여부는 ports.persistSnapshot 주입 여부에 달림 — 작업 선택 시에만 적용
       updateSettings: (patch) => {
         const next = { ...get().settings, ...patch };
         const seconds = phaseSeconds(next);
         set({ settings: next, remainingSeconds: seconds[get().phase] });
-      },
-
-      // 일시정지 중 목표 시간 변경 시 호출 — 진행 시간 보존, 남은 시간만 보정
-      applyActiveTaskTimeUpdate: (patch) => {
-        const { settings, phase, remainingSeconds, startedAt } = get();
-        if (startedAt !== null) return; // 실행 중에는 무시 — 호출 측에서 막아야 하는 안전망
-        const next = { ...settings, ...patch };
-        const delta = phaseSeconds(next)[phase] - phaseSeconds(settings)[phase];
-        set({ settings: next, remainingSeconds: Math.max(0, remainingSeconds + delta) });
       },
 
       endSession: () => {
@@ -309,7 +285,6 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
 
       dismissSessionRecord: () => set(resetSessionState(get().defaultSettings)),
 
-      // 세션 진행 중(시작 후 ~ 기록 모달 닫기 전)에는 현재 세션 설정을 건드리지 않음
       syncDefaultSettings: (defaults) => {
         const { sessionStarted, sessionEnded, phase } = get();
         if (sessionStarted || sessionEnded) {
@@ -345,7 +320,6 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         const loaded = loadSnapshot ? loadSnapshot(fallback) : fallback;
         // lastActiveAt은 여기서 갱신하지 않음 — StrictMode 이중 마운트로 hydrate가 두 번 불려도 판단이 흔들리지 않아야 함
         set({ ...loaded, showAbandonedPrompt: false });
-        // 스냅샷보다 설정 로드가 먼저 끝난 경우 대기 상태의 이전 설정이 기본값을 덮어쓰지 않도록 재적용
         get().syncDefaultSettings(get().defaultSettings);
         get().checkAbandoned();
       },

@@ -28,7 +28,7 @@ export function PresetsCategoryCard({
   onOpenMotivational,
 }: Props) {
   const { mode, colorTheme } = useThemeMode();
-  const taskCount = useTaskStore((s) => s.tasks.filter((t) => !t.completed).length);
+  const taskCount = useTaskStore((s) => s.tasks.length);
   const categoryCount = useTaskStore((s) => s.categories.length);
   const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
   const motivationalCount = useSettingsStore((s) => s.motivationalMessages.length);

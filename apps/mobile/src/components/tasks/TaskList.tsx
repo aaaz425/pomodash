@@ -35,8 +35,6 @@ export function TaskList({
   const [editTarget, setEditTarget] = useState<Task | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
-  const visibleTasks = tasks.filter((t) => !t.completed);
-
   function handleDelete() {
     if (!deleteTargetId) return;
     void deleteTask(deleteTargetId);
@@ -65,11 +63,11 @@ export function TaskList({
 
   return (
     <View>
-      {visibleTasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <EmptyState message="작업이 없습니다" paddingVertical={emptyStatePaddingVertical} />
       ) : mode === 'manage' ? (
         <DraggableFlatList
-          data={visibleTasks}
+          data={tasks}
           keyExtractor={(t) => t.id}
           style={styles.scrollList}
           onDragEnd={({ from, to }) => void reorderTasks(from, to)}
@@ -80,7 +78,7 @@ export function TaskList({
         />
       ) : (
         <ScrollView style={maxHeight ? { maxHeight } : undefined} nestedScrollEnabled>
-          <View style={styles.list}>{visibleTasks.map((t) => renderRow(t))}</View>
+          <View style={styles.list}>{tasks.map((t) => renderRow(t))}</View>
         </ScrollView>
       )}
 
