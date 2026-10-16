@@ -33,6 +33,7 @@ export interface TimerStorePorts {
 
 export interface TimerStore extends TimerSnapshot {
   isFocusMode: boolean; // true일 때 집중 모드 오버레이 표시
+  defaultSettings: TimerSettings;
   showAbandonedPrompt: boolean;
   // TimerEngine(싱글턴)이 매초 갱신하는 tick 캐시 — 영속화 대상 아님, 다른 컴포넌트는 읽기만 함
   runningDisplaySeconds: number | null;
@@ -46,6 +47,7 @@ export interface TimerStore extends TimerSnapshot {
   setCurrentTask: (taskId: string | null) => void;
   completeCycle: () => void;
   updateSettings: (patch: Partial<TimerSettings>) => void;
+  syncDefaultSettings: (defaults: TimerSettings) => void;
   applyActiveTaskTimeUpdate: (patch: Partial<TimerSettings>) => void;
   endSession: () => void;
   dismissSessionRecord: () => void;
@@ -69,8 +71,8 @@ function creditableElapsed(elapsed: number): number {
 }
 
 // 세션 전체 집중 시간이 노이즈 수준이면 기록 자체를 만들지 않고 초기 상태로 되돌림
-function resetSessionState() {
-  const seconds = phaseSeconds(DEFAULT_TIMER_SETTINGS);
+function resetSessionState(settings: TimerSettings) {
+  const seconds = phaseSeconds(settings);
   return {
     phase: 'focus' as const,
     mode: 'pomodoro' as const,
@@ -82,7 +84,7 @@ function resetSessionState() {
     isFocusMode: false,
     showAbandonedPrompt: false,
     sessionStarted: false,
-    settings: DEFAULT_TIMER_SETTINGS,
+    settings,
     sessionStartedAt: null,
     sessionEndedAt: null,
     accFocusSeconds: 0,
@@ -130,6 +132,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
       cycleCount: 0,
       currentTaskId: null,
       settings,
+      defaultSettings: settings,
       sessionEnded: false,
       isFocusMode: false,
       showAbandonedPrompt: false,
@@ -200,10 +203,11 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
       // 작업 선택 시 해당 작업의 설정 적용, 해제 시 기본값으로 복원
       setCurrentTask: (taskId) => {
         if (taskId === null) {
-          const seconds = phaseSeconds(DEFAULT_TIMER_SETTINGS);
+          const { defaultSettings } = get();
+          const seconds = phaseSeconds(defaultSettings);
           set({
             currentTaskId: null,
-            settings: DEFAULT_TIMER_SETTINGS,
+            settings: defaultSettings,
             remainingSeconds: seconds.focus,
           });
         } else {
@@ -285,7 +289,7 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         const totalFocus = phase === 'focus' ? accFocusSeconds + elapsed : accFocusSeconds;
         if (totalFocus < SESSION_LIMITS.MIN_SESSION_FOCUS_SECONDS) {
           onSessionTooShort?.();
-          set(resetSessionState());
+          set(resetSessionState(get().defaultSettings));
           return;
         }
         const closedPeriods =
@@ -303,7 +307,21 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         });
       },
 
-      dismissSessionRecord: () => set(resetSessionState()),
+      dismissSessionRecord: () => set(resetSessionState(get().defaultSettings)),
+
+      // 세션 진행 중(시작 후 ~ 기록 모달 닫기 전)에는 현재 세션 설정을 건드리지 않음
+      syncDefaultSettings: (defaults) => {
+        const { sessionStarted, sessionEnded, phase } = get();
+        if (sessionStarted || sessionEnded) {
+          set({ defaultSettings: defaults });
+          return;
+        }
+        set({
+          defaultSettings: defaults,
+          settings: defaults,
+          remainingSeconds: phaseSeconds(defaults)[phase],
+        });
+      },
 
       enterFocusMode: () => set({ isFocusMode: true }),
       exitFocusMode: () => set({ isFocusMode: false }),
@@ -327,6 +345,8 @@ export function createTimerStore(ports: TimerStorePorts = {}) {
         const loaded = loadSnapshot ? loadSnapshot(fallback) : fallback;
         // lastActiveAt은 여기서 갱신하지 않음 — StrictMode 이중 마운트로 hydrate가 두 번 불려도 판단이 흔들리지 않아야 함
         set({ ...loaded, showAbandonedPrompt: false });
+        // 스냅샷보다 설정 로드가 먼저 끝난 경우 대기 상태의 이전 설정이 기본값을 덮어쓰지 않도록 재적용
+        get().syncDefaultSettings(get().defaultSettings);
         get().checkAbandoned();
       },
     };

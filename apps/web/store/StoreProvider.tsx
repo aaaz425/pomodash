@@ -56,6 +56,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     );
   }, [taskStore, settingsStore, timerStore]);
 
+  useEffect(
+    () =>
+      settingsStore.subscribe((state, prev) => {
+        if (state.defaultTimerSettings === prev.defaultTimerSettings) return;
+        timerStore.getState().syncDefaultSettings(state.defaultTimerSettings);
+      }),
+    [timerStore, settingsStore],
+  );
+
   return (
     <TimerStoreContext.Provider value={timerStore}>
       <TaskStoreContext.Provider value={taskStore}>
