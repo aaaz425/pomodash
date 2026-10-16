@@ -22,10 +22,6 @@ erDiagram
         uuid user_id FK "auth.users"
         uuid category_id FK "on delete restrict"
         text title
-        int target_focus_minutes "1-120, 기본 25"
-        int target_cycles "1-10, 기본 4"
-        int target_break_minutes "0-60, 기본 5"
-        boolean completed
         int position
         timestamptz created_at
     }
