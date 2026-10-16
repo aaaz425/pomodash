@@ -11,8 +11,8 @@ erDiagram
     CATEGORIES {
         uuid id PK
         uuid user_id FK "auth.users"
-        text name
-        text color "Tailwind class, 'bg-' 접두사 CHECK"
+        text name "최대 20자"
+        text color "hex, ^#[0-9a-fA-F]{6}$ CHECK"
         int position
         timestamptz created_at
     }
@@ -21,7 +21,7 @@ erDiagram
         uuid id PK
         uuid user_id FK "auth.users"
         uuid category_id FK "on delete restrict"
-        text title
+        text title "최대 100자"
         int position
         timestamptz created_at
     }
@@ -41,7 +41,7 @@ erDiagram
         jsonb focus_periods "내장 배열, 최대 100개 CHECK"
         text note "nullable, 최대 500자"
         smallint focus_rating "nullable, 1-3"
-        text[] distraction_tags
+        text[] distraction_tags "태그별 길이 CHECK"
         timestamptz created_at
     }
 
@@ -53,10 +53,11 @@ erDiagram
         text sound_type "'sine'|'chime'|'bell'|'digital'"
         smallint sound_volume "0-100"
         smallint sound_repeat_count "1-5"
-        text[] motivational_messages
-        int default_focus_minutes
-        int default_short_break_minutes
-        int default_total_cycles
+        text[] motivational_messages "1-20개, 각 1-200자"
+        int default_focus_minutes "1-120"
+        int default_short_break_minutes "0-60"
+        int default_total_cycles "1-10"
+        boolean keep_screen_awake
         timestamptz updated_at
     }
 
@@ -76,12 +77,20 @@ TypeScript 인터페이스는 `types/models.ts`(웹)/`types/*.ts`(모바일), Zo
 - `tasks.category_id`는 `on delete restrict` — 참조하는 task가 있으면 카테고리 삭제가 막힌다(웹/앱 UX에서 안내)
 - `sessions.task_id`는 `on delete set null` — 작업 삭제 시 세션은 "미분류"로 남는다
 - `handle_new_user()` 트리거: 신규 계정 생성 시 기본 카테고리 5개 + 기본 `settings` 1행을 원자적으로 시딩(닉네임은 카카오 프로필 닉네임 또는 이메일 로컬 파트)
+- `categories_count_limit` 트리거: 유저당 카테고리 최대 10개(여러 행 집계라 CHECK 대신 트리거)
+
+---
+
+## RPC 및 보조 테이블
+
+- `get_dashboard_summary(p_timezone)`: 스트릭, 월간 히트맵, 전일/전주/전월 비교, 가장 바쁜 요일처럼 전체 기록을 스캔해야 하는 대시보드 통계를 서버에서 계산
+- `email_check_rate_limits` 테이블 + `check_and_record_email_rate_limit()`: `check-email-provider` Edge Function의 IP 기반 rate limit. RLS 정책이 없어 service_role만 접근
 
 ---
 
 ## 기기 로컬 저장소 (Supabase 미러링 아님)
 
-Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소에는 새로고침/재시작 복구용 활성 타이머 스냅샷과 테마만 남는다 — 키 목록과 검증 패턴은 [docs/guides/data-models.md](../guides/data-models.md) 참조.
+Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소에는 새로고침/재시작 복구용 활성 타이머 스냅샷, 테마, 모바일의 암호화된 로그인 세션만 남는다 — 키 목록과 검증 패턴은 [docs/guides/data-models.md](../guides/data-models.md) 참조.
 
 ---
 

@@ -1,6 +1,6 @@
 # 화면정의서 — Screen Specification
 
-> **버전:** 1.2 · **기준:** apps/web (Next.js). 모바일 앱(apps/mobile)은 화면 구성·라우팅·상호작용이 픽셀 단위로 동일하다 — 별도 문서 없이 이 문서를 공용으로 참조한다. 파일 경로만 `apps/mobile/src/`로 대응해서 읽는다.
+> **버전:** 1.3 · **기준:** apps/web (Next.js). 모바일 앱(apps/mobile)은 화면 구성·라우팅·상호작용이 픽셀 단위로 동일하다 — 별도 문서 없이 이 문서를 공용으로 참조한다. 파일 경로만 `apps/mobile/src/`로 대응해서 읽는다. 모바일의 통계, 기록 탭은 웹 화면(`/embed/dashboard`, `/embed/journal`)을 WebView로 그대로 띄운다.
 
 ---
 
@@ -30,19 +30,19 @@
 
 MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 마운트되어 있어 특정 화면 전용이 아니라 `/(main)` 하위 모든 페이지에서 조건부로 나타난다.
 
-테마 전환은 별도 헤더 토글이 없고, 설정 화면의 `ThemeSection`(인라인 라이트/다크/시스템 버튼) 하나로만 이루어진다. `components/shared/ThemeInit.tsx`는 초기 테마 값을 적용하는 마운트 전용 컴포넌트다.
+테마 전환은 별도 헤더 토글이 없고, 설정 화면의 `ThemeModal`(라이트/다크/시스템 + 컬러 테마 4종) 하나로만 이루어진다. `components/shared/ThemeInit.tsx`는 초기 테마 값을 적용하는 마운트 전용 컴포넌트다.
 
 ### 테마
 
 - 다크 모드 기본, 라이트 모드 지원
 - 시스템 설정 연동 + 수동 전환 (설정 화면의 ThemeSection)
-- 색상 토큰: 딥 네이비 계열(다크) / 뉴트럴 화이트 계열(라이트), 민트 포인트
+- 색상 토큰: 딥 네이비 계열(다크) / 뉴트럴 화이트 계열(라이트), 액센트는 컬러 테마(미드나잇/선셋/오션/모노)를 따름
 
 ---
 
 ## 화면 1 — 랜딩 페이지
 
-**경로:** `/` (랜딩 전용 레이아웃, 네비게이션 없음)
+**경로:** `/landing` (랜딩 전용 레이아웃, 네비게이션 없음)
 **파일:** `app/landing/page.tsx`
 **목적:** 신규 방문자에게 서비스를 소개하고 메인 화면 진입을 유도한다.
 
@@ -52,17 +52,19 @@ MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 �
 | ------- | --------- | --------------------- |
 | LandingHeader | `components/landing/LandingHeader.tsx` | 로고 + 시작하기 버튼 |
 | LandingHero | `components/landing/LandingHero.tsx` | 타이틀 + 서브카피 + CTA |
+| LandingHighlights | `components/landing/LandingHighlights.tsx` | 핵심 특징 요약 |
 | LandingFeatures | `components/landing/LandingFeatures.tsx` | 주요 기능 소개 |
 | LandingHowItWorks | `components/landing/LandingHowItWorks.tsx` | 사용 흐름 설명 |
 | LandingCtaSection | `components/landing/LandingCtaSection.tsx` | 하단 CTA |
 | LandingFooter | `components/landing/LandingFooter.tsx` | 푸터 |
 | LandingCTA | `components/landing/LandingCTA.tsx` | 헤더/히어로/하단에서 공용으로 쓰는 CTA 버튼 |
+| LandingSmoothScroll | `components/landing/LandingSmoothScroll.tsx` | 페이지 내 부드러운 스크롤 |
 
 ### 인터랙션
 
 | 액션                 | 동작                |
 | ------------------ | ----------------- |
-| "시작하기" / CTA 버튼 클릭 | `/(main)`(메인 화면)으로 이동 |
+| "시작하기" / CTA 버튼 클릭 | `/`(메인 타이머 화면)으로 이동, 비회원도 바로 체험 가능 |
 | 헤더 로고 클릭           | 랜딩 페이지 최상단 스크롤    |
 
 ### 에지케이스
@@ -73,7 +75,7 @@ MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 �
 
 ## 화면 2 — 메인 (타이머)
 
-**경로:** `/(main)`
+**경로:** `/`
 **파일:** `app/(main)/page.tsx`
 **목적:** 타이머 실행이 중심인 화면. 작업 선택은 타이머 시작 모달을 통해 이루어진다.
 
@@ -83,17 +85,17 @@ MiniTimerWidget과 AbandonedSessionDialog는 `app/(main)/layout.tsx`에 상시 �
 
 ```
 TimerSection
-├─ 현재 작업 표시 (CategoryBadge + 제목, 없으면 "선택된 작업이 없습니다")
+├─ 현재 작업 표시 (CategoryBadge + 제목, 선택된 작업이 없으면 비움)
 ├─ TimerRing (내부에 TimerGlow 포함, 원형 SVG + 중앙 시간/상태뱃지)
 ├─ CycleIndicator (mode==='free'면 렌더링 안 함)
-├─ 타이머 설정 카드 (집중/휴식/사이클 3분할 표시)
 └─ TimerControls
     ├─ "집중" 버튼 (실행 중일 때만 활성) → enterFocusMode()
     ├─ 시작/일시정지 버튼 (타이머 미시작 시 StartSessionModal 오픈)
     ├─ "타이머 종료" 버튼 → ConfirmDialog
     └─ StartSessionModal (조건부 마운트)
-        └─ TaskList(mode="select") + SegmentedControl(포모도로/자유) + TimerSettingsGroup
-SessionRecordModal (타이머 종료 후에만 마운트)
+        └─ TaskList(mode="select") + SegmentedControl(포모도로/자유) + TimerSettingsGroup(초기값 = 타이머 기본값)
+SessionRecordModal (타이머 종료 후에만 마운트, 비회원은 로그인 안내)
+├─ SessionProgressBadge
 └─ SessionTaskSelector (미분류 기록에 사후 작업 지정 시)
     └─ TaskList(mode="select")
 FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
@@ -106,7 +108,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 | TimerSection     | `components/timer/TimerSection.tsx`      | 메인 타이머 전체 조립             |
 | TimerRing        | `components/timer/TimerRing.tsx`         | 원형 진행률 링 + 시간/상태 표시 (TimerGlow 포함) |
 | TimerGlow        | `components/timer/TimerGlow.tsx`         | phase별 blur 배경광 (장식용)    |
-| SessionProgressBadge | `components/timer/SessionProgressBadge.tsx` | 타이머 진행 요약(사이클 또는 자유모드 경과 시간) |
+| SessionProgressBadge | `components/timer/SessionProgressBadge.tsx` | 기록 모달의 진행 요약(사이클 또는 자유모드 경과 시간) |
 | TimerControls    | `components/timer/TimerControls.tsx`     | 집중모드 진입/시작·일시정지/종료 버튼    |
 | CycleIndicator   | `components/timer/CycleIndicator.tsx`    | 사이클 진행 점 표시 (자유 모드는 숨김)  |
 | StartSessionModal | `components/timer/StartSessionModal.tsx` | 타이머 시작 전 작업/모드/설정 선택      |
@@ -123,7 +125,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 | 집중 실행 중  | 일시정지 버튼 + 종료 버튼, 링 진행, 집중 모드 버튼 활성 |
 | 휴식 실행 중  | 일시정지 버튼 + 종료 버튼, 링 다른 색상           |
 | 일시정지     | 재개 버튼                              |
-| 사이클 완료   | 다음 단계 선택 안내                        |
+| 사이클 완료   | 다음 페이즈 자동 시작 (집중 → 휴식 → 집중)        |
 
 ### 인터랙션
 
@@ -143,8 +145,9 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 
 ### 에지케이스
 
-- 작업 없음: "작업을 추가해서 집중을 시작해보세요" 빈 상태
-- 작업 미선택 상태에서 타이머 시작: 미분류 기록으로 저장
+- 작업 없음: 시작 모달 작업 목록에 "작업이 없습니다" 빈 상태
+- 작업 미선택 상태에서 타이머 시작: 미분류로 진행, 기록 모달에서 작업 사후 지정 가능
+- 집중 30초 미만에서 종료: 기록 모달 없이 초기화, 토스트 안내
 
 ---
 
@@ -176,7 +179,7 @@ FocusMode (집중 모드 진입 시 AnimatePresence로 마운트)
 
 ## 화면 4 — 대시보드
 
-**경로:** `/(main)/dashboard`
+**경로:** `/dashboard` (모바일 WebView는 `/embed/dashboard`)
 **파일:** `app/(main)/dashboard/page.tsx`, `components/dashboard/DashboardView.tsx`
 **목적:** 집중 기록을 집계해 시각화하고 성취감을 준다.
 
@@ -232,7 +235,7 @@ DashboardView
 
 ## 화면 5 — 저널 (리스트/캘린더 + 인사이트)
 
-**경로:** `/(main)/journal`
+**경로:** `/journal` (모바일 WebView는 `/embed/journal`)
 **파일:** `app/(main)/journal/page.tsx`, `components/journal/JournalView.tsx`
 **목적:** 저장된 기록을 리스트 또는 캘린더로 조회하고, 집중도/방해요소 기반 인사이트를 제공하며, 기록을 수정/삭제한다.
 
@@ -311,11 +314,18 @@ JournalView
 
 ## 화면 6 — 설정
 
-**경로:** `/(main)/settings`
+**경로:** `/settings`
 **파일:** `app/(main)/settings/page.tsx`, `components/settings/SettingsView.tsx`
-**목적:** 타이머 기본값, 작업/카테고리 관리, 동기부여 메시지, 알림, 테마, 앱 정보를 관리한다.
+**목적:** 계정, 타이머 기본값, 작업/카테고리 관리, 동기부여 메시지, 알림, 테마, 앱 정보를 관리한다. 비회원은 로그인 안내(`GuestPrompt`)만 표시한다.
 
-한 페이지 아코디언 방식이 아니라 두 그룹으로 나뉜다. (1) 인라인형 — 모달 없이 그 자리에서 바로 조작하는 `ProfileSection`(닉네임), `ThemeSection`(테마), `InstallSection`(PWA 설치), `AboutSection`(앱 정보). (2) 모달형 — `SettingsMenuRow`(아이콘+라벨+요약값+화살표)를 클릭하면 대응 모달이 열리는 타이머 기본값/작업 관리/카테고리 관리/동기부여 메시지/알림. `SettingsView`는 `openMenu` 단일 state로 5개 모달을 배타 제어한다.
+첫 화면은 카테고리 4개(계정/환경설정/알림/앱 정보) 목록이고, 하나를 고르면 해당 카테고리 화면으로 들어간다(`SettingsView`의 `activeCategory` state).
+
+| 카테고리 | 구성 |
+| --- | --- |
+| 계정 | `ProfileSection`(닉네임 인라인) + `AccountSection`(비밀번호 변경/설정, 로그아웃, 회원탈퇴) |
+| 환경설정 | `SettingsMenuRow` 5개 — 테마/타이머 기본값/작업 관리/카테고리 관리/동기부여 메시지, 클릭 시 대응 모달 (`openMenu` 단일 state로 배타 제어) |
+| 알림 | `NotificationSection` 인라인 — 브라우저 알림, 화면 꺼짐 방지, 소리 알림(종류/음량/반복) |
+| 앱 정보 | `InstallSection`(PWA 설치) + `AboutSection`(버전/설명/랜딩 링크) |
 
 작업 관리 모달 안에 "카테고리 관리" 버튼이 있어 클릭하면 카테고리 목록 모달이 그 위에 중첩되고, 목록 모달에서 추가/편집을 누르면 카테고리 편집 모달이 다시 그 위에 중첩된다(최대 3중 모달).
 
@@ -324,26 +334,28 @@ JournalView
 | 컴포넌트               | 경로                                         | 형태                        |
 | ------------------ | ------------------------------------------ | ------------------------- |
 | ProfileSection | `components/settings/ProfileSection.tsx` | 인라인 — 닉네임 입력+저장 |
-| ThemeSection | `components/settings/ThemeSection.tsx` | 인라인 — 라이트/다크/시스템 버튼 |
+| AccountSection / PasswordChangeDialog | `components/settings/AccountSection.tsx`, `PasswordChangeDialog.tsx` | 인라인 — 비밀번호 변경/설정, 로그아웃, 회원탈퇴 |
+| ThemeModal | `components/settings/ThemeModal.tsx` | 모달 — `ThemeSection`(라이트/다크/시스템) + `ColorThemeSection`(컬러 테마 4종) |
+| NotificationSection | `components/settings/notification/NotificationSection.tsx` | 인라인 — 브라우저 알림/화면 꺼짐 방지/소리 알림 |
 | InstallSection | `components/settings/InstallSection.tsx` | 인라인 — PWA 설치 상태별 안내/버튼 |
 | AboutSection | `components/settings/AboutSection.tsx` | 인라인 — 앱 이름/버전/설명/랜딩 링크 |
 | SettingsMenuRow | `components/shared/SettingsMenuRow.tsx` | 아이콘+라벨+요약값+화살표 클릭형 행 |
-| TimerDefaultsModal / TimerDefaultsSection | `components/settings/timer-defaults/` | 모달 — 기본 집중/휴식/사이클 |
+| TimerDefaultsModal / TimerDefaultsSection | `components/settings/timer-defaults/` | 모달 — 기본 집중/휴식/사이클 (집중 1–120분) |
 | TaskManageModal | `components/settings/task/TaskManageModal.tsx` | 모달 — 작업 목록 관리(TaskList mode="manage") |
 | CategoryModal / CategorySection | `components/settings/category/` | 모달 — 카테고리 목록(드래그 정렬/편집/삭제) |
-| CategoryEditModal | `components/settings/category/CategoryEditModal.tsx` | 모달 — 카테고리 이름/색상 추가·편집 (CategoryModal 위 중첩) |
+| CategoryEditModal / ColorPickerModal | `components/settings/category/` | 모달 — 카테고리 이름/색상 추가·편집 (CategoryModal 위 중첩) |
 | MotivationalModal / MotivationalSection | `components/settings/motivational/` | 모달 — 동기부여 메시지 목록(드래그 정렬, 행 내 인라인 편집) |
-| NotificationModal / NotificationSection | `components/settings/notification/` | 모달 — 브라우저 알림+소리 알림 |
-| StepperInput       | `components/shared/StepperInput.tsx`       | 숫자 증감 입력 (단위 포함)          |
-| ConfirmDialog      | `components/shared/ConfirmDialog.tsx`      | 카테고리/작업 삭제 확인                |
+| StepperInput       | `components/shared/StepperInput.tsx`       | 숫자 증감 입력 (버튼은 step 단위, 직접 입력은 1 단위) |
+| ConfirmDialog      | `components/shared/ConfirmDialog.tsx`      | 카테고리/작업 삭제, 탈퇴 확인                |
 
 ### 인터랙션
 
 | 액션              | 동작                                      |
 | --------------- | --------------------------------------- |
+| 카테고리 클릭 | 해당 카테고리 화면 진입, 뒤로가기로 목록 복귀 |
 | 닉네임 입력 후 저장 | 즉시 저장, "저장됨" 1.5초 표시(모달 없음) |
-| 테마 버튼 클릭 | 즉시 전환(모달 없음) |
-| "타이머 기본값"/"작업 관리"/"카테고리 관리"/"동기부여 메시지"/"알림" 행 클릭 | 각 대응 모달 오픈 |
+| "테마"/"타이머 기본값"/"작업 관리"/"카테고리 관리"/"동기부여 메시지" 행 클릭 | 각 대응 모달 오픈 |
+| 타이머 기본값 변경 | 즉시 저장, 대기 중인 타이머 화면에 바로 반영 |
 | 작업 관리 모달에서 "카테고리 관리" 클릭 | 카테고리 목록 모달이 위에 중첩 오픈 |
 | 카테고리 목록 모달에서 추가/편집 클릭 | 카테고리 편집 모달이 다시 위에 중첩 오픈 |
 | 소리 알림 토글 끔 | 세부 옵션(종류/음량/반복) 비활성 처리 |
@@ -359,14 +371,14 @@ JournalView
 
 ## 화면 7 — 로그인 / 회원가입
 
-**경로:** `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/confirm`
-**목적:** 이메일 또는 카카오로 인증한다. 미로그인 상태에서 `/(main)` 하위 접근 시 `/login`으로 리다이렉트된다.
+**경로:** `/login`, `/signup`, `/welcome`, `/forgot-password`, `/reset-password`, `/auth/confirm`, `/auth/reset-confirm`
+**목적:** 이메일 또는 카카오로 인증한다. 미로그인 상태에서도 타이머 화면은 쓸 수 있고, 통계/기록/설정 화면은 로그인 안내를 보여준다.
 
 ### 인터랙션
 
 | 액션 | 동작 |
 | --- | --- |
-| 이메일+비밀번호 회원가입 | 확인 메일 발송 → `/auth/confirm` 링크 클릭 시 인증 완료 |
+| 이메일+비밀번호 회원가입 | 확인 메일 발송 → `/auth/confirm` 링크 클릭 시 인증 완료 → `/welcome` 가입 완료 화면 |
 | 카카오 로그인 버튼 | OAuth 진행, 최초 로그인 시 기본 카테고리/설정 자동 시딩 |
 | "비밀번호를 잊으셨나요" | `/forgot-password`에서 이메일 입력 → 재설정 링크 발송 → `/reset-password`에서 새 비밀번호 설정 |
 
@@ -374,6 +386,15 @@ JournalView
 
 - 이메일 인증 전 로그인 시도: Supabase 정책에 따른 안내
 - 카카오 로그인 실패/취소: 에러 없이 로그인 화면으로 복귀
+
+---
+
+## 화면 8 — 약관 / 개인정보처리방침
+
+**형태:** 모달 (`components/legal/LegalModal.tsx`, 본문은 `LegalContent.tsx`)
+**목적:** 서비스 이용약관과 개인정보처리방침을 보여준다. 로그인/회원가입 동의 문구, 랜딩 푸터, 설정의 앱 정보에서 모달로 연다.
+
+같은 본문을 `/terms`, `/privacy` 정적 페이지로도 제공한다. 앱 안에서 링크하는 곳은 없고, 외부 링크와 sitemap용이다.
 
 ---
 

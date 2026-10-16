@@ -1,6 +1,6 @@
 # 아키텍처 구조도
 
-> **버전:** 2.0 · **기준:** pnpm 모노레포 + Supabase 백엔드 (Phase 7·8 완료)
+> **버전:** 2.1 · **기준:** pnpm 모노레포 + Supabase 백엔드 + 하이브리드 WebView (Phase 11 완료)
 
 ---
 
@@ -12,7 +12,8 @@ flowchart TB
         WebApp["App Router / Components / Zustand Stores"]
     end
     subgraph Mobile["apps/mobile (Expo / React Native)"]
-        MobileApp["Expo Router / Components / Zustand Stores"]
+        MobileApp["Expo Router / Components / Zustand Stores\n(타이머, 설정 탭은 네이티브)"]
+        WebView["EmbeddedWebScreen (WebView)\n통계, 기록 탭"]
     end
     subgraph Shared["packages/shared (@pomoroutine/shared)"]
         SharedLib["순수 로직: 타이머 계산, 대시보드 집계,\n뱃지, focusPeriods, 세션 유틸"]
@@ -20,21 +21,25 @@ flowchart TB
 
     subgraph Supabase["Supabase"]
         Auth["Auth (이메일 + 카카오)"]
-        DB["Postgres (categories/tasks/sessions/settings, RLS)"]
+        DB["Postgres (categories/tasks/sessions/settings, RLS)\n+ RPC get_dashboard_summary"]
+        Edge["Edge Functions\n(kakao-login, delete-account, check-email-provider)"]
     end
 
     WebApp --> SharedLib
     MobileApp --> SharedLib
     WebApp --> Supabase
     MobileApp --> Supabase
+    WebView -->|"/dashboard?embed, /journal?embed\n(proxy가 /embed/*로 rewrite)"| WebApp
 
     LS["localStorage — 활성 타이머 스냅샷 + 테마만"]
-    AS["AsyncStorage — 활성 타이머 스냅샷 + 세션 캐시"]
+    AS["AsyncStorage — 활성 타이머 스냅샷 + 테마 + 암호화된 로그인 세션"]
     WebApp --> LS
     MobileApp --> AS
 ```
 
-Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소(localStorage/AsyncStorage)에는 새로고침 복구용 활성 타이머 스냅샷과 테마만 남는다.
+Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소(localStorage/AsyncStorage)에는 새로고침 복구용 활성 타이머 스냅샷과 테마, 모바일의 암호화된 로그인 세션만 남는다.
+
+모바일의 통계, 기록 탭은 웹의 embed 라우트를 WebView로 띄운다. 네이티브 로그인 세션은 인증 브릿지(`webviewAuthBridge`)로 WebView 쿠키에 넘긴다.
 
 ---
 
@@ -70,13 +75,13 @@ stateDiagram-v2
     Paused --> Running : 재개
     Running --> Idle : 리셋
 
-    Running --> CycleEnd : 집중 타이머 완료
-    CycleEnd --> BreakRunning : 다음 사이클 (휴식 시작)
-    BreakRunning --> CycleEnd : 휴식 타이머 완료
+    Running --> BreakRunning : 집중 완료 (휴식 자동 시작)
+    BreakRunning --> Running : 휴식 완료 (다음 집중 자동 시작)
 
-    CycleEnd --> SessionComplete : 마지막 사이클 완료\n또는 세션 종료 버튼
+    Running --> SessionComplete : 마지막 사이클 완료\n또는 세션 종료 버튼
+    Paused --> SessionComplete : 세션 종료 버튼
 
-    SessionComplete --> Idle : 세션 저장 완료
+    SessionComplete --> Idle : 기록 저장 또는 건너뛰기
 
     note right of Running
         절대 시간 기반 계산
@@ -94,6 +99,7 @@ sequenceDiagram
     actor User
     participant Timer as TimerSection
     participant Store as timerStore
+    participant Modal as SessionRecordModal
     participant Task as taskStore
     participant Supa as Supabase
 
@@ -107,11 +113,15 @@ sequenceDiagram
 
     User->>Timer: 세션 종료
     Timer->>Store: endSession()
-    Store->>Store: normalizeFocusPeriods()
-    Store->>Task: addSession(session)
+    Store->>Store: 집중 30초 미만이면 기록 없이 초기화
+    Store->>Modal: sessionEnded = true
+    User->>Modal: 메모, 집중도, 방해요소 입력 후 저장
+    Modal->>Modal: normalizeFocusPeriods()
+    Modal->>Task: addSession(session)
     Task->>Task: optimistic update (즉시 UI 반영)
-    Task->>Supa: insert (Zod 검증 후)
-    Supa-->>Task: 실패 시 롤백 + toast
+    Task->>Supa: insert
+    Supa-->>Task: 실패 시 롤백 + toast, 폼 유지
+    Modal->>Store: dismissSessionRecord() (설정을 타이머 기본값으로 복원)
 ```
 
 ---
@@ -120,11 +130,11 @@ sequenceDiagram
 
 | 스토어 | 주요 상태 | 주요 액션 |
 |--------|-----------|-----------|
-| timerStore | phase, mode, startedAt, remainingSeconds, cycleCount, rawFocusPeriods | start, pause, complete, reset, endSession |
+| timerStore | phase, mode, startedAt, remainingSeconds, cycleCount, rawFocusPeriods, defaultSettings | start, pause, complete, reset, endSession, syncDefaultSettings |
 | taskStore | tasks[], categories[], sessions[] | addTask, updateTask, deleteTask, addSession, updateSessionFields, addCategory, deleteCategory |
 | settingsStore | AppSettings 필드 (nickname, soundType 등) | setNickname, setTimerDefaults, setSoundType, addMessage 등 |
 
-세 스토어 모두 `createStore()` 팩토리 패턴을 쓴다(SSR/RN 양쪽에서 싱글톤 버그 방지). 그중 `timerStore`만 `packages/shared`의 `createTimerStore(ports)`를 웹/모바일 각자 감싸 localStorage/AsyncStorage 포트를 주입하고, `taskStore`/`settingsStore`는 플랫폼별로 각자 구현한다(Supabase 클라이언트 호출 방식 차이). 참조: [conventions.md](../guides/conventions.md)
+세 스토어 모두 `createStore()` 팩토리 패턴을 쓴다(SSR/RN 양쪽에서 싱글톤 버그 방지). 그중 `timerStore`만 `packages/shared`의 `createTimerStore(ports)`를 웹/모바일 각자 감싸 localStorage/AsyncStorage 포트를 주입하고, `taskStore`/`settingsStore`는 플랫폼별로 각자 구현한다(Supabase 클라이언트 호출 방식 차이). `StoreProvider`가 settingsStore의 타이머 기본값 변경을 구독해 `timerStore.syncDefaultSettings()`로 넘기며, 타이머는 세션 진행 중이 아닐 때만 이 값을 반영한다. 참조: [conventions.md](../guides/conventions.md)
 
 ---
 
