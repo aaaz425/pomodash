@@ -26,7 +26,7 @@ describe('toTask', () => {
     });
   });
 
-  it('targetFocusMinutes가 범위(5-120)를 벗어나면 검증 실패로 null 반환', () => {
+  it('targetFocusMinutes가 범위(1-120)를 벗어나면 검증 실패로 null 반환', () => {
     expect(toTask({ ...validRow, target_focus_minutes: 200 })).toBeNull();
   });
 
