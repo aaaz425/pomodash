@@ -2,11 +2,11 @@
 
 [![Vercel](https://img.shields.io/badge/배포-Vercel-black?logo=vercel)](https://pomoroutine.com) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
-계획하고, 집중하고, 기록한다
+계획하고, 집중하고, 기록하는 포모도로 집중 도구
 
-수험생과 취업 준비생을 위한 포모도로 기반 집중 도구.
-
-## 스크린샷
+- 수험생과 취업 준비생을 위한 작업 계획 → 집중 타이머 → 회고 기록 → 통계 흐름
+- 웹과 React Native 앱 동시 개발, 계정 하나로 기기 간 자동 동기화
+- 서비스 https://pomoroutine.com
 
 <div align="center">
   <img width="32%" alt="메인 화면" src="docs/specs/images/main.png" />
@@ -14,114 +14,85 @@
   <img width="32%" alt="대시보드" src="docs/specs/images/dashboard.png" />
 </div>
 
-## 주요 기능
+## 핵심 기능
 
-| | 기능 | 설명 |
-|---|---|---|
-| ⏱ | **포모도로 타이머** | 절대시간 기반, 백그라운드 탭 드리프트 없음 |
-| 📋 | **작업 관리** | 카테고리별 작업 생성 및 순서 정렬 |
-| 🎯 | **집중 모드** | 타이머만 남기고 방해 요소 최소화 |
-| 📝 | **세션 기록** | 회고 메모·집중도·방해요소 태그 + 집중 구간 타임라인 |
-| 📊 | **대시보드** | 일/주/월/전체 집중 시간 시각화, 스트릭, 카테고리별·시간대별 분석 |
-| 🏆 | **뱃지 컬렉션** | 스트릭·누적 시간·다양성·특별 이벤트 뱃지 수집 |
-| 🔗 | **공유 카드** | 집중 요약을 이미지로 생성해 공유 |
-| 🔐 | **계정 동기화** | 이메일·카카오 로그인, 기기 간 데이터 자동 동기화, 비회원 타이머 체험 |
-| 📱 | **웹 + 모바일** | Next.js 웹, React Native(Expo) 앱 동시 지원 — 픽셀 단위 동일 UI, 통계/기록 탭은 WebView |
-| 🌙 | **다크/라이트 모드** | 시스템 설정 연동, 수동 전환, 컬러 테마 4종 |
+| 기능 | 설명 |
+|---|---|
+| 포모도로 타이머 | 집중과 휴식 자동 전환, 고정 사이클 없는 자유 모드 |
+| 집중 모드 | 타이머와 동기부여 메시지만 남긴 전체 화면 |
+| 회고 기록 | 메모, 집중도, 방해 요소 태그, 집중 구간 타임라인 |
+| 통계 | 기간별 집중 시간, 스트릭, 카테고리와 시간대 분석, 월간 히트맵 |
+| 뱃지와 공유 카드 | 스트릭, 누적 시간, 다양성 뱃지 수집과 집중 요약 이미지 공유 |
+| 비회원 체험 | 로그인 없이 타이머 바로 사용 |
 
-## 개발 가이드
+## 기술적 의사결정
 
-### 요구사항
+**웹과 모바일의 로직 공유**
+- 타이머 상태 머신, 통계 집계, 뱃지 판정을 `packages/shared`로 추출해 두 앱이 같은 코드 사용
+- 저장소 차이는 포트 주입으로 분리 — 웹은 localStorage, 앱은 AsyncStorage
 
-Node.js 22+, pnpm 11+, Docker (로컬 Supabase 스택 사용 시)
+**하이브리드 앱 구조**
+- 타이머와 설정은 네이티브, 통계와 기록 탭은 웹 화면을 WebView로 재사용
+- 네이티브 로그인 세션을 WebView 쿠키로 넘기는 인증 브릿지로 재로그인 없이 연결
 
-### 설치 및 실행
+**낙관적 업데이트와 임시 ID 처리**
+- 작업, 카테고리, 기록은 서버 응답 전에 화면에 먼저 반영하고 실패하면 되돌림
+- 생성 직후 응답이 오기 전에 수정이나 삭제가 들어오면 늦게 온 응답이 변경을 덮어쓰는 문제
+- 생성 요청이 끝날 때까지 기다린 뒤 실제 DB id로 처리하도록 변경 [#140](https://github.com/aaaz425/pomoroutine/pull/140)
 
-```bash
-git clone https://github.com/aaaz425/pomoroutine.git
-cd pomoroutine
-pnpm install
-pnpm dev                      # 웹 (apps/web) → http://localhost:3000
-pnpm --filter mobile start    # 모바일 (Expo)
-```
+**서버 집계와 이중 검증**
+- 스트릭과 월간 히트맵처럼 전체 기록이 필요한 통계는 Postgres RPC에서 계산
+- 전 테이블 RLS로 계정별 격리, 입력 제약은 클라이언트 Zod와 DB CHECK 양쪽에 동일하게 적용
 
-### 로컬 Supabase 스택 (선택)
+## 트러블슈팅
 
-원격 Supabase 프로젝트 대신 로컬 Postgres/Auth/Storage로 개발하려면 Docker 실행 후 아래 명령어를 사용한다.
+**대시보드 성능 — 알고리즘이 아니라 데이터 흐름이 원인**
+- 기록이 많아질수록 월간 히트맵 계산이 느려지는 문제
+- Map 기반 O(n) 집계로 개선 [#114](https://github.com/aaaz425/pomoroutine/pull/114)
+- 근본 원인은 클라이언트가 전체 기록을 받아 집계하는 구조로 판단, 집계를 DB RPC로 이전 [#136](https://github.com/aaaz425/pomoroutine/pull/136)
 
-```bash
-cp apps/web/.env.local.example apps/web/.env.local
-npx supabase start
-```
-
-`supabase start` 출력의 `API_URL`, `ANON_KEY` 값을 `apps/web/.env.local`의 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`에 채워 넣는다. 모바일도 필요하면 `apps/mobile/.env.local.example`을 동일하게 복사해 같은 값을 채운다.
-
-종료는 `npx supabase stop`.
-
-### 명령어
-
-| 명령어 | 설명 |
-|--------|------|
-| `pnpm dev` | 웹 로컬 개발 서버 |
-| `pnpm build` | 웹 프로덕션 빌드 (커밋 전 통과 확인) |
-| `pnpm lint` | 전체 워크스페이스 린트 |
-| `pnpm test` | 단위 테스트 (Vitest) |
-| `pnpm test:e2e` | E2E 테스트 (Playwright) |
-| `pnpm --filter mobile start` | Expo 개발 서버 |
-| `npx supabase start` | 로컬 Supabase 스택 기동 (Docker 필요) |
-| `npx supabase stop` | 로컬 Supabase 스택 종료 |
-
-### 프로젝트 구조
-
-pnpm workspace + Turborepo 모노레포.
-
-```
-apps/
-  web/           # Next.js 웹 앱
-  mobile/        # React Native(Expo) 앱
-packages/
-  shared/        # 웹·모바일 공유 순수 로직 (타이머 계산, 대시보드 집계, 뱃지 등)
-docs/            # 프로젝트 문서 (웹·모바일 공통)
-supabase/        # DB 스키마, RLS 정책, Edge Functions
-```
-
-### 산출물 (Specs)
-
-| 문서 | 내용 |
-|------|------|
-| [PRD](docs/specs/PRD.md) | 제품 목표, 사용자 페르소나, 핵심 기능 요구사항 |
-| [ERD](docs/specs/ERD.md) | 데이터 모델 및 관계도 |
-| [기능 명세](docs/specs/feature-spec.md) | 기능별 상세 명세 및 유저 스토리 |
-| [화면 명세](docs/specs/screen-spec.md) | 화면별 레이아웃 및 상호작용 |
-| [아키텍처](docs/specs/architecture-diagram.md) | 기술 선택 이유, Mermaid 구조도 |
-
-### 개발 가이드 (Guides)
-
-| 문서 | 내용 |
-|------|------|
-| [용어집](docs/guides/glossary.md) | 작업·세션·사이클·페이즈 등 도메인 용어 정의 |
-| [컨벤션](docs/guides/conventions.md) | 폴더 구조, 네이밍, 컴포넌트 재활용 원칙 |
-| [데이터 모델](docs/guides/data-models.md) | 타입 정의, Supabase 스키마 및 접근 패턴 |
-| [디자인 시스템](docs/guides/design.md) | 색상, 타이포, 컴포넌트 디자인 시스템 |
-| [커밋 컨벤션](docs/guides/commit-convention.md) | 브랜치 전략, 커밋 컨벤션, PR 규칙 |
-| [테스트 전략](docs/guides/testing.md) | Vitest + Playwright 테스트 전략 |
-| [로드맵](docs/roadmap.md) | 구현 로드맵 및 진행 현황 |
+**CI e2e 간헐 실패 — 테스트 코드가 아니라 실행 환경이 원인**
+- 실패 시 trace를 수집해 브라우저가 타임아웃 내내 완전히 멈추는 패턴 확인 [#151](https://github.com/aaaz425/pomoroutine/pull/151)
+- 같은 VM에서 dev 서버 HMR 컴파일과 브라우저가 CPU를 다투는 것이 원인
+- e2e를 프로덕션 빌드로 전환해 안정화, CI 실행 시간도 기존 최대 3분 9초에서 2분 9초로 단축 [#153](https://github.com/aaaz425/pomoroutine/pull/153)
 
 ## 기술 스택
 
-| 기술 | 용도 |
-|------|------|
-| Next.js 16 | 웹 앱, App Router |
-| React Native (Expo) | 모바일 앱, Expo Router |
-| Tailwind CSS + shadcn/ui | 웹 UI 구성 및 디자인 시스템 |
-| Zustand | 타이머/작업/설정 전역 상태 관리 (웹·모바일 공유 패턴) |
-| Zod | 입력·저장 데이터 런타임 검증 |
-| Supabase | 인증·DB·기기 간 동기화 (Postgres + RLS) |
-| Recharts | 대시보드 차트 (모바일은 웹 대시보드를 WebView로 표시) |
-| date-fns | 날짜 그루핑 및 스트릭 계산 |
-| framer-motion / react-native-reanimated | 집중 모드 전환 애니메이션 |
-| Turborepo + pnpm workspace | 모노레포 빌드·태스크 관리 |
-| Vercel / Vercel Analytics | 웹 배포 및 사용 지표 모니터링 |
+| 영역 | 기술 |
+|---|---|
+| 웹 | Next.js 16 App Router, Tailwind CSS, shadcn/ui, Recharts, framer-motion |
+| 앱 | React Native, Expo Router, react-native-reanimated, react-native-webview |
+| 상태와 검증 | Zustand, Zod |
+| 백엔드 | Supabase Postgres, Auth, RLS, Edge Functions |
+| 테스트 | Vitest, Playwright, GitHub Actions |
+| 인프라 | pnpm workspace, Turborepo, Vercel |
+
+## 문서
+
+| 문서 | 내용 |
+|---|---|
+| [PRD](docs/specs/PRD.md) | 문제 정의, 타겟 사용자, 기능 범위 |
+| [기능 명세](docs/specs/feature-spec.md) | 기능별 사용자 스토리와 수용 기준 |
+| [화면 명세](docs/specs/screen-spec.md) | 화면 구성과 인터랙션 |
+| [ERD](docs/specs/ERD.md) | 데이터 모델과 설계 이유 |
+| [아키텍처](docs/specs/architecture-diagram.md) | 시스템 구조와 핵심 설계 결정 |
+| [디자인 시스템](docs/guides/design.md) | 색상, 타이포, 컴포넌트 규칙 |
+
+개발 규칙 문서는 `CLAUDE.md`와 `docs/guides/`에 AI 에이전트 참고용으로 분리
+
+## 로컬 실행
+
+요구사항 Node.js 22+, pnpm 11+, 로컬 Supabase 사용 시 Docker
+
+```bash
+pnpm install
+pnpm dev                      # 웹 http://localhost:3000
+pnpm --filter mobile start    # 앱 Expo 개발 서버
+pnpm test                     # 단위 테스트
+pnpm test:e2e                 # e2e 테스트
+```
+
+로컬 Supabase 스택은 `npx supabase start` 후 출력된 `API_URL`, `ANON_KEY`를 `apps/web/.env.local`에 입력
 
 ## 라이선스
 
