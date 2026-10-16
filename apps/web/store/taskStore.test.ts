@@ -70,10 +70,6 @@ beforeEach(() => {
     id: nextId(),
     title: input.title,
     categoryId: input.categoryId,
-    targetFocusMinutes: input.targetFocusMinutes,
-    targetCycles: input.targetCycles,
-    targetBreakMinutes: input.targetBreakMinutes,
-    completed: false,
     createdAt: new Date().toISOString(),
   }));
   mockInsertCategory.mockImplementation(async (input) => ({
@@ -118,30 +114,6 @@ function makeSessionInput(overrides: Partial<Omit<Session, 'id'>> = {}): Omit<Se
 }
 
 describe('addTask', () => {
-  it('기본값(targetFocusMinutes=25, targetCycles=4, targetBreakMinutes=5)으로 task 생성', async () => {
-    const store = createTaskStore();
-    await store.getState().addTask({ title: 'A', categoryId: 'c1' });
-    const [task] = store.getState().tasks;
-    expect(task.targetFocusMinutes).toBe(25);
-    expect(task.targetCycles).toBe(4);
-    expect(task.targetBreakMinutes).toBe(5);
-  });
-
-  it('targetFocusMinutes/targetCycles/targetBreakMinutes를 명시하면 해당 값 사용', async () => {
-    const store = createTaskStore();
-    await store.getState().addTask({
-      title: 'A',
-      categoryId: 'c1',
-      targetFocusMinutes: 50,
-      targetCycles: 2,
-      targetBreakMinutes: 10,
-    });
-    const [task] = store.getState().tasks;
-    expect(task.targetFocusMinutes).toBe(50);
-    expect(task.targetCycles).toBe(2);
-    expect(task.targetBreakMinutes).toBe(10);
-  });
-
   it('title 양 끝 공백이 trim됨', async () => {
     const store = createTaskStore();
     await store.getState().addTask({ title: '  공부하기  ', categoryId: 'c1' });
@@ -172,43 +144,16 @@ describe('addTask', () => {
   });
 });
 
-describe('toggleTask', () => {
-  it('completed가 false에서 true로 토글됨', async () => {
-    const store = createTaskStore();
-    const id = await store.getState().addTask({ title: 'A', categoryId: 'c1' });
-    await store.getState().toggleTask(id!);
-    expect(store.getState().tasks[0].completed).toBe(true);
-  });
-
-  it('completed가 true에서 false로 토글됨', async () => {
-    const store = createTaskStore();
-    const id = await store.getState().addTask({ title: 'A', categoryId: 'c1' });
-    await store.getState().toggleTask(id!);
-    await store.getState().toggleTask(id!);
-    expect(store.getState().tasks[0].completed).toBe(false);
-  });
-
-  it('존재하지 않는 id면 아무 task도 변경되지 않고 저장 호출도 없음', async () => {
-    const store = createTaskStore();
-    await store.getState().addTask({ title: 'A', categoryId: 'c1' });
-    await store.getState().toggleTask('no-such-id');
-    expect(store.getState().tasks[0].completed).toBe(false);
-    expect(mockUpdateTask).not.toHaveBeenCalled();
-  });
-});
-
 describe('updateTask', () => {
-  it('title/categoryId/목표 시간 필드를 부분적으로 변경할 수 있음', async () => {
+  it('title/categoryId를 부분적으로 변경할 수 있음', async () => {
     const store = createTaskStore();
     const id = await store.getState().addTask({ title: 'A', categoryId: 'c1' });
 
-    await store.getState().updateTask(id!, { title: 'B', targetFocusMinutes: 50 });
+    await store.getState().updateTask(id!, { title: 'B' });
 
     const task = store.getState().tasks[0];
     expect(task.title).toBe('B');
-    expect(task.targetFocusMinutes).toBe(50);
     expect(task.categoryId).toBe('c1'); // 패치에 없는 필드는 유지
-    expect(task.targetCycles).toBe(4);
   });
 
   it('title 양 끝 공백이 trim됨', async () => {
@@ -256,10 +201,6 @@ describe('updateTask', () => {
       id: 'db-id-1',
       title: 'A',
       categoryId: 'c1',
-      targetFocusMinutes: 25,
-      targetCycles: 4,
-      targetBreakMinutes: 5,
-      completed: false,
       createdAt: new Date().toISOString(),
     });
     await addPromise;
@@ -303,10 +244,6 @@ describe('deleteTask', () => {
       id: 'db-id-1',
       title: 'A',
       categoryId: 'c1',
-      targetFocusMinutes: 25,
-      targetCycles: 4,
-      targetBreakMinutes: 5,
-      completed: false,
       createdAt: new Date().toISOString(),
     });
     await addPromise;
@@ -730,10 +667,6 @@ describe('hydrate', () => {
       id: 't1',
       title: '저장된 작업',
       categoryId: 'c1',
-      targetFocusMinutes: 25,
-      targetCycles: 4,
-      targetBreakMinutes: 5,
-      completed: false,
       createdAt: '2026-01-01T00:00:00.000Z',
     };
     mockFetchTasks.mockResolvedValueOnce({ tasks: [task], invalidCount: 0 });

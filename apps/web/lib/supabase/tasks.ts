@@ -5,25 +5,16 @@ interface TaskRow {
   id: string;
   title: string;
   category_id: string;
-  target_focus_minutes: number;
-  target_cycles: number;
-  target_break_minutes: number;
-  completed: boolean;
   created_at: string;
 }
 
-const SELECT_COLUMNS =
-  'id, title, category_id, target_focus_minutes, target_cycles, target_break_minutes, completed, created_at';
+const SELECT_COLUMNS = 'id, title, category_id, created_at';
 
 export function toTask(row: TaskRow): Task | null {
   const parsed = TaskSchema.safeParse({
     id: row.id,
     title: row.title,
     categoryId: row.category_id,
-    targetFocusMinutes: row.target_focus_minutes,
-    targetCycles: row.target_cycles,
-    targetBreakMinutes: row.target_break_minutes,
-    completed: row.completed,
     createdAt: row.created_at,
   });
   return parsed.success ? parsed.data : null;
@@ -43,9 +34,6 @@ export async function fetchTasks(): Promise<{ tasks: Task[]; invalidCount: numbe
 export async function insertTask(input: {
   title: string;
   categoryId: string;
-  targetFocusMinutes: number;
-  targetCycles: number;
-  targetBreakMinutes: number;
 }): Promise<Task | null> {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -53,9 +41,6 @@ export async function insertTask(input: {
     .insert({
       title: input.title,
       category_id: input.categoryId,
-      target_focus_minutes: input.targetFocusMinutes,
-      target_cycles: input.targetCycles,
-      target_break_minutes: input.targetBreakMinutes,
     })
     .select(SELECT_COLUMNS)
     .single();
@@ -68,20 +53,12 @@ export async function updateTask(
   patch: Partial<{
     title: string;
     categoryId: string;
-    targetFocusMinutes: number;
-    targetCycles: number;
-    targetBreakMinutes: number;
-    completed: boolean;
   }>,
 ): Promise<{ error: boolean }> {
   const supabase = createClient();
   const row: Record<string, unknown> = {};
   if (patch.title !== undefined) row.title = patch.title;
   if (patch.categoryId !== undefined) row.category_id = patch.categoryId;
-  if (patch.targetFocusMinutes !== undefined) row.target_focus_minutes = patch.targetFocusMinutes;
-  if (patch.targetCycles !== undefined) row.target_cycles = patch.targetCycles;
-  if (patch.targetBreakMinutes !== undefined) row.target_break_minutes = patch.targetBreakMinutes;
-  if (patch.completed !== undefined) row.completed = patch.completed;
 
   const { error } = await supabase.from('tasks').update(row).eq('id', id);
   return { error: error !== null };

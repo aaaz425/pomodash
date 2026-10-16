@@ -18,10 +18,6 @@ export interface Task {
   id: string;
   title: string;
   categoryId: string;
-  targetFocusMinutes: number; // 분
-  targetCycles: number; // 회
-  targetBreakMinutes: number; // 분
-  completed: boolean;
   createdAt: string; // ISO 8601
 }
 

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import type { TimerMode, TimerSettings } from '@pomoroutine/shared';
 import { Text } from '@/components/shared/Text';
-import { useTimerStore, useTaskStore } from '@/store/StoreProvider';
+import { useTimerStore } from '@/store/StoreProvider';
 import { Modal } from '@/components/shared/Modal';
 import { Portal } from '@/components/shared/Portal';
 import { SegmentedControl } from '@/components/shared/SegmentedControl';
@@ -33,27 +33,9 @@ function StartSessionSheetContent({ visible, onClose }: Props) {
   const setMode = useTimerStore((s) => s.setMode);
   const start = useTimerStore((s) => s.start);
 
-  const tasks = useTaskStore((s) => s.tasks);
-
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(currentTaskId);
   const [pendingSettings, setPendingSettings] = useState<TimerSettings>({ ...storeSettings });
   const [pendingMode, setPendingMode] = useState<TimerMode>(storeMode);
-
-  function handleTaskSelect(taskId: string) {
-    if (taskId === pendingTaskId) {
-      setPendingTaskId(null);
-      return;
-    }
-    setPendingTaskId(taskId);
-    const task = tasks.find((t) => t.id === taskId);
-    if (task) {
-      setPendingSettings({
-        focusMinutes: task.targetFocusMinutes,
-        shortBreakMinutes: task.targetBreakMinutes,
-        totalCycles: task.targetCycles,
-      });
-    }
-  }
 
   function handleStart() {
     setCurrentTask(pendingTaskId);
@@ -108,7 +90,7 @@ function StartSessionSheetContent({ visible, onClose }: Props) {
         <TaskList
           mode="select"
           selectedTaskId={pendingTaskId}
-          onSelect={handleTaskSelect}
+          onSelect={(id) => setPendingTaskId((prev) => (prev === id ? null : id))}
           maxHeight={144}
         />
       </View>

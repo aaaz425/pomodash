@@ -49,8 +49,6 @@ export function TaskList({
   const [editTarget, setEditTarget] = useState<Task | 'new' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
-  const visibleTasks = tasks.filter((t) => !t.completed);
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -82,7 +80,7 @@ export function TaskList({
             <Skeleton className="h-11 w-full rounded-lg" />
           </div>
         )
-      ) : visibleTasks.length === 0 ? (
+      ) : tasks.length === 0 ? (
         <EmptyState message="작업이 없습니다" className={emptyStateClassName} />
       ) : (
         <DndContext
@@ -92,12 +90,9 @@ export function TaskList({
           modifiers={[restrictToVerticalAxis]}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext
-            items={visibleTasks.map((t) => t.id)}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
             <div className={listClassName ?? 'flex flex-col gap-1 max-h-[308px] overflow-y-auto'}>
-              {visibleTasks.map((task) => (
+              {tasks.map((task) => (
                 <TaskItem
                   key={task.id}
                   task={task}

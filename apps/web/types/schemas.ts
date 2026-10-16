@@ -13,18 +13,6 @@ export const TaskSchema = z.object({
   id: z.string(),
   title: z.string().max(INPUT_LIMITS.TITLE_MAX_LENGTH),
   categoryId: z.string(),
-  targetFocusMinutes: z
-    .number()
-    .min(TIMER_LIMITS.FOCUS_MINUTES_MIN)
-    .max(TIMER_LIMITS.FOCUS_MINUTES_MAX)
-    .default(25),
-  targetCycles: z.number().min(TIMER_LIMITS.CYCLES_MIN).max(TIMER_LIMITS.CYCLES_MAX).default(4),
-  targetBreakMinutes: z
-    .number()
-    .min(TIMER_LIMITS.BREAK_MINUTES_MIN)
-    .max(TIMER_LIMITS.BREAK_MINUTES_MAX)
-    .default(5),
-  completed: z.boolean(),
   createdAt: z.string(),
 });
 

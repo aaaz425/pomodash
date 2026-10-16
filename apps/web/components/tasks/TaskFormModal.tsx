@@ -1,17 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronDown, ChevronRight, Tag } from 'lucide-react';
-import { useTaskStore, useSettingsStore, useTimerStore } from '@/store/StoreProvider';
+import { Tag } from 'lucide-react';
+import { useTaskStore } from '@/store/StoreProvider';
 import { CategoryPills } from '@/components/shared/CategoryPills';
 import { CategoryModal } from '@/components/settings/category/CategoryModal';
-import { TimerSettingsGroup } from '@/components/shared/TimerSettingsGroup';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/shared/Modal';
 import { TextInput } from '@/components/shared/TextInput';
 import { INPUT_LIMITS } from '@/lib/constants/limits';
-import { withReducedMotion } from '@/lib/motion';
 import type { Task } from '@/types';
 
 interface Props {
@@ -21,32 +18,12 @@ interface Props {
 }
 
 export function TaskFormModal({ task, onClose, onCreated }: Props) {
-  const reducedMotion = useReducedMotion();
   const categories = useTaskStore((s) => s.categories);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
-  const defaultTimerSettings = useSettingsStore((s) => s.defaultTimerSettings);
-
-  const currentTaskId = useTimerStore((s) => s.currentTaskId);
-  const isRunning = useTimerStore((s) => s.startedAt !== null);
-  const applyActiveTaskTimeUpdate = useTimerStore((s) => s.applyActiveTaskTimeUpdate);
-
-  const isActiveTask = task !== null && task.id === currentTaskId;
-  const timeFieldsDisabled = isActiveTask && isRunning;
 
   const [title, setTitle] = useState(task?.title ?? '');
   const [categoryId, setCategoryId] = useState(task?.categoryId ?? categories[0]?.id ?? '');
-  const [targetFocusMinutes, setTargetFocusMinutes] = useState(
-    task?.targetFocusMinutes ?? defaultTimerSettings.focusMinutes,
-  );
-  const [targetCycles, setTargetCycles] = useState(
-    task?.targetCycles ?? defaultTimerSettings.totalCycles,
-  );
-  const [targetBreakMinutes, setTargetBreakMinutes] = useState(
-    task?.targetBreakMinutes ?? defaultTimerSettings.shortBreakMinutes,
-  );
-  // 새 작업은 기본값만 빠르게 채우도록 접어두고, 기존 작업 수정은 이미 의미 있는 값이라 펼쳐서 보여줌
-  const [showTimeSettings, setShowTimeSettings] = useState(task !== null);
   // 저장이 비동기(Supabase 왕복)라 이게 없으면 응답 오기 전에 다시 눌러 중복 생성될 수 있음
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -57,29 +34,10 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
     setIsSubmitting(true);
 
     if (task === null) {
-      const newId = await addTask({
-        title: trimmed,
-        categoryId,
-        targetFocusMinutes,
-        targetCycles,
-        targetBreakMinutes,
-      });
+      const newId = await addTask({ title: trimmed, categoryId });
       if (newId) onCreated?.(newId);
     } else {
-      await updateTask(task.id, {
-        title: trimmed,
-        categoryId,
-        targetFocusMinutes,
-        targetCycles,
-        targetBreakMinutes,
-      });
-      if (isActiveTask && !isRunning) {
-        applyActiveTaskTimeUpdate({
-          focusMinutes: targetFocusMinutes,
-          shortBreakMinutes: targetBreakMinutes,
-          totalCycles: targetCycles,
-        });
-      }
+      await updateTask(task.id, { title: trimmed, categoryId });
     }
     onClose();
   }
@@ -146,57 +104,6 @@ export function TaskFormModal({ task, onClose, onCreated }: Props) {
             selectedId={categoryId}
             onChange={setCategoryId}
           />
-        </div>
-
-        {/* 목표 시간 — 접이식 */}
-        <div className="flex flex-col">
-          <button
-            type="button"
-            onClick={() => setShowTimeSettings((v) => !v)}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors self-start"
-          >
-            {showTimeSettings ? (
-              <ChevronDown className="w-3.5 h-3.5" />
-            ) : (
-              <ChevronRight className="w-3.5 h-3.5" />
-            )}
-            목표 시간
-          </button>
-
-          <AnimatePresence initial={false}>
-            {showTimeSettings && (
-              <motion.div
-                key="task-time-settings"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={withReducedMotion(!!reducedMotion, {
-                  duration: 0.2,
-                  ease: 'easeInOut',
-                })}
-                className="overflow-hidden"
-              >
-                <div className="flex flex-col gap-2 pt-2">
-                  <TimerSettingsGroup
-                    focusMinutes={targetFocusMinutes}
-                    onFocusMinutesChange={setTargetFocusMinutes}
-                    totalCycles={targetCycles}
-                    onTotalCyclesChange={setTargetCycles}
-                    shortBreakMinutes={targetBreakMinutes}
-                    onShortBreakMinutesChange={setTargetBreakMinutes}
-                    disabled={timeFieldsDisabled}
-                  />
-                  {isActiveTask && (
-                    <p className="text-[11px] text-amber-500/90 pt-0.5">
-                      {isRunning
-                        ? '타이머를 일시정지하면 시간을 수정할 수 있어요'
-                        : '이 변경은 지금 진행 중인 타이머에도 바로 적용돼요'}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </Modal>
 
