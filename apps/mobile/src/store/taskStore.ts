@@ -17,12 +17,7 @@ import {
   deleteCategory as deleteCategoryRow,
   reorderCategories as reorderCategoriesRows,
 } from '@/lib/supabase/categories';
-import {
-  fetchSessions,
-  insertSession as insertSessionRow,
-  updateSession as updateSessionRow,
-  deleteSession as deleteSessionRow,
-} from '@/lib/supabase/sessions';
+import { insertSession as insertSessionRow } from '@/lib/supabase/sessions';
 import type { Task, Category } from '@/types/tasks';
 import type { Session } from '@/types/sessions';
 import { TOAST_MESSAGES } from '@pomoroutine/shared';
@@ -39,7 +34,6 @@ const DEFAULT_CATEGORIES: Category[] = [
 interface TaskStore {
   tasks: Task[];
   categories: Category[];
-  sessions: Session[];
 
   addTask: (input: { title: string; categoryId: string }) => Promise<string | null>;
   updateTask: (id: string, patch: Partial<Pick<Task, 'title' | 'categoryId'>>) => Promise<void>;
@@ -53,11 +47,6 @@ interface TaskStore {
 
   /** 성공 여부를 반환 — 실패 시 호출부가 폼을 유지하고 재시도할 수 있도록 함 */
   addSession: (input: Omit<Session, 'id'>) => Promise<boolean>;
-  updateSessionFields: (
-    id: string,
-    patch: Partial<Pick<Session, 'title' | 'note' | 'focusRating' | 'distractionTags' | 'taskId'>>,
-  ) => Promise<boolean>;
-  deleteSession: (id: string) => Promise<boolean>;
 
   hydrate: () => Promise<void>;
 }
@@ -83,12 +72,10 @@ function resolvePendingId(pending: PendingIds, id: string): Promise<string | nul
 export const createTaskStore = () => {
   const pendingTaskIds: PendingIds = new Map();
   const pendingCategoryIds: PendingIds = new Map();
-  const pendingSessionIds: PendingIds = new Map();
 
   return createStore<TaskStore>()((set, get) => ({
     tasks: [],
     categories: [],
-    sessions: [],
 
     addTask: async ({ title, categoryId }) => {
       const trimmed = title.trim();
@@ -248,84 +235,26 @@ export const createTaskStore = () => {
     },
 
     addSession: async (input) => {
-      const tempId = generateId();
-      set((state) => ({ sessions: [{ id: tempId, ...input }, ...state.sessions] }));
-
-      const idPromise = (async () => {
-        const inserted = await insertSessionRow(input);
-        if (!inserted) {
-          set((state) => ({ sessions: state.sessions.filter((s) => s.id !== tempId) }));
-          return null;
-        }
-        set((state) => ({ sessions: state.sessions.map((s) => (s.id === tempId ? inserted : s)) }));
-        return inserted.id;
-      })();
-      trackPendingId(pendingSessionIds, tempId, idPromise);
-
-      const insertedId = await idPromise;
-      if (!insertedId) {
-        toast(TOAST_MESSAGES.sessionSaveFailed);
-        return false;
-      }
-      return true;
-    },
-
-    updateSessionFields: async (id, patch) => {
-      const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return false;
-      const original = get().sessions.find((s) => s.id === targetId);
-      if (!original) return false;
-      set((state) => ({
-        sessions: state.sessions.map((s) => (s.id === targetId ? { ...s, ...patch } : s)),
-      }));
-      const { error } = await updateSessionRow(targetId, patch);
+      const { error } = await insertSessionRow(input);
       if (error) {
-        set((state) => ({
-          sessions: state.sessions.map((s) => (s.id === targetId ? original : s)),
-        }));
         toast(TOAST_MESSAGES.sessionSaveFailed);
-        return false;
-      }
-      return true;
-    },
-
-    deleteSession: async (id) => {
-      const targetId = await resolvePendingId(pendingSessionIds, id);
-      if (!targetId) return false;
-      const index = get().sessions.findIndex((s) => s.id === targetId);
-      if (index === -1) return false;
-      const target = get().sessions[index];
-      set((state) => ({ sessions: state.sessions.filter((s) => s.id !== targetId) }));
-      const { error } = await deleteSessionRow(targetId);
-      if (error) {
-        set((state) => {
-          const sessions = [...state.sessions];
-          sessions.splice(Math.min(index, sessions.length), 0, target);
-          return { sessions };
-        });
-        toast(TOAST_MESSAGES.sessionDeleteFailed);
         return false;
       }
       return true;
     },
 
     hydrate: async () => {
-      const [tasksResult, categoriesResult, sessionsResult] = await Promise.all([
+      const [tasksResult, categoriesResult] = await Promise.all([
         withRetry(fetchTasks),
         withRetry(fetchCategories),
-        withRetry(fetchSessions),
       ]);
       set({
         tasks: tasksResult?.tasks ?? [],
         categories: categoriesResult?.categories ?? DEFAULT_CATEGORIES,
-        sessions: sessionsResult?.sessions ?? [],
       });
 
       // 형식이 안 맞는 데이터가 있어 일부 항목이 조용히 빠졌을 때 사용자에게 알림
-      const invalidCount =
-        (tasksResult?.invalidCount ?? 0) +
-        (categoriesResult?.invalidCount ?? 0) +
-        (sessionsResult?.invalidCount ?? 0);
+      const invalidCount = (tasksResult?.invalidCount ?? 0) + (categoriesResult?.invalidCount ?? 0);
       if (invalidCount > 0) {
         toast(TOAST_MESSAGES.sessionsInvalid(invalidCount));
       }
