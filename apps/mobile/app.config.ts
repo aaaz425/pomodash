@@ -52,7 +52,12 @@ const config: ExpoConfig = {
       },
     ],
     withoutPushEntitlement,
-    'expo-notifications',
+    [
+      'expo-notifications',
+      {
+        icon: './assets/images/notification-icon.png',
+      },
+    ],
     'expo-sharing',
     'expo-secure-store',
     'expo-audio',
