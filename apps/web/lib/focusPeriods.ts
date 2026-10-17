@@ -1,1 +1,1 @@
-export { normalizeFocusPeriods, clampPeriodDuration } from '@pomoroutine/shared';
+export { normalizeFocusPeriods } from '@pomoroutine/shared';

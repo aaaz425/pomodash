@@ -1,13 +1,6 @@
 import type { SoundType } from '@/types';
 import { SOUND_SEQUENCE_INTERVAL } from '@/lib/constants/ux';
 
-export async function requestNotificationPermission(): Promise<boolean> {
-  if (typeof window === 'undefined' || !('Notification' in window)) return false;
-  if (Notification.permission === 'granted') return true;
-  const result = await Notification.requestPermission();
-  return result === 'granted';
-}
-
 export function sendNotification(title: string, body: string): void {
   if (typeof window === 'undefined' || !('Notification' in window)) return;
   if (Notification.permission !== 'granted') return;

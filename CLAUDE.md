@@ -7,7 +7,7 @@
 
 ## 기술 스택
 
-- 웹: Next.js 16 App Router, Tailwind CSS, shadcn/ui, Recharts, framer-motion, react-hook-form, Vercel Analytics, Speed Insights
+- 웹: Next.js 16 App Router, Tailwind CSS, shadcn/ui, Recharts, framer-motion, Vercel Analytics, Speed Insights
 - 앱: React Native, Expo Router, react-native-reanimated, react-native-webview
 - 공통: Zustand, Zod, date-fns
 - 백엔드: Supabase Postgres, Auth, RLS, Edge Functions

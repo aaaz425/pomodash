@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 
-import { TaskSchema, STORAGE_KEYS } from '@/types';
-import { initStorage, loadFromStorage, saveToStorage } from './storage';
+import { TaskSchema } from '@/types';
+import { loadFromStorage, saveToStorage } from './storage';
 
 // vitest.config.ts가 environment: 'jsdom' 고정이라 SSR guard는 이 파일에서 검증하지 않는다
 
@@ -58,29 +58,5 @@ describe('loadFromStorage', () => {
   it('JSON은 유효하지만 스키마 검증에 실패하면 fallback 반환', () => {
     localStorage.setItem('k', JSON.stringify({ wrong: 'shape' }));
     expect(loadFromStorage('k', schema, fallback)).toBe(fallback);
-  });
-});
-
-describe('initStorage', () => {
-  it('버전이 일치하면 localStorage를 비우지 않음', () => {
-    localStorage.setItem(STORAGE_KEYS.version, '1');
-    localStorage.setItem('other', 'kept');
-    initStorage();
-    expect(localStorage.getItem('other')).toBe('kept');
-  });
-
-  it('버전이 다르면 localStorage 전체를 비우고 새 버전을 기록', () => {
-    localStorage.setItem(STORAGE_KEYS.version, '0');
-    localStorage.setItem('other', 'should-be-cleared');
-    initStorage();
-    expect(localStorage.getItem('other')).toBeNull();
-    expect(localStorage.getItem(STORAGE_KEYS.version)).toBe('1');
-  });
-
-  it('버전 키가 아예 없으면(첫 실행) localStorage를 비우고 버전을 기록', () => {
-    localStorage.setItem('other', 'should-be-cleared');
-    initStorage();
-    expect(localStorage.getItem('other')).toBeNull();
-    expect(localStorage.getItem(STORAGE_KEYS.version)).toBe('1');
   });
 });
