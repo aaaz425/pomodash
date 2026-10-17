@@ -1,110 +1,55 @@
-# Conventions
+# 컨벤션
 
-## 폴더 구조
+절대 규칙은 CLAUDE.md에 있고, 이 문서는 코드를 어디에 두고 어떻게 나누는지 정리
 
-pnpm workspace 모노레포. 아래 구조는 `apps/web/` 기준이다. `apps/mobile/`은 Expo(Expo Router) 앱으로 별도 구조를 따른다.
+## 코드 위치
 
-```
-apps/web/
-  app/                  # 라우팅 세그먼트만 — 비즈니스 로직 금지
-  config/               # 앱 설정 선언 (site.ts)
-  components/
-    ui/                 # shadcn/ui — 직접 수정 금지
-    timer/              # 타이머 feature
-    tasks/              # 작업 feature
-    dashboard/          # 대시보드 feature
-    journal/            # 기록 feature
-    settings/           # 설정 feature
-    landing/            # 랜딩 페이지 feature
-    auth/               # 로그인/회원가입 폼
-    legal/              # 약관/개인정보처리방침 콘텐츠와 모달
-    shared/             # 여러 feature에서 공유하는 컴포넌트
-      layout/           # 반응형 레이아웃 전용 (app 레이어에서만 사용)
-  store/                # Zustand 스토어 (createStore 팩토리 패턴)
-    StoreProvider.tsx   # SSR 안전 초기화용 Provider — app/(main)/layout.tsx, app/embed/layout.tsx에 마운트
-  hooks/                # 브라우저 API 추상화 + 재사용 로직 훅
-  lib/
-    constants/          # 검증·비즈니스·UX 상수 SSOT (limits, ux, categoryColors, timerColors …)
-    supabase/           # Supabase 클라이언트 + 테이블별 조회/저장 (Zod 검증)
-    storage.ts          # localStorage 추상화 + Zod 파싱
-    notifications.ts    # Web Notifications API + 사운드 재생
-    dashboard.ts        # 대시보드 집계 (packages/shared 함수 + 웹 전용 조합)
-    sessionUtils.ts     # 세션 포맷팅·그룹핑
-    focusPeriods.ts     # packages/shared 정규화 함수 re-export
-    utils.ts            # cn(), generateId() 등 범용 유틸
-  types/
-    models.ts           # TypeScript 인터페이스 + 타입 별칭
-    schemas.ts          # Zod 스키마 + 기본값 + STORAGE_KEYS
-    index.ts             # barrel (re-export — 기존 import 경로 유지)
+| 코드 종류 | 웹 `apps/web/` | 모바일 `apps/mobile/src/` |
+|---|---|---|
+| 라우트, 레이아웃 | `app/` | `app/` — Expo Router |
+| 기능별 컴포넌트 | `components/<feature>/` | `components/<feature>/` |
+| 여러 기능이 쓰는 컴포넌트 | `components/shared/` | `components/shared/` |
+| shadcn/ui 원본 | `components/ui/` | 없음 |
+| Zustand 스토어 | `store/` | `store/` |
+| 훅 | `hooks/` | `hooks/` |
+| 상수 | `lib/constants/` | `constants/` |
+| Supabase 조회와 저장 | `lib/supabase/` | `lib/supabase/` |
+| 도메인 순수 함수 | `lib/` | `lib/` |
+| 타입과 스키마 | `types/` | `types/` |
 
-packages/shared/        # 웹/모바일 공유 순수 로직 (timerStore 팩토리, 집계, 뱃지, 상수, 공용 타입)
-docs/                   # 루트 유지 — 웹/모바일 공통 프로젝트 문서
-supabase/                # 루트 유지 — 웹/모바일이 공유하는 백엔드 스키마
-```
+- 웹과 모바일이 함께 쓰는 순수 로직은 `packages/shared`로 옮김 — 타이머 스토어 팩토리, 통계 집계, 뱃지, 입력 제한 상수, 공용 타입
+- 한쪽 앱에만 쓰이는 로직은 그 앱의 `lib/`에 둠
 
-### 무엇이 어디에 들어가는가
-
-| 코드 종류                      | 위치                         |
-| ------------------------------ | ---------------------------- |
-| 페이지 라우트, 레이아웃        | `app/`                       |
-| 앱 설정·서드파티 초기화        | `config/`                    |
-| UI 컴포넌트 (feature별)        | `components/<feature>/`      |
-| 여러 feature에서 쓰는 컴포넌트 | `components/shared/`         |
-| shadcn/ui 원본                 | `components/ui/` (수정 금지) |
-| 전역 상태                      | `store/`                     |
-| 재사용 로직 훅                 | `hooks/`                     |
-| 검증·비즈니스·UX 상수          | `lib/constants/`             |
-| 도메인 순수 함수·유틸          | `lib/`                       |
-| TypeScript 인터페이스          | `types/models.ts`            |
-| Zod 스키마·기본값              | `types/schemas.ts`           |
-
-### 의존성 방향 규칙
-
-`app/ → components/ → lib/` 단방향만 허용.
-`lib/`에서 `components/`나 `app/`을 import하지 않는다.
-
----
+**위치별 주의점**
+- `app/`에는 라우팅과 레이아웃만 두고 비즈니스 로직은 넣지 않음
+- `components/shared/layout/`은 반응형 내비게이션 전용으로 `app/`의 레이아웃에서만 사용
+- `StoreProvider`는 `app/(main)/layout.tsx`와 `app/embed/layout.tsx`에 마운트
+- `config/`는 사이트 메타 정보 같은 앱 설정 선언만
 
 ## 네이밍
 
-| 대상          | 규칙                   | 예시               |
-| ------------- | ---------------------- | ------------------ |
-| 컴포넌트 파일 | PascalCase             | `TimerDisplay.tsx` |
-| 스토어 파일   | camelCase + Store      | `timerStore.ts`    |
-| 훅 파일       | camelCase + use 접두사 | `useTimer.ts`      |
-| 유틸 파일     | camelCase              | `storage.ts`       |
-| 타입 이름     | PascalCase             | `TimerState`       |
-| 함수/변수     | camelCase              | `remainingSeconds` |
+| 대상 | 규칙 | 예시 |
+|---|---|---|
+| 컴포넌트 파일 | PascalCase | `TimerRing.tsx` |
+| 스토어 파일 | camelCase + Store | `timerStore.ts` |
+| 훅 파일 | use 접두사 | `useTimer.ts` |
+| 유틸 파일 | camelCase | `storage.ts` |
+| 타입 | PascalCase | `TimerSnapshot` |
+| 함수, 변수 | camelCase | `remainingSeconds` |
 
----
+## 컴포넌트
 
-## 컴포넌트 규칙
+- 서버 컴포넌트가 기본, 상태나 이벤트가 필요할 때만 `'use client'`
+- props 타입은 파일 상단에 `interface Props`로 정의
+- shadcn/ui 컴포넌트를 먼저 찾고, 없을 때만 직접 작성
+- `button`, `[role="button"]`, `select`, `label[for]`의 `cursor: pointer`는 `globals.css`에 전역으로 걸려 있어 클래스를 따로 붙이지 않음, `disabled`에는 `cursor-not-allowed`를 명시
 
-- 서버 컴포넌트 기본, 클라이언트 상태/이벤트 필요 시 `'use client'` 명시
-- props 타입은 파일 상단에 `interface Props` 로 정의
-- shadcn/ui 컴포넌트 우선 사용, 없을 때만 직접 작성
-- `button`, `[role="button"]`, `select`, `label[for]` 요소는 호버 시 `cursor: pointer` — `globals.css`에 레이어 밖(unlayered) 전역 규칙으로 적용되어 있으므로 개별 클래스를 따로 추가하지 않아도 된다. `disabled` 상태에는 `cursor-not-allowed`를 명시적으로 추가한다.
+**분리 기준** — 하나라도 해당하면 분리 검토
+- 200줄 초과
+- 폼 로직, 표시, 애니메이션처럼 역할이 둘 이상 섞임
+- 같은 패턴이 두 곳 이상에서 반복
+- 따로 단위 테스트하고 싶은 조각
 
-### 컴포넌트 분리 기준
-
-아래 4가지 중 하나라도 해당되면 분리를 검토한다.
-
-1. **200줄 초과** — 파일 크기 자체가 분리 신호
-2. **역할이 2개 이상** — 폼 로직 + 표시 로직 + 애니메이션 등이 한 파일에 혼재
-3. **2곳 이상에서 동일 패턴 반복** — 즉시 공유 컴포넌트로 추출
-4. **독립 테스트 단위** — 단위 테스트를 별도로 작성하고 싶은 조각
-
-**분리 위치 규칙**
-
-| 용도                                    | 위치                                |
-| --------------------------------------- | ----------------------------------- |
-| 한 feature 안에서만 쓰이는 서브컴포넌트 | `components/<feature>/` (같은 폴더) |
-| 2개 이상 feature에서 쓰이는 컴포넌트    | `components/shared/`                |
-
----
-
-## 기타
-
-- 절대 경로 import 사용 (`@/components/...`)
-- 인터페이스는 `types/models.ts`, Zod 스키마는 `types/schemas.ts`, 상수는 `lib/constants`에서 import. `@/types` barrel import도 허용.
-- 색상은 Tailwind 클래스만 사용, 인라인 style 금지
+**분리 위치**
+- 한 기능 안에서만 쓰면 같은 `components/<feature>/` 폴더
+- 두 기능 이상에서 쓰면 `components/shared/`
