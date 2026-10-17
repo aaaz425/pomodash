@@ -44,9 +44,6 @@
 - `totalCycles`는 시작 당시 설정값의 스냅샷
 - `mode`가 `free`면 `completedCycles`, `totalCycles`가 0 — 사이클 수 대신 집중 시간으로 표시
 
-**TimerRecord**
-- 페이즈 단위 집계용으로 예약만 해둔 타입, 지금은 쓰지 않음
-
 ## 입력 제한
 
 - 제한 값은 Zod 스키마와 DB CHECK에 같은 값으로 들어감
@@ -65,5 +62,4 @@
 - 데이터는 모두 Supabase에 저장
 - localStorage에는 활성 타이머 스냅샷과 테마, 컬러 테마만 저장
 - 키는 `STORAGE_KEYS`, `theme`만 예외적으로 `pomoroutine:` 접두사 없음
-- `STORAGE_VERSION`이 다르면 localStorage를 비우고 새 버전 기록
 - 접근 규칙은 CLAUDE.md의 localStorage 항목 참고
