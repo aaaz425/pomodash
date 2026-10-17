@@ -19,7 +19,6 @@ const config: ExpoConfig = {
   userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier: 'com.pomoroutine.app',
-    icon: './assets/expo.icon',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -27,7 +26,7 @@ const config: ExpoConfig = {
   android: {
     package: 'com.pomoroutine.app',
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      backgroundColor: '#0f172a',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -47,13 +46,18 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#208AEF',
+        backgroundColor: '#0f172a',
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        imageWidth: 120,
       },
     ],
     withoutPushEntitlement,
-    'expo-notifications',
+    [
+      'expo-notifications',
+      {
+        icon: './assets/images/notification-icon.png',
+      },
+    ],
     'expo-sharing',
     'expo-secure-store',
     'expo-audio',
