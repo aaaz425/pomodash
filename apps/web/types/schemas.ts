@@ -151,7 +151,6 @@ export const NewPasswordSchema = z
 
 export const STORAGE_KEYS = {
   activeTimer: 'pomoroutine:active-timer',
-  version: 'pomoroutine:version',
   theme: 'theme',
   colorTheme: 'pomoroutine:color-theme',
 } as const;

@@ -38,17 +38,6 @@ export interface Session {
   distractionTags: string[]; // DISTRACTION_TAGS의 id 배열, 옵션
 }
 
-// per-phase 집계용 예약 타입, 미사용
-export interface TimerRecord {
-  id: string;
-  taskId: string | null;
-  phase: TimerPhase;
-  startedAt: string;
-  endedAt: string;
-  focusSeconds: number;
-  pausedSeconds: number;
-}
-
 export type { SoundType } from '@pomoroutine/shared';
 
 export type TabType = 'today' | 'week' | 'month' | 'all';

@@ -6,5 +6,3 @@ export const SESSION_LIMITS = {
 } as const;
 
 export { AUTH_LIMITS } from '@pomoroutine/shared';
-
-export const STORAGE_VERSION = 1;
