@@ -1,218 +1,69 @@
-# Data Models
+# 데이터 모델
 
-프로젝트 전체에서 사용하는 TypeScript 타입 정의.
-인터페이스는 `types/models.ts`, Zod 스키마와 기본값은 `types/schemas.ts`에 위치한다. `types/index.ts`는 둘을 re-export하는 barrel이다.
+타입 정의는 코드가 원본이고, 이 문서는 코드만 봐서는 알 수 없는 규칙만 정리
 
-## 개념 계층 (Concept Hierarchy)
+## 위치
 
-### 세션 (Session)
+| 대상 | 위치 |
+|---|---|
+| 웹 인터페이스 | `apps/web/types/models.ts` |
+| 웹 Zod 스키마, 기본값, `STORAGE_KEYS` | `apps/web/types/schemas.ts` |
+| 모바일 타입과 스키마 | `apps/mobile/src/types/*.ts` |
+| 웹과 모바일 공용 타입 | `packages/shared/src/types` — `TimerPhase`, `TimerMode`, `TimerSettings`, `FocusPeriod`, `AppSettings` 등 |
+| 입력 제한 상수 | `packages/shared/src/constants/limits.ts` |
+| DB 스키마 | `supabase/migrations/` |
 
-특정 작업에 할당된 집중 작업 단위. 한 세션은 `totalCycles`회의 사이클로 구성되며,
-마지막 사이클이 끝나면 세션 기록 모달이 표시되고 세션이 마무리된다.
-사용자는 세션을 시작/종료하며 작업을 관리한다.
+## 개념 관계
 
-**세션 메모(note):** 세션이 완전히 끝난 후 사용자가 1회 작성하는 회고 메모. 최대 500자.
-사이클마다 작성하는 것이 아니라, 마지막 사이클 완료 시점에 한 번만 표시된다.
+- 작업 Task — 제목과 카테고리만 가짐, 타이머 설정 없음
+- 기록 Session — 타이머를 한 번 실행한 결과, 작업 연결은 선택
+- 사이클 — 기록 안의 집중과 휴식 한 쌍, 별도 타입 없음
+- 타이머 설정 — `AppSettings.defaultTimerSettings`에서 시작하고 시작 화면에서 그 회차만 조정
 
-**집중 시간 집계 원칙:** `endedAt - startedAt`은 일시정지를 포함한 경과 시간이므로 집계에 사용하면 가짜 집중 시간이 된다. 집중 시간 통계는 반드시 `focusSeconds`만 사용한다. 타임라인 블록 표시는 `focusPeriods` 배열을 사용한다.
+## 불변식
 
-**focusPeriods 정규화:** 저장 전 `lib/focusPeriods.ts`의 `normalizeFocusPeriods()`를 반드시 통과시킨다.
+**집중 시간**
+- 집중 시간 통계는 반드시 `focusSeconds`만 사용
+- `endedAt - startedAt`은 일시정지가 포함된 경과 시간이라 집계에 쓰지 않음
+- 타임라인 표시는 `focusPeriods` 사용
 
-- 5초 미만 집중 구간 드롭 (노이즈)
+**기록 생성**
+- 세션 전체 집중 시간이 30초 미만이면 기록을 만들지 않고 타이머 초기화 — `SESSION_LIMITS.MIN_SESSION_FOCUS_SECONDS`
+- 기록 화면에서 건너뛰면 기록을 저장하지 않음
+- `note`는 사이클마다가 아니라 기록 화면에서 한 번만 작성
+
+**focusPeriods 정규화**
+- 저장 전 `normalizeFocusPeriods()`를 반드시 통과 — 웹 `SessionRecordModal`, 모바일 `SessionCompleteSheet`에서 호출
+- 5초 미만 구간 제거
 - 5초 이하 일시정지로 나뉜 인접 구간 병합
-- 최대 100개 구간 상한 (초과 시 뒤쪽 구간을 드롭, 병합하지 않음)
+- 최대 100개, 초과분은 뒤쪽을 버리고 병합하지 않음
 
-### 사이클 (Cycle)
+**Session 필드**
+- `taskId`가 null이면 미분류, 작업을 삭제해도 기록은 남고 null로 바뀜
+- `title`은 작업과 별개인 기록별 라벨, 저널 상세 편집에서만 설정
+- `totalCycles`는 시작 당시 설정값의 스냅샷
+- `mode`가 `free`면 `completedCycles`, `totalCycles`가 0 — 사이클 수 대신 집중 시간으로 표시
 
-세션 내의 반복 단위. focus → short-break 한 쌍.
-`totalCycles`(기본 4)회 완료 시 세션 종료.
+**TimerRecord**
+- 페이즈 단위 집계용으로 예약만 해둔 타입, 지금은 쓰지 않음
 
-### 타이머 기록 (TimerRecord)
+## 입력 제한
 
-향후 개별 타이머 phase(focus / short-break) 1회의 세분화된 실행 기록용으로 예약된 타입.
-현재는 사용하지 않는다. 대시보드에서 phase 단위 집계가 필요할 때 활성화한다.
+- 제한 값은 Zod 스키마와 DB CHECK에 같은 값으로 들어감
+- 제한을 바꿀 때는 `limits.ts`와 마이그레이션을 함께 수정
+- DB 제약을 Zod보다 엄격하게 만들지 않음
+- 카테고리 최대 개수처럼 여러 행에 걸친 제한은 트리거로 강제
 
-### 대시보드 요약 (DashboardSummary)
+## 통계 데이터
 
-스트릭·월간 히트맵·전일/전주/전월 비교·가장 바쁜 요일처럼 세션 전체 히스토리를 스캔해야 하는 통계.
-클라이언트가 전체 `sessions` row를 받아와 집계하던 방식은 세션 수가 늘수록 선형으로 느려지는 구조적 문제가 있었다.
-Postgres RPC `get_dashboard_summary(p_timezone)`가 서버에서 한 번에 계산해 반환하며, `lib/supabase/dashboard.ts`의
-`fetchDashboardSummary()`가 이를 호출하고 Zod로 검증한다. 오늘/이번주/이번달 탭의 원시 세션 목록(필터링·리스트 표시용)은
-여전히 클라이언트가 `sessions`를 들고 계산 — DashboardSummary는 "전체 히스토리 스캔이 필요한 통계"만 담당한다.
+- 스트릭, 월간 히트맵, 직전 기간 비교, 가장 바쁜 요일은 RPC `get_dashboard_summary(p_timezone)`가 계산 — `lib/supabase/dashboard.ts`의 `fetchDashboardSummary()`로 호출하고 Zod 검증
+- 기간 탭 차트와 저널 목록은 클라이언트가 가진 sessions로 계산
+- 뱃지는 아직 전체 sessions를 받아 클라이언트에서 계산
 
----
+## 기기 로컬 저장
 
-## Core Types
-
-```typescript
-export type TimerPhase = 'focus' | 'short-break'
-export type TimerMode = 'pomodoro' | 'free'
-
-export interface Category {
-  id: string
-  name: string
-  color: string // Tailwind color class (e.g. 'bg-blue-500')
-}
-
-export interface Task {
-  id: string
-  title: string
-  categoryId: string
-  createdAt: string // ISO 8601
-}
-
-export interface FocusPeriod {
-  start: string // ISO 8601
-  end: string // ISO 8601
-}
-
-export interface Session {
-  id: string
-  taskId: string | null // null = 미분류
-  mode: TimerMode // 'free'는 completedCycles/totalCycles가 0 — "N/M 사이클" 대신 별도 표시 필요
-  startedAt: string // ISO 8601 — 세션 최초 시작 시각 (시간대 분석용)
-  endedAt: string // ISO 8601 — 세션 종료 시각 (경과 시간 ≠ 집중 시간)
-  completedCycles: number // 실제 완료 사이클 수
-  totalCycles: number // 당시 설정값 스냅샷
-  focusSeconds: number // 집계용 — 반드시 이 값만 사용 (endedAt - startedAt 금지)
-  pausedSeconds: number // 총 일시정지 초
-  focusPeriods: Array<{ start: string; end: string }> // 타임라인 블록용 실제 집중 구간
-  note: string | null // 세션 회고 메모, 마지막 사이클 완료 시 1회 작성
-  focusRating: FocusRating | null // 집중도 자가 평점 3단계, 옵션
-  distractionTags: string[] // 방해요소 태그 프리셋(id) 배열, 옵션
-}
-
-export type FocusRating = 1 | 2 | 3
-
-// TimerRecord — 향후 per-phase 세분화 집계용으로 예약, 현재 미사용
-export interface TimerRecord {
-  id: string
-  taskId: string | null
-  phase: TimerPhase
-  startedAt: string // ISO 8601
-  endedAt: string // ISO 8601
-  focusSeconds: number
-  pausedSeconds: number
-}
-
-export interface PeriodStat {
-  focusSeconds: number
-  count: number
-}
-
-// get_dashboard_summary RPC 응답 — 전체 히스토리를 스캔해야 하는 통계만 담는다
-export interface DashboardSummary {
-  streakDays: number
-  maxStreakDays: number
-  monthlyActivity: DayActivity[]
-  monthFocusSeconds: number
-  busiestDay: string | null
-  firstSessionDate: string | null // ISO 8601
-  prevDay: PeriodStat
-  prevWeek: PeriodStat
-  prevMonth: PeriodStat
-}
-
-export interface TimerSettings {
-  focusMinutes: number
-  shortBreakMinutes: number
-  totalCycles: number // 세션당 총 사이클 수
-}
-
-export interface AppSettings {
-  nickname: string
-  browserNotification: boolean
-  soundAlert: boolean
-  soundType: SoundType         // 'sine' | 'chime' | 'bell' | 'digital'
-  soundVolume: number          // 0–100
-  soundRepeatCount: number     // 1–5
-  motivationalMessages: string[] // 1–20개
-  defaultTimerSettings: TimerSettings
-  keepScreenAwake: boolean
-}
-```
-
-## localStorage Keys
-
-Task/Category/Session/AppSettings는 Supabase로 이전되어 더 이상 localStorage에 저장하지 않는다(`lib/supabase/*.ts`에서 Zod로 검증). localStorage에는 새로고침 복구용 활성 타이머 스냅샷과 테마만 남아있다.
-
-```typescript
-const STORAGE_KEYS = {
-  activeTimer: 'pomoroutine:active-timer',
-  version: 'pomoroutine:version',
-  theme: 'theme', // 예외적으로 'pomoroutine:' 접두사 없음
-} as const
-```
-
-## localStorage 접근 패턴
-
-localStorage 데이터는 외부 입력이므로 반드시 런타임 검증을 거친다.
-Zod 스키마로 파싱 + 타입 추론을 일원화하고, SSR 환경을 방어한다.
-
-```typescript
-import { z } from 'zod'
-
-// 스키마 정의 (types/models.ts의 interface와 1:1 대응) — 활성 타이머 예시
-const ActiveTimerStateSchema = z.object({
-  phase: z.enum(['focus', 'short-break']),
-  remainingSeconds: z.number(),
-  startedAt: z.number().nullable(),
-  // ...
-})
-
-// lib/storage.ts — 제네릭 유틸
-function loadFromStorage<T>(key: string, schema: z.ZodType<T>, fallback: T): T {
-  if (typeof window === 'undefined') return fallback // SSR guard
-  try {
-    const raw = localStorage.getItem(key)
-    if (!raw) return fallback
-    return schema.parse(JSON.parse(raw))
-  } catch {
-    return fallback // 파싱 실패 시 기본값 fallback (구버전 데이터 방어)
-  }
-}
-```
-
-## 스키마 버저닝
-
-데이터 구조 변경 시 기존 localStorage 데이터와 충돌을 방지하기 위해 버전을 관리한다.
-
-```typescript
-const STORAGE_VERSION = 1
-
-// 버전 불일치 감지 시 초기화 또는 마이그레이션
-const storedVersion = localStorage.getItem('pomoroutine:version')
-if (Number(storedVersion) !== STORAGE_VERSION) {
-  // 마이그레이션 로직 또는 초기화
-  localStorage.clear()
-  localStorage.setItem('pomoroutine:version', String(STORAGE_VERSION))
-}
-```
-
-## Default Values
-
-```typescript
-const DEFAULT_CATEGORIES: Category[] = [
-  { id: '1', name: '공부', color: 'bg-blue-500' },
-  { id: '2', name: '업무', color: 'bg-green-500' },
-  { id: '3', name: '운동', color: 'bg-orange-500' },
-  { id: '4', name: '독서', color: 'bg-purple-500' },
-  { id: '5', name: '기타', color: 'bg-gray-500' },
-]
-
-const DEFAULT_TIMER_SETTINGS: TimerSettings = {
-  focusMinutes: 25,
-  shortBreakMinutes: 5,
-  totalCycles: 4,
-}
-```
-
-## Zod 유효성 범위
-
-```typescript
-// TimerSettingsSchema 허용 범위
-focusMinutes: 1–120분
-shortBreakMinutes: 0–60분
-totalCycles: 1–10회
-```
-
+- 데이터는 모두 Supabase에 저장
+- localStorage에는 활성 타이머 스냅샷과 테마, 컬러 테마만 저장
+- 키는 `STORAGE_KEYS`, `theme`만 예외적으로 `pomoroutine:` 접두사 없음
+- `STORAGE_VERSION`이 다르면 localStorage를 비우고 새 버전 기록
+- 접근 규칙은 CLAUDE.md의 localStorage 항목 참고

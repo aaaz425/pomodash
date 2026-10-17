@@ -2,101 +2,39 @@
 version: 1.0
 ---
 
-# Testing Strategy
+# 테스트
 
-## 두 레이어 전략
+| 종류 | 도구 | 실행 |
+|---|---|---|
+| 단위 | Vitest | `pnpm test` — `packages/shared`와 `apps/web`을 함께 실행 |
+| e2e | Playwright | PR마다 GitHub Actions에서 자동 실행, 로컬은 `pnpm test:e2e` |
+| 모바일 | 없음 | CI에서 타입체크와 린트만 실행 — `.github/workflows/mobile-check.yml` |
 
-| 레이어 | 도구       | 실행 시점                                        |
-| ------ | ---------- | ------------------------------------------------ |
-| Unit   | Vitest     | 기능 개발 중 (pre-commit hook은 현재 미활성화)   |
-| E2E    | Playwright | PR 생성 시 GitHub Actions 자동 실행, 로컬 수동 가능 |
+## 단위 테스트
 
----
+**대상**
+- 브라우저 없이 돌아가는 순수 로직만 테스트, UI 컴포넌트는 제외
+- `packages/shared` — 타이머 스토어, focusPeriods 정규화, 뱃지, 공유 카드, 방치 감지
+- `apps/web/store` — 포트 주입한 저장과 복원, 낙관적 업데이트와 롤백
+- `apps/web/lib` — localStorage 파싱 실패 처리, DB row 변환과 Zod 검증 실패 처리
 
-## Unit 테스트 (Vitest)
+**규칙**
+- 테스트 파일은 대상 파일과 같은 폴더에 `*.test.ts`로 둠
+- `lib/`, `store/`, `packages/shared`를 바꾸면 관련 테스트를 직접 실행해 확인 — pre-commit hook은 prettier, 타입체크, 린트만 돌리고 단위 테스트는 돌리지 않음
 
-### 언제 도입하는가
+## e2e 테스트
 
-각 핵심 레이어(`lib/`, `store/`)를 구현할 때 함께 작성한다.
+| 파일 | 흐름 |
+|---|---|
+| `auth.setup.ts` | 테스트 계정으로 로그인해 storageState 저장, 나머지 스펙이 재사용 |
+| `full-flow.spec.ts` | 작업 생성 → 타이머 → 기록 → 저널과 통계 반영 |
+| `timer.spec.ts` | 시작, 일시정지, 종료 |
+| `tasks.spec.ts` | 작업 생성과 타이머 연결 |
+| `settings.spec.ts` | 카테고리와 동기부여 메시지 추가, 수정, 삭제 |
+| `dashboard.spec.ts` | 통계 화면 렌더링과 탭 전환 |
 
-### 무엇을 테스트하는가
-
-브라우저 없이 실행 가능한 순수 로직만. UI 컴포넌트는 MVP 범위에서 제외.
-
-| 대상                   | 핵심 테스트 케이스                                                     |
-| ---------------------- | ---------------------------------------------------------------------- |
-| `lib/storage.ts`       | Zod 파싱 실패 시 fallback 반환, SSR 환경(`window === undefined`) guard |
-| `store/timerStore.ts`  | `pause()` 후 `startedAt === null`, 절대시간 기반 잔여 시간 계산        |
-| `lib/notifications.ts` | 권한 없을 때 조용히 실패                                               |
-
-### 파일 위치
-
-테스트 대상 파일과 같은 폴더, `*.test.ts` 확장자.
-
-```
-lib/
-  storage.ts
-  storage.test.ts   ← 여기
-store/
-  timerStore.ts
-  timerStore.test.ts
-```
-
-### 테스트 퍼스트 패턴
-
-구현 요청 전에 실패하는 테스트를 먼저 작성한 뒤 Claude에게 통과시키도록 지시한다.
-
-```
-"timerStore의 pause() 호출 시 startedAt이 null이 되어야 한다는
-테스트를 먼저 작성해줘. 그 다음에 통과시켜줘."
-```
-
-### lefthook 연동
-
-vitest는 설치되어 있으나 pre-commit hook은 현재 주석 처리 상태. 활성화하려면 `lefthook.yml`에서 주석 해제:
-
-```yaml
-pre-commit:
-  commands:
-    unit-test:
-      run: pnpm test -- --run
-```
-
----
-
-## E2E 테스트 (Playwright)
-
-### 언제 실행하는가
-
-PR 생성 시 GitHub Actions(`.github/workflows/e2e.yml`)에서 자동 실행.
-로컬에서 수동 실행도 가능.
-
-```bash
-pnpm test:e2e
-```
-
-### 핵심 플로우
-
-```
-tests/e2e/
-  full-flow.spec.ts   # 작업 생성 → 타이머 → 세션 기록 → 대시보드 집계 전체 흐름
-  settings.spec.ts    # 설정 페이지 스모크 테스트
-  timer.spec.ts       # 타이머 시작 → 일시정지 → 재개 → 완료
-  tasks.spec.ts       # 작업 생성 → 타이머 연결 → 세션 종료
-  dashboard.spec.ts   # 집계 데이터 표시 확인
-```
-
-### 브라우저 설정
-
-Chromium 단일 브라우저 실행. `playwright.config.ts` 참고.
-CI에서는 `retries: 2`, 로컬에서는 개발 서버가 이미 떠 있으면 재사용.
-
----
-
-## 패키지 설치 현황
-
-| 패키지 | 상태 |
-|--------|------|
-| `@playwright/test` | 설치됨 |
-| `vitest` | 설치됨 (v4.1.9) |
-
+**실행 환경**
+- Chromium 하나로 실행, CI에서는 실패 시 2회 재시도
+- 로컬은 3000번 포트에 서버가 떠 있으면 재사용하고, 없으면 dev 서버가 아닌 프로덕션 빌드로 띄움
+- `.env.local`의 Supabase에 테스트 계정으로 접속해 실제 데이터를 만듦 — CI는 시크릿 `E2E_TEST_EMAIL`, `E2E_TEST_PASSWORD` 사용
+- 시작 화면의 타이머 값은 테스트 계정의 타이머 기본값을 따르므로 증감 버튼 횟수에 의존하지 말고 값을 직접 입력

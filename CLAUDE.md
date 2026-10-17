@@ -7,20 +7,22 @@
 
 ## 기술 스택
 
-Next.js 16 (App Router) · Tailwind CSS · shadcn/ui · Zustand · Zod · Recharts · date-fns · react-hook-form · framer-motion · Vercel Analytics · Vercel
-네이티브 앱: React Native (Expo, Expo Router)
+- 웹: Next.js 16 App Router, Tailwind CSS, shadcn/ui, Recharts, framer-motion, react-hook-form, Vercel Analytics, Speed Insights
+- 앱: React Native, Expo Router, react-native-reanimated, react-native-webview
+- 공통: Zustand, Zod, date-fns
+- 백엔드: Supabase Postgres, Auth, RLS, Edge Functions
 
 ## 모노레포 구조
 
-pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 네이티브 앱) — 두 앱이 공유하는 순수 로직(타이머 계산, 대시보드 집계, 뱃지, focusPeriods, 세션 유틸 등)은 `packages/shared`(`@pomoroutine/shared`)로 추출되어 있다. `docs/`, `supabase/`는 두 앱이 공유하는 루트 레벨 리소스.
+pnpm workspace + Turborepo. `apps/web`(Next.js 웹 앱), `apps/mobile`(Expo 앱), `packages/shared`(`@pomoroutine/shared`, 두 앱이 공유하는 순수 로직). `docs/`, `supabase/`는 루트 공용 리소스. 앱의 통계와 기록 탭은 웹 `/embed/*` 화면을 WebView로 띄운다.
 
 ## 개발 명령어
 
 ```bash
 pnpm dev          # 웹 로컬 개발 서버 (apps/web)
-pnpm build        # 웹 프로덕션 빌드 — 커밋 전 반드시 통과 확인
+pnpm build        # 웹 프로덕션 빌드 — 사용자가 요청할 때만 실행
 pnpm lint         # 전체 워크스페이스 린트
-pnpm test         # 웹 단위 테스트 (vitest)
+pnpm test         # 단위 테스트 (packages/shared + apps/web, vitest)
 pnpm --filter mobile start   # Expo 개발 서버 (apps/mobile)
 ```
 
@@ -33,6 +35,13 @@ pnpm --filter mobile start   # Expo 개발 서버 (apps/mobile)
 - 새 기능 작업 시작 전 **반드시** `docs/roadmap.md`를 읽고 다음에 할 작업을 파악한다
 - 파악한 내용을 사용자에게 제시하고 **승인을 받은 후** 브랜치를 생성한다
 - 임의로 작업 범위를 결정하거나 브랜치를 생성하지 않는다
+- 로드맵에 없는 작업은 사용자 지시를 따른다 — 로드맵에 추가할지도 사용자가 정한다
+
+### 웹과 모바일 동시 적용
+
+- 기능 변경과 버그 수정은 `apps/web`과 `apps/mobile`에 **함께** 적용한다
+- 두 앱이 같은 로직을 쓰면 각자 구현하지 말고 `packages/shared`로 옮긴다
+- 리뷰나 조사도 한쪽만 보지 말고 두 앱을 같이 확인한다
 
 ### Zustand
 
@@ -82,9 +91,15 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - 색상은 Tailwind 클래스만 사용, 인라인 `style={}` 금지
 - 절대 경로 import 사용 (`@/components/...`), 상대 경로 금지
 - shadcn/ui `components/ui/` 파일 직접 수정 금지 — 래퍼 컴포넌트 사용
-- 주석은 코드에서 자명하지 않은 **WHY**(제약, 불변식, 비자명한 동작)에만 작성. 단위/포맷 힌트(`// 분`, `// ISO 8601`)는 허용. 코드를 한국어로 번역하는 주석, 장황한 설명 주석은 금지.
-- 변수·함수명이 이미 전달하는 내용을 그대로 반복하는 라벨성 주석 금지
-- 비자명한 WHY라도 배경 설명을 걷어내고 핵심 제약만 1~2줄로 압축
+
+### 주석
+
+- **기본은 주석 없음** — 새 코드에는 주석을 달지 않는다
+- 예외는 코드만 봐서는 절대 알 수 없는 제약뿐(외부 라이브러리 버그 우회 등), 그때도 1줄
+- 단위/포맷 힌트(`// 분`, `// ISO 8601`)는 허용
+- WHY 설명이 필요하면 코드 대신 대화나 PR 본문에 쓴다
+- 코드를 고치다 기존 주석이 맞지 않게 되면 고쳐 쓰지 말고 지운다
+- 커밋 전 `git diff | grep '^+.*//'`로 추가된 주석이 없는지 확인
 
 ### 보안
 
@@ -94,53 +109,37 @@ targetSeconds - Math.floor((Date.now() - startedAt) / 1000)
 - API 라우트 응답은 필요한 필드만 추출해서 반환 — 외부 API 응답 원본을 클라이언트에 그대로 전달 금지
 - `dangerouslySetInnerHTML` 사용 금지 — 사용자 입력을 HTML로 렌더링하는 경로 차단
 
-### Verification (커밋 전 필수)
+### 원격 DB 반영
 
-- `pnpm build` 통과 확인 (pre-commit hook이 tsc + lint를 강제하지만 미리 확인)
+- `supabase db push`로 원격 DB에 반영하기 전에 **반드시** 사용자에게 알리고 승인을 받는다
+- 먼저 `supabase db push --dry-run`으로 적용될 마이그레이션을 확인해 보여준다
+- 컬럼 삭제처럼 배포된 코드를 깨는 마이그레이션은 새 코드 배포가 끝난 뒤에 push한다
+- 마이그레이션은 로컬 Supabase(`supabase db reset`)에서 먼저 적용해 본다
+
+### Verification (커밋 전)
+
+- 타입체크와 린트는 pre-commit hook에 맡긴다 — `pnpm build`는 사용자가 요청할 때만 실행
+- `lib/`, `store/`, `packages/shared` 변경 시 관련 단위 테스트 통과 확인
 - UI 변경 시 다크/라이트 모드 양쪽 확인
-- `lib/`, `store/` 변경 시 관련 단위 테스트 통과 확인
 
 ---
 
 ## Git 워크플로우
 
-> 1인 개발을 전제로 설계된 워크플로우. 개발 인원 충원 시 역할 분담, 브랜치 보호 규칙 등을 재검토해야 한다.
+> 1인 개발을 전제로 설계된 워크플로우. 작업 순서와 형식은 `docs/guides/commit-convention.md`가 원본
 
-### 전체 흐름 (Claude가 전담)
-
-1. 브랜치 내 중간 커밋 → **매번 변경 내용을 요약해 보여주고 승인 받은 후** 커밋 + 즉시 push를 한 세트로 진행 (커밋한 브랜치명 응답에 명시)
-   - 브랜치 생성이나 계획을 승인받았어도 예외 없음 — 커밋 시점마다 별도로 승인 필요
-2. PR 생성 전 → **반드시** feature 브랜치에서 `git fetch origin && git rebase origin/main` 실행 후 push
-3. 작업 완료 → PR 제목/본문 초안 제시 → **승인 후** `gh pr create`
-4. **승인 후** `gh pr merge --squash`
-5. merge 직후 **반드시** main으로 전환 후 정리
-6. 다음 브랜치 생성
-
-### 핵심 규칙
-
-- **커밋 전 항상 사용자 승인**, 승인 후 커밋과 push를 한 세트로 즉시 진행하고 브랜치명을 응답에 명시
-- 커밋 메시지는 **제목 한 줄만** — 본문(WHY 등) 없이 작성. 사용자가 명시적으로 본문을 요청할 때만 예외
-- Squash merge는 **사용자가 직접 하지 않는다** — 반드시 Claude가 처리
-- PR 전 rebase 누락 시 GitHub에서 충돌 발생 → **PR 생성 전 반드시 실행**
-- 커밋 메시지: `docs/guides/commit-convention.md` 형식만 사용
-- PR 본문: `.github/pull_request_template.md` 형식만 사용
+- **커밋할 때마다** 변경 내용을 요약해 보여주고 승인받은 뒤 커밋과 push를 한 세트로 진행, 브랜치명을 응답에 명시
+- 브랜치 생성이나 계획을 승인받았어도 커밋 승인은 따로 받는다
+- PR 생성 전 **반드시** feature 브랜치에서 rebase, PR과 squash merge는 각각 승인 후 Claude가 처리
+- 커밋, PR, 문서에는 무엇을 바꿨는지만 쓰고 대화 속 의도나 대상 독자는 드러내지 않는다
 
 ### 로드맵 상태 관리 (docs/roadmap.md)
+
+로드맵에 있는 작업일 때만 적용
 
 - **브랜치 생성 시** → 해당 항목 `[ ]` → `[>]` 로 변경 후 feature 브랜치에 커밋
 - **사용자 승인 후, squash merge 실행 전** → 해당 항목 `[>]` → `[x]` 로 변경 후 feature 브랜치에 커밋·push → 그 다음 merge
   - `[x]` 변경이 squash commit 안에 포함되어 PR 번호와 함께 main에 기록됨
-- 두 시점 모두 **예외 없이** roadmap.md 업데이트 후 커밋/머지 진행
-
-```bash
-# PR 생성 전 (feature 브랜치에서)
-git fetch origin && git rebase origin/main
-
-# merge 후 항상 실행
-git switch main && git pull && git branch -D <merged-branch>
-```
-
-- 자세한 내용: `docs/guides/commit-convention.md`
 
 ---
 
@@ -155,4 +154,3 @@ git switch main && git pull && git branch -D <merged-branch>
 ## 주요 결정사항
 
 - AI API 없이도 완전히 작동 (Claude API는 MVP 이후 선택적 추가)
-- 다크 모드 우선 + 라이트 모드 지원 (시스템 설정 연동, 수동 전환 가능)

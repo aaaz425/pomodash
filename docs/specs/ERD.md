@@ -1,8 +1,7 @@
-# ERD — Entity Relationship Diagram
+# ERD
 
-> **버전:** 2.0 · **기준:** Supabase Postgres (`supabase/migrations/`), RLS로 `auth.uid() = user_id` 전 테이블 적용
-
----
+- Supabase Postgres 기준, 원본은 `supabase/migrations/`
+- 모든 테이블은 계정 단위로 격리
 
 ## 관계도
 
@@ -10,35 +9,35 @@
 erDiagram
     CATEGORIES {
         uuid id PK
-        uuid user_id FK "auth.users"
-        text name
-        text color "Tailwind class, 'bg-' 접두사 CHECK"
+        uuid user_id FK
+        text name "최대 20자"
+        text color "hex"
         int position
         timestamptz created_at
     }
 
     TASKS {
         uuid id PK
-        uuid user_id FK "auth.users"
+        uuid user_id FK
         uuid category_id FK "on delete restrict"
-        text title
+        text title "최대 100자"
         int position
         timestamptz created_at
     }
 
     SESSIONS {
         uuid id PK
-        uuid user_id FK "auth.users"
+        uuid user_id FK
         uuid task_id FK "nullable, on delete set null"
-        text title "nullable, 최대 100자, taskId와 독립된 자유 라벨"
-        text mode "'pomodoro' | 'free'"
+        text title "nullable, 최대 100자"
+        text mode "pomodoro 또는 free"
         timestamptz started_at
         timestamptz ended_at
         int completed_cycles
-        int total_cycles "당시 설정값 스냅샷"
-        int focus_seconds "집계 전용 — ended_at-started_at 사용 금지"
+        int total_cycles "시작 당시 설정값"
+        int focus_seconds "일시정지 제외 집중 시간"
         int paused_seconds
-        jsonb focus_periods "내장 배열, 최대 100개 CHECK"
+        jsonb focus_periods "집중 구간 배열, 최대 100개"
         text note "nullable, 최대 500자"
         smallint focus_rating "nullable, 1-3"
         text[] distraction_tags
@@ -46,46 +45,63 @@ erDiagram
     }
 
     SETTINGS {
-        uuid user_id PK "auth.users, 유저당 1행"
+        uuid user_id PK
         text nickname "최대 20자"
         boolean browser_notification
         boolean sound_alert
-        text sound_type "'sine'|'chime'|'bell'|'digital'"
+        text sound_type
         smallint sound_volume "0-100"
         smallint sound_repeat_count "1-5"
-        text[] motivational_messages
-        int default_focus_minutes
-        int default_short_break_minutes
-        int default_total_cycles
+        text[] motivational_messages "1-20개"
+        int default_focus_minutes "1-120"
+        int default_short_break_minutes "0-60"
+        int default_total_cycles "1-10"
+        boolean keep_screen_awake
         timestamptz updated_at
     }
 
     CATEGORIES ||--o{ TASKS : "분류"
-    TASKS |o--o{ SESSIONS : "집중 기록 (nullable)"
+    TASKS |o--o{ SESSIONS : "기록"
 ```
 
-`focus_periods`는 정규화하지 않고 `jsonb`로 내장한다 — 항상 부모 세션과 함께만 조회/집계되어 별도 테이블화 이득이 없다(`packages/shared/src/lib/focusPeriods.ts`, `dashboard.ts`). 정규화 규칙: 5초 미만 구간 드롭, 5초 이하 일시정지로 나뉜 인접 구간 병합, 최대 100개 상한.
+| 테이블 | 역할 |
+|---|---|
+| categories | 작업 분류, 유저당 최대 10개 |
+| tasks | 집중할 대상, 제목과 카테고리만 보관 |
+| sessions | 타이머 한 번의 실행 기록 |
+| settings | 유저당 1행, 타이머 기본값과 알림, 메시지 설정 |
 
-TypeScript 인터페이스는 `types/models.ts`(웹)/`types/*.ts`(모바일), Zod 스키마는 `types/schemas.ts`에 대응한다. 필드 상세 제약: [docs/guides/data-models.md](../guides/data-models.md)
+## 설계 결정
 
----
+**계정 격리를 DB에서 강제**
+- 모든 테이블에 RLS를 걸어 본인 행만 읽고 쓸 수 있게 함
+- `user_id` 기본값을 `auth.uid()`로 두어 클라이언트가 소유자를 따로 보내지 않아도 되고, 다른 사람의 id로 쓰려는 요청은 RLS가 막음
 
-## RLS 및 트리거
+**집중 시간은 별도 컬럼으로 저장**
+- `ended_at - started_at`은 일시정지가 포함된 경과 시간이라 집계에 쓰지 않음
+- 실제 집중 시간 `focus_seconds`를 따로 저장하고 모든 통계는 이 값만 사용
 
-- 전 테이블 `select`/`insert`/`update`/`delete`를 `auth.uid() = user_id`로 제한, `authenticated` 롤에만 권한 부여(로그인 필수, `anon` 권한 없음)
-- `tasks.category_id`는 `on delete restrict` — 참조하는 task가 있으면 카테고리 삭제가 막힌다(웹/앱 UX에서 안내)
-- `sessions.task_id`는 `on delete set null` — 작업 삭제 시 세션은 "미분류"로 남는다
-- `handle_new_user()` 트리거: 신규 계정 생성 시 기본 카테고리 5개 + 기본 `settings` 1행을 원자적으로 시딩(닉네임은 카카오 프로필 닉네임 또는 이메일 로컬 파트)
+**집중 구간은 jsonb로 내장**
+- 집중 구간은 항상 기록과 함께 조회하고 따로 조회할 일이 없어 별도 테이블 대신 배열로 저장
+- 저장하기 전에 5초 미만 구간은 버리고, 5초 이하로 잠깐 멈춘 구간은 하나로 합쳐 최대 100개까지만 저장
 
----
+**삭제 정책으로 기록 보존**
+- 작업을 지워도 기록은 남기고 미분류로 전환 — `on delete set null`
+- 작업이 쓰고 있는 카테고리는 삭제 불가 — `on delete restrict`
 
-## 기기 로컬 저장소 (Supabase 미러링 아님)
+**입력 제약을 클라이언트와 DB에 이중 적용**
+- 길이, 범위, 개수 제약을 Zod 스키마와 DB CHECK에 같은 값으로 설정
+- DB 제약이 Zod보다 엄격하지 않게 맞춰 정상 입력이 DB에서 거부되는 일이 없게 함
+- 카테고리 개수처럼 여러 행에 걸친 제약은 CHECK로 표현할 수 없어 트리거로 강제
 
-Task/Category/Session/AppSettings는 Supabase가 단일 진실 원천이다. 기기 로컬 저장소에는 새로고침/재시작 복구용 활성 타이머 스냅샷과 테마만 남는다 — 키 목록과 검증 패턴은 [docs/guides/data-models.md](../guides/data-models.md) 참조.
+**전체 기록이 필요한 통계는 RPC로 계산**
+- 스트릭, 월간 히트맵, 직전 기간 비교, 가장 바쁜 요일은 `get_dashboard_summary`에서 계산
+- 날짜 경계는 서버 시계가 아닌 사용자 시간대 기준
+- 호출한 사용자의 권한으로 실행돼 RLS가 그대로 적용됨
 
----
+**가입 시 기본 데이터 자동 생성**
+- 회원가입 트리거가 기본 카테고리 5개와 설정 1행을 한 트랜잭션에서 생성
 
-## 참조
+## 보조 테이블
 
-- 마이그레이션 원본: `supabase/migrations/`
-- 데이터 모델 상세(타입/기본값/localStorage 키): [docs/guides/data-models.md](../guides/data-models.md)
+- `email_check_rate_limits` — 가입 여부 확인 API의 IP 기반 호출 제한, 서비스 키로만 접근
