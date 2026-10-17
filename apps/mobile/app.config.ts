@@ -42,10 +42,6 @@ const config: ExpoConfig = {
       'android.permission.READ_MEDIA_AUDIO',
     ],
   },
-  web: {
-    output: 'static',
-    favicon: './assets/images/favicon.png',
-  },
   plugins: [
     'expo-router',
     [
